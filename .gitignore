@@ -1,0 +1,5 @@
+build
+composer.lock
+docs
+vendor
+tests/temp
