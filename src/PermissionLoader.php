@@ -4,6 +4,7 @@ namespace Spatie\Permission;
 
 use Exception;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Log;
 use Spatie\Permission\Models\Permission;
 
 class PermissionLoader
@@ -27,7 +28,7 @@ class PermissionLoader
                 });
             }
         } catch (Exception $e) {
-            \Log::alert('Could not register permissions');
+            Log::alert('Could not register permissions');
         }
     }
 
