@@ -1,5 +1,5 @@
 <?php
-namespace Spatie\Permission\models;
+namespace Spatie\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
