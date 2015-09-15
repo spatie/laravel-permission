@@ -19,7 +19,9 @@ $role->givePermissionTo('edit articles');
 
 $user->assignRole('writer');
 
-$user->can('edit articles');
+$user->can('edit articles') //returns true;
+
+$user->hasRole('writer') //returns true;
 ```
 
 Spatie is webdesign agency in Antwerp, Belgium. You'll find an overview of all our open source projects [on our website](https://spatie.be/opensource).
@@ -54,7 +56,48 @@ php artisan migrate
 
 ## Usage
 
+This package allows for users to be associated with roles. Permissions can be associated with roles.
+A `Role` and a `Permission` are regular Eloquent-models. They can have a name and can be created like this:
 
+```php
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+
+$role = Role::create(['name' => 'writer']);
+$permission = Permission::create(['name' => 'create-articles']);
+```
+
+###Roles
+A role can be associated with a user:
+
+```php
+$user->addRole('writer');
+```
+
+The `addRole`-function can accept a string or a `Spatie\Permission\Models\Role`-object;
+
+You can determine if a user has a certain role:
+
+```php
+$user->hasRole('writer');
+```
+
+The `addRole` and `hasRole`-functions can accept a string or a `Spatie\Permission\Models\Role`-object;
+
+###Permissions
+A permission can be associated with a role:
+
+```php
+$role->givePermissionTo('create-articles');
+```
+The `givePermissionTo`-function can accept a string or a `Spatie\Permission\Models\Permission`-object;
+
+Saved permission and roles will be registered with the `Illuminate\Auth\Access\Gate`-class. So you can
+test if a user has a permission with Laravel's default `can`-function.
+
+```php
+$user->can('create-articles');
+``` 
 
 ## Change log
 
