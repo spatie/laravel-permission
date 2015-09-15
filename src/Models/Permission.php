@@ -1,4 +1,5 @@
 <?php
+
 namespace Spatie\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -6,7 +7,6 @@ use Spatie\Permission\RefreshesPermissionCache;
 
 class Permission extends Model
 {
-
     use RefreshesPermissionCache;
     /**
      * A permission can be applied to roles.

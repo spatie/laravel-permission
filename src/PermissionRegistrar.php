@@ -27,6 +27,9 @@ class PermissionRegistrar
         $this->cache = $cache;
     }
 
+    /**
+     *  Register the permissions.
+     */
     public function registerPermissions()
     {
         try {
@@ -40,22 +43,23 @@ class PermissionRegistrar
         }
     }
 
+    /**
+     *  Forget the cached permissions.
+     */
     public function forgetCachedPermissions()
     {
         $this->cache->forget($this->cacheKey);
     }
 
+    /**
+     * Get the current permissions.
+     *
+     * @return mixed
+     */
     protected function getPermissions()
     {
-        return $this->cache->rememberForever($this->cacheKey, function() {
+        return $this->cache->rememberForever($this->cacheKey, function () {
             return Permission::with('roles')->get();
         });
-
-
-
-
-
-
-
     }
 }

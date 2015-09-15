@@ -2,23 +2,26 @@
 
 namespace Spatie\Permission;
 
-trait RefreshesPermissionCache {
-
+trait RefreshesPermissionCache
+{
     public static function bootRefreshesPermissionCache()
     {
-        static::created(function($model) {
+        static::created(function ($model) {
             $model->forgetCachedPermissions();
         });
 
-        static::updated(function($model) {
+        static::updated(function ($model) {
             $model->forgetCachedPermissions();
         });
 
-        static::deleted(function($model) {
+        static::deleted(function ($model) {
             $model->forgetCachedPermissions();
         });
     }
 
+    /**
+     *  Forget the cached permissions.
+     */
     public function forgetCachedPermissions()
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
