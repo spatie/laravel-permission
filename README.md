@@ -121,7 +121,7 @@ If you discover any security related issues, please email [freek@spatie.be](mail
 - [All Contributors](../../contributors)
 
 This package is heavily based on [Jeffrey Way](https://twitter.com/jeffrey_way)'s awesome [Laracasts](https://laracasts.com)-lesson 
-on [roles and persmissions](https://laracasts.com/series/whats-new-in-laravel-5-1/episodes/16). His original code 
+on [roles and permissions](https://laracasts.com/series/whats-new-in-laravel-5-1/episodes/16). His original code 
 can be found [in this repo on GitHub](https://github.com/laracasts/laravel-5-roles-and-permissions-demo).
  
 
