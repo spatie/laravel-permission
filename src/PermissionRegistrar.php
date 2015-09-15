@@ -54,7 +54,7 @@ class PermissionRegistrar
     /**
      * Get the current permissions.
      *
-     * @return mixed
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     protected function getPermissions()
     {

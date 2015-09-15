@@ -24,7 +24,7 @@ class Role extends Model
      *
      * @param  $permission
      *
-     * @return mixed
+     * @return this
      */
     public function givePermissionTo($permission)
     {
@@ -32,8 +32,10 @@ class Role extends Model
             $permission = Permission::whereName($permission)->firstOrFail();
         }
 
+        $this->permissions()->save($permission);
+
         $this->forgetCachedPermissions();
 
-        return $this->permissions()->save($permission);
+        return $this;
     }
 }
