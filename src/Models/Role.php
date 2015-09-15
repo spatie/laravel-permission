@@ -9,6 +9,8 @@ class Role extends Model
 {
     use RefreshesPermissionCache;
 
+    public $guarded = ['id'];
+
     /**
      * A role may be given various permissions.
      *

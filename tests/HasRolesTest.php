@@ -2,6 +2,8 @@
 
 namespace Spatie\Permission\Test;
 
+use Spatie\Permission\Models\Role;
+
 class HasRolesTest extends TestCase
 {
     /**
@@ -37,11 +39,17 @@ class HasRolesTest extends TestCase
     /**
      * @test
      */
-    public function it_can_determine_if_a_user_has_multiple_roles()
+    public function it_can_determine_if_a_user_has_one_of_the_given_roles()
     {
+        Role::create(['name' => 'second role']);
+
+        $this->assertFalse($this->testUser->hasRole(Role::all()));
+
         $this->testUser->assignRole($this->testRole);
 
-        $this->assertTrue($this->testUser->hasRole($this->testUser->roles));
+        $this->testUser = User::find($this->testUser->id);
+
+        $this->assertTrue($this->testUser->hasRole(Role::all()));
     }
 
     /**

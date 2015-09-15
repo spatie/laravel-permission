@@ -33,7 +33,7 @@ trait HasRoles
         $this->roles()->save($role);
     }
     /**
-     * Determine if the user has the given role.
+     * Determine if the user has (one of) the given role(s).
      *
      * @param string|Role|Collection $roles
      *

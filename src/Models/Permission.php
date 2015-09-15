@@ -8,6 +8,9 @@ use Spatie\Permission\RefreshesPermissionCache;
 class Permission extends Model
 {
     use RefreshesPermissionCache;
+
+    public $guarded = ['id'];
+
     /**
      * A permission can be applied to roles.
      *
