@@ -80,7 +80,7 @@ You can determine if a user has a certain role:
 $user->hasRole('writer');
 ```
 
-The `assignRole` and `hasRole`-functions can accept a string or a `Spatie\Permission\Models\Role`-object;
+The `assignRole` and `hasRole`-functions can accept a string or a `Spatie\Permission\Models\Role`-object.
 
 ###Permissions
 A permission can be associated with a role:
@@ -88,7 +88,7 @@ A permission can be associated with a role:
 ```php
 $role->givePermissionTo('create-articles');
 ```
-The `givePermissionTo`-function can accept a string or a `Spatie\Permission\Models\Permission`-object;
+The `givePermissionTo`-function can accept a string or a `Spatie\Permission\Models\Permission`-object.
 
 Saved permission and roles will be registered with the `Illuminate\Auth\Access\Gate`-class. So you can
 test if a user has a permission with Laravel's default `can`-function.

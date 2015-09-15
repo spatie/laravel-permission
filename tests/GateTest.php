@@ -2,6 +2,8 @@
 
 namespace Spatie\Permission\Test;
 
+use Spatie\Permission\Models\Permission;
+
 class GateTest extends TestCase
 {
     /**
