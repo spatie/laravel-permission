@@ -87,21 +87,9 @@ abstract class TestCase extends Orchestra
 
         (new \CreatePermissionTables())->up();
 
-        $user = new User();
-        $user->email = 'test@user.com';
-        $user->save();
-
-        $role = new Role();
-        $role->name = 'testRole';
-        $role->save();
-
-        $permission = new Permission();
-        $permission->name = 'edit-articles';
-        $permission->save();
-
-        $permission = new Permission();
-        $permission->name = 'edit-news';
-        $permission->save();
+        User::create(['email' => 'test@user.com']);
+        Role::create(['name' => 'testRole']);
+        Permission::create(['name' => 'edit-news']);
     }
 
     /**
