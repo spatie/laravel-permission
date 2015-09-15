@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission;
 
+use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -19,7 +20,7 @@ trait HasRoles
     /**
      * Assign the given role to the user.
      *
-     * @param  $role
+     * @param string|Role $role
      *
      * @return mixed
      */
@@ -34,21 +35,21 @@ trait HasRoles
     /**
      * Determine if the user has the given role.
      *
-     * @param mixed $role
+     * @param string|Role|Collection $roles
      *
      * @return bool
      */
-    public function hasRole($role)
+    public function hasRole($roles)
     {
-        if (is_string($role)) {
-            return $this->roles->contains('name', $role);
+        if (is_string($roles)) {
+            return $this->roles->contains('name', $roles);
         }
 
-        if ($role instanceof Role) {
-            return $this->roles->contains('id', $role->id);
+        if ($roles instanceof Role) {
+            return $this->roles->contains('id', $roles->id);
         }
 
-        return !!$role->intersect($this->roles)->count();
+        return !!$roles->intersect($this->roles)->count();
     }
 
     /**

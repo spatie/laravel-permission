@@ -29,17 +29,25 @@ class PermissionRegistrar
 
     /**
      *  Register the permissions.
+     *
+     * @return boolean
      */
     public function registerPermissions()
     {
         try {
-            foreach ($this->getPermissions() as $permission) {
+            $this->getPermissions()->map(function ($permission) {
+
                 $this->gate->define($permission->name, function ($user) use ($permission) {
                     return $user->hasRole($permission->roles);
                 });
-            }
+
+            });
+
+            return true;
         } catch (Exception $e) {
             Log::alert('Could not register permissions');
+
+            return false;
         }
     }
 

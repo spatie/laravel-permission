@@ -15,7 +15,7 @@ class GateTest extends TestCase
 
         $this->assertTrue($this->testUser->hasPermission($this->testPermission));
 
-        $this->reloadPermissions();
+        $this->assertTrue($this->reloadPermissions());
 
         $this->assertTrue($this->testUser->can('edit-articles'));
 

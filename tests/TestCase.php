@@ -37,7 +37,7 @@ abstract class TestCase extends Orchestra
 
         $this->testUser = User::first();
         $this->testRole = Role::first();
-        $this->testPermission = Permission::first();
+        $this->testPermission = Permission::find(1);
     }
 
     /**
@@ -53,6 +53,8 @@ abstract class TestCase extends Orchestra
     }
 
     /**
+     * Set up the environment.
+     *
      * @param \Illuminate\Foundation\Application $app
      */
     protected function getEnvironmentSetUp($app)
@@ -68,6 +70,8 @@ abstract class TestCase extends Orchestra
     }
 
     /**
+     * Set up the database.
+     *
      * @param \Illuminate\Foundation\Application $app
      */
     protected function setUpDatabase($app)
@@ -94,8 +98,17 @@ abstract class TestCase extends Orchestra
         $permission = new Permission();
         $permission->name = 'edit-articles';
         $permission->save();
+
+        $permission = new Permission();
+        $permission->name = 'edit-news';
+        $permission->save();
     }
 
+    /**
+     * Initialize the directory.
+     *
+     * @param string $directory
+     */
     protected function initializeDirectory($directory)
     {
         if (File::isDirectory($directory)) {
@@ -104,13 +117,25 @@ abstract class TestCase extends Orchestra
         File::makeDirectory($directory);
     }
 
+    /**
+     * Get the temporary directory.
+     *
+     * @param string $suffix
+     *
+     * @return string
+     */
     public function getTempDirectory($suffix = '')
     {
         return __DIR__.'/temp'.($suffix == '' ? '' : '/'.$suffix);
     }
 
+    /**
+     * Reload the permissions.
+     *
+     * @return bool
+     */
     protected function reloadPermissions()
     {
-        app(PermissionRegistrar::class)->registerPermissions();
+        return app(PermissionRegistrar::class)->registerPermissions();
     }
 }
