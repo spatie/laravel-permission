@@ -31,12 +31,30 @@ You can install the package via composer:
 $ composer require spatie/laravel-permission
 ```
 
+This service provider must be installed.
+```php
+// config/app.php
+'providers' => [
+    ...
+    Spatie\Permission\PermissionServiceProvider::class,
+];
+```
+
+You can publish the migration with:
+```bash
+php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="migrations"
+```
+
+After the migration has been published you can create the role- and permission-tables by
+running the migrations:
+
+```bash
+php artisan migrate
+```
+
 ## Usage
 
-``` php
-$skeleton = new Spatie\Skeleton();
-echo $skeleton->echoPhrase('Hello, Spatie!');
-```
+
 
 ## Change log
 
@@ -54,7 +72,7 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 ## Security
 
-If you discover any security related issues, please email freek@spatie.be instead of using the issue tracker.
+If you discover any security related issues, please email [freek@spatie.be](mailto:freek@spatie.be) instead of using the issue tracker.
 
 ## Credits
 
