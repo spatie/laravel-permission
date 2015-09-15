@@ -26,12 +26,21 @@ trait HasRoles
      */
     public function assignRole($role)
     {
-        if (is_string($role)) {
-            $role = Role::whereName($role)->firstOrFail();
-        }
-
-        $this->roles()->save($role);
+        $this->roles()->save($this->getStoredRole($role));
     }
+
+    /**
+     * Revoke the given role from the user.
+     *
+     * @param string|Role $role
+     *
+     * @return mixed
+     */
+    public function removeRole($role)
+    {
+        $this->roles()->detach($this->getStoredRole($role));
+    }
+
     /**
      * Determine if the user has (one of) the given role(s).
      *
@@ -66,5 +75,19 @@ trait HasRoles
         }
 
         return $this->hasRole($permission->roles);
+    }
+
+    /**
+     * @param $role
+     *
+     * @return mixed
+     */
+    protected function getStoredRole($role)
+    {
+        if (is_string($role)) {
+            return Role::whereName($role)->firstOrFail();
+        }
+
+        return $role;
     }
 }

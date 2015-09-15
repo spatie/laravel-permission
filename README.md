@@ -54,6 +54,10 @@ running the migrations:
 php artisan migrate
 ```
 
+Finally add the `Spatie\Permission\HasRoles`-trait to the User model.
+
+
+
 ## Usage
 
 This package allows for users to be associated with roles. Permissions can be associated with roles.
@@ -80,7 +84,13 @@ You can determine if a user has a certain role:
 $user->hasRole('writer');
 ```
 
-The `assignRole` and `hasRole`-functions can accept a string or a `Spatie\Permission\Models\Role`-object.
+A role can be removed from a user:
+
+```php
+$user->removeRole('writer');
+```
+
+The `assignRole`, `hasRole`, and `removeRole`-functions can accept a string or a `Spatie\Permission\Models\Role`-object.
 
 ###Permissions
 A permission can be associated with a role:
@@ -88,7 +98,14 @@ A permission can be associated with a role:
 ```php
 $role->givePermissionTo('create-articles');
 ```
-The `givePermissionTo`-function can accept a string or a `Spatie\Permission\Models\Permission`-object.
+
+A permission can be revoked:
+
+```php
+$role->revokePermissionTo('create-articles');
+```
+
+The `givePermissionTo` and `revokePermissionTo`-functions can accept a string or a `Spatie\Permission\Models\Permission`-object.
 
 Saved permission and roles will be registered with the `Illuminate\Auth\Access\Gate`-class. So you can
 test if a user has a permission with Laravel's default `can`-function.

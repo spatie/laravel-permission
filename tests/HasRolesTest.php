@@ -17,11 +17,17 @@ class HasRolesTest extends TestCase
     /**
      * @test
      */
-    public function it_can_assign_a_role()
+    public function it_can_assign_and_remove_a_role()
     {
         $this->testUser->assignRole('testRole');
 
         $this->assertTrue($this->testUser->hasRole('testRole'));
+
+        $this->testUser->removeRole('testRole');
+
+        $this->testUser = User::find($this->testUser->id);
+
+        $this->assertFalse($this->testUser->hasRole('testRole'));
     }
 
     /**
@@ -70,6 +76,22 @@ class HasRolesTest extends TestCase
         $this->testUser->assignRole('testRole');
 
         $this->assertTrue($this->testUser->hasPermission('edit-articles'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_revoke_a_permission_from_a_role()
+    {
+        $this->testRole->givePermissionTo('edit-articles');
+
+        $this->testUser->assignRole('testRole');
+
+        $this->assertTrue($this->testUser->hasPermission('edit-articles'));
+
+        $this->testRole->revokePermissionTo('edit-articles');
+
+        $this->assertFalse($this->testUser->hasPermission('edit-articles'));
     }
 
     /**

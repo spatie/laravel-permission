@@ -30,14 +30,33 @@ class Role extends Model
      */
     public function givePermissionTo($permission)
     {
-        if (is_string($permission)) {
-            $permission = Permission::whereName($permission)->firstOrFail();
-        }
-
-        $this->permissions()->save($permission);
+        $this->permissions()->save($this->getStoredPermission($permission));
 
         $this->forgetCachedPermissions();
 
         return $this;
+    }
+
+    public function revokePermissionTo($permission)
+    {
+        $this->permissions()->detach($this->getStoredPermission($permission));
+
+        $this->forgetCachedPermissions();
+
+        return $this;
+    }
+
+    /**
+     * @param $permission
+     *
+     * @return mixed
+     */
+    protected function getStoredPermission($permission)
+    {
+        if (is_string($permission)) {
+            return Permission::whereName($permission)->firstOrFail();
+        }
+
+        return $permission;
     }
 }
