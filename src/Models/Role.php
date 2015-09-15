@@ -3,9 +3,12 @@
 namespace Spatie\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\RefreshesPermissionCache;
 
 class Role extends Model
 {
+    use RefreshesPermissionCache;
+
     /**
      * A role may be given various permissions.
      *
@@ -28,6 +31,8 @@ class Role extends Model
         if (is_string($permission)) {
             $permission = Permission::whereName($permission)->firstOrFail();
         }
+
+        $this->forgetCachedPermissions();
 
         return $this->permissions()->save($permission);
     }

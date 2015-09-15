@@ -9,9 +9,9 @@ class PermissionServiceProvider extends ServiceProvider
     /**
      * Bootstrap the application services.
      *
-     * @param PermissionLoader $permissionLoader
+     * @param PermissionRegistrar $permissionLoader
      */
-    public function boot(PermissionLoader $permissionLoader)
+    public function boot(PermissionRegistrar $permissionLoader)
     {
         if (!class_exists('CreatePermissionTables')) {
             // Publish the migration

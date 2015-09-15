@@ -7,7 +7,20 @@
 [![Quality Score](https://img.shields.io/scrutinizer/g/spatie/laravel-permission.svg?style=flat-square)](https://scrutinizer-ci.com/g/spatie/laravel-permission)
 [![Total Downloads](https://img.shields.io/packagist/dt/spatie/laravel-permission.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-permission)
 
-WORK IN PROGRESS!! DO NOT USE (YET)!!
+This package allows to save permissions and roles in a database. It is built upon the [Laravel's
+authorization functionality](http://laravel.com/docs/5.1/authorization) that 
+was [introduced in version 5.1.11](http://christoph-rumpel.com/2015/09/new-acl-features-in-laravel/)
+
+Once installed you can do stuff like this:
+
+```php
+//writer is an instance of Spatie\Permission\Models\Role
+$role->givePermissionTo('edit articles');
+
+$user->assignRole('writer');
+
+$user->can('edit articles');
+```
 
 Spatie is webdesign agency in Antwerp, Belgium. You'll find an overview of all our open source projects [on our website](https://spatie.be/opensource).
 
@@ -47,6 +60,10 @@ If you discover any security related issues, please email freek@spatie.be instea
 
 - [Freek Van der Herten](https://github.com/freekmurze)
 - [All Contributors](../../contributors)
+
+This package is heavily based on [Jeffrey Way](https://twitter.com/jeffrey_way)'s awesome [Laracasts](https://laracasts.com)-lesson 
+on [roles and persmissions](https://laracasts.com/series/whats-new-in-laravel-5-1/episodes/16).
+ 
 
 ## About Spatie
 Spatie is webdesign agency in Antwerp, Belgium. You'll find an overview of all our open source projects [on our website](https://spatie.be/opensource).

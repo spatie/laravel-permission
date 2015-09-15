@@ -4,19 +4,27 @@ namespace Spatie\Permission;
 
 use Exception;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Cache\Repository;
 use Log;
 use Spatie\Permission\Models\Permission;
 
-class PermissionLoader
+class PermissionRegistrar
 {
     /**
      * @var Gate
      */
     protected $gate;
+    /**
+     * @var Repository
+     */
+    private $cache;
 
-    public function __construct(Gate $gate)
+    private $cacheKey = 'spatie.permission.cache';
+
+    public function __construct(Gate $gate, Repository $cache)
     {
         $this->gate = $gate;
+        $this->cache = $cache;
     }
 
     public function registerPermissions()
@@ -32,8 +40,22 @@ class PermissionLoader
         }
     }
 
-    public function getPermissions()
+    public function forgetCachedPermissions()
     {
-        return Permission::with('roles')->get();
+        $this->cache->forget($this->cacheKey);
+    }
+
+    protected function getPermissions()
+    {
+        return $this->cache->rememberForever($this->cacheKey, function() {
+            return Permission::with('roles')->get();
+        });
+
+
+
+
+
+
+
     }
 }

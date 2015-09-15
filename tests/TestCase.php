@@ -6,7 +6,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-use Spatie\Permission\PermissionLoader;
+use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\PermissionServiceProvider;
 use File;
 
@@ -111,6 +111,6 @@ abstract class TestCase extends Orchestra
 
     protected function reloadPermissions()
     {
-        app(PermissionLoader::class)->registerPermissions();
+        app(PermissionRegistrar::class)->registerPermissions();
     }
 }
