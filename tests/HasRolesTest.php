@@ -22,19 +22,16 @@ class HasRolesTest extends TestCase
         $this->assertTrue($this->testUser->hasRole('testRole'));
     }
 
-
     /**
      * @test
      */
     public function it_can_assign_a_role_using_an_object()
     {
-        /* TO DO: make this test work
         $this->testUser->assignRole($this->testRole);
 
         $this->testUser = User::find($this->testUser->id);
 
         $this->assertTrue($this->testUser->hasRole($this->testRole));
-        */
     }
 
     /**

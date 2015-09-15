@@ -44,12 +44,9 @@ trait HasRoles
             return $this->roles->contains('name', $role);
         }
 
-/* TO DO: make this work
         if ($role instanceof Role) {
-            dd($this->roles, 'role');
-            return $this->roles->contains('id', $role);
+            return $this->roles->contains('id', $role->id);
         }
-*/
 
         return !!$role->intersect($this->roles)->count();
     }
