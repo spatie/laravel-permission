@@ -141,6 +141,10 @@ This package is heavily based on [Jeffrey Way](https://twitter.com/jeffrey_way)'
 on [roles and permissions](https://laracasts.com/series/whats-new-in-laravel-5-1/episodes/16). His original code 
 can be found [in this repo on GitHub](https://github.com/laracasts/laravel-5-roles-and-permissions-demo).
  
+## Alternatives
+
+- [https://github.com/BeatSwitch/lock-laravel](Lock)
+- [https://github.com/Zizaco/entrust](Entrust)
 
 ## About Spatie
 Spatie is webdesign agency in Antwerp, Belgium. You'll find an overview of all our open source projects [on our website](https://spatie.be/opensource).
