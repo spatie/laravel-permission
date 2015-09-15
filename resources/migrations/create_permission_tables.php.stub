@@ -25,8 +25,8 @@ class CreatePermissionTables extends Migration
         });
 
         Schema::create('permission_role', function (Blueprint $table) {
-            $table->integer('permission_id')->unsigned()->nullable();
-            $table->integer('role_id')->unsigned()->nullable();
+            $table->integer('permission_id')->unsigned();
+            $table->integer('role_id')->unsigned();
 
             $table->foreign('permission_id')
                 ->references('id')
@@ -43,7 +43,7 @@ class CreatePermissionTables extends Migration
 
         Schema::create('role_user', function (Blueprint $table) {
             $table->integer('role_id')->unsigned();
-            $table->integer('user_id')->unsigned()->nullable();
+            $table->integer('user_id')->unsigned();
 
             $table->foreign('role_id')
                 ->references('id')
@@ -66,6 +66,7 @@ class CreatePermissionTables extends Migration
      */
     public function down()
     {
+        Schema::dropTable('role_user');
         Schema::dropTable('permission_role');
         Schema::dropTable('roles');
         Schema::dropTable('permissions');
