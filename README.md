@@ -71,10 +71,8 @@ $permission = Permission::create(['name' => 'create-articles']);
 A role can be associated with a user:
 
 ```php
-$user->addRole('writer');
+$user->assignRole('writer');
 ```
-
-The `addRole`-function can accept a string or a `Spatie\Permission\Models\Role`-object;
 
 You can determine if a user has a certain role:
 
@@ -82,7 +80,7 @@ You can determine if a user has a certain role:
 $user->hasRole('writer');
 ```
 
-The `addRole` and `hasRole`-functions can accept a string or a `Spatie\Permission\Models\Role`-object;
+The `assignRole` and `hasRole`-functions can accept a string or a `Spatie\Permission\Models\Role`-object;
 
 ###Permissions
 A permission can be associated with a role:
