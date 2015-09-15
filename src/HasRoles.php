@@ -2,7 +2,6 @@
 
 namespace Spatie\Permission;
 
-use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -44,7 +43,7 @@ trait HasRoles
     /**
      * Determine if the user has (one of) the given role(s).
      *
-     * @param string|Role|Collection $roles
+     * @param string|Role|\Illuminate\Support\Collection $roles
      *
      * @return bool
      */
