@@ -24,21 +24,21 @@ class CreatePermissionTables extends Migration
             $table->timestamps();
         });
 
-        Schema::create('role_has_permissions', function (Blueprint $table) {
+        Schema::create('user_has_permissions', function (Blueprint $table) {
+            $table->integer('user_id')->unsigned();
             $table->integer('permission_id')->unsigned();
-            $table->integer('role_id')->unsigned();
+
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
 
             $table->foreign('permission_id')
                 ->references('id')
                 ->on('permissions')
                 ->onDelete('cascade');
 
-            $table->foreign('role_id')
-                ->references('id')
-                ->on('roles')
-                ->onDelete('cascade');
-
-            $table->primary(['permission_id', 'role_id']);
+            $table->primary(['user_id', 'permission_id']);
         });
 
         Schema::create('user_has_roles', function (Blueprint $table) {
@@ -56,6 +56,23 @@ class CreatePermissionTables extends Migration
                 ->onDelete('cascade');
 
             $table->primary(['role_id', 'user_id']);
+
+            Schema::create('role_has_permissions', function (Blueprint $table) {
+                $table->integer('permission_id')->unsigned();
+                $table->integer('role_id')->unsigned();
+
+                $table->foreign('permission_id')
+                    ->references('id')
+                    ->on('permissions')
+                    ->onDelete('cascade');
+
+                $table->foreign('role_id')
+                    ->references('id')
+                    ->on('roles')
+                    ->onDelete('cascade');
+
+                $table->primary(['permission_id', 'role_id']);
+            });
         });
     }
 
@@ -66,8 +83,9 @@ class CreatePermissionTables extends Migration
      */
     public function down()
     {
-        Schema::drop('role_user');
-        Schema::drop('permission_role');
+        Schema::drop('role_has_permissions');
+        Schema::drop('user_has_roles');
+        Schema::drop('user_has_permissions');
         Schema::drop('roles');
         Schema::drop('permissions');
     }

@@ -1,12 +1,15 @@
 <?php
 
-namespace Spatie\Permission;
+namespace Spatie\Permission\Traits;
 
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 trait HasRoles
 {
+    use HasPermissions;
+    use RefreshesPermissionCache;
+
     /**
      * A user may have multiple roles.
      *
@@ -16,6 +19,17 @@ trait HasRoles
     {
         return $this->belongsToMany(Role::class, 'user_has_roles');
     }
+
+    /**
+     * A user may have multiple direct permissions.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'user_has_permissions');
+    }
+
     /**
      * Assign the given role to the user.
      *
@@ -73,7 +87,21 @@ trait HasRoles
             $permission = Permission::findByName($permission);
         }
 
+        return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
+    }
+
+    protected function hasPermissionViaRole(Permission $permission)
+    {
         return $this->hasRole($permission->roles);
+    }
+
+    protected function hasDirectPermission(Permission $permission)
+    {
+        if (is_string($permission)) {
+            $permission = Permission::findByName($permission);
+        }
+
+        return $this->permissions->contains('id', $permission->id);
     }
 
     /**

@@ -4,7 +4,7 @@ namespace Spatie\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
-use Spatie\Permission\RefreshesPermissionCache;
+use Spatie\Permission\Traits\RefreshesPermissionCache;
 
 class Permission extends Model
 {

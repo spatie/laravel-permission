@@ -4,10 +4,12 @@ namespace Spatie\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
-use Spatie\Permission\RefreshesPermissionCache;
+use Spatie\Permission\Traits\HasPermissions;
+use Spatie\Permission\Traits\RefreshesPermissionCache;
 
 class Role extends Model
 {
+    use HasPermissions;
     use RefreshesPermissionCache;
 
     public $guarded = ['id'];
@@ -20,45 +22,6 @@ class Role extends Model
     public function permissions()
     {
         return $this->belongsToMany(Permission::class, 'role_has_permissions');
-    }
-
-    /**
-     * Grant the given permission to a role.
-     *
-     * @param  $permission
-     *
-     * @return this
-     */
-    public function givePermissionTo($permission)
-    {
-        $this->permissions()->save($this->getStoredPermission($permission));
-
-        $this->forgetCachedPermissions();
-
-        return $this;
-    }
-
-    public function revokePermissionTo($permission)
-    {
-        $this->permissions()->detach($this->getStoredPermission($permission));
-
-        $this->forgetCachedPermissions();
-
-        return $this;
-    }
-
-    /**
-     * @param $permission
-     *
-     * @return mixed
-     */
-    protected function getStoredPermission($permission)
-    {
-        if (is_string($permission)) {
-            return Permission::findByName($permission);
-        }
-
-        return $permission;
     }
 
     /**

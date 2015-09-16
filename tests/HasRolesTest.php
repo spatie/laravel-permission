@@ -25,7 +25,7 @@ class HasRolesTest extends TestCase
 
         $this->testUser->removeRole('testRole');
 
-        $this->testUser = User::find($this->testUser->id);
+        $this->refreshTestUser();
 
         $this->assertFalse($this->testUser->hasRole('testRole'));
     }
@@ -37,7 +37,7 @@ class HasRolesTest extends TestCase
     {
         $this->testUser->assignRole($this->testRole);
 
-        $this->testUser = User::find($this->testUser->id);
+        $this->refreshTestUser();
 
         $this->assertTrue($this->testUser->hasRole($this->testRole));
     }
@@ -53,7 +53,7 @@ class HasRolesTest extends TestCase
 
         $this->testUser->assignRole($this->testRole);
 
-        $this->testUser = User::find($this->testUser->id);
+        $this->refreshTestUser();
 
         $this->assertTrue($this->testUser->hasRole(Role::all()));
     }
@@ -104,5 +104,35 @@ class HasRolesTest extends TestCase
         $this->testUser->assignRole($this->testRole);
 
         $this->assertTrue($this->testUser->hasPermission($this->testPermission));
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_assign_a_permission_to_a_user()
+    {
+        $this->testUser->givePermissionTo($this->testPermission);
+
+        $this->refreshTestUser();
+
+        $this->assertTrue($this->testUser->hasPermission($this->testPermission));
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_revoke_a_permission_from_a_user()
+    {
+        $this->testUser->givePermissionTo($this->testPermission);
+
+        $this->refreshTestUser();
+
+        $this->assertTrue($this->testUser->hasPermission($this->testPermission));
+
+        $this->testUser->revokePermissionTo($this->testPermission);
+
+        $this->refreshTestUser();
+
+        $this->assertFalse($this->testUser->hasPermission($this->testPermission));
     }
 }

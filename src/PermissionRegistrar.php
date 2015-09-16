@@ -26,7 +26,7 @@ class PermissionRegistrar
     protected $cacheKey = 'spatie.permission.cache';
 
     /**
-     * @param Gate $gate
+     * @param Gate       $gate
      * @param Repository $cache
      */
     public function __construct(Gate $gate, Repository $cache)
@@ -46,7 +46,7 @@ class PermissionRegistrar
             $this->getPermissions()->map(function ($permission) {
 
                 $this->gate->define($permission->name, function ($user) use ($permission) {
-                    return $user->hasRole($permission->roles);
+                    return $user->hasPermission($permission);
                 });
 
             });

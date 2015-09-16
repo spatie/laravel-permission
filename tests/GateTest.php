@@ -10,13 +10,27 @@ class GateTest extends TestCase
     /**
      * @test
      */
-    public function it_can_determine_if_a_user_has_a_permission()
+    public function it_can_determine_if_a_user_has_a_permission_when_using_roles()
     {
         $this->testRole->givePermissionTo($this->testPermission);
 
         $this->testUser->assignRole($this->testRole);
 
         $this->assertTrue($this->testUser->hasPermission($this->testPermission));
+
+        $this->assertTrue($this->reloadPermissions());
+
+        $this->assertTrue($this->testUser->can('edit-articles'));
+
+        $this->assertFalse($this->testUser->can('non-existing-permission'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_determine_if_a_user_has_a_permission_when_direct_permissions()
+    {
+        $this->testUser->givePermissionTo($this->testPermission);
 
         $this->assertTrue($this->reloadPermissions());
 

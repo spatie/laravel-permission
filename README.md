@@ -14,14 +14,18 @@ was [introduced in version 5.1.11](http://christoph-rumpel.com/2015/09/new-acl-f
 Once installed you can do stuff like this:
 
 ```php
-//writer is an instance of Spatie\Permission\Models\Role
-$role->givePermissionTo('edit articles');
+//adding permissions to a user
+$user->givePermissionTo('edit articles');
 
+//adding permissions via a role
 $user->assignRole('writer');
+$user2->assignRole('writer');
+$role->assignPermission('edit articles');
+```
 
-$user->can('edit articles') //returns true;
-
-$user->hasRole('writer') //returns true;
+You can test if a user has a permission with Laravel's default `can`-function.
+```php
+$user->can('edit articles');
 ```
 
 Spatie is webdesign agency in Antwerp, Belgium. You'll find an overview of all our open source projects [on our website](https://spatie.be/opensource).
@@ -68,20 +72,38 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
 $role = Role::create(['name' => 'writer']);
-$permission = Permission::create(['name' => 'create-articles']);
+$permission = Permission::create(['name' => 'edit articles']);
 ```
 
-###Roles
-A role can be associated with a user:
+###Using permissions
+A permission can be given to a user:
+
+```php
+$user->givePermissionTo('edit articles');
+```
+
+A permission can be revoked from a user:
+
+```php
+$user->revokePermissionTo('edit articles');
+```
+
+You can test if a user has a permission:
+```php
+$user->hasPermission('edit articles');
+```
+
+Saved permissions will be registered with the `Illuminate\Auth\Access\Gate`-class. So you can
+test if a user has a permission with Laravel's default `can`-function.
+```php
+$user->can('edit articles');
+```
+
+###Using roles and permissions
+A role can be assigned to a user:
 
 ```php
 $user->assignRole('writer');
-```
-
-You can determine if a user has a certain role:
-
-```php
-$user->hasRole('writer');
 ```
 
 A role can be removed from a user:
@@ -89,29 +111,31 @@ A role can be removed from a user:
 ```php
 $user->removeRole('writer');
 ```
+You can determine if a user has a certain role:
+
+```php
+$user->hasRole('writer');
+```
 
 The `assignRole`, `hasRole`, and `removeRole`-functions can accept a string or a `Spatie\Permission\Models\Role`-object.
 
-###Permissions
-A permission can be associated with a role:
+A permission can be given to a role:
 
 ```php
-$role->givePermissionTo('create-articles');
+$role->givePermissionTo('edit articles');
 ```
 
-A permission can be revoked:
+A permission can be revoked from a role:
 
 ```php
-$role->revokePermissionTo('create-articles');
+$role->revokePermissionTo('edit articles');
 ```
 
 The `givePermissionTo` and `revokePermissionTo`-functions can accept a string or a `Spatie\Permission\Models\Permission`-object.
 
-Saved permission and roles will be registered with the `Illuminate\Auth\Access\Gate`-class. So you can
-test if a user has a permission with Laravel's default `can`-function.
-
+Saved permission and roles are also registered with the `Illuminate\Auth\Access\Gate`-class. 
 ```php
-$user->can('create-articles');
+$user->can('edit articles');
 ``` 
 
 ## Change log

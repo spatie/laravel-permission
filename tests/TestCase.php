@@ -127,4 +127,12 @@ abstract class TestCase extends Orchestra
     {
         return app(PermissionRegistrar::class)->registerPermissions();
     }
+
+    /**
+     * Refresh the testuser.
+     */
+    public function refreshTestUser()
+    {
+        $this->testUser = User::find($this->testUser->id);
+    }
 }
