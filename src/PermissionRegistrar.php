@@ -14,13 +14,21 @@ class PermissionRegistrar
      * @var Gate
      */
     protected $gate;
+
     /**
      * @var Repository
      */
-    private $cache;
+    protected $cache;
 
-    private $cacheKey = 'spatie.permission.cache';
+    /**
+     * @var string
+     */
+    protected $cacheKey = 'spatie.permission.cache';
 
+    /**
+     * @param Gate $gate
+     * @param Repository $cache
+     */
     public function __construct(Gate $gate, Repository $cache)
     {
         $this->gate = $gate;

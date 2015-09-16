@@ -14,7 +14,7 @@ trait HasRoles
      */
     public function roles()
     {
-        return $this->belongsToMany(Role::class);
+        return $this->belongsToMany(Role::class, 'user_has_roles');
     }
     /**
      * Assign the given role to the user.
