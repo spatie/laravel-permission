@@ -21,7 +21,7 @@ trait HasRoles
      *
      * @param string|Role $role
      *
-     * @return mixed
+     * @return Role
      */
     public function assignRole($role)
     {
@@ -79,7 +79,7 @@ trait HasRoles
     /**
      * @param $role
      *
-     * @return mixed
+     * @return Role
      */
     protected function getStoredRole($role)
     {
