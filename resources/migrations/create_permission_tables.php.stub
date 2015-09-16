@@ -66,9 +66,9 @@ class CreatePermissionTables extends Migration
      */
     public function down()
     {
-        Schema::dropTable('role_user');
-        Schema::dropTable('permission_role');
-        Schema::dropTable('roles');
-        Schema::dropTable('permissions');
+        Schema::drop('role_user');
+        Schema::drop('permission_role');
+        Schema::drop('roles');
+        Schema::drop('permissions');
     }
 }
