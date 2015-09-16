@@ -169,7 +169,7 @@ can be found [in this repo on GitHub](https://github.com/laracasts/laravel-5-rol
 ## Alternatives
 
 - [BeatSwitch/lock-laravel](https://github.com/BeatSwitch/lock-laravel)
-- [Zizaco/entrust](https://github.com/Zizaco/entrust])
+- [Zizaco/entrust](https://github.com/Zizaco/entrust)
 
 ## About Spatie
 Spatie is webdesign agency in Antwerp, Belgium. You'll find an overview of all our open source projects [on our website](https://spatie.be/opensource).
