@@ -27,7 +27,7 @@ class Role extends Model
     /**
      * Find a role by it's name.
      *
-     * @param $name
+     * @param string $name
      *
      * @throws RoleDoesNotExist
      */

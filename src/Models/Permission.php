@@ -25,7 +25,7 @@ class Permission extends Model
     /**
      * Find a permission by it's name.
      *
-     * @param $name
+     * @param string $name
      *
      * @throws PermissionDoesNotExist
      */

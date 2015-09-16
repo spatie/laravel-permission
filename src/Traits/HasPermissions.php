@@ -11,7 +11,7 @@ trait HasPermissions
      *
      * @param  $permission
      *
-     * @return this
+     * @return HasPermissions
      */
     public function givePermissionTo($permission)
     {
@@ -27,7 +27,7 @@ trait HasPermissions
      *
      * @param $permission
      *
-     * @return $this
+     * @return HasPermissions
      */
     public function revokePermissionTo($permission)
     {
