@@ -35,9 +35,7 @@ class Role extends Model
     {
         $role = static::where('name', $name)->first();
 
-        if (!$role) {
-            throw new RoleDoesNotExist();
-        }
+        if (!$role) throw new RoleDoesNotExist();
 
         return $role;
     }

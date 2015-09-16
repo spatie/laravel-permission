@@ -33,9 +33,7 @@ class Permission extends Model
     {
         $permission = static::where('name', $name)->first();
 
-        if (!$permission) {
-            throw new PermissionDoesNotExist();
-        }
+        if (!$permission) throw new PermissionDoesNotExist();
 
         return $permission;
     }
