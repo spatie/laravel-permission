@@ -20,7 +20,8 @@ $user->givePermissionTo('edit articles');
 //adding permissions via a role
 $user->assignRole('writer');
 $user2->assignRole('writer');
-$role->assignPermission('edit articles');
+
+$role->givePermissionTo('edit articles');
 ```
 
 You can test if a user has a permission with Laravel's default `can`-function.
