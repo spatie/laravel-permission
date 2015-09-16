@@ -25,7 +25,7 @@ class Role extends Model
     }
 
     /**
-     * Find a role by it's name.
+     * Find a role by its name.
      *
      * @param string $name
      *
