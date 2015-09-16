@@ -23,7 +23,7 @@ class Permission extends Model
     }
 
     /**
-     * Find a permission by it's name.
+     * Find a permission by its name.
      *
      * @param string $name
      *
