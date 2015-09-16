@@ -57,7 +57,7 @@ trait HasRoles
             return $this->roles->contains('id', $roles->id);
         }
 
-        return !!$roles->intersect($this->roles)->count();
+        return (bool) !!$roles->intersect($this->roles)->count();
     }
 
     /**
@@ -70,7 +70,7 @@ trait HasRoles
     public function hasPermission($permission)
     {
         if (is_string($permission)) {
-            $permission = Permission::whereName($permission)->firstOrFail();
+            $permission = Permission::findByName($permission);
         }
 
         return $this->hasRole($permission->roles);
@@ -84,7 +84,7 @@ trait HasRoles
     protected function getStoredRole($role)
     {
         if (is_string($role)) {
-            return Role::whereName($role)->firstOrFail();
+            return Role::findByName($role);
         }
 
         return $role;

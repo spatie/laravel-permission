@@ -2,7 +2,8 @@
 
 namespace Spatie\Permission\Test;
 
-use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Exceptions\PermissionDoesNotExist;
+use Spatie\Permission\Exceptions\RoleDoesNotExist;
 
 class GateTest extends TestCase
 {
@@ -22,6 +23,26 @@ class GateTest extends TestCase
         $this->assertTrue($this->testUser->can('edit-articles'));
 
         $this->assertFalse($this->testUser->can('non-existing-permission'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_will_throw_an_exception_when_using_a_permission_that_does_not_exist()
+    {
+        $this->setExpectedException(PermissionDoesNotExist::class);
+
+        $this->testRole->givePermissionTo('create-evil-empire');
+    }
+
+    /**
+     * @test
+     */
+    public function it_will_throw_an_exception_when_assign_a_role_that_does_not_exist()
+    {
+        $this->setExpectedException(RoleDoesNotExist::class);
+
+        $this->testUser->assignRole('evil-emperor');
     }
 
     /**

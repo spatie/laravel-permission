@@ -3,6 +3,7 @@
 namespace Spatie\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\RefreshesPermissionCache;
 
 class Role extends Model
@@ -54,9 +55,27 @@ class Role extends Model
     protected function getStoredPermission($permission)
     {
         if (is_string($permission)) {
-            return Permission::whereName($permission)->firstOrFail();
+            return Permission::findByName($permission);
         }
 
         return $permission;
+    }
+
+    /**
+     * Find a role by it's name.
+     *
+     * @param $name
+     *
+     * @throws RoleDoesNotExist
+     */
+    public static function findByName($name)
+    {
+        $role = static::where('name', $name)->first();
+
+        if (!$role) {
+            throw new RoleDoesNotExist();
+        }
+
+        return $role;
     }
 }
