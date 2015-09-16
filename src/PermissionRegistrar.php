@@ -30,7 +30,7 @@ class PermissionRegistrar
     /**
      *  Register the permissions.
      *
-     * @return boolean
+     * @return bool
      */
     public function registerPermissions()
     {
