@@ -59,7 +59,7 @@ running the migrations:
 php artisan migrate
 ```
 
-Finally add the `Spatie\Permission\HasRoles`-trait to the User model.
+Finally add the `Spatie\Permission\Traits\HasRoles`-trait to the User model.
 
 
 
