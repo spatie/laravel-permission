@@ -12,6 +12,12 @@ class Permission extends Model
 
     public $guarded = ['id'];
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->setTable(config('laravel-permissions.tables.permissions'));
+    }
+
     /**
      * A permission can be applied to roles.
      *
@@ -19,7 +25,7 @@ class Permission extends Model
      */
     public function roles()
     {
-        return $this->belongsToMany(Role::class, 'role_has_permissions');
+        return $this->belongsToMany(Role::class, config('laravel-permissions.tables.role_has_permissions'));
     }
 
     /**

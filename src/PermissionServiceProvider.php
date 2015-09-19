@@ -20,6 +20,14 @@ class PermissionServiceProvider extends ServiceProvider
                 __DIR__.'/../resources/migrations/create_permission_tables.php.stub' => $this->app->basePath().'/'.'database/migrations/'.$timestamp.'_create_permission_tables.php',
             ], 'migrations');
         }
+        $this->publishes([
+            __DIR__ . '/../resources/config/config.php' => config_path('laravel-permissions.php')
+        ]);
+
+        $this->mergeConfigFrom(
+            __DIR__ . '/../resources/config/config.php', 'laravel-permissions'
+        );
+
 
         $permissionLoader->registerPermissions();
     }

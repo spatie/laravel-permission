@@ -17,7 +17,7 @@ trait HasRoles
      */
     public function roles()
     {
-        return $this->belongsToMany(Role::class, 'user_has_roles');
+        return $this->belongsToMany(Role::class, config('laravel-permissions.tables.user_has_roles'));
     }
 
     /**
@@ -27,7 +27,7 @@ trait HasRoles
      */
     public function permissions()
     {
-        return $this->belongsToMany(Permission::class, 'user_has_permissions');
+        return $this->belongsToMany(Permission::class, config('laravel-permissions.tables.user_has_permissions'));
     }
 
     /**
