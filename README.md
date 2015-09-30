@@ -91,7 +91,7 @@ $user->revokePermissionTo('edit articles');
 
 You can test if a user has a permission:
 ```php
-$user->hasPermission('edit articles');
+$user->hasPermissionTo('edit articles');
 ```
 
 Saved permissions will be registered with the `Illuminate\Auth\Access\Gate`-class. So you can

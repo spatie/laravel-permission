@@ -16,7 +16,7 @@ class GateTest extends TestCase
 
         $this->testUser->assignRole($this->testRole);
 
-        $this->assertTrue($this->testUser->hasPermission($this->testPermission));
+        $this->assertTrue($this->testUser->hasPermissionTo($this->testPermission));
 
         $this->assertTrue($this->reloadPermissions());
 

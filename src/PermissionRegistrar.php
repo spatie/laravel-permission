@@ -46,7 +46,7 @@ class PermissionRegistrar
             $this->getPermissions()->map(function ($permission) {
 
                 $this->gate->define($permission->name, function ($user) use ($permission) {
-                    return $user->hasPermission($permission);
+                    return $user->hasPermissionTo($permission);
                 });
 
             });

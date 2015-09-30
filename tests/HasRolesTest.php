@@ -63,7 +63,7 @@ class HasRolesTest extends TestCase
      */
     public function it_can_determine_that_the_user_does_not_have_a_permission()
     {
-        $this->assertFalse($this->testUser->hasPermission('edit-articles'));
+        $this->assertFalse($this->testUser->hasPermissionTo('edit-articles'));
     }
 
     /**
@@ -75,7 +75,7 @@ class HasRolesTest extends TestCase
 
         $this->testUser->assignRole('testRole');
 
-        $this->assertTrue($this->testUser->hasPermission('edit-articles'));
+        $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
     }
 
     /**
@@ -87,11 +87,11 @@ class HasRolesTest extends TestCase
 
         $this->testUser->assignRole('testRole');
 
-        $this->assertTrue($this->testUser->hasPermission('edit-articles'));
+        $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
 
         $this->testRole->revokePermissionTo('edit-articles');
 
-        $this->assertFalse($this->testUser->hasPermission('edit-articles'));
+        $this->assertFalse($this->testUser->hasPermissionTo('edit-articles'));
     }
 
     /**
@@ -103,7 +103,7 @@ class HasRolesTest extends TestCase
 
         $this->testUser->assignRole($this->testRole);
 
-        $this->assertTrue($this->testUser->hasPermission($this->testPermission));
+        $this->assertTrue($this->testUser->hasPermissionTo($this->testPermission));
     }
 
     /**
@@ -115,7 +115,7 @@ class HasRolesTest extends TestCase
 
         $this->refreshTestUser();
 
-        $this->assertTrue($this->testUser->hasPermission($this->testPermission));
+        $this->assertTrue($this->testUser->hasPermissionTo($this->testPermission));
     }
 
     /**
@@ -127,12 +127,34 @@ class HasRolesTest extends TestCase
 
         $this->refreshTestUser();
 
-        $this->assertTrue($this->testUser->hasPermission($this->testPermission));
+        $this->assertTrue($this->testUser->hasPermissionTo($this->testPermission));
 
         $this->testUser->revokePermissionTo($this->testPermission);
 
         $this->refreshTestUser();
 
-        $this->assertFalse($this->testUser->hasPermission($this->testPermission));
+        $this->assertFalse($this->testUser->hasPermissionTo($this->testPermission));
+    }
+
+    /**
+     * @test
+     *
+     * @deprecated
+     */
+    public function it_can_check_permissions_with_the_deprecated_has_permission_method()
+    {
+        $this->assertSame(
+            $this->testUser->hasPermissionTo($this->testPermission),
+            $this->testUser->hasPermission($this->testPermission)
+        );
+
+        $this->testUser->givePermissionTo($this->testPermission);
+
+        $this->refreshTestUser();
+
+        $this->assertSame(
+            $this->testUser->hasPermissionTo($this->testPermission),
+            $this->testUser->hasPermission($this->testPermission)
+        );
     }
 }

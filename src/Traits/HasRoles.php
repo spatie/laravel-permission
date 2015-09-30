@@ -81,7 +81,7 @@ trait HasRoles
      *
      * @return bool
      */
-    public function hasPermission($permission)
+    public function hasPermissionTo($permission)
     {
         if (is_string($permission)) {
             $permission = Permission::findByName($permission);
@@ -90,11 +90,39 @@ trait HasRoles
         return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
     }
 
+    /**
+     * @deprecated deprecated since version 1.0.1, use hasPermissionTo instead
+     *
+     * Determine if the user may perform the given permission.
+     *
+     * @param Permission $permission
+     *
+     * @return bool
+     */
+    public function hasPermission($permission)
+    {
+        return $this->hasPermissionTo($permission);
+    }
+
+    /**
+     * Determine if the user has, via roles, has the given permission.
+     *
+     * @param Permission $permission
+     *
+     * @return bool
+     */
     protected function hasPermissionViaRole(Permission $permission)
     {
         return $this->hasRole($permission->roles);
     }
 
+    /**
+     * Determine if the user has has the given permission.
+     *
+     * @param Permission $permission
+     *
+     * @return bool
+     */
     protected function hasDirectPermission(Permission $permission)
     {
         if (is_string($permission)) {
