@@ -26,7 +26,7 @@ class BladeTest extends TestCase
         $role = 'admin';
         $roles = [$role];
 
-        $this->actingAs($this->userWithoutRolesOrPermissions);
+        $this->actingAs($this->testUser);
 
         //$this->assertEquals('does not have role', $this->renderView('role', [$role]));
         //$this->assertEquals('does not have role', $this->renderView('hasrole', [$role]));
@@ -39,13 +39,20 @@ class BladeTest extends TestCase
      */
     public function the_role_directive_will_evaluate_true_when_the_logged_in_user_has_the_role()
     {
-        $this->actingAs($this->testUser);
+        $this->actingAs($this->getAdmin());
 
-        $role = $this->testUser;
+        $role = 'admin';
 
         $this->assertEquals('has role', $this->renderView('role', $role));
+    }
 
+    public function getAdmin()
+    {
+        $this->testUser->assignRole('admin');
 
+        $this->refreshTestUser();
+
+        return $this->testUser;
     }
 
     public function renderView($view, $parameters)
