@@ -8,7 +8,7 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/spatie/laravel-permission.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-permission)
 
 This package allows to save permissions and roles in a database. It is built upon the [Laravel's
-authorization functionality](http://laravel.com/docs/5.1/authorization) that 
+authorization functionality](http://laravel.com/docs/5.1/authorization) that
 was [introduced in version 5.1.11](http://christoph-rumpel.com/2015/09/new-acl-features-in-laravel/)
 
 Once installed you can do stuff like this:
@@ -117,8 +117,17 @@ You can determine if a user has a certain role:
 ```php
 $user->hasRole('writer');
 ```
+You can also determine if a user has any of a given list of roles:
+```php
+$user->hasAnyRole(Role::all());
+```
+You can also determine if a user has all of a given list of roles:
 
-The `assignRole`, `hasRole`, and `removeRole`-functions can accept a string or a `Spatie\Permission\Models\Role`-object.
+```php
+$user->hasAllRoles(Role::all());
+```
+
+The `assignRole`, `hasRole`, and `removeRole`-functions can accept a string, a `Spatie\Permission\Models\Role`-object or an `\Illuminate\Support\Collection`-object.
 
 A permission can be given to a role:
 
@@ -134,10 +143,10 @@ $role->revokePermissionTo('edit articles');
 
 The `givePermissionTo` and `revokePermissionTo`-functions can accept a string or a `Spatie\Permission\Models\Permission`-object.
 
-Saved permission and roles are also registered with the `Illuminate\Auth\Access\Gate`-class. 
+Saved permission and roles are also registered with the `Illuminate\Auth\Access\Gate`-class.
 ```php
 $user->can('edit articles');
-``` 
+```
 
 ## Change log
 
@@ -162,10 +171,10 @@ If you discover any security related issues, please email [freek@spatie.be](mail
 - [Freek Van der Herten](https://github.com/freekmurze)
 - [All Contributors](../../contributors)
 
-This package is heavily based on [Jeffrey Way](https://twitter.com/jeffrey_way)'s awesome [Laracasts](https://laracasts.com)-lesson 
-on [roles and permissions](https://laracasts.com/series/whats-new-in-laravel-5-1/episodes/16). His original code 
+This package is heavily based on [Jeffrey Way](https://twitter.com/jeffrey_way)'s awesome [Laracasts](https://laracasts.com)-lesson
+on [roles and permissions](https://laracasts.com/series/whats-new-in-laravel-5-1/episodes/16). His original code
 can be found [in this repo on GitHub](https://github.com/laracasts/laravel-5-roles-and-permissions-demo).
- 
+
 ## Alternatives
 
 - [BeatSwitch/lock-laravel](https://github.com/BeatSwitch/lock-laravel)
