@@ -71,13 +71,13 @@ class HasRolesTest extends TestCase
 
         $this->assertFalse($this->testUser->hasAllRoles(Role::all()));
 
-		Role::create(['name' => 'second role']);
-		
+        Role::create(['name' => 'second role']);
+
         $this->testUser->assignRole($this->testRole);
 
-		$this->refreshTestUser();
+        $this->refreshTestUser();
 
-		$this->assertFalse($this->testUser->hasAllRoles(Role::all()));
+        $this->assertFalse($this->testUser->hasAllRoles(Role::all()));
 
         $this->testUser->assignRole('second role');
 

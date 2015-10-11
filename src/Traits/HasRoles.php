@@ -74,7 +74,7 @@ trait HasRoles
         return (bool) !!$roles->intersect($this->roles)->count();
     }
 
-	/**
+    /**
      * Determine if the user has any of the given role(s).
      *
      * @param string|Role|\Illuminate\Support\Collection $roles
