@@ -29,7 +29,8 @@ You can test if a user has a permission with Laravel's default `can`-function.
 $user->can('edit articles');
 ```
 
-Spatie is webdesign agency in Antwerp, Belgium. You'll find an overview of all our open source projects [on our website](https://spatie.be/opensource).
+Spatie is webdesign agency in Antwerp, Belgium. You'll find an overview of all 
+our open source projects [on our website](https://spatie.be/opensource).
 
 ## Install
 
@@ -65,8 +66,10 @@ Finally add the `Spatie\Permission\Traits\HasRoles`-trait to the User model.
 
 ## Usage
 
-This package allows for users to be associated with roles. Permissions can be associated with roles.
-A `Role` and a `Permission` are regular Eloquent-models. They can have a name and can be created like this:
+This package allows for users to be associated with roles. Permissions can be 
+associated with roles.
+A `Role` and a `Permission` are regular Eloquent-models. They can have a name 
+and can be created like this:
 
 ```php
 use Spatie\Permission\Models\Role;
@@ -117,6 +120,7 @@ You can determine if a user has a certain role:
 ```php
 $user->hasRole('writer');
 ```
+
 You can also determine if a user has any of a given list of roles:
 ```php
 $user->hasAnyRole(Role::all());
@@ -127,7 +131,8 @@ You can also determine if a user has all of a given list of roles:
 $user->hasAllRoles(Role::all());
 ```
 
-The `assignRole`, `hasRole`, and `removeRole`-functions can accept a string, a `Spatie\Permission\Models\Role`-object or an `\Illuminate\Support\Collection`-object.
+The `assignRole`, `hasRole`, `hasAnyRole`, `hasAllRoles`  and `removeRole`-functions can accept a
+ string, a `Spatie\Permission\Models\Role`-object or an `\Illuminate\Support\Collection`-object.
 
 A permission can be given to a role:
 
@@ -141,7 +146,8 @@ A permission can be revoked from a role:
 $role->revokePermissionTo('edit articles');
 ```
 
-The `givePermissionTo` and `revokePermissionTo`-functions can accept a string or a `Spatie\Permission\Models\Permission`-object.
+The `givePermissionTo` and `revokePermissionTo`-functions can accept a 
+string or a `Spatie\Permission\Models\Permission`-object.
 
 Saved permission and roles are also registered with the `Illuminate\Auth\Access\Gate`-class.
 ```php
@@ -149,7 +155,8 @@ $user->can('edit articles');
 ```
 
 ###Using blade directives
-This package also adds blade directives to verify whether the currently logged in user has all or any of a given list of roles.
+This package also adds Blade directives to verify whether the
+currently logged in user has all or any of a given list of roles.
 
 ```php
 @role('writer')
@@ -160,10 +167,10 @@ I'm not a writer...
 ```
 
 ```php
-@hasrole(Role::first())
-I have the first role!
+@hasrole('writer')
+I'm a writer!
 @else
-I don't have the first role...
+I'm not a writer...
 @endhasrole
 ```
 

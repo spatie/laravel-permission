@@ -2,6 +2,11 @@
 
 All Notable changes to `laravel-permission` will be documented in this file
 
+## 1.1.0 - 2015-10-11
+
+### Fixed
+- Added 
+
 ## 1.0.2 - 2015-10-11
 
 ### Fixed
