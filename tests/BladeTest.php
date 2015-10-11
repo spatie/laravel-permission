@@ -28,10 +28,24 @@ class BladeTest extends TestCase
 
         $this->actingAs($this->userWithoutRolesOrPermissions);
 
-        $this->assertEquals('does not have role', $this->renderView('role', [$role]));
+        //$this->assertEquals('does not have role', $this->renderView('role', [$role]));
         //$this->assertEquals('does not have role', $this->renderView('hasrole', [$role]));
         //$this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', $roles));
         //$this->assertEquals('does not have any of the given roles', $this->renderView('hasAnyRole', $roles));
+    }
+
+    /**
+     * @test
+     */
+    public function the_role_directive_will_evaluate_true_when_the_logged_in_user_has_the_role()
+    {
+        $this->actingAs($this->testUser);
+
+        $role = $this->testUser;
+
+        $this->assertEquals('has role', $this->renderView('role', $role));
+
+
     }
 
     public function renderView($view, $parameters)
