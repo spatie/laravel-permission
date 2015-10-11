@@ -18,6 +18,11 @@ abstract class TestCase extends Orchestra
     protected $testUser;
 
     /**
+     * @var \Spatie\Permission\Test\User
+     */
+    protected $userWithoutRolesOrPermissions;
+
+    /**
      * @var \Spatie\Permission\Models\Role
      */
     protected $testRole;
@@ -38,6 +43,8 @@ abstract class TestCase extends Orchestra
         $this->testUser = User::first();
         $this->testRole = Role::first();
         $this->testPermission = Permission::find(1);
+
+        $this->userWithoutRolesOrPermissions = User::create(['email' => 'test@guest.com']);
     }
 
     /**
