@@ -42,7 +42,7 @@ class PermissionServiceProvider extends ServiceProvider
         $this->app->afterResolving('blade.compiler', function (BladeCompiler $bladeCompiler) {
 
             $bladeCompiler->directive('role', function ($role) {
-                return "<?php if(auth()->check() && auth()->user()->hasRole($role)): ?>";
+                return "<?php if(auth()->check() && auth()->user()->hasRole({$role})): ?>";
             });
             $bladeCompiler->directive('endrole', function () {
                 return '<?php endif; ?>';
@@ -63,7 +63,7 @@ class PermissionServiceProvider extends ServiceProvider
             });
 
             $bladeCompiler->directive('hasallroles', function ($roles) {
-                return "<?php if(auth()->check() && auth()->user()->hasAllRoles($roles)): ?>";
+                return "<?php if(auth()->check() && auth()->user()->hasAllRoles({$roles})): ?>";
             });
             $bladeCompiler->directive('endhasallroles', function () {
                 return '<?php endif; ?>';
