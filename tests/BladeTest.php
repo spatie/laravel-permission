@@ -24,8 +24,6 @@ class BladeTest extends TestCase
             $view = view($view)->with($parameters);
         }
 
-        return trim((string)($view));
+        return trim((string) ($view));
     }
-
-
 }
