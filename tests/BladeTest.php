@@ -25,9 +25,7 @@ class BladeTest extends TestCase
     {
         $role = 'admin';
         $roles = [$role];
-
-        $this->actingAs(User::create(['email' => 'someboy@guest.com']);
-
+        
         $this->assertEquals('does not have role', $this->renderView('role', [$role]));
         $this->assertEquals('does not have role', $this->renderView('hasrole', [$role]));
         $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', $roles));
