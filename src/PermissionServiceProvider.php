@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission;
 
+use Auth;
 use Illuminate\Support\ServiceProvider;
 
 class PermissionServiceProvider extends ServiceProvider
@@ -29,5 +30,54 @@ class PermissionServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->registerBladeExtensions();
+    }
+
+	/**
+     * Register the blade extensions.
+     */
+    protected function registerBladeExtensions()
+    {
+        $this->app->afterResolving('blade.compiler', function (BladeCompiler $bladeCompiler) {
+            /*
+             * add @role and @endrole to blade compiler
+             */
+            $bladeCompiler->directive('role', function ($role) {
+                return "<?php if(Auth::user()->hasRole{$role}): ?>";
+            });
+            $bladeCompiler->directive('endrole', function ($role) {
+                return '<?php endif; ?>';
+            });
+
+            /*
+             * add @hasrole and @endhasrole to blade compiler
+             */
+            $bladeCompiler->directive('hasrole', function ($role) {
+                return "<?php if(Auth::user()->hasRole{$role}): ?>";
+            });
+            $bladeCompiler->directive('endhasrole', function ($role) {
+                return '<?php endif; ?>';
+            });
+
+            /*
+             * add @hasanyrole and @endhasanyrole to blade compiler
+             */
+            $bladeCompiler->directive('hasanyrole', function ($roles) {
+                return "<?php if(Auth::user()->hasAnyRole{$roles}): ?>";
+            });
+            $bladeCompiler->directive('endhasanyrole', function ($roles) {
+                return '<?php endif; ?>';
+            });
+
+            /*
+             * add @hasallroles and @endhasallroles to blade compiler
+             */
+            $bladeCompiler->directive('hasAllRoles', function ($roles) {
+                return "<?php if(Auth::user()->hasAllRoles{$roles}): ?>";
+            });
+            $bladeCompiler->directive('endhasallroles', function ($roles) {
+                return '<?php endif; ?>';
+            });
+        });
     }
 }
