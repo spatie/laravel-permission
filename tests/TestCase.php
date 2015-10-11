@@ -67,6 +67,8 @@ abstract class TestCase extends Orchestra
             'database' => $this->getTempDirectory().'/database.sqlite',
             'prefix' => '',
         ]);
+
+        $app['config']->set('view.paths', [__DIR__ . '/resources/views']);
     }
 
     /**

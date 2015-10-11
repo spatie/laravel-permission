@@ -4,6 +4,7 @@ namespace Spatie\Permission;
 
 use Auth;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\View\Compilers\BladeCompiler;
 
 class PermissionServiceProvider extends ServiceProvider
 {
@@ -41,28 +42,28 @@ class PermissionServiceProvider extends ServiceProvider
         $this->app->afterResolving('blade.compiler', function (BladeCompiler $bladeCompiler) {
 
             $bladeCompiler->directive('role', function ($role) {
-                return "<?php if(Auth::check() && Auth::user()->hasRole{$role}): ?>";
+                return "<?php if(Auth::check() && Auth::user()->hasRole($role)): ?>";
             });
             $bladeCompiler->directive('endrole', function () {
                 return '<?php endif; ?>';
             });
 
             $bladeCompiler->directive('hasrole', function ($role) {
-                return "<?php if(Auth::check() && Auth::user()->hasRole{$role}): ?>";
+                return "<?php if(Auth::check() && Auth::user()->hasRole({$role})): ?>";
             });
             $bladeCompiler->directive('endhasrole', function () {
                 return '<?php endif; ?>';
             });
 
             $bladeCompiler->directive('hasanyrole', function ($roles) {
-                return "<?php if(Auth::check() && Auth::user()->hasAnyRole{$roles}): ?>";
+                return "<?php if(Auth::check() && Auth::user()->hasAnyRole({$roles})): ?>";
             });
             $bladeCompiler->directive('endhasanyrole', function () {
                 return '<?php endif; ?>';
             });
 
-            $bladeCompiler->directive('hasAllRoles', function ($roles) {
-                return "<?php if(Auth::check() && Auth::user()->hasAllRoles{$roles}): ?>";
+            $bladeCompiler->directive('hasallroles', function ($roles) {
+                return "<?php if(Auth::check() && Auth::user()->hasAllRoles($roles)): ?>";
             });
             $bladeCompiler->directive('endhasallroles', function () {
                 return '<?php endif; ?>';
