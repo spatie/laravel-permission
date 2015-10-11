@@ -45,7 +45,7 @@ class HasRolesTest extends TestCase
     /**
      * @test
      */
-    public function it_can_determine_if_a_user_has_one_of_the_given_roles()
+    public function it_can_determine_that_a_user_has_one_of_the_given_roles()
     {
         Role::create(['name' => 'second role']);
 
@@ -56,6 +56,34 @@ class HasRolesTest extends TestCase
         $this->refreshTestUser();
 
         $this->assertTrue($this->testUser->hasRole(Role::all()));
+
+        $this->assertTrue($this->testUser->hasAnyRole(Role::all()));
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_determine_that_a_user_has_all_of_the_given_roles()
+    {
+        $this->assertFalse($this->testUser->hasAllRoles(Role::first()));
+
+        $this->assertFalse($this->testUser->hasAllRoles('testRole'));
+
+        $this->assertFalse($this->testUser->hasAllRoles(Role::all()));
+
+		Role::create(['name' => 'second role']);
+		
+        $this->testUser->assignRole($this->testRole);
+
+		$this->refreshTestUser();
+
+		$this->assertFalse($this->testUser->hasAllRoles(Role::all()));
+
+        $this->testUser->assignRole('second role');
+
+        $this->refreshTestUser();
+
+        $this->assertTrue($this->testUser->hasAllRoles(Role::all()));
     }
 
     /**

@@ -74,6 +74,38 @@ trait HasRoles
         return (bool) !!$roles->intersect($this->roles)->count();
     }
 
+	/**
+     * Determine if the user has any of the given role(s).
+     *
+     * @param string|Role|\Illuminate\Support\Collection $roles
+     *
+     * @return bool
+     */
+    public function hasAnyRole($roles)
+    {
+        return $this->hasRole($roles);
+    }
+
+    /**
+     * Determine if the user has all of the given role(s).
+     *
+     * @param string|Role|\Illuminate\Support\Collection $roles
+     *
+     * @return bool
+     */
+    public function hasAllRoles($roles)
+    {
+        if (is_string($roles)) {
+            return $this->roles->contains('name', $roles);
+        }
+
+        if ($roles instanceof Role) {
+            return $this->roles->contains('id', $roles->id);
+        }
+
+        return $roles->intersect($this->roles) == $roles;
+    }
+
     /**
      * Determine if the user may perform the given permission.
      *
