@@ -2,6 +2,8 @@
 
 namespace Spatie\Permission\Test;
 
+use Spatie\Permission\Models\Role;
+
 class BladeTest extends TestCase
 {
     /**
@@ -26,7 +28,7 @@ class BladeTest extends TestCase
         $role = 'admin';
         $roles = [$role];
 
-        $this->actingAs($this->testUser);
+        //$this->actingAs($this->testUser);
 
         //$this->assertEquals('does not have role', $this->renderView('role', [$role]));
         //$this->assertEquals('does not have role', $this->renderView('hasrole', [$role]));
@@ -39,15 +41,15 @@ class BladeTest extends TestCase
      */
     public function the_role_directive_will_evaluate_true_when_the_logged_in_user_has_the_role()
     {
-        $this->actingAs($this->getAdmin());
+        auth()->login($this->getAdmin());
 
-        $role = 'admin';
-
-        $this->assertEquals('has role', $this->renderView('role', $role));
+        $this->assertEquals('has role', $this->renderView('role', ['role' => 'admin']));
     }
 
     public function getAdmin()
     {
+        Role::create(['name' => 'admin']);
+
         $this->testUser->assignRole('admin');
 
         $this->refreshTestUser();
