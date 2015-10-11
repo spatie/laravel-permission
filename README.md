@@ -148,6 +148,41 @@ Saved permission and roles are also registered with the `Illuminate\Auth\Access\
 $user->can('edit articles');
 ```
 
+###Using blade directives
+This package also adds blade directives to verify whether the currently logged in user has all or any of a given list of roles.
+
+```php
+@role('writer')
+I'm a writer!
+@else
+I'm not a writer...
+@endrole
+```
+
+```php
+@hasrole(Role::first())
+I have the first role!
+@else
+I don't have the first role...
+@endhasrole
+```
+
+```php
+@hasanyrole(Role::all())
+I have one or more of these roles!
+@else
+I have none of these roles...
+@endhasanyrole
+```
+
+```php
+@hasallroles(Role::all())
+I have all of these roles!
+@else
+I don't have all of these roles...
+@endhasallroles
+```
+
 ## Change log
 
 Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
