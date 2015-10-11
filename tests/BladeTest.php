@@ -21,7 +21,7 @@ class BladeTest extends TestCase
     /**
      * @test
      */
-    public function all_blade_directives_will_evaluate_falsly_when_there_is_somebody_with_no_roles_or_permissions_is_logged_in()
+    public function all_blade_directives_will_evaluate_falsly_when_somebody_without_roles_or_permissions_is_logged_in()
     {
         $role = 'admin';
         $roles = [$role];
