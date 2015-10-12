@@ -103,7 +103,11 @@ trait HasRoles
             return $this->roles->contains('id', $roles->id);
         }
 
-        return $roles->intersect($this->roles) == $roles;
+        $roles = collect()->make($roles)->map(function ($role) {
+            return $role instanceof Role ? $role->name : $role;
+        });
+
+        return $roles->intersect($this->roles->lists('name')) == $roles;
     }
 
     /**
