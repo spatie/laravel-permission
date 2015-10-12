@@ -60,7 +60,7 @@ class BladeTest extends TestCase
     {
         auth()->login($this->getAdmin());
 
-        $this->assertEquals('has role', $this->renderView('hasrole', ['role' => 'admin']));
+        $this->assertEquals('has role', $this->renderView('hasRole', ['role' => 'admin']));
     }
 
     /**
