@@ -2,7 +2,6 @@
 
 namespace Spatie\Permission;
 
-use Auth;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
 
