@@ -2,10 +2,11 @@
 
 All Notable changes to `laravel-permission` will be documented in this file
 
-## 1.1.0 - 2015-10-11
+## 1.1.0 - 2015-10-12
 
-### Fixed
-- Added 
+### Added
+- Blade directives 
+- `hasAllRoles()`- and `hasAnyRole()`-functions
 
 ## 1.0.2 - 2015-10-11
 
