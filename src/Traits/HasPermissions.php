@@ -2,7 +2,8 @@
 
 namespace Spatie\Permission\Traits;
 
-use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Contracts\PermissionContract;
+use Spatie\Permission\Contracts\HasPermissionsContract;
 
 trait HasPermissions
 {
@@ -11,7 +12,7 @@ trait HasPermissions
      *
      * @param  $permission
      *
-     * @return HasPermissions
+     * @return HasPermissionsContract
      */
     public function givePermissionTo($permission)
     {
@@ -27,7 +28,7 @@ trait HasPermissions
      *
      * @param $permission
      *
-     * @return HasPermissions
+     * @return HasPermissionsContract
      */
     public function revokePermissionTo($permission)
     {
@@ -41,12 +42,12 @@ trait HasPermissions
     /**
      * @param $permission
      *
-     * @return Permission
+     * @return PermissionContract
      */
     protected function getStoredPermission($permission)
     {
         if (is_string($permission)) {
-            return Permission::findByName($permission);
+            return app(PermissionContract::class)->findByName($permission);
         }
 
         return $permission;

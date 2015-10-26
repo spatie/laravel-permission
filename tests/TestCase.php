@@ -86,8 +86,10 @@ abstract class TestCase extends Orchestra
         });
 
         include_once '__DIR__'.'/../resources/migrations/create_permission_tables.php.stub';
+        include_once '__DIR__'.'/../resources/migrations/create_role_tables.php.stub';
 
         (new \CreatePermissionTables())->up();
+        (new \CreateRoleTables())->up();
 
         User::create(['email' => 'test@user.com']);
         Role::create(['name' => 'testRole']);

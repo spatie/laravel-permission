@@ -21,7 +21,8 @@
     "require": {
         "php" : ">=5.5.0",
         "laravel/framework": "^5.1.11",
-        "illuminate/contracts": "^5.1"
+        "illuminate/contracts": "^5.1",
+        "propaganistas/laravel-auth-context": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit" : "4.*",
