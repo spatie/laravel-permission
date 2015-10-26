@@ -77,20 +77,52 @@ return [
     */
 
     'models' => [
-        /*
-         * The class name of the permission model to be used.
-         */
-        'permission' => 'Spatie\Permission\Models\Permission',
 
         /*
-         * The class name of the role model to be used.
-         */
-        'role' => 'Spatie\Permission\Models\Role',
+        |--------------------------------------------------------------------------
+        | Permission Model
+        |--------------------------------------------------------------------------
+        |
+        | When using the "HasRoles" trait from this package, we need to know which
+        | Eloquent model should be used to retrieve your permissions. Of course, it
+        | is often just the "Permission" model but you may use whatever you like.
+        |
+        | The model you want to use as a Permission model needs to implement the
+        | `Spatie\Permission\Contracts\Permission` contract.
+        |
+        */
+
+        'permission' => Spatie\Permission\Models\Permission::class,
 
         /*
-         * The class name of the user model to be used.
-         */
-        'user' => 'App\User',
+        |--------------------------------------------------------------------------
+        | Role Model
+        |--------------------------------------------------------------------------
+        |
+        | When using the "HasRoles" trait from this package, we need to know which
+        | Eloquent model should be used to retrieve your roles. Of course, it
+        | is often just the "Role" model but you may use whatever you like.
+        |
+        | The model you want to use as a Role model needs to implement the
+        | `Spatie\Permission\Contracts\Role` contract.
+        |
+        */
+
+        'role' => Spatie\Permission\Models\Role::class,
+
+        /*
+        |--------------------------------------------------------------------------
+        | User Model
+        |--------------------------------------------------------------------------
+        |
+        | When using the "HasRoles" trait from this package, we need to know which
+        | Eloquent model should be used to retrieve your users. Of course, it
+        | is often just the "User" model but you may use whatever you like.
+        |
+        */
+
+        'user' => App\User::class,
+
     ],
 
     /*
@@ -100,43 +132,91 @@ return [
     */
 
     'tableNames' => [
+
         /*
-         * The name of the "users" table to be used.
-         */
+        |--------------------------------------------------------------------------
+        | Users Table
+        |--------------------------------------------------------------------------
+        |
+        | When using the "HasRoles" trait from this package, we need to know which
+        | table should be used to retrieve your users. We have chosen a basic
+        | default value but you may easily change it to any table you like.
+        |
+        */
+
         'users' => 'users',
 
         /*
-         * The name of the "roles" table to be used.
-         */
+        |--------------------------------------------------------------------------
+        | Roles Table
+        |--------------------------------------------------------------------------
+        |
+        | When using the "HasRoles" trait from this package, we need to know which
+        | table should be used to retrieve your roles. We have chosen a basic
+        | default value but you may easily change it to any table you like.
+        |
+        */
+
         'roles' => 'roles',
 
         /*
-         * The name of the "permissions" table to be used.
-         */
+        |--------------------------------------------------------------------------
+        | Permissions Table
+        |--------------------------------------------------------------------------
+        |
+        | When using the "HasRoles" trait from this package, we need to know which
+        | table should be used to retrieve your permissions. We have chosen a basic
+        | default value but you may easily change it to any table you like.
+        |
+        */
+
         'permissions' => 'permissions',
 
         /*
-         * The name of the "user_has_permissions" table to be used.
-         */
+        |--------------------------------------------------------------------------
+        | User Permissions Table
+        |--------------------------------------------------------------------------
+        |
+        | When using the "HasRoles" trait from this package, we need to know which
+        | table should be used to retrieve your users permissions. We have chosen a
+        | basic default value but you may easily change it to any table you like.
+        |
+        */
+
         'user_has_permissions' => 'user_has_permissions',
 
         /*
-         * The name of the "user_has_roles" table to be used.
-         */
+        |--------------------------------------------------------------------------
+        | User Roles Table
+        |--------------------------------------------------------------------------
+        |
+        | When using the "HasRoles" trait from this package, we need to know which
+        | table should be used to retrieve your users roles. We have chosen a
+        | basic default value but you may easily change it to any table you like.
+        |
+        */
+
         'user_has_roles' => 'user_has_roles',
 
         /*
-         * The name of the "role_has_permissions" table to be used.
-         */
+        |--------------------------------------------------------------------------
+        | Role Permissions Table
+        |--------------------------------------------------------------------------
+        |
+        | When using the "HasRoles" trait from this package, we need to know which
+        | table should be used to retrieve your roles permissions. We have chosen a
+        | basic default value but you may easily change it to any table you like.
+        |
+        */
+
         'role_has_permissions' => 'role_has_permissions',
+
     ],
 
 ];
 ```
 
 And finally add the `Spatie\Permission\Traits\HasRoles`-trait to the User model.
-
-
 
 ## Usage
 
@@ -263,6 +343,15 @@ I have all of these roles!
 I don't have all of these roles...
 @endhasallroles
 ```
+
+## Extending
+
+If you need to extend or replace the existing `Role` or `Permission` models you just need to 
+keep the following things in mind:
+
+- Your `Role` model needs to implement the `Spatie\Permission\Contracts\Role` contract
+- Your `Permission` model needs to implement the `Spatie\Permission\Contracts\Permission` contract
+- You must publish the configuration and update the `models.role` and `models.permission` values
 
 ## Change log
 
