@@ -7,7 +7,7 @@
 [![Quality Score](https://img.shields.io/scrutinizer/g/spatie/laravel-permission.svg?style=flat-square)](https://scrutinizer-ci.com/g/spatie/laravel-permission)
 [![Total Downloads](https://img.shields.io/packagist/dt/spatie/laravel-permission.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-permission)
 
-This package allows to save permissions and roles in a database. It is built upon the [Laravel's
+This package allows to save permissions and roles in a database. It is built upon [Laravel's
 authorization functionality](http://laravel.com/docs/5.1/authorization) that
 was [introduced in version 5.1.11](http://christoph-rumpel.com/2015/09/new-acl-features-in-laravel/)
 
@@ -60,8 +60,28 @@ running the migrations:
 php artisan migrate
 ```
 
-Finally add the `Spatie\Permission\Traits\HasRoles`-trait to the User model.
+Finally add the `Spatie\Permission\Traits\HasRoles` trait to the User model and have it implement `Spatie\Permission\Traits\HasRolesContract` and `Spatie\Permission\Traits\HasPermissionsContract`, e.g.
 
+```php
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\Access\Authorizable;
+use Spatie\Permission\Contracts\HasPermissionsContract;
+use Spatie\Permission\Contracts\HasRolesContract;
+use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+
+class User extends Model implements AuthorizableContract,
+                                    AuthenticatableContract,
+                                    HasRolesContract,
+                                    HasPermissionsContract
+{
+    use HasRoles,
+        Authorizable,
+        Authenticatable;
+}
+```
 
 
 ## Usage
@@ -78,6 +98,20 @@ use Spatie\Permission\Models\Permission;
 $role = Role::create(['name' => 'writer']);
 $permission = Permission::create(['name' => 'edit articles']);
 ```
+
+It is possible to use your own models for roles and permissions by specifying the classes in this package's config file.
+Publish the config file using the following command:
+
+```bash
+php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="config"
+```
+
+...and
+
+- have your `Role` model implement `Spatie\Permission\Contracts\RoleContract` and `Spatie\Permission\Contracts\HasPermissionsContract`
+- have your `Permission` model implement `Spatie\Permission\Contracts\PermissionContract`
+
+You can import the `Spatie\Permission\Traits\RoleTrait` and `Spatie\Permission\Traits\PermissionTrait` respectively to easily comply to the contracts.
 
 ###Using permissions
 A permission can be given to a user:

@@ -3,42 +3,13 @@
 namespace Spatie\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Permission\Exceptions\RoleDoesNotExist;
-use Spatie\Permission\Traits\HasPermissions;
-use Spatie\Permission\Traits\RefreshesPermissionCache;
+use Spatie\Permission\Traits\RoleTrait;
+use Spatie\Permission\Contracts\RoleContract;
+use Spatie\Permission\Contracts\HasPermissionsContract;
 
-class Role extends Model
+class Role extends Model implements RoleContract, HasPermissionsContract
 {
-    use HasPermissions;
-    use RefreshesPermissionCache;
+    use RoleTrait;
 
     public $guarded = ['id'];
-
-    /**
-     * A role may be given various permissions.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function permissions()
-    {
-        return $this->belongsToMany(Permission::class, 'role_has_permissions');
-    }
-
-    /**
-     * Find a role by its name.
-     *
-     * @param string $name
-     *
-     * @throws RoleDoesNotExist
-     */
-    public static function findByName($name)
-    {
-        $role = static::where('name', $name)->first();
-
-        if (!$role) {
-            throw new RoleDoesNotExist();
-        }
-
-        return $role;
-    }
 }

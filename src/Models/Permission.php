@@ -3,40 +3,12 @@
 namespace Spatie\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Permission\Exceptions\PermissionDoesNotExist;
-use Spatie\Permission\Traits\RefreshesPermissionCache;
+use Spatie\Permission\Traits\PermissionTrait;
+use Spatie\Permission\Contracts\PermissionContract;
 
-class Permission extends Model
+class Permission extends Model implements PermissionContract
 {
-    use RefreshesPermissionCache;
+    use PermissionTrait;
 
     public $guarded = ['id'];
-
-    /**
-     * A permission can be applied to roles.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function roles()
-    {
-        return $this->belongsToMany(Role::class, 'role_has_permissions');
-    }
-
-    /**
-     * Find a permission by its name.
-     *
-     * @param string $name
-     *
-     * @throws PermissionDoesNotExist
-     */
-    public static function findByName($name)
-    {
-        $permission = static::where('name', $name)->first();
-
-        if (!$permission) {
-            throw new PermissionDoesNotExist();
-        }
-
-        return $permission;
-    }
 }

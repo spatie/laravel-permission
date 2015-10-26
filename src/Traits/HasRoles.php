@@ -2,8 +2,9 @@
 
 namespace Spatie\Permission\Traits;
 
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
+use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Contracts\RoleContract;
+use Spatie\Permission\Contracts\PermissionContract;
 
 trait HasRoles
 {
@@ -17,7 +18,7 @@ trait HasRoles
      */
     public function roles()
     {
-        return $this->belongsToMany(Role::class, 'user_has_roles');
+        return $this->belongsToMany(config('laravel-permission.role'), 'user_has_roles');
     }
 
     /**
@@ -27,15 +28,15 @@ trait HasRoles
      */
     public function permissions()
     {
-        return $this->belongsToMany(Permission::class, 'user_has_permissions');
+        return $this->belongsToMany(config('laravel-permission.permission'), 'user_has_permissions');
     }
 
     /**
      * Assign the given role to the user.
      *
-     * @param string|Role $role
+     * @param string|RoleContract $role
      *
-     * @return Role
+     * @return RoleContract
      */
     public function assignRole($role)
     {
@@ -45,7 +46,7 @@ trait HasRoles
     /**
      * Revoke the given role from the user.
      *
-     * @param string|Role $role
+     * @param string|RoleContract $role
      *
      * @return mixed
      */
@@ -57,7 +58,7 @@ trait HasRoles
     /**
      * Determine if the user has (one of) the given role(s).
      *
-     * @param string|Role|\Illuminate\Support\Collection $roles
+     * @param string|RoleContract|\Illuminate\Support\Collection $roles
      *
      * @return bool
      */
@@ -67,7 +68,7 @@ trait HasRoles
             return $this->roles->contains('name', $roles);
         }
 
-        if ($roles instanceof Role) {
+        if ($roles instanceof RoleContract) {
             return $this->roles->contains('id', $roles->id);
         }
 
@@ -77,7 +78,7 @@ trait HasRoles
     /**
      * Determine if the user has any of the given role(s).
      *
-     * @param string|Role|\Illuminate\Support\Collection $roles
+     * @param string|RoleContract|\Illuminate\Support\Collection $roles
      *
      * @return bool
      */
@@ -89,7 +90,7 @@ trait HasRoles
     /**
      * Determine if the user has all of the given role(s).
      *
-     * @param string|Role|\Illuminate\Support\Collection $roles
+     * @param string|RoleContract|\Illuminate\Support\Collection $roles
      *
      * @return bool
      */
@@ -99,12 +100,12 @@ trait HasRoles
             return $this->roles->contains('name', $roles);
         }
 
-        if ($roles instanceof Role) {
+        if ($roles instanceof RoleContract) {
             return $this->roles->contains('id', $roles->id);
         }
 
         $roles = collect()->make($roles)->map(function ($role) {
-            return $role instanceof Role ? $role->name : $role;
+            return $role instanceof RoleContract ? $role->name : $role;
         });
 
         return $roles->intersect($this->roles->lists('name')) == $roles;
@@ -113,14 +114,14 @@ trait HasRoles
     /**
      * Determine if the user may perform the given permission.
      *
-     * @param Permission $permission
+     * @param string|PermissionContract $permission
      *
      * @return bool
      */
     public function hasPermissionTo($permission)
     {
         if (is_string($permission)) {
-            $permission = Permission::findByName($permission);
+            $permission = app(PermissionContract::class)->findByName($permission);
         }
 
         return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
@@ -131,7 +132,7 @@ trait HasRoles
      *
      * Determine if the user may perform the given permission.
      *
-     * @param Permission $permission
+     * @param PermissionContract $permission
      *
      * @return bool
      */
@@ -143,11 +144,11 @@ trait HasRoles
     /**
      * Determine if the user has, via roles, has the given permission.
      *
-     * @param Permission $permission
+     * @param PermissionContract $permission
      *
      * @return bool
      */
-    protected function hasPermissionViaRole(Permission $permission)
+    protected function hasPermissionViaRole(PermissionContract $permission)
     {
         return $this->hasRole($permission->roles);
     }
@@ -155,14 +156,14 @@ trait HasRoles
     /**
      * Determine if the user has has the given permission.
      *
-     * @param Permission $permission
+     * @param PermissionContract $permission
      *
      * @return bool
      */
-    protected function hasDirectPermission(Permission $permission)
+    protected function hasDirectPermission(PermissionContract $permission)
     {
         if (is_string($permission)) {
-            $permission = Permission::findByName($permission);
+            $permission = app(PermissionContract::class)->findByName($permission);
         }
 
         return $this->permissions->contains('id', $permission->id);
@@ -171,12 +172,12 @@ trait HasRoles
     /**
      * @param $role
      *
-     * @return Role
+     * @return RoleContract
      */
     protected function getStoredRole($role)
     {
         if (is_string($role)) {
-            return Role::findByName($role);
+            return app(RoleContract::class)->findByName($role);
         }
 
         return $role;
