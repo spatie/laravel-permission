@@ -12,11 +12,31 @@ class Permission extends Model implements PermissionContract
     use RefreshesPermissionCache;
 
     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'permissions';
+
+    /**
      * The attributes that aren't mass assignable.
      *
      * @var array
      */
     public $guarded = ['id'];
+
+    /**
+     * Create a new Eloquent model instance.
+     *
+     * @param  array  $attributes
+     * @return void
+     */
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->table = config('laravel-permission.tables.permissions');
+    }
 
     /**
      * A permission can be applied to roles.

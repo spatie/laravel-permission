@@ -14,11 +14,31 @@ class Role extends Model implements RoleContract
     use RefreshesPermissionCache;
 
     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'roles';
+
+    /**
      * The attributes that aren't mass assignable.
      *
      * @var array
      */
     public $guarded = ['id'];
+
+    /**
+     * Create a new Eloquent model instance.
+     *
+     * @param  array  $attributes
+     * @return void
+     */
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->table = config('laravel-permission.tables.roles');
+    }
 
     /**
      * A role may be given various permissions.
