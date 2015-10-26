@@ -4,6 +4,8 @@ namespace Spatie\Permission;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
+use Spatie\Permission\Contracts\Permission as PermissionContract;
+use Spatie\Permission\Contracts\Role as RoleContract;
 
 class PermissionServiceProvider extends ServiceProvider
 {
@@ -14,6 +16,10 @@ class PermissionServiceProvider extends ServiceProvider
      */
     public function boot(PermissionRegistrar $permissionLoader)
     {
+        $this->publishes([
+            __DIR__.'/../resources/config/laravel-permission.php' => $this->app->configPath().'/'.'laravel-permission.php',
+        ], 'config');
+
         if (!class_exists('CreatePermissionTables')) {
             // Publish the migration
             $timestamp = date('Y_m_d_His', time());
@@ -30,6 +36,13 @@ class PermissionServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->mergeConfigFrom(__DIR__.'/../resources/config/laravel-permission.php', 'laravel-permission');
+
+        $config = config('laravel-permission.models');
+
+        $this->app->bind(PermissionContract::class, $config['permission']);
+        $this->app->bind(RoleContract::class, $config['role']);
+
         $this->registerBladeExtensions();
     }
 

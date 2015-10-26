@@ -6,7 +6,7 @@ use Exception;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Cache\Repository;
 use Log;
-use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Contracts\Permission;
 
 class PermissionRegistrar
 {
@@ -75,7 +75,7 @@ class PermissionRegistrar
     protected function getPermissions()
     {
         return $this->cache->rememberForever($this->cacheKey, function () {
-            return Permission::with('roles')->get();
+            return app(Permission::class)->with('roles')->get();
         });
     }
 }

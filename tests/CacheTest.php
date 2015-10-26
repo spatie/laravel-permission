@@ -3,8 +3,8 @@
 namespace Spatie\Permission\Test;
 
 use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
+use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\PermissionRegistrar;
 
 class CacheTest extends TestCase
@@ -44,7 +44,7 @@ class CacheTest extends TestCase
      */
     public function permission_creation_and_updating_should_flush_the_cache()
     {
-        $permission = Permission::create(['name' => 'new']);
+        $permission = app(Permission::class)->create(['name' => 'new']);
         $this->assertCount(3, DB::getQueryLog());
 
         $this->registrar->registerPermissions();
@@ -63,7 +63,7 @@ class CacheTest extends TestCase
      */
     public function role_creation_and_updating_should_flush_the_cache()
     {
-        $role = Role::create(['name' => 'new']);
+        $role = app(Role::class)->create(['name' => 'new']);
         $this->assertCount(3, DB::getQueryLog());
 
         $this->registrar->registerPermissions();

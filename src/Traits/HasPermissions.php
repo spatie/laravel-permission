@@ -2,7 +2,7 @@
 
 namespace Spatie\Permission\Traits;
 
-use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Contracts\Permission;
 
 trait HasPermissions
 {
@@ -46,7 +46,7 @@ trait HasPermissions
     protected function getStoredPermission($permission)
     {
         if (is_string($permission)) {
-            return Permission::findByName($permission);
+            return app(Permission::class)->findByName($permission);
         }
 
         return $permission;

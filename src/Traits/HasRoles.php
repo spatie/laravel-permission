@@ -2,8 +2,8 @@
 
 namespace Spatie\Permission\Traits;
 
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
+use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Contracts\Role;
 
 trait HasRoles
 {
@@ -17,7 +17,10 @@ trait HasRoles
      */
     public function roles()
     {
-        return $this->belongsToMany(Role::class, 'user_has_roles');
+        return $this->belongsToMany(
+            config('laravel-permission.models.role'),
+            config('laravel-permission.tables.user_has_roles')
+        );
     }
 
     /**
@@ -27,7 +30,10 @@ trait HasRoles
      */
     public function permissions()
     {
-        return $this->belongsToMany(Permission::class, 'user_has_permissions');
+        return $this->belongsToMany(
+            config('laravel-permission.models.permission'),
+            config('laravel-permission.tables.user_has_permissions')
+        );
     }
 
     /**
@@ -120,7 +126,7 @@ trait HasRoles
     public function hasPermissionTo($permission)
     {
         if (is_string($permission)) {
-            $permission = Permission::findByName($permission);
+            $permission = app(Permission::class)->findByName($permission);
         }
 
         return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
@@ -162,7 +168,7 @@ trait HasRoles
     protected function hasDirectPermission(Permission $permission)
     {
         if (is_string($permission)) {
-            $permission = Permission::findByName($permission);
+            $permission = app(Permission::class)->findByName($permission);
         }
 
         return $this->permissions->contains('id', $permission->id);
@@ -176,7 +182,7 @@ trait HasRoles
     protected function getStoredRole($role)
     {
         if (is_string($role)) {
-            return Role::findByName($role);
+            return app(Role::class)->findByName($role);
         }
 
         return $role;

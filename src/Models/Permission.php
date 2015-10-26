@@ -3,13 +3,19 @@
 namespace Spatie\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Contracts\Permission as PermissionContract;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
 
-class Permission extends Model
+class Permission extends Model implements PermissionContract
 {
     use RefreshesPermissionCache;
 
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array
+     */
     public $guarded = ['id'];
 
     /**
@@ -19,7 +25,23 @@ class Permission extends Model
      */
     public function roles()
     {
-        return $this->belongsToMany(Role::class, 'role_has_permissions');
+        return $this->belongsToMany(
+            config('laravel-permission.models.role'),
+            config('laravel-permission.tables.role_has_permissions')
+        );
+    }
+
+    /**
+     * A permission can be applied to users.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function users()
+    {
+        return $this->belongsToMany(
+            config('laravel-permission.models.user'),
+            config('laravel-permission.tables.user_has_permissions')
+        );
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreatePermissionTables extends Migration
 {
@@ -12,19 +12,21 @@ class CreatePermissionTables extends Migration
      */
     public function up()
     {
-        Schema::create('roles', function (Blueprint $table) {
+        $config = config('laravel-permission.tables');
+
+        Schema::create($config['roles'], function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->timestamps();
         });
 
-        Schema::create('permissions', function (Blueprint $table) {
+        Schema::create($config['permissions'], function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->timestamps();
         });
 
-        Schema::create('user_has_permissions', function (Blueprint $table) {
+        Schema::create($config['user_has_permissions'], function (Blueprint $table) {
             $table->integer('user_id')->unsigned();
             $table->integer('permission_id')->unsigned();
 
@@ -41,7 +43,7 @@ class CreatePermissionTables extends Migration
             $table->primary(['user_id', 'permission_id']);
         });
 
-        Schema::create('user_has_roles', function (Blueprint $table) {
+        Schema::create($config['user_has_roles'], function (Blueprint $table) use ($config) {
             $table->integer('role_id')->unsigned();
             $table->integer('user_id')->unsigned();
 
@@ -57,7 +59,7 @@ class CreatePermissionTables extends Migration
 
             $table->primary(['role_id', 'user_id']);
 
-            Schema::create('role_has_permissions', function (Blueprint $table) {
+            Schema::create($config['role_has_permissions'], function (Blueprint $table) {
                 $table->integer('permission_id')->unsigned();
                 $table->integer('role_id')->unsigned();
 
@@ -83,10 +85,12 @@ class CreatePermissionTables extends Migration
      */
     public function down()
     {
-        Schema::drop('role_has_permissions');
-        Schema::drop('user_has_roles');
-        Schema::drop('user_has_permissions');
-        Schema::drop('roles');
-        Schema::drop('permissions');
+        $config = config('laravel-permission.tables');
+
+        Schema::drop($config['role_has_permissions']);
+        Schema::drop($config['user_has_roles']);
+        Schema::drop($config['user_has_permissions']);
+        Schema::drop($config['roles']);
+        Schema::drop($config['permissions']);
     }
 }
