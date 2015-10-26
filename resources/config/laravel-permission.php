@@ -12,17 +12,17 @@ return [
         /*
          * The class name of the permission model to be used.
          */
-        'permission' => 'Spatie\Permission\Models\Permission',
+        'permission' => Spatie\Permission\Models\Permission::class,
 
         /*
          * The class name of the role model to be used.
          */
-        'role' => 'Spatie\Permission\Models\Role',
+        'role' => Spatie\Permission\Models\Role::class,
 
         /*
          * The class name of the user model to be used.
          */
-        'user' => 'App\User',
+        'user' => App\User::class,
     ],
 
     /*
