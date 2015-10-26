@@ -14,13 +14,6 @@ class Role extends Model implements RoleContract
     use RefreshesPermissionCache;
 
     /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'roles';
-
-    /**
      * The attributes that aren't mass assignable.
      *
      * @var array
@@ -30,14 +23,13 @@ class Role extends Model implements RoleContract
     /**
      * Create a new Eloquent model instance.
      *
-     * @param  array  $attributes
-     * @return void
+     * @param array $attributes
      */
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
 
-        $this->table = config('laravel-permission.tables.roles');
+        $this->setTable(config('laravel-permission.tableNames.roles'));
     }
 
     /**
@@ -49,7 +41,7 @@ class Role extends Model implements RoleContract
     {
         return $this->belongsToMany(
             config('laravel-permission.models.permission'),
-            config('laravel-permission.tables.role_has_permissions')
+            config('laravel-permission.tableNames.role_has_permissions')
         );
     }
 
@@ -62,7 +54,7 @@ class Role extends Model implements RoleContract
     {
         return $this->belongsToMany(
             config('laravel-permission.models.user'),
-            config('laravel-permission.tables.user_has_roles')
+            config('laravel-permission.tableNames.user_has_roles')
         );
     }
 

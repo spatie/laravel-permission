@@ -60,7 +60,81 @@ running the migrations:
 php artisan migrate
 ```
 
-Finally add the `Spatie\Permission\Traits\HasRoles`-trait to the User model.
+You can publish the config-file with:
+```bash
+php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="config"
+```
+
+This is the contents of the published config file:
+
+```php
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Authorization Models
+    |--------------------------------------------------------------------------
+    */
+
+    'models' => [
+        /*
+         * The class name of the permission model to be used.
+         */
+        'permission' => 'Spatie\Permission\Models\Permission',
+
+        /*
+         * The class name of the role model to be used.
+         */
+        'role' => 'Spatie\Permission\Models\Role',
+
+        /*
+         * The class name of the user model to be used.
+         */
+        'user' => 'App\User',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Authorization Tables
+    |--------------------------------------------------------------------------
+    */
+
+    'tableNames' => [
+        /*
+         * The name of the "users" table to be used.
+         */
+        'users' => 'users',
+
+        /*
+         * The name of the "roles" table to be used.
+         */
+        'roles' => 'roles',
+
+        /*
+         * The name of the "permissions" table to be used.
+         */
+        'permissions' => 'permissions',
+
+        /*
+         * The name of the "user_has_permissions" table to be used.
+         */
+        'user_has_permissions' => 'user_has_permissions',
+
+        /*
+         * The name of the "user_has_roles" table to be used.
+         */
+        'user_has_roles' => 'user_has_roles',
+
+        /*
+         * The name of the "role_has_permissions" table to be used.
+         */
+        'role_has_permissions' => 'role_has_permissions',
+    ],
+
+];
+```
+
+And finally add the `Spatie\Permission\Traits\HasRoles`-trait to the User model.
 
 
 

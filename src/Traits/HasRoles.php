@@ -19,7 +19,7 @@ trait HasRoles
     {
         return $this->belongsToMany(
             config('laravel-permission.models.role'),
-            config('laravel-permission.tables.user_has_roles')
+            config('laravel-permission.tableNames.user_has_roles')
         );
     }
 
@@ -32,7 +32,7 @@ trait HasRoles
     {
         return $this->belongsToMany(
             config('laravel-permission.models.permission'),
-            config('laravel-permission.tables.user_has_permissions')
+            config('laravel-permission.tableNames.user_has_permissions')
         );
     }
 

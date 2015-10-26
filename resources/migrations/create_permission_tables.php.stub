@@ -12,7 +12,7 @@ class CreatePermissionTables extends Migration
      */
     public function up()
     {
-        $config = config('laravel-permission.tables');
+        $config = config('laravel-permission.tableNames');
 
         Schema::create($config['roles'], function (Blueprint $table) {
             $table->increments('id');
@@ -26,18 +26,18 @@ class CreatePermissionTables extends Migration
             $table->timestamps();
         });
 
-        Schema::create($config['user_has_permissions'], function (Blueprint $table) {
+        Schema::create($config['user_has_permissions'], function (Blueprint $table) use ($config) {
             $table->integer('user_id')->unsigned();
             $table->integer('permission_id')->unsigned();
 
             $table->foreign('user_id')
                 ->references('id')
-                ->on('users')
+                ->on($config['users'])
                 ->onDelete('cascade');
 
             $table->foreign('permission_id')
                 ->references('id')
-                ->on('permissions')
+                ->on($config['permissions'])
                 ->onDelete('cascade');
 
             $table->primary(['user_id', 'permission_id']);
@@ -49,28 +49,28 @@ class CreatePermissionTables extends Migration
 
             $table->foreign('role_id')
                 ->references('id')
-                ->on('roles')
+                ->on($config['roles'])
                 ->onDelete('cascade');
 
             $table->foreign('user_id')
                 ->references('id')
-                ->on('users')
+                ->on($config['users'])
                 ->onDelete('cascade');
 
             $table->primary(['role_id', 'user_id']);
 
-            Schema::create($config['role_has_permissions'], function (Blueprint $table) {
+            Schema::create($config['role_has_permissions'], function (Blueprint $table) use ($config) {
                 $table->integer('permission_id')->unsigned();
                 $table->integer('role_id')->unsigned();
 
                 $table->foreign('permission_id')
                     ->references('id')
-                    ->on('permissions')
+                    ->on($config['permissions'])
                     ->onDelete('cascade');
 
                 $table->foreign('role_id')
                     ->references('id')
-                    ->on('roles')
+                    ->on($config['roles'])
                     ->onDelete('cascade');
 
                 $table->primary(['permission_id', 'role_id']);
@@ -85,7 +85,7 @@ class CreatePermissionTables extends Migration
      */
     public function down()
     {
-        $config = config('laravel-permission.tables');
+        $config = config('laravel-permission.tableNames');
 
         Schema::drop($config['role_has_permissions']);
         Schema::drop($config['user_has_roles']);

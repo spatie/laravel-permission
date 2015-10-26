@@ -2,6 +2,12 @@
 
 return [
 
+    /*
+    |--------------------------------------------------------------------------
+    | Authorization Models
+    |--------------------------------------------------------------------------
+    */
+
     'models' => [
         /*
          * The class name of the permission model to be used.
@@ -19,7 +25,18 @@ return [
         'user' => 'App\User',
     ],
 
-    'tables' => [
+    /*
+    |--------------------------------------------------------------------------
+    | Authorization Tables
+    |--------------------------------------------------------------------------
+    */
+
+    'tableNames' => [
+        /*
+         * The name of the "users" table to be used.
+         */
+        'users' => 'users',
+
         /*
          * The name of the "roles" table to be used.
          */
