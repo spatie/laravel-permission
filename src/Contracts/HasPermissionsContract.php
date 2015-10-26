@@ -19,11 +19,4 @@ interface HasPermissionsContract
      * @return HasPermissionsContract
      */
     function revokePermissionTo($permission);
-
-    /**
-     * @param $permission
-     *
-     * @return PermissionContract
-     */
-    function getStoredPermission($permission);
 }

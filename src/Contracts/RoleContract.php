@@ -35,11 +35,4 @@ interface RoleContract
      * @return HasPermissionsContract
      */
     function revokePermissionTo($permission);
-
-    /**
-     * @param $permission
-     *
-     * @return object PermissionContract
-     */
-    function getStoredPermission($permission);
 }

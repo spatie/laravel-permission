@@ -81,28 +81,4 @@ interface HasRolesContract
      */
     function hasPermission($permission);
 
-    /**
-     * Determine if the user has, via roles, has the given permission.
-     *
-     * @param PermissionContract $permission
-     *
-     * @return bool
-     */
-    function hasPermissionViaRole(PermissionContract $permission);
-
-    /**
-     * Determine if the user has has the given permission.
-     *
-     * @param PermissionContract $permission
-     *
-     * @return bool
-     */
-    function hasDirectPermission(PermissionContract $permission);
-
-    /**
-     * @param $role
-     *
-     * @return RoleContract
-     */
-    function getStoredRole($role);
 }
