@@ -2,6 +2,11 @@
 
 All Notable changes to `laravel-permission` will be documented in this file
 
+## 1.2.0 - 2015-10-28
+
+###Added
+- support for custom models
+
 ## 1.1.0 - 2015-10-12
 
 ### Added
