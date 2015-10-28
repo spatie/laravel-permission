@@ -7,7 +7,7 @@
 [![Quality Score](https://img.shields.io/scrutinizer/g/spatie/laravel-permission.svg?style=flat-square)](https://scrutinizer-ci.com/g/spatie/laravel-permission)
 [![Total Downloads](https://img.shields.io/packagist/dt/spatie/laravel-permission.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-permission)
 
-This package allows to save permissions and roles in a database. It is built upon the [Laravel's
+This package allows to save permissions and roles in a database. It is built upon [Laravel's
 authorization functionality](http://laravel.com/docs/5.1/authorization) that
 was [introduced in version 5.1.11](http://christoph-rumpel.com/2015/09/new-acl-features-in-laravel/)
 
