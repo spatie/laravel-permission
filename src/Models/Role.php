@@ -29,7 +29,7 @@ class Role extends Model implements RoleContract
     {
         parent::__construct($attributes);
 
-        $this->setTable(config('laravel-permission.tableNames.roles'));
+        $this->setTable(config('laravel-permission.table_names.roles'));
     }
 
     /**
@@ -41,7 +41,7 @@ class Role extends Model implements RoleContract
     {
         return $this->belongsToMany(
             config('laravel-permission.models.permission'),
-            config('laravel-permission.tableNames.role_has_permissions')
+            config('laravel-permission.table_names.role_has_permissions')
         );
     }
 
@@ -54,7 +54,7 @@ class Role extends Model implements RoleContract
     {
         return $this->belongsToMany(
             config('laravel-permission.models.user'),
-            config('laravel-permission.tableNames.user_has_roles')
+            config('laravel-permission.table_names.user_has_roles')
         );
     }
 

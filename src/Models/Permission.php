@@ -27,7 +27,7 @@ class Permission extends Model implements PermissionContract
     {
         parent::__construct($attributes);
 
-        $this->setTable(config('laravel-permission.tableNames.permissions'));
+        $this->setTable(config('laravel-permission.table_names.permissions'));
     }
 
     /**
@@ -39,7 +39,7 @@ class Permission extends Model implements PermissionContract
     {
         return $this->belongsToMany(
             config('laravel-permission.models.role'),
-            config('laravel-permission.tableNames.role_has_permissions')
+            config('laravel-permission.table_names.role_has_permissions')
         );
     }
 
@@ -52,7 +52,7 @@ class Permission extends Model implements PermissionContract
     {
         return $this->belongsToMany(
             config('laravel-permission.models.user'),
-            config('laravel-permission.tableNames.user_has_permissions')
+            config('laravel-permission.table_names.user_has_permissions')
         );
     }
 
