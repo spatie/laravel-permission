@@ -109,20 +109,6 @@ return [
         */
 
         'role' => Spatie\Permission\Models\Role::class,
-
-        /*
-        |--------------------------------------------------------------------------
-        | User Model
-        |--------------------------------------------------------------------------
-        |
-        | When using the "HasRoles" trait from this package, we need to know which
-        | Eloquent model should be used to retrieve your users. Of course, it
-        | is often just the "User" model but you may use whatever you like.
-        |
-        */
-
-        'user' => App\User::class,
-
     ],
 
     /*
@@ -132,19 +118,6 @@ return [
     */
 
     'table_names' => [
-
-        /*
-        |--------------------------------------------------------------------------
-        | Users Table
-        |--------------------------------------------------------------------------
-        |
-        | When using the "HasRoles" trait from this package, we need to know which
-        | table should be used to retrieve your users. We have chosen a basic
-        | default value but you may easily change it to any table you like.
-        |
-        */
-
-        'users' => 'users',
 
         /*
         |--------------------------------------------------------------------------

@@ -53,7 +53,7 @@ class Role extends Model implements RoleContract
     public function users()
     {
         return $this->belongsToMany(
-            config('laravel-permission.models.user'),
+            config('auth.model'),
             config('laravel-permission.table_names.user_has_roles')
         );
     }
