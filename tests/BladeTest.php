@@ -2,15 +2,18 @@
 
 namespace Spatie\Permission\Test;
 
-use Spatie\Permission\Models\Role;
+use Spatie\Permission\Contracts\Role;
 
 class BladeTest extends TestCase
 {
     public function setUp()
     {
         parent::setUp();
-        Role::create(['name' => 'member']);
-        Role::create(['name' => 'admin']);
+
+        $roleModel = app(Role::class);
+
+        $roleModel->create(['name' => 'member']);
+        $roleModel->create(['name' => 'admin']);
     }
 
     /**

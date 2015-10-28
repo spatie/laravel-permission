@@ -2,7 +2,7 @@
 
 namespace Spatie\Permission\Test;
 
-use Spatie\Permission\Models\Role;
+use Spatie\Permission\Contracts\Role;
 
 class HasRolesTest extends TestCase
 {
@@ -47,17 +47,19 @@ class HasRolesTest extends TestCase
      */
     public function it_can_determine_that_a_user_has_one_of_the_given_roles()
     {
-        Role::create(['name' => 'second role']);
+        $roleModel = app(Role::class);
 
-        $this->assertFalse($this->testUser->hasRole(Role::all()));
+        $roleModel->create(['name' => 'second role']);
+
+        $this->assertFalse($this->testUser->hasRole($roleModel->all()));
 
         $this->testUser->assignRole($this->testRole);
 
         $this->refreshTestUser();
 
-        $this->assertTrue($this->testUser->hasRole(Role::all()));
+        $this->assertTrue($this->testUser->hasRole($roleModel->all()));
 
-        $this->assertTrue($this->testUser->hasAnyRole(Role::all()));
+        $this->assertTrue($this->testUser->hasAnyRole($roleModel->all()));
     }
 
     /**
@@ -65,25 +67,27 @@ class HasRolesTest extends TestCase
      */
     public function it_can_determine_that_a_user_has_all_of_the_given_roles()
     {
-        $this->assertFalse($this->testUser->hasAllRoles(Role::first()));
+        $roleModel = app(Role::class);
+
+        $this->assertFalse($this->testUser->hasAllRoles($roleModel->first()));
 
         $this->assertFalse($this->testUser->hasAllRoles('testRole'));
 
-        $this->assertFalse($this->testUser->hasAllRoles(Role::all()));
+        $this->assertFalse($this->testUser->hasAllRoles($roleModel->all()));
 
-        Role::create(['name' => 'second role']);
+        $roleModel->create(['name' => 'second role']);
 
         $this->testUser->assignRole($this->testRole);
 
         $this->refreshTestUser();
 
-        $this->assertFalse($this->testUser->hasAllRoles(Role::all()));
+        $this->assertFalse($this->testUser->hasAllRoles($roleModel->all()));
 
         $this->testUser->assignRole('second role');
 
         $this->refreshTestUser();
 
-        $this->assertTrue($this->testUser->hasAllRoles(Role::all()));
+        $this->assertTrue($this->testUser->hasAllRoles($roleModel->all()));
     }
 
     /**

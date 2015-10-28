@@ -2,13 +2,13 @@
 
 namespace Spatie\Permission\Test;
 
+use File;
 use Illuminate\Database\Schema\Blueprint;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
+use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\PermissionServiceProvider;
-use File;
 
 abstract class TestCase extends Orchestra
 {
@@ -36,8 +36,8 @@ abstract class TestCase extends Orchestra
         $this->reloadPermissions();
 
         $this->testUser = User::first();
-        $this->testRole = Role::first();
-        $this->testPermission = Permission::find(1);
+        $this->testRole = app(Role::class)->first();
+        $this->testPermission = app(Permission::class)->find(1);
     }
 
     /**
@@ -90,9 +90,9 @@ abstract class TestCase extends Orchestra
         (new \CreatePermissionTables())->up();
 
         User::create(['email' => 'test@user.com']);
-        Role::create(['name' => 'testRole']);
-        Permission::create(['name' => 'edit-articles']);
-        Permission::create(['name' => 'edit-news']);
+        $app[Role::class]->create(['name' => 'testRole']);
+        $app[Permission::class]->create(['name' => 'edit-articles']);
+        $app[Permission::class]->create(['name' => 'edit-news']);
     }
 
     /**
