@@ -2,6 +2,11 @@
 
 All Notable changes to `laravel-permission` will be documented in this file
 
+## 1.2.1 - 2015-12-22
+
+- use database_path to publish migrations
+
+
 ## 1.2.0 - 2015-10-28
 
 ###Added
