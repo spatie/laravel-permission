@@ -13,7 +13,7 @@ class CreatePermissionTables extends Migration
     public function up()
     {
         $config = config('laravel-permission.table_names');
-        $config['users'] = config('auth.table');
+        $config['users'] = 'users';
 
         Schema::create($config['roles'], function (Blueprint $table) {
             $table->increments('id');

@@ -53,6 +53,9 @@ You can publish the migration with:
 php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="migrations"
 ```
 
+The package assumes that your users table name is called "users". If this is not the case
+you should manually edit the published migration to use your custom table name.
+
 After the migration has been published you can create the role- and permission-tables by
 running the migrations:
 
