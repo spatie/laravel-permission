@@ -2,7 +2,7 @@
 
 All Notable changes to `laravel-permission` will be documented in this file
 
-## 1.2.2 - 2015-12-25
+## 1.3.0 - 2015-12-25
 
 - added compatiblity for Laravel 5.2
 
