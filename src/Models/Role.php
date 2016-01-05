@@ -62,6 +62,8 @@ class Role extends Model implements RoleContract
      * Find a role by its name.
      *
      * @param string $name
+     * 
+     * @return Role
      *
      * @throws RoleDoesNotExist
      */
