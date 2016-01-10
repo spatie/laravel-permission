@@ -2,6 +2,10 @@
 
 All Notable changes to `laravel-permission` will be documented in this file
 
+## 1.3.1 - 2016-01-10
+
+- fixed bug when testing for non existing permissions
+
 ## 1.3.0 - 2015-12-25
 
 - added compatiblity for Laravel 5.2

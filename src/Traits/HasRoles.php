@@ -77,7 +77,7 @@ trait HasRoles
             return $this->roles->contains('id', $roles->id);
         }
 
-        return (bool) !!$roles->intersect($this->roles)->count();
+        return (bool) (bool) $roles->intersect($this->roles)->count();
     }
 
     /**
@@ -169,6 +169,10 @@ trait HasRoles
     {
         if (is_string($permission)) {
             $permission = app(Permission::class)->findByName($permission);
+
+            if (!$permission) {
+                return false;
+            }
         }
 
         return $this->permissions->contains('id', $permission->id);
