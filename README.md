@@ -198,7 +198,7 @@ First add the `Spatie\Permission\Traits\HasRoles`-trait to your User model.
 
 ```php
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Spatie\Permission\Traits\HasRoles
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
