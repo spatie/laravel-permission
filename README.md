@@ -192,7 +192,19 @@ return [
 ];
 ```
 
-And finally add the `Spatie\Permission\Traits\HasRoles`-trait to the User model.
+Finally add the `Spatie\Permission\Traits\HasRoles`-trait to the User model.
+
+```php
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Spatie\Permission\Traits\HasRoles
+
+class User extends Authenticatable
+{
+    use HasRoles;
+    
+    // ...
+}
+```
 
 ## Usage
 
