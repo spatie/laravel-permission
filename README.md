@@ -192,7 +192,9 @@ return [
 ];
 ```
 
-Finally add the `Spatie\Permission\Traits\HasRoles`-trait to the User model.
+## Usage
+
+First add the `Spatie\Permission\Traits\HasRoles`-trait to your User model.
 
 ```php
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -206,12 +208,8 @@ class User extends Authenticatable
 }
 ```
 
-## Usage
-
-This package allows for users to be associated with roles. Permissions can be 
-associated with roles.
-A `Role` and a `Permission` are regular Eloquent-models. They can have a name 
-and can be created like this:
+This package allows for users to be associated with roles. Permissions can be associated with roles.
+A `Role` and a `Permission` are regular Eloquent-models. They can have a name and can be created like this:
 
 ```php
 use Spatie\Permission\Models\Role;
