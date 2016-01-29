@@ -167,6 +167,10 @@ trait HasRoles
      */
     protected function hasDirectPermission(Permission $permission)
     {
+        if( ! $this->permissions) {
+            return false;
+        }
+        
         if (is_string($permission)) {
             $permission = app(Permission::class)->findByName($permission);
 
