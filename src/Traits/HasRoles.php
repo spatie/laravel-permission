@@ -77,7 +77,7 @@ trait HasRoles
             return $this->roles->contains('id', $roles->id);
         }
 
-        return (bool) (bool) $roles->intersect($this->roles)->count();
+        return (bool) $roles->intersect($this->roles)->count();
     }
 
     /**
