@@ -102,6 +102,16 @@ class HasRolesTest extends TestCase
     /**
      * @test
      */
+    public function it_can_work_with_a_user_that_does_not_have_any_permissions_at_all()
+    {
+        $user = new User();
+
+        $this->assertFalse($user->hasPermissionTo('edit-articles'));
+    }
+
+    /**
+     * @test
+     */
     public function it_can_determine_that_the_user_does_not_have_a_permission_even_with_non_existing_permissions()
     {
         $this->setExpectedException(PermissionDoesNotExist::class);
