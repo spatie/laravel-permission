@@ -219,6 +219,13 @@ $role = Role::create(['name' => 'writer']);
 $permission = Permission::create(['name' => 'edit articles']);
 ```
 
+The `HasRoles` adds eloquent relationships to your models, which can be accessed directly or used as a base query.
+
+```php
+$permissions = $user->permissions;
+$roles = $user->roles()->pluck('name');
+```
+
 ###Using permissions
 A permission can be given to a user:
 
