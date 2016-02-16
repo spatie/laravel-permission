@@ -29,6 +29,8 @@ You can test if a user has a permission with Laravel's default `can`-function.
 $user->can('edit articles');
 ```
 
+If you want a drop-in middleware to check permissions, check out our authorize package: https://github.com/spatie/laravel-authorize
+
 Spatie is webdesign agency in Antwerp, Belgium. You'll find an overview of all 
 our open source projects [on our website](https://spatie.be/opensource).
 
