@@ -2,6 +2,10 @@
 
 All Notable changes to `laravel-permission` will be documented in this file
 
+## 1.3.2 - 2016-02-23
+
+- Fixed user table configuration
+
 ## 1.3.1 - 2016-01-10
 
 - fixed bug when testing for non existing permissions
