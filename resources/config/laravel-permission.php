@@ -52,6 +52,17 @@ return [
 
     'table_names' => [
 
+        /*
+        |--------------------------------------------------------------------------
+        | Users Table
+        |--------------------------------------------------------------------------
+        |
+        | The table that your application uses for users. This table's model will
+        | be using the "HasRoles" and "HasPermissions" traits.
+        |
+        */
+        'users' => 'users',
+
 
         /*
         |--------------------------------------------------------------------------
