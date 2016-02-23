@@ -2,9 +2,13 @@
 
 All Notable changes to `laravel-permission` will be documented in this file
 
+## 1.3.3 - 2016-02-24
+
+- `hasDirectPermission` can now accept a string
+
 ## 1.3.2 - 2016-02-23
 
-- Fixed user table configuration
+- fixed user table configuration
 
 ## 1.3.1 - 2016-01-10
 
