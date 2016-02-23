@@ -339,6 +339,14 @@ I don't have all of these roles...
 @endhasallroles
 ```
 
+```php
+@haspermissionto('write code')
+I have permission to write code!
+@else
+I don't have permission to write code...
+@endhaspermissionto
+```
+
 ## Extending
 
 If you need to extend or replace the existing `Role` or `Permission` models you just need to 

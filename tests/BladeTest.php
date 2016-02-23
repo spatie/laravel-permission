@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Test;
 
+use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 
 class BladeTest extends TestCase
@@ -11,9 +12,12 @@ class BladeTest extends TestCase
         parent::setUp();
 
         $roleModel = app(Role::class);
+        $permissionModel = app(Permission::class) ;
 
         $roleModel->create(['name' => 'member']);
-        $roleModel->create(['name' => 'admin']);
+        $admin = $roleModel->create(['name' => 'admin']);
+        $permission = $permissionModel->create( ['name' => 'write code'] ) ;
+        $admin->permissions()->save($permission) ;
     }
 
     /**
@@ -23,11 +27,13 @@ class BladeTest extends TestCase
     {
         $role = 'admin';
         $roles = [$role];
+        $permission = 'write code' ;
 
         $this->assertEquals('does not have role', $this->renderView('role', [$role]));
         $this->assertEquals('does not have role', $this->renderView('hasRole', [$role]));
         $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', $roles));
         $this->assertEquals('does not have any of the given roles', $this->renderView('hasAnyRole', $roles));
+        $this->assertEquals('does not have permission to', $this->renderView('hasPermissionTo', [$permission]));
     }
 
     /**
@@ -37,6 +43,7 @@ class BladeTest extends TestCase
     {
         $role = 'admin';
         $roles = 'admin';
+        $permission = 'write code' ;
 
         $this->actingAs($this->testUser);
 
@@ -44,6 +51,7 @@ class BladeTest extends TestCase
         $this->assertEquals('does not have role', $this->renderView('hasRole', compact('role')));
         $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', compact('roles')));
         $this->assertEquals('does not have any of the given roles', $this->renderView('hasAnyRole', compact('roles')));
+        $this->assertEquals('does not have permission to', $this->renderView('hasPermissionTo', compact('permission')));
     }
 
     /**
@@ -95,6 +103,18 @@ class BladeTest extends TestCase
 
         $this->assertEquals('does have all of the given roles', $this->renderView('hasAllRoles', compact('roles')));
     }
+
+    /**
+     * @test
+     */
+    public function the_haspermissionto_directive_will_evaluate_true_when_the_logged_in_user_has_the_permission_to()
+    {
+        $permission = 'write code' ;
+        auth()->login($this->getAdmin());
+
+        $this->assertEquals('has permission to', $this->renderView('hasPermissionTo', compact('permission')));
+    }
+
 
     public function getAdmin()
     {
