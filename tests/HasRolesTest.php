@@ -61,6 +61,16 @@ class HasRolesTest extends TestCase
         $this->assertTrue($this->testUser->hasRole($roleModel->all()));
 
         $this->assertTrue($this->testUser->hasAnyRole($roleModel->all()));
+
+        $this->assertTrue($this->testUser->hasAnyRole('testRole'));
+
+        $this->assertFalse($this->testUser->hasAnyRole('role does not exist'));
+
+        $this->assertTrue($this->testUser->hasAnyRole(['testRole']));
+
+        $this->assertTrue($this->testUser->hasAnyRole(['testRole', 'role does not exist']));
+
+        $this->assertFalse($this->testUser->hasAnyRole(['role does not exist']));
     }
 
     /**

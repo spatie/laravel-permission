@@ -63,7 +63,7 @@ trait HasRoles
     /**
      * Determine if the user has (one of) the given role(s).
      *
-     * @param string|Role|\Illuminate\Support\Collection $roles
+     * @param string|array|Role|\Illuminate\Support\Collection $roles
      *
      * @return bool
      */
@@ -77,13 +77,23 @@ trait HasRoles
             return $this->roles->contains('id', $roles->id);
         }
 
+        if (is_array($roles)) {
+            foreach ($roles as $role) {
+                if ($this->hasRole($role)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         return (bool) $roles->intersect($this->roles)->count();
     }
 
     /**
      * Determine if the user has any of the given role(s).
      *
-     * @param string|Role|\Illuminate\Support\Collection $roles
+     * @param string|array|Role|\Illuminate\Support\Collection $roles
      *
      * @return bool
      */
