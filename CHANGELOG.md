@@ -2,7 +2,7 @@
 
 All Notable changes to `laravel-permission` will be documented in this file
 
-## 1.3.4 2016-02-27
+## 1.3.4 - 2016-02-27
 -  `hasAnyRole` can now properly process an array
 
 ## 1.3.3 - 2016-02-24
