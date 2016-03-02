@@ -339,6 +339,8 @@ I don't have all of these roles...
 @endhasallroles
 ```
 
+You can use Laravel's native `@can` directive to check if a user has a certain permission.
+
 ## Extending
 
 If you need to extend or replace the existing `Role` or `Permission` models you just need to 
