@@ -1,0 +1,43 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+
+class AddUniqueIndexToRolesAndPermissionsNameColumns extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        $config = config('laravel-permission.table_names');
+
+        Schema::table($config['roles'], function (Blueprint $table) {
+            $table->unique('name');
+        });
+
+        Schema::table($config['permissions'], function (Blueprint $table) {
+            $table->unique('name');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        $config = config('laravel-permission.table_names');
+
+       Schema::table($config['roles'], function (Blueprint $table) {
+            $table->dropUnique('name');
+        });
+
+        Schema::table($config['permissions'], function (Blueprint $table) {
+            $table->dropUnique('name');
+        });
+    }
+}
