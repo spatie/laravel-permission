@@ -45,7 +45,7 @@ class PermissionServiceProvider extends ServiceProvider
             $this->migrations[dirname(__DIR__) . '/resources/migrations/create_permission_tables.php.stub'] = $this->app->databasePath() . '/migrations/' . $timestamp . '_create_permission_tables.php';
         }
 
-        if (!class_exists('AddUniqueIndexToRolesAndPermissionsNameColumns')) {
+        if (!class_exists('AddUniqueIndexToRolesAndPermissionsNameColumns') && class_exists('CreatePermissionTables')) {
             $this->migrations[dirname(__DIR__) . '/resources/migrations/add_unique_index_to_roles_and_permissions_name_columns.php.stub'] = $this->app->databasePath() . '/migrations/' . $timestamp . '_add_unique_index_to_roles_and_permissions_name_columns.php';
         }
     }
