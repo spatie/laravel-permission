@@ -157,7 +157,7 @@ trait HasRoles
     }
 
     /**
-     * Determine if the user has, via roles, has the given permission.
+     * Determine if the user has, via roles, the given permission.
      *
      * @param Permission $permission
      *
@@ -169,7 +169,7 @@ trait HasRoles
     }
 
     /**
-     * Determine if the user has has the given permission.
+     * Determine if the user has the given permission.
      *
      * @param string|Permission $permission
      *
