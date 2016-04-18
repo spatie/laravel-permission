@@ -85,7 +85,7 @@ abstract class TestCase extends Orchestra
             $table->string('email');
         });
 
-        include_once '__DIR__'.'/../resources/migrations/create_permission_tables.php.stub';
+        include_once __DIR__.'/../resources/migrations/create_permission_tables.php.stub';
 
         (new \CreatePermissionTables())->up();
 
