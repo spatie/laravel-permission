@@ -26,4 +26,13 @@ interface Role
      * @throws RoleDoesNotExist
      */
     public static function findByName($name);
+
+    /**
+     * Determine if the user may perform the given permission.
+     *
+     * @param string|Permission $permission
+     *
+     * @return bool
+     */
+    public function hasPermissionTo($permission);
 }

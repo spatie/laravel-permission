@@ -4,6 +4,7 @@ namespace Spatie\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Contracts\Role as RoleContract;
+use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
@@ -62,7 +63,7 @@ class Role extends Model implements RoleContract
      * Find a role by its name.
      *
      * @param string $name
-     * 
+     *
      * @return Role
      *
      * @throws RoleDoesNotExist
@@ -76,5 +77,25 @@ class Role extends Model implements RoleContract
         }
 
         return $role;
+    }
+
+    /**
+     * Determine if the user may perform the given permission.
+     *
+     * @param string|Permission $permission
+     *
+     * @return bool
+     */
+    public function hasPermissionTo($permission)
+    {
+        if (is_string($permission)) {
+            try {
+                $permission = app(Permission::class)->findByName($permission);
+            } catch (PermissionDoesNotExist $e) {
+                return false;
+            }
+        }
+
+        return $this->permissions->contains('id', $permission->id);
     }
 }
