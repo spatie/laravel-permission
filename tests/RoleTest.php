@@ -1,4 +1,6 @@
-<?php namespace Spatie\Permission\Test;
+<?php
+
+namespace Spatie\Permission\Test;
 
 use Spatie\Permission\Models\Permission;
 
@@ -7,7 +9,7 @@ class RoleTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        
+
         Permission::create(['name' => 'other-permission']);
 
         $this->testRole->givePermissionTo($this->testPermission);
@@ -37,4 +39,3 @@ class RoleTest extends TestCase
         $this->assertFalse($this->testRole->hasPermissionTo($permission));
     }
 }
-
