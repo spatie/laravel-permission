@@ -289,6 +289,13 @@ A permission can be given to a role:
 $role->givePermissionTo('edit articles');
 ```
 
+
+You can determine if a role has a certain permission:
+
+```php
+$role->hasPermissionTo('edit articles');
+```
+
 A permission can be revoked from a role:
 
 ```php
