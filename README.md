@@ -349,7 +349,7 @@ I don't have all of these roles...
 You can use Laravel's native `@can` directive to check if a user has a certain permission.
 
 ## Combine with a middleware
-One way to accomplisch this would be to make a new Middleware ourselfs.
+One way to accomplish this would be to make a new Middleware ourselfs.
 
 ``` bash
 $ php artisan make:middleware RoleMiddleware
