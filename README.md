@@ -348,6 +348,46 @@ I don't have all of these roles...
 
 You can use Laravel's native `@can` directive to check if a user has a certain permission.
 
+## Combine with a middleware
+One way to accomplish this would be to make a new Middleware ourselfs.
+
+``` bash
+$ php artisan make:middleware RoleMiddleware
+```
+
+This will create a RoleMiddleware for you and here you can handle your role and permissions check.
+```php
+// app/Http/Middleware/RoleMiddleware.php
+public function handle($request, Closure $next, $role, $permission)
+{
+    if (! $request->user()->hasRole($role) || ! $request->user()->can($permission)) {
+        abort(403);
+    }
+
+    return $next($request);
+}
+```
+
+Don't forget to add the route middleware to your Kernel:
+
+```php
+// app/Http/Kernel.php
+protected $routeMiddleware = [
+    'auth' => \App\Http\Middleware\Authenticate::class,
+    'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
+    'role' => \App\Http\Middleware\RoleMiddleware::class,
+    ...
+];
+```
+
+Now you can protect your routes using the middleware you just set up:
+
+```php
+Route::group(['middleware' => ['role:admin,access_backend']], function () {
+    //
+});
+```
+
 ## Extending
 
 If you need to extend or replace the existing `Role` or `Permission` models you just need to 
