@@ -21,6 +21,23 @@ trait HasPermissions
 
         return $this;
     }
+    
+    /**
+     * Grant the given permissions to a role.
+     *
+     * @param $permissions
+     * @param array $joinings
+     * 
+     * @return $this
+     */
+    public function givePermissions($permissions, array $joinings = [])
+    {
+        $this->permissions()->saveMany($permissions, $joinings);
+
+        $this->forgetCachedPermissions();
+
+        return $this;
+    }
 
     /**
      * Revoke the given permission.
