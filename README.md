@@ -432,6 +432,7 @@ can be found [in this repo on GitHub](https://github.com/laracasts/laravel-5-rol
 - [BeatSwitch/lock-laravel](https://github.com/BeatSwitch/lock-laravel)
 - [Zizaco/entrust](https://github.com/Zizaco/entrust)
 - [JosephSilber/bouncer](https://github.com/JosephSilber/bouncer)
+- [bican/roles](https://github.com/romanbican/roles)
 
 ## About Spatie
 Spatie is webdesign agency in Antwerp, Belgium. You'll find an overview of all our open source projects [on our website](https://spatie.be/opensource).
