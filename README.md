@@ -360,6 +360,10 @@ This will create a RoleMiddleware for you and here you can handle your role and 
 // app/Http/Middleware/RoleMiddleware.php
 public function handle($request, Closure $next, $role, $permission)
 {
+    if (Auth::guest()) {
+        return redirect($urlOfYourLoginPage);
+    }
+
     if (! $request->user()->hasRole($role)) {
        abort(403);
     }
