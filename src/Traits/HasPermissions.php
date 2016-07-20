@@ -7,15 +7,23 @@ use Spatie\Permission\Contracts\Permission;
 trait HasPermissions
 {
     /**
-     * Grant the given permission to a role.
+     * Grant the given permission(s) to a role.
      *
-     * @param  $permission
+     * @param string|array|Permission|\Illuminate\Support\Collection $permissions
+     * @param array $params
      *
      * @return HasPermissions
      */
-    public function givePermissionTo($permission)
+    public function givePermissionTo($permissions, ...$params)
     {
-        $this->permissions()->save($this->getStoredPermission($permission));
+        $joinings = $this->resolveJoiningAttributes($params);
+
+        if (is_string($permissions) && $this->usingMultipleArguments($params)) {
+            array_unshift($params, $permissions);
+            $permissions = $params;
+        }
+
+        $this->savePermissions($permissions, $joinings);
 
         $this->forgetCachedPermissions();
 
@@ -23,20 +31,22 @@ trait HasPermissions
     }
     
     /**
-     * Grant the given permissions to a role.
+     * Save the given permissions to a role.
      *
-     * @param $permissions
+     * @param array|Permission|\Illuminate\Support\Collection $permissions
      * @param array $joinings
      * 
-     * @return $this
+     * @return array|\Illuminate\Database\Eloquent\Model
      */
-    public function givePermissions($permissions, array $joinings = [])
+    protected function savePermissions($permissions, array $joinings = [])
     {
-        $this->permissions()->saveMany($permissions, $joinings);
+        $permissions = $this->getStoredPermission($permissions);
 
-        $this->forgetCachedPermissions();
+        if($permissions instanceof \Illuminate\Database\Eloquent\Collection) {
+            return $this->permissions()->saveMany($permissions, $joinings);
+        }
 
-        return $this;
+        return $this->permissions()->save($permissions);
     }
 
     /**
@@ -56,16 +66,42 @@ trait HasPermissions
     }
 
     /**
-     * @param $permission
+     * @param string|array|Permission|\Illuminate\Support\Collection $permissions
      *
      * @return Permission
      */
-    protected function getStoredPermission($permission)
+    protected function getStoredPermission($permissions)
     {
-        if (is_string($permission)) {
-            return app(Permission::class)->findByName($permission);
+        if (is_string($permissions)) {
+            return app(Permission::class)->findByName($permissions);
         }
 
-        return $permission;
+        if (is_array($permissions)) {
+            return app(Permission::class)->whereIn('name', $permissions)->get();
+        }
+
+        return $permissions;
+    }
+
+    /**
+     * @param $params
+     * @return bool
+     */
+    private function usingMultipleArguments($params)
+    {
+        return count($params) > 0;
+    }
+
+    /**
+     * @param $params
+     * @return array
+     */
+    protected function resolveJoiningAttributes(&$params)
+    {
+        if(is_array(end($params)) && !empty($params)) {
+            return array_pop($params);
+        }
+
+        return [];
     }
 }

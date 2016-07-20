@@ -144,6 +144,32 @@ class HasRolesTest extends TestCase
     /**
      * @test
      */
+    public function it_can_assign_multiple_permissions_to_a_role_using_an_array()
+    {
+        $this->testRole->givePermissionTo(['edit-articles', 'edit-news']);
+
+        $this->testUser->assignRole('testRole');
+
+        $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
+        $this->assertTrue($this->testUser->hasPermissionTo('edit-news'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_assign_multiple_permissions_to_a_role_using_multiple_arguments()
+    {
+        $this->testRole->givePermissionTo('edit-articles', 'edit-news');
+
+        $this->testUser->assignRole('testRole');
+
+        $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
+        $this->assertTrue($this->testUser->hasPermissionTo('edit-news'));
+    }
+
+    /**
+     * @test
+     */
     public function it_can_revoke_a_permission_from_a_role()
     {
         $this->testRole->givePermissionTo('edit-articles');
