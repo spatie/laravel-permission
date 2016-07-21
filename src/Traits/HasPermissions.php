@@ -3,6 +3,7 @@
 namespace Spatie\Permission\Traits;
 
 use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Exceptions\PermissionMustNotBeEmpty;
 
 trait HasPermissions
 {
@@ -10,15 +11,17 @@ trait HasPermissions
      * Grant the given permission(s) to a role.
      *
      * @param string|array|Permission|\Illuminate\Support\Collection $permissions
-     * @param array $params
      *
      * @return HasPermissions
      */
-    public function givePermissionTo($permissions, ...$params)
+    public function givePermissionTo(...$permissions)
     {
-        if (is_string($permissions) && $this->usingMultipleArguments($params)) {
-            array_unshift($params, $permissions);
-            $permissions = $params;
+        if(count($permissions) < 1) {
+            throw new PermissionMustNotBeEmpty();
+        }
+
+        if (!$this->usingMultipleArguments($permissions)) {
+            $permissions = current($permissions);
         }
 
         $this->savePermissions($permissions);
@@ -86,7 +89,7 @@ trait HasPermissions
      */
     private function usingMultipleArguments($params)
     {
-        return count($params) > 0;
+        return count($params) > 1;
     }
 
 }
