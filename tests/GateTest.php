@@ -7,9 +7,7 @@ use Spatie\Permission\Exceptions\RoleDoesNotExist;
 
 class GateTest extends TestCase
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function it_can_determine_if_a_user_has_a_permission_when_using_roles()
     {
         $this->testRole->givePermissionTo($this->testPermission);
@@ -25,9 +23,7 @@ class GateTest extends TestCase
         $this->assertFalse($this->testUser->can('non-existing-permission'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function it_can_determine_if_a_user_has_a_permission_when_direct_permissions()
     {
         $this->testUser->givePermissionTo($this->testPermission);
@@ -39,9 +35,7 @@ class GateTest extends TestCase
         $this->assertFalse($this->testUser->can('non-existing-permission'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function it_will_throw_an_exception_when_using_a_permission_that_does_not_exist()
     {
         $this->setExpectedException(PermissionDoesNotExist::class);
@@ -49,9 +43,7 @@ class GateTest extends TestCase
         $this->testRole->givePermissionTo('create-evil-empire');
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function it_will_throw_an_exception_when_assign_a_role_that_does_not_exist()
     {
         $this->setExpectedException(RoleDoesNotExist::class);
@@ -59,9 +51,7 @@ class GateTest extends TestCase
         $this->testUser->assignRole('evil-emperor');
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function it_can_determine_if_a_user_does_not_have_a_permission()
     {
         $this->assertFalse($this->testUser->can('edit-articles'));
