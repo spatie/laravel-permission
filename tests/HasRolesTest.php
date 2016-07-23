@@ -143,6 +143,41 @@ class HasRolesTest extends TestCase
 
     /**
      * @test
+     * @expectedException \Spatie\Permission\Exceptions\PermissionMustNotBeEmpty
+     */
+    public function it_should_fail_assigning_permissions_to_a_role_when_we_do_not_pass_any_arguments()
+    {
+        $this->testRole->givePermissionTo();
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_assign_multiple_permissions_to_a_role_using_an_array()
+    {
+        $this->testRole->givePermissionTo(['edit-articles', 'edit-news']);
+
+        $this->testUser->assignRole('testRole');
+
+        $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
+        $this->assertTrue($this->testUser->hasPermissionTo('edit-news'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_assign_multiple_permissions_to_a_role_using_multiple_arguments()
+    {
+        $this->testRole->givePermissionTo('edit-articles', 'edit-news');
+
+        $this->testUser->assignRole('testRole');
+
+        $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
+        $this->assertTrue($this->testUser->hasPermissionTo('edit-news'));
+    }
+
+    /**
+     * @test
      */
     public function it_can_revoke_a_permission_from_a_role()
     {

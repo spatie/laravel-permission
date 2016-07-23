@@ -3,23 +3,50 @@
 namespace Spatie\Permission\Traits;
 
 use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Exceptions\PermissionMustNotBeEmpty;
 
 trait HasPermissions
 {
     /**
-     * Grant the given permission to a role.
+     * Grant the given permission(s) to a role.
      *
-     * @param  $permission
+     * @param string|array|Permission|\Illuminate\Support\Collection $permissions
      *
      * @return HasPermissions
      */
-    public function givePermissionTo($permission)
+    public function givePermissionTo(...$permissions)
     {
-        $this->permissions()->save($this->getStoredPermission($permission));
+        if(count($permissions) < 1) {
+            throw new PermissionMustNotBeEmpty();
+        }
+
+        if (!$this->usingMultipleArguments($permissions)) {
+            $permissions = current($permissions);
+        }
+
+        $this->savePermissions($permissions);
 
         $this->forgetCachedPermissions();
 
         return $this;
+    }
+    
+    /**
+     * Save the given permissions to a role.
+     *
+     * @param array|Permission|\Illuminate\Support\Collection $permissions
+     * 
+     * @return array|\Illuminate\Database\Eloquent\Model
+     */
+    protected function savePermissions($permissions)
+    {
+        $permissions = $this->getStoredPermission($permissions);
+
+        if($permissions instanceof \Illuminate\Database\Eloquent\Collection) {
+            return $this->permissions()->saveMany($permissions);
+        }
+
+        return $this->permissions()->save($permissions);
     }
 
     /**
@@ -39,16 +66,30 @@ trait HasPermissions
     }
 
     /**
-     * @param $permission
+     * @param string|array|Permission|\Illuminate\Support\Collection $permissions
      *
      * @return Permission
      */
-    protected function getStoredPermission($permission)
+    protected function getStoredPermission($permissions)
     {
-        if (is_string($permission)) {
-            return app(Permission::class)->findByName($permission);
+        if (is_string($permissions)) {
+            return app(Permission::class)->findByName($permissions);
         }
 
-        return $permission;
+        if (is_array($permissions)) {
+            return app(Permission::class)->whereIn('name', $permissions)->get();
+        }
+
+        return $permissions;
     }
+
+    /**
+     * @param $params
+     * @return bool
+     */
+    private function usingMultipleArguments($params)
+    {
+        return count($params) > 1;
+    }
+
 }
