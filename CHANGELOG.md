@@ -4,8 +4,9 @@ All Notable changes to `laravel-permission` will be documented in this file
 
 ## 1.5.0 - 2016-07-23
 - allowed `givePermissonTo` to accept multiple permissions
-- dropped support for PHP 5.5 and HHVM
 - added `syncRoles`-method
+- added `syncPermissions`-method
+- dropped support for PHP 5.5 and HHVM
 
 ## 1.4.0 - 2016-05-08
 -  added `hasPermissionTo` function to the `Role` model

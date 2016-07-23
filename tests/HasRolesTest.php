@@ -28,7 +28,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_assign_multipe_roles_at_once()
+    public function it_can_assign_multiple_roles_at_once()
     {
         $this->testUser->assignRole('testRole', 'testRole2');
 
@@ -209,6 +209,36 @@ class HasRolesTest extends TestCase
 
         $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
         $this->assertTrue($this->testUser->hasPermissionTo('edit-news'));
+    }
+
+    /** @test */
+    public function it_can_sync_permissions_on_a_role()
+    {
+        $this->testRole->givePermissionTo('edit-articles');
+
+        $this->testRole->syncPermissions('edit-news');
+
+        $this->testUser->assignRole('testRole');
+
+        $this->assertFalse($this->testUser->hasPermissionTo('edit-articles'));
+
+        $this->assertTrue($this->testUser->hasPermissionTo('edit-news'));
+    }
+
+    /** @test */
+    public function it_will_remove_all_permission_on_a_role_when_passing_an_empty_array_to_sync_permissions()
+    {
+        $this->testRole->givePermissionTo('edit-articles');
+
+        $this->testRole->givePermissionTo('edit-news');
+
+        $this->testRole->syncPermissions([]);
+
+        $this->testUser->assignRole('testRole');
+
+        $this->assertFalse($this->testUser->hasPermissionTo('edit-articles'));
+
+        $this->assertFalse($this->testUser->hasPermissionTo('edit-news'));
     }
 
     /** @test */

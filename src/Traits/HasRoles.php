@@ -73,6 +73,8 @@ trait HasRoles
      * Remove all current roles and set the given ones.
      *
      * @param array ...$roles
+     *
+     * @return $this
      */
     public function syncRoles(...$roles)
     {
@@ -85,6 +87,8 @@ trait HasRoles
             })->each(function (Role $role) {
                 $this->roles()->save($role);
             });
+
+        return $this;
     }
 
     /**

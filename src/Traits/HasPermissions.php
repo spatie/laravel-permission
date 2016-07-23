@@ -33,6 +33,8 @@ trait HasPermissions
      * Remove all current permissions and set the given ones.
      *
      * @param array ...$permissions
+     *
+     * @return $this
      */
     public function syncPermissions(...$permissions)
     {
@@ -45,6 +47,10 @@ trait HasPermissions
             })->each(function (Permission $permission) {
                 $this->permissions()->save($permission);
             });
+
+        $this->forgetCachedPermissions();
+
+        return $this;
     }
 
     /**
