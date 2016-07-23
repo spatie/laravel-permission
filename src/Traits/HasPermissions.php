@@ -3,7 +3,6 @@
 namespace Spatie\Permission\Traits;
 
 use Spatie\Permission\Contracts\Permission;
-use Spatie\Permission\Exceptions\PermissionMustNotBeEmpty;
 
 trait HasPermissions
 {
@@ -16,37 +15,18 @@ trait HasPermissions
      */
     public function givePermissionTo(...$permissions)
     {
-        if(count($permissions) < 1) {
-            throw new PermissionMustNotBeEmpty();
-        }
-
-        if (!$this->usingMultipleArguments($permissions)) {
-            $permissions = current($permissions);
-        }
-
-        $this->savePermissions($permissions);
+        collect($permissions)
+            ->flatten()
+            ->map(function ($permission) {
+                return $this->getStoredPermission($permission);
+            })
+            ->each(function (Permission $permission) {
+                return $this->permissions()->save($permission);
+            });
 
         $this->forgetCachedPermissions();
 
         return $this;
-    }
-    
-    /**
-     * Save the given permissions to a role.
-     *
-     * @param array|Permission|\Illuminate\Support\Collection $permissions
-     * 
-     * @return array|\Illuminate\Database\Eloquent\Model
-     */
-    protected function savePermissions($permissions)
-    {
-        $permissions = $this->getStoredPermission($permissions);
-
-        if($permissions instanceof \Illuminate\Database\Eloquent\Collection) {
-            return $this->permissions()->saveMany($permissions);
-        }
-
-        return $this->permissions()->save($permissions);
     }
 
     /**
@@ -82,14 +62,4 @@ trait HasPermissions
 
         return $permissions;
     }
-
-    /**
-     * @param $params
-     * @return bool
-     */
-    private function usingMultipleArguments($params)
-    {
-        return count($params) > 1;
-    }
-
 }

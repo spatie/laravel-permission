@@ -143,15 +143,6 @@ class HasRolesTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Spatie\Permission\Exceptions\PermissionMustNotBeEmpty
-     */
-    public function it_should_fail_assigning_permissions_to_a_role_when_we_do_not_pass_any_arguments()
-    {
-        $this->testRole->givePermissionTo();
-    }
-
-    /**
-     * @test
      */
     public function it_can_assign_multiple_permissions_to_a_role_using_an_array()
     {
