@@ -45,14 +45,13 @@ trait HasRoles
      */
     public function assignRole(...$roles)
     {
-        collect($roles)
+        $roles = collect($roles)
             ->flatten()
             ->map(function ($role) {
                 return $this->getStoredRole($role);
-            })
-            ->each(function (Role $role) {
-                return $this->roles()->save($role);
             });
+
+        $this->roles()->saveMany($roles);
 
         $this->forgetCachedPermissions();
 
@@ -80,15 +79,7 @@ trait HasRoles
     {
         $this->roles()->detach();
 
-        collect($roles)
-            ->flatten()
-            ->map(function ($role) {
-                return $this->getStoredRole($role);
-            })->each(function (Role $role) {
-                $this->roles()->save($role);
-            });
-
-        return $this;
+        return $this->assignRole($roles);
     }
 
     /**

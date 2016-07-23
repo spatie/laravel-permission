@@ -15,14 +15,13 @@ trait HasPermissions
      */
     public function givePermissionTo(...$permissions)
     {
-        collect($permissions)
+        $permissions = collect($permissions)
             ->flatten()
             ->map(function ($permission) {
                 return $this->getStoredPermission($permission);
-            })
-            ->each(function (Permission $permission) {
-                return $this->permissions()->save($permission);
             });
+
+        $this->permissions()->saveMany($permissions);
 
         $this->forgetCachedPermissions();
 
@@ -40,17 +39,7 @@ trait HasPermissions
     {
         $this->permissions()->detach();
 
-        collect($permissions)
-            ->flatten()
-            ->map(function ($permission) {
-                return $this->getStoredPermission($permission);
-            })->each(function (Permission $permission) {
-                $this->permissions()->save($permission);
-            });
-
-        $this->forgetCachedPermissions();
-
-        return $this;
+        return $this->givePermissionTo($permissions);
     }
 
     /**
