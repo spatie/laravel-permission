@@ -61,6 +61,24 @@ trait HasRoles
     }
 
     /**
+     * Sync the given roles.
+     *
+     * @param array ...$roles
+     */
+    public function syncRoles(...$roles)
+    {
+        $this->roles()->detach();
+
+        collect($roles)
+            ->flatten()
+            ->map(function ($role) {
+                return $this->getStoredRole($role);
+            })->each(function (Role $role) {
+                $this->roles()->save($role);
+            });
+    }
+
+    /**
      * Determine if the user has (one of) the given role(s).
      *
      * @param string|array|Role|\Illuminate\Support\Collection $roles

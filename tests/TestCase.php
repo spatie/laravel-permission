@@ -91,6 +91,7 @@ abstract class TestCase extends Orchestra
 
         User::create(['email' => 'test@user.com']);
         $app[Role::class]->create(['name' => 'testRole']);
+        $app[Role::class]->create(['name' => 'testRole2']);
         $app[Permission::class]->create(['name' => 'edit-articles']);
         $app[Permission::class]->create(['name' => 'edit-news']);
     }
