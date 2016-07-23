@@ -49,7 +49,9 @@ trait HasRoles
             ->flatten()
             ->map(function ($role) {
                 return $this->getStoredRole($role);
-            });
+            })
+            ->all();
+
 
         $this->roles()->saveMany($roles);
 

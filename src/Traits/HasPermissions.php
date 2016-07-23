@@ -19,7 +19,8 @@ trait HasPermissions
             ->flatten()
             ->map(function ($permission) {
                 return $this->getStoredPermission($permission);
-            });
+            })
+            ->all();
 
         $this->permissions()->saveMany($permissions);
 
