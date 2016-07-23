@@ -28,6 +28,26 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_assign_multipe_roles_at_once()
+    {
+        $this->testUser->assignRole('testRole', 'testRole2');
+
+        $this->assertTrue($this->testUser->hasRole('testRole'));
+
+        $this->assertTrue($this->testUser->hasRole('testRole2'));
+    }
+
+    /** @test */
+    public function it_can_assign_multiple_roles_using_an_array()
+    {
+        $this->testUser->assignRole(['testRole', 'testRole2']);
+
+        $this->assertTrue($this->testUser->hasRole('testRole'));
+
+        $this->assertTrue($this->testUser->hasRole('testRole2'));
+    }
+
+    /** @test */
     public function it_can_sync_roles_from_a_string()
     {
         $this->testUser->assignRole('testRole');

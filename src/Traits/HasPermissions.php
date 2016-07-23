@@ -30,6 +30,24 @@ trait HasPermissions
     }
 
     /**
+     * Remove all current permissions and set the given ones.
+     *
+     * @param array ...$permissions
+     */
+    public function syncPermissions(...$permissions)
+    {
+        $this->permissions()->detach();
+
+        collect($permissions)
+            ->flatten()
+            ->map(function ($permission) {
+                return $this->getStoredPermission($permission);
+            })->each(function (Permission $permission) {
+                $this->permissions()->save($permission);
+            });
+    }
+
+    /**
      * Revoke the given permission.
      *
      * @param $permission

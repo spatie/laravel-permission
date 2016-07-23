@@ -263,6 +263,10 @@ A role can be assigned to a user:
 
 ```php
 $user->assignRole('writer');
+
+// you can also assing multiple roles at once
+$user->assignRole('writer', 'admin');
+$user->assignRole(['writer', 'admin']);
 ```
 
 A role can be removed from a user:
