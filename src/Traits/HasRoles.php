@@ -42,8 +42,6 @@ trait HasRoles
      * @param array|string|\Spatie\Permission\Models\Role ...$roles
      *
      * @return \Spatie\Permission\Contracts\Role
-
-     *
      */
     public function assignRole(...$roles)
     {
