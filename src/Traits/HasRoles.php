@@ -61,7 +61,7 @@ trait HasRoles
     }
 
     /**
-     * Sync the given roles.
+     * Remove all current roles and set the given ones.
      *
      * @param array ...$roles
      */

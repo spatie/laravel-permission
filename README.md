@@ -233,6 +233,12 @@ A permission can be given to a user:
 
 ```php
 $user->givePermissionTo('edit articles');
+
+//you can also give multiple permission at once
+$user->givePermissionTo('edit articles', 'delete articles');
+
+//you may also pass an array
+$user->givePermissionTo(['edit articles', 'delete articles']);
 ```
 
 A permission can be revoked from a user:
@@ -264,6 +270,14 @@ A role can be removed from a user:
 ```php
 $user->removeRole('writer');
 ```
+
+Roles can also be synced :
+
+```php
+//all current roles will be removed from the user and replace by the array given
+$user->syncRoles(['writer', 'admin']);
+```
+
 You can determine if a user has a certain role:
 
 ```php
