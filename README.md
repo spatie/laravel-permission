@@ -233,7 +233,7 @@ The `HasRoles` adds eloquent relationships to your models, which can be accessed
 
 ```php
 $permissions = $user->permissions;
-$roles = $user->roles()->pluck('name');
+$roles = $user->roles()->pluck('name'); // returns a collection
 ```
 
 ###Using permissions
