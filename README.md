@@ -381,9 +381,13 @@ The package doesn't contain a middleware to check permissions but it's very triv
 $ php artisan make:middleware RoleMiddleware
 ```
 
-This will create a RoleMiddleware for you and here you can handle your role and permissions check.
+This will create a RoleMiddleware for you, where you can handle your role and permissions check.
 ```php
 // app/Http/Middleware/RoleMiddleware.php
+use Illuminate\Support\Facades\Auth;
+
+...
+
 public function handle($request, Closure $next, $role, $permission)
 {
     if (Auth::guest()) {
