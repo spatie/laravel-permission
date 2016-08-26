@@ -384,7 +384,7 @@ $ php artisan make:middleware RoleMiddleware
 This will create a RoleMiddleware for you, where you can handle your role and permissions check.
 ```php
 // app/Http/Middleware/RoleMiddleware.php
-use Illuminate\Support\Facades\Auth;
+use Auth;
 
 ...
 
