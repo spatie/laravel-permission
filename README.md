@@ -5,6 +5,7 @@
 [![Build Status](https://img.shields.io/travis/spatie/laravel-permission/master.svg?style=flat-square)](https://travis-ci.org/spatie/laravel-permission)
 [![SensioLabsInsight](https://img.shields.io/sensiolabs/i/a25f93ac-5e8f-48c8-a9a1-5d3ef3f9e8f2.svg?style=flat-square)](https://insight.sensiolabs.com/projects/a25f93ac-5e8f-48c8-a9a1-5d3ef3f9e8f2)
 [![Quality Score](https://img.shields.io/scrutinizer/g/spatie/laravel-permission.svg?style=flat-square)](https://scrutinizer-ci.com/g/spatie/laravel-permission)
+[![StyleCI](https://styleci.io/repos/42480275/shield)](https://styleci.io/repos/42480275)
 [![Total Downloads](https://img.shields.io/packagist/dt/spatie/laravel-permission.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-permission)
 
 This package allows to save permissions and roles in a database. It is built upon [Laravel's
@@ -463,9 +464,9 @@ can be found [in this repo on GitHub](https://github.com/laracasts/laravel-5-rol
 
 ## Alternatives
 
+- [JosephSilber/bouncer](https://github.com/JosephSilber/bouncer)
 - [BeatSwitch/lock-laravel](https://github.com/BeatSwitch/lock-laravel)
 - [Zizaco/entrust](https://github.com/Zizaco/entrust)
-- [JosephSilber/bouncer](https://github.com/JosephSilber/bouncer)
 - [bican/roles](https://github.com/romanbican/roles)
 
 ## About Spatie
