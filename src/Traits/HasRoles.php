@@ -147,7 +147,7 @@ trait HasRoles
             return $role instanceof Role ? $role->name : $role;
         });
 
-        return $roles->intersect($this->roles->lists('name')) == $roles;
+        return $roles->intersect($this->roles->pluck('name')) == $roles;
     }
 
     /**

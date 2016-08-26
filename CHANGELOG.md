@@ -2,6 +2,9 @@
 
 All Notable changes to `laravel-permission` will be documented in this file
 
+## 1.5.2 - 2016-08-26
+- make compatible with L5.3
+
 ## 1.5.1 - 2016-07-23
 - fixes `givePermissionTo` and `assignRole` in Laravel 5.1
 
