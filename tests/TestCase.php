@@ -63,9 +63,9 @@ abstract class TestCase extends Orchestra
 
         $app['config']->set('database.default', 'sqlite');
         $app['config']->set('database.connections.sqlite', [
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => $this->getTempDirectory().'/database.sqlite',
-            'prefix' => '',
+            'prefix'   => '',
         ]);
 
         $app['config']->set('view.paths', [__DIR__.'/resources/views']);
