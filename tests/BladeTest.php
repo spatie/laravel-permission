@@ -3,6 +3,7 @@
 namespace Spatie\Permission\Test;
 
 use Spatie\Permission\Contracts\Role;
+use Spatie\Permission\Contracts\Permission;
 
 class BladeTest extends TestCase
 {
@@ -48,6 +49,31 @@ class BladeTest extends TestCase
         auth()->login($this->getAdmin());
 
         $this->assertEquals('has role', $this->renderView('role', ['role' => 'admin']));
+    }
+
+    /** @test */
+    public function the_has_any_permissions_will_evaluate_true_when_the_logged_in_user_has_one_of_the_permissions()
+    {
+        $this->actingAs($this->testUser);
+        $this->testUser->givePermissionTo('edit-articles');
+
+        $this->assertEquals('does have the permission', $this->renderView('hasAnyPermission', ['permissions' => 'edit-articles']));
+    }
+
+    /** @test */
+    public function the_has_any_permissions_will_evaluate_falsy_when_the_logged_in_user_has_one_of_the_permissions()
+    {
+        $this->actingAs($this->testUser);
+
+        $this->assertEquals('does not have any of the given permissions', $this->renderView('hasAnyPermission', ['permissions' => 'edit-articles']));
+    }
+
+    /** @test */
+    public function the_has_any_permissions_will_not_blow_up_on_an_invalid_permission()
+    {
+        $this->actingAs($this->testUser);
+
+        $this->assertEquals('does not have any of the given permissions', $this->renderView('hasAnyPermission', ['permissions' => 'made-up-permission']));
     }
 
     /** @test */
