@@ -395,15 +395,23 @@ public function handle($request, Closure $next, $role, $permission)
         return redirect($urlOfYourLoginPage);
     }
 
-    if (! $request->user()->hasRole($role)) {
-       abort(403);
-    }
-    
-    if (! $request->user()->can($permission)) {
-       abort(403);
+    $roles = explode('|', $role);
+    if (! $request->user()->hasAnyRole($roles)) {
+        abort(403);
     }
 
-    return $next($request);
+    if ($permission === 'null') {
+        return $next($request);
+    }
+
+    $permissions = explode('|', $permission);
+    foreach($permissions as $permission) {
+        if ($request->user()->hasPermissionTo($permission)) {
+            return $next($request);
+        }
+    }
+
+    abort(403);
 }
 ```
 
