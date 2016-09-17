@@ -79,7 +79,7 @@ You can publish the config-file with:
 php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="config"
 ```
 
-This is the contents of the published config file:
+This is the contents of the published config file (laravel-permission.php):
 
 ```php
 return [
