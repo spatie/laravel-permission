@@ -45,6 +45,7 @@ trait HasRoles
     {
         return $this->roles->orderByDesc('level')->first();
     }
+
     /**
      * Assign the given role to the user.
      *
