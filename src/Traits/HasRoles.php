@@ -37,6 +37,15 @@ trait HasRoles
     }
 
     /**
+     * get the main (highest) role of this user
+     *
+     * @return Role
+     */
+    public function getMainRole()
+    {
+        return $this->roles->orderByDesc('level')->first();
+    }
+    /**
      * Assign the given role to the user.
      *
      * @param array|string|\Spatie\Permission\Models\Role ...$roles
