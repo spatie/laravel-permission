@@ -10,25 +10,44 @@ use Spatie\Permission\Contracts\Role as RoleContract;
 class PermissionServiceProvider extends ServiceProvider
 {
     /**
+     * The migrations array.
+     *
+     * @var array
+     */
+    private $migrations = [];
+
+    /**
      * Bootstrap the application services.
      *
      * @param PermissionRegistrar $permissionLoader
      */
     public function boot(PermissionRegistrar $permissionLoader)
     {
+        $this->setMigrations();
+
         $this->publishes([
             __DIR__.'/../resources/config/laravel-permission.php' => $this->app->configPath().'/'.'laravel-permission.php',
         ], 'config');
 
-        if (!class_exists('CreatePermissionTables')) {
-            // Publish the migration
-            $timestamp = date('Y_m_d_His', time());
-            $this->publishes([
-                __DIR__.'/../resources/migrations/create_permission_tables.php.stub' => $this->app->databasePath().'/migrations/'.$timestamp.'_create_permission_tables.php',
-            ], 'migrations');
-        }
+        $this->publishes($this->migrations, 'migrations');
 
         $permissionLoader->registerPermissions();
+    }
+
+    /**
+     * Set up the array of migrations to publish by checking if they've already been published.
+     */
+    private function setMigrations()
+    {
+        $timestamp = date('Y_m_d_His', time());
+
+        if (!class_exists('CreatePermissionTables')) {
+            $this->migrations[dirname(__DIR__) . '/resources/migrations/create_permission_tables.php.stub'] = $this->app->databasePath() . '/migrations/' . $timestamp . '_create_permission_tables.php';
+        }
+
+        if (!class_exists('AddUniqueIndexToRolesAndPermissionsNameColumns')) {
+            $this->migrations[dirname(__DIR__) . '/resources/migrations/add_unique_index_to_roles_and_permissions_name_columns.php.stub'] = $this->app->databasePath() . '/migrations/' . $timestamp . '_add_unique_index_to_roles_and_permissions_name_columns.php';
+        }
     }
 
     /**
