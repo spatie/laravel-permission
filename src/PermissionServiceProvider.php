@@ -12,7 +12,6 @@ class PermissionServiceProvider extends ServiceProvider
     /**
      * Bootstrap the application services.
      *
-     * @param PermissionRegistrar $permissionLoader
      */
     public function boot()
     {
@@ -32,7 +31,7 @@ class PermissionServiceProvider extends ServiceProvider
     /**
      * Finish configuring the application.
      *
-     * @return void
+     * @param PermissionRegistrar $permissionLoader
      */
     public function booted(PermissionRegistrar $permissionLoader)
     {
