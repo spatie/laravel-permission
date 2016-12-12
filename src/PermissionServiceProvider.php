@@ -11,7 +11,6 @@ class PermissionServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
-     *
      */
     public function boot()
     {
@@ -27,7 +26,7 @@ class PermissionServiceProvider extends ServiceProvider
             ], 'migrations');
         }
     }
-    
+
     /**
      * Finish configuring the application.
      *
