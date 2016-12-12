@@ -14,7 +14,7 @@ class PermissionServiceProvider extends ServiceProvider
      *
      * @param PermissionRegistrar $permissionLoader
      */
-    public function boot(PermissionRegistrar $permissionLoader)
+    public function boot()
     {
         $this->publishes([
             __DIR__.'/../resources/config/laravel-permission.php' => $this->app->configPath().'/'.'laravel-permission.php',
@@ -27,7 +27,15 @@ class PermissionServiceProvider extends ServiceProvider
                 __DIR__.'/../resources/migrations/create_permission_tables.php.stub' => $this->app->databasePath().'/migrations/'.$timestamp.'_create_permission_tables.php',
             ], 'migrations');
         }
-
+    }
+    
+    /**
+     * Finish configuring the application.
+     *
+     * @return void
+     */
+    public function booted(PermissionRegistrar $permissionLoader)
+    {
         $permissionLoader->registerPermissions();
     }
 
