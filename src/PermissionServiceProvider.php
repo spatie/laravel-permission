@@ -28,6 +28,12 @@ class PermissionServiceProvider extends ServiceProvider
             ], 'migrations');
         }
 
+        $this->mergeConfigFrom(
+            __DIR__.'/../resources/config/laravel-permission.php',
+            'laravel-permission'
+        );
+        $this->registerModelBindings();
+
         $permissionLoader->registerPermissions();
     }
 
@@ -36,10 +42,6 @@ class PermissionServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__.'/../resources/config/laravel-permission.php', 'laravel-permission');
-
-        $this->registerModelBindings();
-
         $this->registerBladeExtensions();
     }
 
