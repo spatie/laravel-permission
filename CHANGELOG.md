@@ -2,6 +2,9 @@
 
 All Notable changes to `laravel-permission` will be documented in this file
 
+## 1.5.3 - 2016-12-15
+- moved some things to `boot` method in SP to solve some compatibilty problems with other pacakges
+
 ## 1.5.2 - 2016-08-26
 - make compatible with L5.3
 
