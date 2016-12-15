@@ -52,7 +52,6 @@ trait HasRoles
             })
             ->all();
 
-
         $this->roles()->saveMany($roles);
 
         $this->forgetCachedPermissions();
