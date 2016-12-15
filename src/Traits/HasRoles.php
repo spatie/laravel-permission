@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Traits;
 
+use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 
@@ -163,6 +164,32 @@ trait HasRoles
         }
 
         return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
+    }
+
+    /**
+     * Determine if the user has any of the given permission(s).
+     *
+     * @param string|array|Permission|\Illuminate\Support\Collection $permissions
+     *
+     * @return bool
+     */
+    public function hasAnyPermission($permissions)
+    {
+        if (is_string($permissions)) {
+            try {
+                return $this->hasPermissionTo($permissions);
+            } catch (PermissionDoesNotExist $e) {
+                return false;
+            }
+        }
+
+        if ($permissions instanceof Permission) {
+            return $this->hasPermissionTo($permissions);
+        }
+
+        return (bool) collect($permissions)->first(function ($permission) {
+            return $this->hasPermissionTo($permission);
+        });
     }
 
     /**

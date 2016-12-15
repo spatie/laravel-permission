@@ -325,6 +325,12 @@ You can determine if a role has a certain permission:
 $role->hasPermissionTo('edit articles');
 ```
 
+You can determine if a user has a permission in a group of permissions:
+
+```php
+$user->hasAnyPermission(['edit-articles', 'admin']);
+```
+
 A permission can be revoked from a role:
 
 ```php
@@ -373,6 +379,14 @@ I have all of these roles!
 @else
 I don't have all of these roles...
 @endhasallroles
+```
+
+```php
+@hasanypermission(Permission::all())
+I have one or more of these permissions!
+@else
+I have none of these permissions...
+@endhasanypermission
 ```
 
 You can use Laravel's native `@can` directive to check if a user has a certain permission.
