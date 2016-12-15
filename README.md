@@ -228,7 +228,7 @@ A `Role` and a `Permission` are regular Eloquent-models. They can have a name an
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
-$role = Role::create(['name' => 'writer']);
+$role = Role::create(['name' => 'writer','level' => 200]);
 $permission = Permission::create(['name' => 'edit articles']);
 ```
 
@@ -308,7 +308,12 @@ You can also determine if a user has all of a given list of roles:
 ```php
 $user->hasAllRoles(Role::all());
 ```
+You can also get the main (highest) role of a user, which returns a
+`Spatie\Permission\Models\Role`-object:
 
+```php
+$user->getMainRole();
+```
 The `assignRole`, `hasRole`, `hasAnyRole`, `hasAllRoles`  and `removeRole`-functions can accept a
  string, a `Spatie\Permission\Models\Role`-object or an `\Illuminate\Support\Collection`-object.
 
