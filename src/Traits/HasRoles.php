@@ -2,8 +2,8 @@
 
 namespace Spatie\Permission\Traits;
 
-use Spatie\Permission\Contracts\Permission;
-use Spatie\Permission\Contracts\Role;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 trait HasRoles
 {
