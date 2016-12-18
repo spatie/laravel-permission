@@ -4,12 +4,12 @@ namespace Spatie\Permission;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
-use Spatie\Permission\Contracts\Permission as PermissionContract;
-use Spatie\Permission\Contracts\Role as RoleContract;
+use Spatie\Permission\Console\AssignRoleCommand;
 use Spatie\Permission\Console\CreatePermissionCommand;
 use Spatie\Permission\Console\CreateRoleCommand;
-use Spatie\Permission\Console\AssignRoleCommand;
 use Spatie\Permission\Console\GivePermissionCommand;
+use Spatie\Permission\Contracts\Permission as PermissionContract;
+use Spatie\Permission\Contracts\Role as RoleContract;
 
 class PermissionServiceProvider extends ServiceProvider
 {

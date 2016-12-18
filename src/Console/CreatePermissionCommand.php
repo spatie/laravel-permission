@@ -42,7 +42,7 @@ class CreatePermissionCommand extends Command
         }
 
         app(Permission::class)->forceFill([
-            'name' => $name
+            'name' => $name,
         ])->save();
 
         $this->info('Success!');

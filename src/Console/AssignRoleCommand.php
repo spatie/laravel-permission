@@ -34,7 +34,7 @@ class AssignRoleCommand extends Command
 
         $userModel = config('auth.model') ?: config('auth.providers.users.model');
 
-        if (! $user = $userModel::where('email', $email)->first()) {
+        if (!$user = $userModel::where('email', $email)->first()) {
             return $this->error("User doesn't exist");
         }
 

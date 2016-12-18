@@ -4,8 +4,8 @@ namespace Spatie\Permission\Console;
 
 use Illuminate\Console\Command;
 use Spatie\Permission\Contracts\Role;
-use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
+use Spatie\Permission\Exceptions\RoleDoesNotExist;
 
 class GivePermissionCommand extends Command
 {
@@ -34,7 +34,7 @@ class GivePermissionCommand extends Command
     {
         if ($this->option('user')) {
             return $this->givePermissionToUser();
-        } else if ($this->option('role')) {
+        } elseif ($this->option('role')) {
             return $this->givePermissionToRole();
         }
 
@@ -50,7 +50,7 @@ class GivePermissionCommand extends Command
     {
         $type = $this->ask('Choose type (user|role)');
 
-        if (! in_array($type, ['user', 'role'])) {
+        if (!in_array($type, ['user', 'role'])) {
             return $this->error('Type not support');
         }
 
@@ -96,7 +96,7 @@ class GivePermissionCommand extends Command
 
         $userModel = config('auth.model') ?: config('auth.providers.users.model');
 
-        if (! $user = $userModel::where('email', $email)->first()) {
+        if (!$user = $userModel::where('email', $email)->first()) {
             return $this->error("User doesn't exist");
         }
 

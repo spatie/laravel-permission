@@ -42,7 +42,7 @@ class CreateRoleCommand extends Command
         }
 
         app(Role::class)->forceFill([
-            'name' => $name
+            'name' => $name,
         ])->save();
 
         $this->info('Success!');
