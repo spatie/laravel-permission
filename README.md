@@ -434,28 +434,28 @@ Manage permission via console. Check commands already enabled `php artisan list`
 
 ###Create Permission
 
-```php
-$ php artisan permission:create-permission
+```bash
+php artisan permission:create-permission
 ```
 
 ###Create Role
 
-```php
-$ php artisan permission:create-role
+```bash
+php artisan permission:create-role
 ```
 
 ###Assign Role to User
 
-```php
-$ php artisan permission:assign-role
+```bash
+php artisan permission:assign-role
 ```
 
 ###Give permission to User and Role type
 
-```php
-$ php artisan permission:give-permission // type will be asked
-$ php artisan permission:give-permission --user
-$ php artisan permission:give-permission --role
+```bash
+php artisan permission:give-permission // type will be asked
+php artisan permission:give-permission --user
+php artisan permission:give-permission --role
 ```
 
 ## Extending
