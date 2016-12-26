@@ -59,12 +59,10 @@ abstract class TestCase extends Orchestra
      */
     protected function getEnvironmentSetUp($app)
     {
-        $this->initializeDirectory($this->getTempDirectory());
-
         $app['config']->set('database.default', 'sqlite');
         $app['config']->set('database.connections.sqlite', [
             'driver'   => 'sqlite',
-            'database' => $this->getTempDirectory().'/database.sqlite',
+            'database' => ':memory:',
             'prefix'   => '',
         ]);
 
@@ -78,8 +76,6 @@ abstract class TestCase extends Orchestra
      */
     protected function setUpDatabase($app)
     {
-        file_put_contents($this->getTempDirectory().'/database.sqlite', null);
-
         $app['db']->connection()->getSchemaBuilder()->create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
@@ -94,33 +90,6 @@ abstract class TestCase extends Orchestra
         $app[Role::class]->create(['name' => 'testRole2']);
         $app[Permission::class]->create(['name' => 'edit-articles']);
         $app[Permission::class]->create(['name' => 'edit-news']);
-    }
-
-    /**
-     * Initialize the directory.
-     *
-     * @param string $directory
-     */
-    protected function initializeDirectory($directory)
-    {
-        if (File::isDirectory($directory)) {
-            File::deleteDirectory($directory);
-        }
-        if (!File::exists($directory)) {
-            File::makeDirectory($directory);
-        }
-    }
-
-    /**
-     * Get the temporary directory.
-     *
-     * @param string $suffix
-     *
-     * @return string
-     */
-    public function getTempDirectory($suffix = '')
-    {
-        return __DIR__.'/temp'.($suffix == '' ? '' : '/'.$suffix);
     }
 
     /**
