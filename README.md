@@ -32,7 +32,7 @@ $user->can('edit articles');
 
 If you want a drop-in middleware to check permissions, check out our authorize package: https://github.com/spatie/laravel-authorize
 
-Spatie is webdesign agency in Antwerp, Belgium. You'll find an overview of all 
+Spatie is webdesign agency in Antwerp, Belgium. You'll find an overview of all
 our open source projects [on our website](https://spatie.be/opensource).
 
 ## Postcardware
@@ -216,7 +216,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     use HasRoles;
-    
+
     // ...
 }
 ```
@@ -338,7 +338,7 @@ A permission can be revoked from a role:
 $role->revokePermissionTo('edit articles');
 ```
 
-The `givePermissionTo` and `revokePermissionTo`-functions can accept a 
+The `givePermissionTo` and `revokePermissionTo`-functions can accept a
 string or a `Spatie\Permission\Models\Permission`-object.
 
 Saved permission and roles are also registered with the `Illuminate\Auth\Access\Gate`-class.
@@ -407,7 +407,7 @@ public function handle($request, Closure $next, $role, $permission)
     if (! $request->user()->hasRole($role)) {
        abort(403);
     }
-    
+
     if (! $request->user()->can($permission)) {
        abort(403);
     }
@@ -435,9 +435,39 @@ Route::group(['middleware' => ['role:admin,access_backend']], function () {
 });
 ```
 
+## Console Commands
+
+Manage permission via console. Check commands already enabled `php artisan list`. You must see `permission:*`
+
+###Create Permission
+
+```bash
+php artisan permission:create-permission
+```
+
+###Create Role
+
+```bash
+php artisan permission:create-role
+```
+
+###Assign Role to User
+
+```bash
+php artisan permission:assign-role
+```
+
+###Give permission to User and Role type
+
+```bash
+php artisan permission:give-permission // type will be asked
+php artisan permission:give-permission --user
+php artisan permission:give-permission --role
+```
+
 ## Extending
 
-If you need to extend or replace the existing `Role` or `Permission` models you just need to 
+If you need to extend or replace the existing `Role` or `Permission` models you just need to
 keep the following things in mind:
 
 - Your `Role` model needs to implement the `Spatie\Permission\Contracts\Role` contract

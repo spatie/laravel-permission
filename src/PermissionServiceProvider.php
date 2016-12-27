@@ -4,6 +4,10 @@ namespace Spatie\Permission;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
+use Spatie\Permission\Console\AssignRoleCommand;
+use Spatie\Permission\Console\CreatePermissionCommand;
+use Spatie\Permission\Console\CreateRoleCommand;
+use Spatie\Permission\Console\GivePermissionCommand;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 use Spatie\Permission\Contracts\Role as RoleContract;
 
@@ -16,16 +20,20 @@ class PermissionServiceProvider extends ServiceProvider
      */
     public function boot(PermissionRegistrar $permissionLoader)
     {
-        $this->publishes([
-            __DIR__.'/../resources/config/laravel-permission.php' => $this->app->configPath().'/'.'laravel-permission.php',
-        ], 'config');
-
-        if (!class_exists('CreatePermissionTables')) {
-            // Publish the migration
-            $timestamp = date('Y_m_d_His', time());
+        if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../resources/migrations/create_permission_tables.php.stub' => $this->app->databasePath().'/migrations/'.$timestamp.'_create_permission_tables.php',
-            ], 'migrations');
+                __DIR__.'/../resources/config/laravel-permission.php' => $this->app->configPath().'/'.'laravel-permission.php',
+            ], 'config');
+
+            if (!class_exists('CreatePermissionTables')) {
+                // Publish the migration
+                $timestamp = date('Y_m_d_His', time());
+                $this->publishes([
+                    __DIR__.'/../resources/migrations/create_permission_tables.php.stub' => $this->app->databasePath().'/migrations/'.$timestamp.'_create_permission_tables.php',
+                ], 'migrations');
+            }
+
+            $this->registerConsoleCommands();
         }
 
         $this->mergeConfigFrom(
@@ -43,6 +51,19 @@ class PermissionServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerBladeExtensions();
+    }
+
+    /**
+     * Register console commands.
+     */
+    protected function registerConsoleCommands()
+    {
+        $this->commands([
+            CreatePermissionCommand::class,
+            CreateRoleCommand::class,
+            AssignRoleCommand::class,
+            GivePermissionCommand::class,
+        ]);
     }
 
     /**
