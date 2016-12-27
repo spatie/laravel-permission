@@ -3,9 +3,9 @@
 namespace Spatie\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Permission\Contracts\Role as RoleContract;
-use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Traits\HasPermissions;
+use Spatie\Permission\Exceptions\RoleDoesNotExist;
+use Spatie\Permission\Contracts\Role as RoleContract;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
 
 class Role extends Model implements RoleContract
@@ -71,7 +71,7 @@ class Role extends Model implements RoleContract
     {
         $role = static::where('name', $name)->first();
 
-        if (!$role) {
+        if (! $role) {
             throw new RoleDoesNotExist();
         }
 

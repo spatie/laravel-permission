@@ -2,8 +2,8 @@
 
 namespace Spatie\Permission\Test;
 
-use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
+use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class GateTest extends TestCase
 {

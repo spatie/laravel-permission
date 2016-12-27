@@ -2,11 +2,11 @@
 
 namespace Spatie\Permission\Test;
 
-use Illuminate\Database\Schema\Blueprint;
-use Orchestra\Testbench\TestCase as Orchestra;
-use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
+use Illuminate\Database\Schema\Blueprint;
 use Spatie\Permission\PermissionRegistrar;
+use Spatie\Permission\Contracts\Permission;
+use Orchestra\Testbench\TestCase as Orchestra;
 use Spatie\Permission\PermissionServiceProvider;
 
 abstract class TestCase extends Orchestra

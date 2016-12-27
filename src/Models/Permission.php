@@ -3,9 +3,9 @@
 namespace Spatie\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Permission\Contracts\Permission as PermissionContract;
-use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
+use Spatie\Permission\Exceptions\PermissionDoesNotExist;
+use Spatie\Permission\Contracts\Permission as PermissionContract;
 
 class Permission extends Model implements PermissionContract
 {
@@ -67,7 +67,7 @@ class Permission extends Model implements PermissionContract
     {
         $permission = static::where('name', $name)->first();
 
-        if (!$permission) {
+        if (! $permission) {
             throw new PermissionDoesNotExist();
         }
 

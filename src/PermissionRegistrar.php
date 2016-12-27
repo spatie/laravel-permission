@@ -2,10 +2,10 @@
 
 namespace Spatie\Permission;
 
+use Log;
 use Exception;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Cache\Repository;
-use Log;
 use Spatie\Permission\Contracts\Permission;
 
 class PermissionRegistrar
