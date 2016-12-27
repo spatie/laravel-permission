@@ -50,7 +50,7 @@ trait HasRoles
             $roles = $roles->toArray();
         }
 
-        if (! is_array($roles)) {
+        if (!is_array($roles)) {
             $roles = [$roles];
         }
 
@@ -61,7 +61,7 @@ trait HasRoles
 
             return app(Role::class)->findByName($role);
         }, $roles);
-        
+
         return $query->whereHas('roles', function ($query) use ($roles) {
             $query->where(function ($query) use ($roles) {
                 foreach ($roles as $role) {
@@ -147,7 +147,7 @@ trait HasRoles
             return false;
         }
 
-        return (bool)$roles->intersect($this->roles)->count();
+        return (bool) $roles->intersect($this->roles)->count();
     }
 
     /**
