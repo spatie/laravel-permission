@@ -104,6 +104,47 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_scope_users_using_a_string()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1->assignRole('testRole');
+        $user2->assignRole('testRole2');
+
+        $scopedUsers = User::role('testRole')->get();
+
+        $this->assertEquals($scopedUsers->count(), 1);
+    }
+
+    /** @test */
+    public function it_can_scope_users_using_an_array()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1->assignRole($this->testRole);
+        $user2->assignRole('testRole2');
+
+        $scopedUsers1 = User::role([$this->testRole])->get();
+        $scopedUsers2 = User::role(['testRole', 'testRole2'])->get();
+
+        $this->assertEquals($scopedUsers1->count(), 1);
+        $this->assertEquals($scopedUsers2->count(), 2);
+    }
+
+    /** @test */
+    public function it_can_scope_users_using_an_object()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1->assignRole($this->testRole);
+        $user2->assignRole('testRole2');
+
+        $scopedUsers = User::role($this->testRole)->get();
+
+        $this->assertEquals($scopedUsers->count(), 1);
+    }
+
+    /** @test */
     public function it_can_determine_that_a_user_has_one_of_the_given_roles()
     {
         $roleModel = app(Role::class);

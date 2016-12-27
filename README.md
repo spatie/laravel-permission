@@ -239,6 +239,13 @@ $permissions = $user->permissions;
 $roles = $user->roles()->pluck('name'); // returns a collection
 ```
 
+The `HasRoles` also adds a scope to your models to scope the query to certain roles.
+
+```php
+$users = User::role('writer')->get(); // Only returns users with the role 'writer'
+```
+The scope can accept a string, a `Spatie\Permission\Models\Role`-object or an `\Illuminate\Support\Collection`-object.
+
 ###Using permissions
 A permission can be given to a user:
 
