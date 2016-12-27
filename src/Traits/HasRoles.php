@@ -37,6 +37,46 @@ trait HasRoles
     }
 
     /**
+     * Scope the user query to certain roles only.
+     *
+     * @param string|array|Role|\Illuminate\Support\Collection $roles
+     *
+     * @return bool
+     */
+    public function scopeRole($query, $roles)
+    {
+        if (is_string($roles)) {
+            return $query->whereHas('roles', function ($query) use ($roles) {
+                $query->where('name', $roles);
+            });
+        }
+
+        if ($roles instanceof Role) {
+            return $query->whereHas('roles', function ($query) use ($roles) {
+                $query->where('id', $roles->id);
+            });
+        }
+
+        if (is_array($roles)) {
+            return $query->whereHas('roles', function ($query) use ($roles) {
+                $query->where(function ($query) use ($roles) {
+                    foreach ($roles as $role) {
+                        if (is_string($role)) {
+                            $query->orWhere('name', $role);
+                        }
+
+                        if ($role instanceof Role) {
+                            $query->orWhere('id', $role->id);
+                        }
+                    }
+                });
+            });
+        }
+
+        return $query;
+    }
+
+    /**
      * Assign the given role to the user.
      *
      * @param array|string|\Spatie\Permission\Models\Role ...$roles
