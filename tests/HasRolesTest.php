@@ -132,6 +132,21 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_scope_users_using_a_collection()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1->assignRole($this->testRole);
+        $user2->assignRole('testRole2');
+
+        $scopedUsers1 = User::role([$this->testRole])->get();
+        $scopedUsers2 = User::role(collect(['testRole', 'testRole2']))->get();
+
+        $this->assertEquals($scopedUsers1->count(), 1);
+        $this->assertEquals($scopedUsers2->count(), 2);
+    }
+
+    /** @test */
     public function it_can_scope_users_using_an_object()
     {
         $user1 = User::create(['email' => 'user1@test.com']);

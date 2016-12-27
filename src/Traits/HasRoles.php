@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Traits;
 
+use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 
@@ -45,33 +46,29 @@ trait HasRoles
      */
     public function scopeRole($query, $roles)
     {
-        if (is_string($roles)) {
-            return $query->whereHas('roles', function ($query) use ($roles) {
-                $query->where('name', $roles);
-            });
+        if ($roles instanceof Collection) {
+            $roles = $roles->toArray();
         }
 
-        if ($roles instanceof Role) {
-            return $query->whereHas('roles', function ($query) use ($roles) {
-                $query->where('id', $roles->id);
-            });
+        if (! is_array($roles)) {
+            $roles = [$roles];
         }
 
-        if (is_array($roles)) {
-            return $query->whereHas('roles', function ($query) use ($roles) {
-                $query->where(function ($query) use ($roles) {
-                    foreach ($roles as $role) {
-                        if (is_string($role)) {
-                            $query->orWhere('name', $role);
-                        }
+        $roles = array_map(function ($role) {
+            if ($role instanceof Role) {
+                return $role;
+            }
 
-                        if ($role instanceof Role) {
-                            $query->orWhere('id', $role->id);
-                        }
-                    }
-                });
+            return app(Role::class)->findByName($role);
+        }, $roles);
+        
+        return $query->whereHas('roles', function ($query) use ($roles) {
+            $query->where(function ($query) use ($roles) {
+                foreach ($roles as $role) {
+                    $query->orWhere('id', $role->id);
+                }
             });
-        }
+        });
 
         return $query;
     }
@@ -150,7 +147,7 @@ trait HasRoles
             return false;
         }
 
-        return (bool) $roles->intersect($this->roles)->count();
+        return (bool)$roles->intersect($this->roles)->count();
     }
 
     /**
