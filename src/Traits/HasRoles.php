@@ -37,7 +37,7 @@ trait HasRoles
     }
 
     /**
-     * Scope the user query to certain roles only
+     * Scope the user query to certain roles only.
      *
      * @param string|array|Role|\Illuminate\Support\Collection $roles
      *
@@ -59,7 +59,7 @@ trait HasRoles
 
         if (is_array($roles)) {
             return $query->whereHas('roles', function ($query) use ($roles) {
-                $query->where(function($query) use ($roles) {
+                $query->where(function ($query) use ($roles) {
                     foreach ($roles as $role) {
                         if (is_string($role)) {
                             $query->orWhere('name', $role);
