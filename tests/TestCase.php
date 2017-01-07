@@ -106,6 +106,6 @@ abstract class TestCase extends Orchestra
      */
     public function refreshTestUser()
     {
-        $this->testUser = User::find($this->testUser->id);
+        $this->testUser = $this->testUser->fresh();
     }
 }
