@@ -2,6 +2,9 @@
 
 All Notable changes to `laravel-permission` will be documented in this file
 
+## 1.6.1 - 2016-01-19
+- make exception logging more verbose
+
 ## 1.6.0 - 2016-12-27
 - added `Role` scope
 

@@ -50,9 +50,10 @@ class PermissionRegistrar
             });
 
             return true;
-        } catch (Exception $e) {
-            Log::alert('Could not register permissions');
-            Log::alert(get_class($e).': '.$e->getMessage());
+        } catch (Exception $exception) {
+            Log::alert(
+                "Could not register permissions because {$exception->getMessage()}" . PHP_EOL
+                . $exception->getTraceAsString());
 
             return false;
         }
