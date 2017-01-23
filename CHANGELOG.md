@@ -2,6 +2,9 @@
 
 All Notable changes to `laravel-permission` will be documented in this file
 
+## 1.7.0 - 2016-01-23
+- added support for Laravel 5.4
+
 ## 1.6.0 - 2016-12-27
 - added `Role` scope
 
