@@ -3,9 +3,9 @@
 namespace Spatie\Permission\Test;
 
 use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\PermissionRegistrar;
+use Spatie\Permission\Contracts\Permission;
 
 class CacheTest extends TestCase
 {

@@ -1,0 +1,3 @@
+preset: laravel
+
+linting: true

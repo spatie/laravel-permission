@@ -2,10 +2,10 @@
 
 namespace Spatie\Permission;
 
+use Log;
 use Exception;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Cache\Repository;
-use Log;
 use Spatie\Permission\Contracts\Permission;
 
 class PermissionRegistrar
@@ -50,8 +50,10 @@ class PermissionRegistrar
             });
 
             return true;
-        } catch (Exception $e) {
-            Log::alert('Could not register permissions');
+        } catch (Exception $exception) {
+            Log::alert(
+                "Could not register permissions because {$exception->getMessage()}".PHP_EOL
+                .$exception->getTraceAsString());
 
             return false;
         }
