@@ -25,7 +25,7 @@ class PermissionServiceProvider extends ServiceProvider
                 __DIR__.'/../resources/migrations/create_permission_tables.php.stub' => $this->app->databasePath().'/migrations/'.$timestamp.'_create_permission_tables.php',
             ], 'migrations');
         }
-      
+
         $this->mergeConfigFrom(
             __DIR__.'/../resources/config/laravel-permission.php',
             'laravel-permission'
