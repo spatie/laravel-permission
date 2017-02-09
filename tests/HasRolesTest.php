@@ -348,7 +348,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_determine_that_user_has_direct_permission ()
+    public function it_can_determine_that_user_has_direct_permission()
     {
         $this->testUser->givePermissionTo('edit-articles');
         $this->refreshTestUser();
@@ -362,6 +362,7 @@ class HasRolesTest extends TestCase
         $this->refreshTestUser();
         $this->assertFalse($this->testUser->hasDirectPermission('edit-articles'));
     }
+
     /**
      * @test
      *
