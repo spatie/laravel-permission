@@ -34,6 +34,7 @@ return [
         * The table that your application uses for users. This table's model will
         * be using the "HasRoles" and "HasPermissions" traits.
         */
+
         'users' => 'users',
 
         /*
@@ -85,6 +86,6 @@ return [
     *
     * If for some reason you want to disable that logging, set this value to false.
     */
-    'log_registration_exception' => true,
 
+    'log_registration_exception' => true,
 ];
