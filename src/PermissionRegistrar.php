@@ -51,7 +51,6 @@ class PermissionRegistrar
 
             return true;
         } catch (Exception $exception) {
-
             if (app()->config['laravel-permission.settings.logging']) {
                 Log::alert(
                     "Could not register permissions because {$exception->getMessage()}".PHP_EOL
