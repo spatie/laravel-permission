@@ -141,10 +141,11 @@ return [
         | Enable/Disable Logging
         |--------------------------------------------------------------------------
         |
-        | By default logging is enabled, however to disable it just set the value
-        | to "false". This might be useful for your test environment.
+        | By default errors logging is enabled, however to disable it just set the
+        | value to "false". This might be useful for your test environment.
         |
         */
+
         'logging' => true,
     ],
 
