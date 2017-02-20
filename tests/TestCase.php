@@ -12,19 +12,13 @@ use Spatie\Permission\PermissionServiceProvider;
 
 abstract class TestCase extends Orchestra
 {
-    /**
-     * @var \Spatie\Permission\Test\User
-     */
+    /** @var \Spatie\Permission\Test\User */
     protected $testUser;
 
-    /**
-     * @var \Spatie\Permission\Models\Role
-     */
+    /** @var \Spatie\Permission\Models\Role */
     protected $testRole;
 
-    /**
-     * @var \Spatie\Permission\Models\Permission
-     */
+    /** @var \Spatie\Permission\Models\Permission */
     protected $testPermission;
 
     public function setUp()
@@ -127,12 +121,12 @@ abstract class TestCase extends Orchestra
 
     protected function assertNotLogged($message, $level)
     {
-        $this->assertFalse($this->hasLog($message, $level), "Found '{$message}' in the logs.");
+        $this->assertFalse($this->hasLog($message, $level), "Found `{$message}` in the logs.");
     }
 
     protected function assertLogged($message, $level)
     {
-        $this->assertTrue($this->hasLog($message, $level), "Couldn't find '{$message}' in the logs.");
+        $this->assertTrue($this->hasLog($message, $level), "Couldn't find `{$message}` in the logs.");
     }
 
     /**

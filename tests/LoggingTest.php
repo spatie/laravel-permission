@@ -4,7 +4,7 @@ namespace Spatie\Permission\Test;
 
 use Monolog\Logger;
 
-class SettingsTest extends TestCase
+class LoggingTest extends TestCase
 {
     public function setUp()
     {
@@ -14,7 +14,7 @@ class SettingsTest extends TestCase
     /** @test */
     public function it_logs_when_config_is_set_to_true()
     {
-        app()->config['laravel-permission.settings.logging'] = true;
+        $this->app['config']->set('laravel-permission.log_registration_exception', true);
 
         (new \CreatePermissionTables())->down();
 
@@ -26,7 +26,7 @@ class SettingsTest extends TestCase
     /** @test */
     public function it_doesnt_log_when_config_is_set_to_false()
     {
-        app()->config['laravel-permission.settings.logging'] = false;
+        $this->app['config']->set('laravel-permission.log_registration_exception', false);
 
         (new \CreatePermissionTables())->down();
 
