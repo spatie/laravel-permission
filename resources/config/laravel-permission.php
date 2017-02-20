@@ -149,6 +149,6 @@ return [
         */
 
         'logging' => true,
-    ]
+    ],
 
 ];
