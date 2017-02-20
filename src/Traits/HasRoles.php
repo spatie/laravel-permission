@@ -65,7 +65,7 @@ trait HasRoles
         return $query->whereHas('roles', function ($query) use ($roles) {
             $query->where(function ($query) use ($roles) {
                 foreach ($roles as $role) {
-                    $query->orWhere('id', $role->id);
+                    $query->orWhere(config('laravel-permission.table_names.roles').'.id', $role->id);
                 }
             });
         });
