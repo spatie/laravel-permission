@@ -91,7 +91,7 @@ class PermissionRegistrar
         if (is_null($logSetting))  {
             return true;
         }
-        
+
         return $logSetting;
     }
 }
