@@ -88,10 +88,10 @@ class PermissionRegistrar
     {
         $logSetting = config('laravel-permission.log_registration_exception');
 
-        if (is_null($logSetting))  {
+        if (is_null($logSetting)) {
             return true;
         }
-        
+
         return $logSetting;
     }
 }
