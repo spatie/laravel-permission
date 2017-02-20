@@ -51,7 +51,7 @@ class PermissionRegistrar
 
             return true;
         } catch (Exception $exception) {
-            if (config('laravel-permission.log_registration_exception')) {
+            if ($this->shouldLogException()) {
                 Log::alert(
                     "Could not register permissions because {$exception->getMessage()}".PHP_EOL
                     .$exception->getTraceAsString());
@@ -79,5 +79,19 @@ class PermissionRegistrar
         return $this->cache->rememberForever($this->cacheKey, function () {
             return app(Permission::class)->with('roles')->get();
         });
+    }
+
+    /**
+     * @return bool
+     */
+    protected function shouldLogException()
+    {
+        $logSetting = config('laravel-permission.log_registration_exception');
+
+        if (is_null($logSetting))  {
+            return true;
+        }
+        
+        return $logSetting;
     }
 }
