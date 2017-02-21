@@ -2,6 +2,19 @@
 
 All Notable changes to `laravel-permission` will be documented in this file
 
+## 1.9.0 - 2017-02-20
+- add `log_registration_exception` in settings file
+- fix for ambiguous column name `id` when using the role scope 
+
+## 1.8.0 - 2017-02-09
+- `hasDirectPermission` method is now public
+
+## 1.7.0 - 2016-01-23
+- added support for Laravel 5.4
+
+## 1.6.1 - 2016-01-19
+- make exception logging more verbose
+
 ## 1.6.0 - 2016-12-27
 - added `Role` scope
 

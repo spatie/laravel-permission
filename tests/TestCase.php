@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Test;
 
+use Monolog\Handler\TestHandler;
 use Spatie\Permission\Contracts\Role;
 use Illuminate\Database\Schema\Blueprint;
 use Spatie\Permission\PermissionRegistrar;
@@ -11,19 +12,13 @@ use Spatie\Permission\PermissionServiceProvider;
 
 abstract class TestCase extends Orchestra
 {
-    /**
-     * @var \Spatie\Permission\Test\User
-     */
+    /** @var \Spatie\Permission\Test\User */
     protected $testUser;
 
-    /**
-     * @var \Spatie\Permission\Models\Role
-     */
+    /** @var \Spatie\Permission\Models\Role */
     protected $testRole;
 
-    /**
-     * @var \Spatie\Permission\Models\Permission
-     */
+    /** @var \Spatie\Permission\Models\Permission */
     protected $testPermission;
 
     public function setUp()
@@ -37,6 +32,8 @@ abstract class TestCase extends Orchestra
         $this->testUser = User::first();
         $this->testRole = app(Role::class)->first();
         $this->testPermission = app(Permission::class)->find(1);
+
+        $this->clearLogTestHandler();
     }
 
     /**
@@ -66,6 +63,8 @@ abstract class TestCase extends Orchestra
         ]);
 
         $app['config']->set('view.paths', [__DIR__.'/resources/views']);
+
+        $app['log']->getMonolog()->pushHandler(new TestHandler());
     }
 
     /**
@@ -98,6 +97,8 @@ abstract class TestCase extends Orchestra
      */
     protected function reloadPermissions()
     {
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
         return app(PermissionRegistrar::class)->registerPermissions();
     }
 
@@ -107,5 +108,38 @@ abstract class TestCase extends Orchestra
     public function refreshTestUser()
     {
         $this->testUser = $this->testUser->fresh();
+    }
+
+    protected function clearLogTestHandler()
+    {
+        collect($this->app['log']->getMonolog()->getHandlers())->filter(function ($handler) {
+            return $handler instanceof TestHandler;
+        })->first(function (TestHandler $handler) {
+            $handler->clear();
+        });
+    }
+
+    protected function assertNotLogged($message, $level)
+    {
+        $this->assertFalse($this->hasLog($message, $level), "Found `{$message}` in the logs.");
+    }
+
+    protected function assertLogged($message, $level)
+    {
+        $this->assertTrue($this->hasLog($message, $level), "Couldn't find `{$message}` in the logs.");
+    }
+
+    /**
+     * @param $message
+     * @param $level
+     *
+     * @return bool
+     */
+    protected function hasLog($message, $level)
+    {
+        return collect($this->app['log']->getMonolog()->getHandlers())->filter(function ($handler) use ($message, $level) {
+            return $handler instanceof TestHandler
+                && $handler->hasRecordThatContains($message, $level);
+        })->count() > 0;
     }
 }

@@ -1,7 +1,6 @@
 # Associate users with roles and permissions
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/spatie/laravel-permission.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-permission)
-[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 [![Build Status](https://img.shields.io/travis/spatie/laravel-permission/master.svg?style=flat-square)](https://travis-ci.org/spatie/laravel-permission)
 [![SensioLabsInsight](https://img.shields.io/sensiolabs/i/a25f93ac-5e8f-48c8-a9a1-5d3ef3f9e8f2.svg?style=flat-square)](https://insight.sensiolabs.com/projects/a25f93ac-5e8f-48c8-a9a1-5d3ef3f9e8f2)
 [![Quality Score](https://img.shields.io/scrutinizer/g/spatie/laravel-permission.svg?style=flat-square)](https://scrutinizer-ci.com/g/spatie/laravel-permission)
@@ -30,7 +29,7 @@ You can test if a user has a permission with Laravel's default `can`-function.
 $user->can('edit articles');
 ```
 
-If you want a drop-in middleware to check permissions, check out our authorize package: https://github.com/spatie/laravel-authorize
+If you are using a Laravel version lower than 5.2.28, and want a drop-in middleware to check permissions, check out our authorize package: https://github.com/spatie/laravel-authorize
 
 Spatie is webdesign agency in Antwerp, Belgium. You'll find an overview of all 
 our open source projects [on our website](https://spatie.be/opensource).
@@ -86,122 +85,90 @@ This is the contents of the published config file:
 
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Authorization Models
-    |--------------------------------------------------------------------------
-    */
-
     'models' => [
 
         /*
-        |--------------------------------------------------------------------------
-        | Permission Model
-        |--------------------------------------------------------------------------
-        |
-        | When using the "HasRoles" trait from this package, we need to know which
-        | Eloquent model should be used to retrieve your permissions. Of course, it
-        | is often just the "Permission" model but you may use whatever you like.
-        |
-        | The model you want to use as a Permission model needs to implement the
-        | `Spatie\Permission\Contracts\Permission` contract.
-        |
+        * When using the "HasRoles" trait from this package, we need to know which
+        * Eloquent model should be used to retrieve your permissions. Of course, it
+        * is often just the "Permission" model but you may use whatever you like.
+        *
+        * The model you want to use as a Permission model needs to implement the
+        * `Spatie\Permission\Contracts\Permission` contract.
         */
 
         'permission' => Spatie\Permission\Models\Permission::class,
 
         /*
-        |--------------------------------------------------------------------------
-        | Role Model
-        |--------------------------------------------------------------------------
-        |
-        | When using the "HasRoles" trait from this package, we need to know which
-        | Eloquent model should be used to retrieve your roles. Of course, it
-        | is often just the "Role" model but you may use whatever you like.
-        |
-        | The model you want to use as a Role model needs to implement the
-        | `Spatie\Permission\Contracts\Role` contract.
-        |
+        * When using the "HasRoles" trait from this package, we need to know which
+        * Eloquent model should be used to retrieve your roles. Of course, it
+        * is often just the "Role" model but you may use whatever you like.
+        *
+        * The model you want to use as a Role model needs to implement the
+        * `Spatie\Permission\Contracts\Role` contract.
         */
 
         'role' => Spatie\Permission\Models\Role::class,
-    ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Authorization Tables
-    |--------------------------------------------------------------------------
-    */
+    ],
 
     'table_names' => [
 
         /*
-        |--------------------------------------------------------------------------
-        | Roles Table
-        |--------------------------------------------------------------------------
-        |
-        | When using the "HasRoles" trait from this package, we need to know which
-        | table should be used to retrieve your roles. We have chosen a basic
-        | default value but you may easily change it to any table you like.
-        |
+        * The table that your application uses for users. This table's model will
+        * be using the "HasRoles" and "HasPermissions" traits.
+        */
+        'users' => 'users',
+
+        /*
+        * When using the "HasRoles" trait from this package, we need to know which
+        * table should be used to retrieve your roles. We have chosen a basic
+        * default value but you may easily change it to any table you like.
         */
 
         'roles' => 'roles',
 
         /*
-        |--------------------------------------------------------------------------
-        | Permissions Table
-        |--------------------------------------------------------------------------
-        |
-        | When using the "HasRoles" trait from this package, we need to know which
-        | table should be used to retrieve your permissions. We have chosen a basic
-        | default value but you may easily change it to any table you like.
-        |
+        * When using the "HasRoles" trait from this package, we need to know which
+        * table should be used to retrieve your permissions. We have chosen a basic
+        * default value but you may easily change it to any table you like.
         */
 
         'permissions' => 'permissions',
 
         /*
-        |--------------------------------------------------------------------------
-        | User Permissions Table
-        |--------------------------------------------------------------------------
-        |
-        | When using the "HasRoles" trait from this package, we need to know which
-        | table should be used to retrieve your users permissions. We have chosen a
-        | basic default value but you may easily change it to any table you like.
-        |
+        * When using the "HasRoles" trait from this package, we need to know which
+        * table should be used to retrieve your users permissions. We have chosen a
+        * basic default value but you may easily change it to any table you like.
         */
 
         'user_has_permissions' => 'user_has_permissions',
 
         /*
-        |--------------------------------------------------------------------------
-        | User Roles Table
-        |--------------------------------------------------------------------------
-        |
-        | When using the "HasRoles" trait from this package, we need to know which
-        | table should be used to retrieve your users roles. We have chosen a
-        | basic default value but you may easily change it to any table you like.
-        |
+        * When using the "HasRoles" trait from this package, we need to know which
+        * table should be used to retrieve your users roles. We have chosen a
+        * basic default value but you may easily change it to any table you like.
         */
 
         'user_has_roles' => 'user_has_roles',
 
         /*
-        |--------------------------------------------------------------------------
-        | Role Permissions Table
-        |--------------------------------------------------------------------------
-        |
-        | When using the "HasRoles" trait from this package, we need to know which
-        | table should be used to retrieve your roles permissions. We have chosen a
-        | basic default value but you may easily change it to any table you like.
-        |
+        * When using the "HasRoles" trait from this package, we need to know which
+        * table should be used to retrieve your roles permissions. We have chosen a
+        * basic default value but you may easily change it to any table you like.
         */
 
         'role_has_permissions' => 'role_has_permissions',
 
     ],
 
+    /*
+    *
+    * By default we'll make an entry in the application log when the permissions
+    * could not be loaded. Normally this only occurs while installing the packages.
+    *
+    * If for some reason you want to disable that logging, set this value to false.
+    */
+    'log_registration_exception' => true,
 ];
 ```
 
@@ -345,6 +312,17 @@ Saved permission and roles are also registered with the `Illuminate\Auth\Access\
 ```php
 $user->can('edit articles');
 ```
+All permissions of roles that user is assigned to are inherited to the 
+user automatically. In addition to these permissions particular permission can be assigned to the user too. For instance, 
+```php
+$role->givePermissionTo('edit articles');
+$user->assignRole('writer');
+
+$user->givePermissionTo('delete articles');
+```
+In above example a role is given permission to edit articles and this role is assigned to a user. Now user can edit articles and additionaly delete articles. The permission of 'delete articles' is his direct permission because it is assigned directly to him. When we call `$user->hasDirectPermission('delete articles')` it returns `True` and `False` for `$user->hasDirectPermission('edit articles')`. 
+
+This method is useful if one has a form for setting permissions for roles and users in his application and want to restrict to change inherited permissions of roles of user, i.e. allowing to change only direct permissions of user.
 
 ###Using blade directives
 This package also adds Blade directives to verify whether the
