@@ -200,23 +200,23 @@ trait HasRoles
         return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
     }
 
-	/**
-	 * Determine if the user has any of the given permissions.
-	 *
-	 * @param array ...$permissions
-	 *
-	 * @return bool
-	 */
-	public function hasAnyPermission(...$permissions)
-	{
-		foreach($permissions as $permission){
-			if($this->hasPermissionTo($permission)){
-				return true;
-			}
-		}
+    /**
+     * Determine if the user has any of the given permissions.
+     *
+     * @param array ...$permissions
+     *
+     * @return bool
+     */
+    public function hasAnyPermission(...$permissions)
+    {
+        foreach ($permissions as $permission) {
+            if ($this->hasPermissionTo($permission)) {
+                return true;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
     /**
      * @deprecated deprecated since version 1.0.1, use hasPermissionTo instead
