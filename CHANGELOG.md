@@ -2,7 +2,7 @@
 
 All Notable changes to `laravel-permission` will be documented in this file
 
-## unreleased
+## 1.11.0
 
 - add `getDirectPermissions`, `getPermissionsViaRoles`, `getAllPermissions`
 
