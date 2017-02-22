@@ -393,6 +393,35 @@ class HasRolesTest extends TestCase
         $this->assertFalse($this->testUser->hasDirectPermission('edit-articles'));
     }
 
+    /** @test */
+    public function it_can_determine_that_user_can_list_all_the_permissions_he_has_via_his_roles()
+    {
+        $roleModel = app(Role::class);
+        $roleModel->findByName('testRole2')->givePermissionTo('edit-news');
+
+        $this->testRole->givePermissionTo('edit-articles');
+        $this->testUser->assignRole('testRole', 'testRole2');
+
+        $this->assertEquals(
+            collect(['edit-articles', 'edit-news']),
+            $this->testUser->permissions_via_roles->pluck('name')
+        );
+    }
+
+    /** @test */
+    public function it_can_determine_that_user_can_list_all_his_permissions()
+    {
+        $this->testUser->givePermissionTo('edit-news');
+
+        $this->testRole->givePermissionTo('edit-articles');
+        $this->testUser->assignRole('testRole');
+
+        $this->assertEquals(
+            collect(['edit-articles', 'edit-news']),
+            $this->testUser->all_permissions->pluck('name')
+        );
+    }
+
     /**
      * @test
      *
