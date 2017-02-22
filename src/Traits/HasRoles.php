@@ -279,11 +279,21 @@ trait HasRoles
     }
 
     /**
-     * Return all the permissions the user have via his roles.
+     * Return all  permissions the directory coupled to the user.
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
-    protected function getPermissionsViaRolesAttribute()
+    public function getDirectPermissions()
+    {
+        return $this->permissions;
+    }
+
+    /**
+     * Return all the permissions the user has via roles.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getPermissionsViaRoles()
     {
         return $this->load('roles', 'roles.permissions')
             ->roles->flatMap(function ($role) {
@@ -292,12 +302,12 @@ trait HasRoles
     }
 
     /**
-     * Return all the permissions the user have (directly and via his roles).
+     * Return all the permissions the user has, both directly and via roles.
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
-    protected function getAllPermissionsAttribute()
+    public function getAllPermissions()
     {
-        return $this->permissions->merge($this->permissions_via_roles)->sort()->values();
+        return $this->permissions->merge($this->getPermissionsViaRoles())->sort()->values();
     }
 }

@@ -394,7 +394,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_determine_that_user_can_list_all_the_permissions_he_has_via_his_roles()
+    public function it_can_list_all_the_permissions_via_his_roles()
     {
         $roleModel = app(Role::class);
         $roleModel->findByName('testRole2')->givePermissionTo('edit-news');
@@ -404,12 +404,12 @@ class HasRolesTest extends TestCase
 
         $this->assertEquals(
             collect(['edit-articles', 'edit-news']),
-            $this->testUser->permissions_via_roles->pluck('name')
+            $this->testUser->getPermissionsViaRoles()->pluck('name')
         );
     }
 
     /** @test */
-    public function it_can_determine_that_user_can_list_all_his_permissions()
+    public function it_can_list_all_the_coupled_permissions_both_directly_and_via_roles()
     {
         $this->testUser->givePermissionTo('edit-news');
 
@@ -418,7 +418,7 @@ class HasRolesTest extends TestCase
 
         $this->assertEquals(
             collect(['edit-articles', 'edit-news']),
-            $this->testUser->all_permissions->pluck('name')
+            $this->testUser->getAllPermissions()->pluck('name')
         );
     }
 
