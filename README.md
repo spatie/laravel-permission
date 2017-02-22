@@ -324,6 +324,21 @@ In above example a role is given permission to edit articles and this role is as
 
 This method is useful if one has a form for setting permissions for roles and users in his application and want to restrict to change inherited permissions of roles of user, i.e. allowing to change only direct permissions of user.
 
+You can also list all of theses permissions:
+```php
+//direct permissions
+$user->permissions
+
+//permissions inherited from user's roles
+$user->permissions_via_roles
+
+//all permissions which apply on the user
+$user->all_permissions
+```
+All theses responses are collections of `Spatie\Permission\Models\Permission`-objects.
+
+If we follow the previous example, the first response will be a collection with the 'delete article' permission, the second will be a collection with the 'edit article' permission and the third will contain both.
+
 ###Using blade directives
 This package also adds Blade directives to verify whether the
 currently logged in user has all or any of a given list of roles.

@@ -277,4 +277,27 @@ trait HasRoles
 
         return $role;
     }
+
+    /**
+     * Return all the permissions the user have via his roles.
+     *
+     * @return Collection
+     */
+    protected function getPermissionsViaRolesAttribute()
+    {
+        return $this->load('roles', 'roles.permissions')
+            ->roles->flatMap(function ($role) {
+                return $role->permissions;
+            })->sort()->values();
+    }
+
+    /**
+     * Return all the permissions the user have (directly and via his roles).
+     *
+     * @return Collection
+     */
+    protected function getAllPermissionsAttribute()
+    {
+        return $this->permissions->merge($this->permissions_via_roles)->sort()->values();
+    }
 }
