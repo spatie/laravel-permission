@@ -79,6 +79,12 @@ class PermissionServiceProvider extends ServiceProvider
             $bladeCompiler->directive('endhasallroles', function () {
                 return '<?php endif; ?>';
             });
+            $bladeCompiler->directive('permission', function ($permission) {
+                return "<?php if(auth()->check() && auth()->user()->hasPermissionTo({$permission})): ?>";
+            });
+            $bladeCompiler->directive('endpermission', function () {
+                return '<?php endif; ?>';
+            });
         });
     }
 }
