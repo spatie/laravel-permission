@@ -74,7 +74,7 @@ class PermissionRegistrar
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    protected function getPermissions()
+    public function getPermissions()
     {
         return $this->cache->rememberForever($this->cacheKey, function () {
             return app(Permission::class)->with('roles')->get();

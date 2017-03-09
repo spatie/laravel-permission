@@ -93,4 +93,21 @@ class CacheTest extends TestCase
         $this->registrar->registerPermissions();
         $this->assertCount(5, DB::getQueryLog());
     }
+
+    /** @test */
+    public function has_permission_to_should_use_the_cache()
+    {
+        $this->testRole->givePermissionTo(['edit-articles', 'edit-news']);
+        $this->testUser->assignRole('testRole');
+        $this->assertCount(6, DB::getQueryLog());
+
+        $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
+        $this->assertCount(10, DB::getQueryLog());
+
+        $this->assertTrue($this->testUser->hasPermissionTo('edit-news'));
+        $this->assertCount(10, DB::getQueryLog());
+
+        $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
+        $this->assertCount(10, DB::getQueryLog());
+    }
 }
