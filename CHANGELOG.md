@@ -2,6 +2,10 @@
 
 All Notable changes to `laravel-permission` will be documented in this file
 
+## 1.12.0
+
+- `hasPermissionTo` use the cache to avoid extra queries when it is called multiple times
+
 ## 1.11.0
 
 - add `getDirectPermissions`, `getPermissionsViaRoles`, `getAllPermissions`
