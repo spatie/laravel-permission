@@ -4,7 +4,7 @@ All Notable changes to `laravel-permission` will be documented in this file
 
 ## 1.11.1
 
-- `hasPermissionTo` use the cache to avoid extra queries when it is called multiple times
+- `hasPermissionTo` uses the cache to avoid extra queries when it is called multiple times
 
 ## 1.11.0
 
