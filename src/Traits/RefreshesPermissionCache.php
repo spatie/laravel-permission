@@ -28,4 +28,14 @@ trait RefreshesPermissionCache
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
+
+    /**
+     * Get the current cached permissions.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    protected static function getPermissions()
+    {
+        return app(PermissionRegistrar::class)->getPermissions();
+    }
 }

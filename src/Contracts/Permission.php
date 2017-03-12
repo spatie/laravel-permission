@@ -23,7 +23,9 @@ interface Permission
      *
      * @param string $name
      *
-     * @throws PermissionDoesNotExist
+     * @throws \Spatie\Permission\Exceptions\PermissionDoesNotExist
+     *
+     * @return Permission
      */
     public static function findByName($name);
 }
