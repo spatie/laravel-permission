@@ -127,6 +127,10 @@ trait HasRoles
      */
     public function hasRole($roles)
     {
+        if (is_numeric($roles)) {
+            return $this->roles->contains('id', $roles);
+        }
+
         if (is_string($roles)) {
             return $this->roles->contains('name', $roles);
         }
