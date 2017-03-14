@@ -38,8 +38,7 @@ return [
         'users' => 'users',
 
         /*
-         * You will need this in case of multi-auth implementation.
-         * TODO: needs some nice wording
+         * The name of the foreign key to the users table.
          */
         'user_foreign_key' => 'user_id',
 
@@ -82,7 +81,6 @@ return [
          */
 
         'role_has_permissions' => 'role_has_permissions',
-
     ],
 
     /*
