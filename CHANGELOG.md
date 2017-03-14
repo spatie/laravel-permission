@@ -2,6 +2,10 @@
 
 All Notable changes to `laravel-permission` will be documented in this file
 
+## 1.12.0
+
+- made foreign key name to users table configurable
+
 ## 1.11.1
 
 - `hasPermissionTo` uses the cache to avoid extra queries when it is called multiple times
