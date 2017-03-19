@@ -222,7 +222,7 @@ $users = User::role('writer')->get(); // Only returns users with the role 'write
 ```
 The scope can accept a string, a `Spatie\Permission\Models\Role`-object or an `\Illuminate\Support\Collection`-object.
 
-###Using permissions
+### Using permissions
 A permission can be given to a user:
 
 ```php
@@ -252,7 +252,7 @@ test if a user has a permission with Laravel's default `can`-function.
 $user->can('edit articles');
 ```
 
-###Using roles and permissions
+### Using roles and permissions
 A role can be assigned to a user:
 
 ```php
@@ -350,7 +350,7 @@ All theses responses are collections of `Spatie\Permission\Models\Permission`-ob
 
 If we follow the previous example, the first response will be a collection with the 'delete article' permission, the second will be a collection with the 'edit article' permission and the third will contain both.
 
-###Using blade directives
+### Using blade directives
 This package also adds Blade directives to verify whether the
 currently logged in user has all or any of a given list of roles.
 
