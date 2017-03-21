@@ -17,6 +17,7 @@ trait HasPermissions
     {
         $permissions = collect($permissions)
             ->flatten()
+            ->unique()
             ->map(function ($permission) {
                 return $this->getStoredPermission($permission);
             })
