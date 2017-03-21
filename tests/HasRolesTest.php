@@ -422,6 +422,18 @@ class HasRolesTest extends TestCase
         );
     }
 
+    /** @test */
+    public function it_filters_out_duplicate_roles_and_permissions()
+    {
+        $this->testUser->assignRole(['testRole', 'testRole2', 'testRole2']);
+        $this->testUser->givePermissionTo($this->testPermission, $this->testPermission);
+        $this->testRole->givePermissionTo($this->testPermission, $this->testPermission);
+
+        $this->assertCount(2, $this->testUser->roles()->get());
+        $this->assertCount(1, $this->testUser->getAllPermissions());
+        $this->assertCount(1, $this->testRole->permissions()->get());
+    }
+
     /**
      * @test
      *

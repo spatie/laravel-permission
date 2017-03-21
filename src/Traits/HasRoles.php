@@ -82,6 +82,7 @@ trait HasRoles
     {
         $roles = collect($roles)
             ->flatten()
+            ->unique()
             ->map(function ($role) {
                 return $this->getStoredRole($role);
             })
