@@ -443,4 +443,40 @@ class HasRolesTest extends TestCase
             $this->testUser->hasPermission($this->testPermission)
         );
     }
+
+    /**
+     * @test
+     */
+    public function it_can_check_role_by_id()
+    {
+        $roleModel = app(Role::class);
+        $role = $roleModel->create(['name' => 'i know name']);
+
+        $this->testUser->assignRole($role->name);
+        $this->assertTrue($this->testUser->hasRole($role->id));
+        $this->assertFalse($this->testUser->hasRole($role->id * -1));
+    }
+
+    /**
+     * @test
+     */
+    public function it_cant_check_role_by_id_if_id_is_not_an_integer()
+    {
+        $roleModel = app(Role::class);
+        $role = $roleModel->create(['name' => 'role name']);
+        $this->testUser->assignRole($role->name);
+
+        $this->assertFalse($this->testUser->hasRole('e2'.$role->id));
+        $this->assertFalse($this->testUser->hasRole($role->id.'e2'));
+
+        $roleStartsWithE2 = $roleModel->create(['name' => 'e2'.$role->id]);
+        $roleEndsWithE2 = $roleModel->create(['name' => $role->id.'e2']);
+
+        $this->testUser->assignRole($roleStartsWithE2->name, $roleEndsWithE2->name);
+
+        $this->refreshTestUser();
+
+        $this->assertTrue($this->testUser->hasRole('e2'.$role->id));
+        $this->assertTrue($this->testUser->hasRole($role->id.'e2'));
+    }
 }

@@ -121,12 +121,16 @@ trait HasRoles
     /**
      * Determine if the user has (one of) the given role(s).
      *
-     * @param string|array|Role|\Illuminate\Support\Collection $roles
+     * @param int|string|array|Role|\Illuminate\Support\Collection $roles
      *
      * @return bool
      */
     public function hasRole($roles)
     {
+        if (is_int($roles)) {
+            return $this->roles->contains('id', $roles);
+        }
+
         if (is_string($roles)) {
             return $this->roles->contains('name', $roles);
         }
