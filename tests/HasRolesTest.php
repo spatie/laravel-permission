@@ -466,17 +466,17 @@ class HasRolesTest extends TestCase
         $role = $roleModel->create(['name' => 'role name']);
         $this->testUser->assignRole($role->name);
 
-        $this->assertFalse($this->testUser->hasRole('e2' . $role->id));
-        $this->assertFalse($this->testUser->hasRole($role->id . 'e2'));
+        $this->assertFalse($this->testUser->hasRole('e2'.$role->id));
+        $this->assertFalse($this->testUser->hasRole($role->id.'e2'));
 
-        $roleStartsWithE2 = $roleModel->create(['name' => 'e2' . $role->id]);
-        $roleEndsWithE2 = $roleModel->create(['name' => $role->id . 'e2']);
+        $roleStartsWithE2 = $roleModel->create(['name' => 'e2'.$role->id]);
+        $roleEndsWithE2 = $roleModel->create(['name' => $role->id.'e2']);
 
         $this->testUser->assignRole($roleStartsWithE2->name, $roleEndsWithE2->name);
 
         $this->refreshTestUser();
 
-        $this->assertTrue($this->testUser->hasRole('e2' . $role->id));
-        $this->assertTrue($this->testUser->hasRole($role->id . 'e2'));
+        $this->assertTrue($this->testUser->hasRole('e2'.$role->id));
+        $this->assertTrue($this->testUser->hasRole($role->id.'e2'));
     }
 }
