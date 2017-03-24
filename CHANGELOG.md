@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.0.0
+
+- cache expiration is now configurable and set to 24h by default
+
 ## 1.12.0
 
 - made foreign key name to users table configurable

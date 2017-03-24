@@ -76,7 +76,7 @@ class PermissionRegistrar
      */
     public function getPermissions()
     {
-        return $this->cache->rememberForever($this->cacheKey, function () {
+        return $this->cache->remember($this->cacheKey, config('laravel-permission.cache_expiration_time'), function () {
             return app(Permission::class)->with('roles')->get();
         });
     }
