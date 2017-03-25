@@ -20,7 +20,7 @@ class PermissionServiceProvider extends ServiceProvider
 
         if (! class_exists('CreatePermissionTables')) {
             // Publish the migration
-            $timestamp = date('Y_m_d_His', time());
+            $timestamp = '2016_01_01_000000';
             $this->publishes([
                 __DIR__.'/../resources/migrations/create_permission_tables.php.stub' => $this->app->databasePath().'/migrations/'.$timestamp.'_create_permission_tables.php',
             ], 'migrations');
