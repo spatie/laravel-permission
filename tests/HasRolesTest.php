@@ -421,26 +421,4 @@ class HasRolesTest extends TestCase
             $this->testUser->getAllPermissions()->pluck('name')
         );
     }
-
-    /**
-     * @test
-     *
-     * @deprecated
-     */
-    public function it_can_check_permissions_with_the_deprecated_has_permission_method()
-    {
-        $this->assertSame(
-            $this->testUser->hasPermissionTo($this->testPermission),
-            $this->testUser->hasPermission($this->testPermission)
-        );
-
-        $this->testUser->givePermissionTo($this->testPermission);
-
-        $this->refreshTestUser();
-
-        $this->assertSame(
-            $this->testUser->hasPermissionTo($this->testPermission),
-            $this->testUser->hasPermission($this->testPermission)
-        );
-    }
 }
