@@ -12,33 +12,39 @@ trait HasRoles
     use RefreshesPermissionCache;
 
     /**
-     * A user may have multiple roles.
+     * A model may have multiple roles.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     public function roles()
     {
-        return $this->belongsToMany(
+        return $this->morphedByMany(
             config('laravel-permission.models.role'),
-            config('laravel-permission.table_names.user_has_roles')
+            'model',
+            config('laravel-permission.table_names.model_has_roles'),
+            'role_id',
+            'model_id'
         );
     }
 
     /**
-     * A user may have multiple direct permissions.
+     * A model may have multiple direct permissions.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     public function permissions()
     {
-        return $this->belongsToMany(
+        return $this->morphedByMany(
             config('laravel-permission.models.permission'),
-            config('laravel-permission.table_names.user_has_permissions')
+            'model',
+            config('laravel-permission.table_names.model_has_permissions'),
+            'permission_id',
+            'model_id'
         );
     }
 
     /**
-     * Scope the user query to certain roles only.
+     * Scope the model query to certain roles only.
      *
      * @param string|array|Role|\Illuminate\Support\Collection $roles
      *
@@ -72,7 +78,7 @@ trait HasRoles
     }
 
     /**
-     * Assign the given role to the user.
+     * Assign the given role to the model.
      *
      * @param array|string|\Spatie\Permission\Models\Role ...$roles
      *
@@ -95,7 +101,7 @@ trait HasRoles
     }
 
     /**
-     * Revoke the given role from the user.
+     * Revoke the given role from the model.
      *
      * @param string|Role $role
      */
@@ -119,7 +125,7 @@ trait HasRoles
     }
 
     /**
-     * Determine if the user has (one of) the given role(s).
+     * Determine if the model has (one of) the given role(s).
      *
      * @param string|array|Role|\Illuminate\Support\Collection $roles
      *
@@ -149,7 +155,7 @@ trait HasRoles
     }
 
     /**
-     * Determine if the user has any of the given role(s).
+     * Determine if the model has any of the given role(s).
      *
      * @param string|array|Role|\Illuminate\Support\Collection $roles
      *
@@ -161,7 +167,7 @@ trait HasRoles
     }
 
     /**
-     * Determine if the user has all of the given role(s).
+     * Determine if the model has all of the given role(s).
      *
      * @param string|Role|\Illuminate\Support\Collection $roles
      *
@@ -185,7 +191,7 @@ trait HasRoles
     }
 
     /**
-     * Determine if the user may perform the given permission.
+     * Determine if the model may perform the given permission.
      *
      * @param string|Permission $permission
      *
@@ -201,7 +207,7 @@ trait HasRoles
     }
 
     /**
-     * Determine if the user has any of the given permissions.
+     * Determine if the model has any of the given permissions.
      *
      * @param array ...$permissions
      *
@@ -219,7 +225,7 @@ trait HasRoles
     }
 
     /**
-     * Determine if the user has, via roles, the given permission.
+     * Determine if the model has, via roles, the given permission.
      *
      * @param Permission $permission
      *
@@ -231,7 +237,7 @@ trait HasRoles
     }
 
     /**
-     * Determine if the user has the given permission.
+     * Determine if the model has the given permission.
      *
      * @param string|Permission $permission
      *
@@ -265,7 +271,7 @@ trait HasRoles
     }
 
     /**
-     * Return all  permissions the directory coupled to the user.
+     * Return all permissions the directory coupled to the model.
      *
      * @return \Illuminate\Support\Collection
      */
@@ -275,7 +281,7 @@ trait HasRoles
     }
 
     /**
-     * Return all the permissions the user has via roles.
+     * Return all the permissions the model has via roles.
      *
      * @return \Illuminate\Support\Collection
      */
@@ -288,7 +294,7 @@ trait HasRoles
     }
 
     /**
-     * Return all the permissions the user has, both directly and via roles.
+     * Return all the permissions the model has, both directly and via roles.
      *
      * @return \Illuminate\Support\Collection
      */

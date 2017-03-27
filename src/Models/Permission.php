@@ -44,16 +44,13 @@ class Permission extends Model implements PermissionContract
     }
 
     /**
-     * A permission can be applied to users.
+     * A permission can be applied to models.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function users()
     {
-        return $this->belongsToMany(
-            config('auth.model') ?: config('auth.providers.users.model'),
-            config('laravel-permission.table_names.user_has_permissions')
-        );
+        // Todo: return a relationship to the users that this permission belongs to
     }
 
     /**

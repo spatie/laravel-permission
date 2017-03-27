@@ -46,16 +46,13 @@ class Role extends Model implements RoleContract
     }
 
     /**
-     * A role may be assigned to various users.
+     * A role may be assigned to User models. Get the users that this model is assigned to.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function users()
     {
-        return $this->belongsToMany(
-            config('auth.model') ?: config('auth.providers.users.model'),
-            config('laravel-permission.table_names.user_has_roles')
-        );
+        // TODO: Get the users that this role morphs to
     }
 
     /**
