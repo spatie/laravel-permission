@@ -2,6 +2,8 @@
 
 namespace Spatie\Permission\Traits;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Contracts\Permission;
@@ -13,10 +15,8 @@ trait HasRoles
 
     /**
      * A model may have multiple roles.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
-    public function roles()
+    public function roles(): MorphToMany
     {
         return $this->morphedByMany(
             config('laravel-permission.models.role'),
@@ -29,10 +29,8 @@ trait HasRoles
 
     /**
      * A model may have multiple direct permissions.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
-    public function permissions()
+    public function permissions(): MorphToMany
     {
         return $this->morphedByMany(
             config('laravel-permission.models.permission'),
@@ -46,12 +44,12 @@ trait HasRoles
     /**
      * Scope the model query to certain roles only.
      *
-     * @param $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @param string|array|Role|\Illuminate\Support\Collection $roles
      *
-     * @return bool
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeRole($query, $roles)
+    public function scopeRole(Builder $query, $roles): Builder
     {
         if ($roles instanceof Collection) {
             $roles = $roles->toArray();
@@ -83,9 +81,9 @@ trait HasRoles
     /**
      * Assign the given role to the model.
      *
-     * @param array|string|\Spatie\Permission\Models\Role ...$roles
+     * @param array|string|\Spatie\Permission\Contracts\Role ...$roles
      *
-     * @return \Spatie\Permission\Contracts\Role
+     * @return $this
      */
     public function assignRole(...$roles)
     {
@@ -109,7 +107,7 @@ trait HasRoles
     /**
      * Revoke the given role from the model.
      *
-     * @param string|Role $role
+     * @param string|\Spatie\Permission\Contracts\Role $role
      */
     public function removeRole($role)
     {
@@ -133,11 +131,11 @@ trait HasRoles
     /**
      * Determine if the model has (one of) the given role(s).
      *
-     * @param string|array|Role|\Illuminate\Support\Collection $roles
+     * @param string|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
      *
      * @return bool
      */
-    public function hasRole($roles)
+    public function hasRole($roles): bool
     {
         if (is_string($roles)) {
             return $this->roles->contains('name', $roles);
@@ -163,11 +161,11 @@ trait HasRoles
     /**
      * Determine if the model has any of the given role(s).
      *
-     * @param string|array|Role|\Illuminate\Support\Collection $roles
+     * @param string|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
      *
      * @return bool
      */
-    public function hasAnyRole($roles)
+    public function hasAnyRole($roles): bool
     {
         return $this->hasRole($roles);
     }
@@ -175,11 +173,11 @@ trait HasRoles
     /**
      * Determine if the model has all of the given role(s).
      *
-     * @param string|Role|\Illuminate\Support\Collection $roles
+     * @param string|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
      *
      * @return bool
      */
-    public function hasAllRoles($roles)
+    public function hasAllRoles($roles): bool
     {
         if (is_string($roles)) {
             return $this->roles->contains('name', $roles);
@@ -199,11 +197,11 @@ trait HasRoles
     /**
      * Determine if the model may perform the given permission.
      *
-     * @param string|Permission $permission
+     * @param string|\Spatie\Permission\Contracts\Permission $permission
      *
      * @return bool
      */
-    public function hasPermissionTo($permission)
+    public function hasPermissionTo($permission): bool
     {
         if (is_string($permission)) {
             $permission = app(Permission::class)->findByName($permission, $this->getOwnGuardName());
@@ -219,7 +217,7 @@ trait HasRoles
      *
      * @return bool
      */
-    public function hasAnyPermission(...$permissions)
+    public function hasAnyPermission(...$permissions): bool
     {
         foreach ($permissions as $permission) {
             if ($this->hasPermissionTo($permission)) {
@@ -233,11 +231,11 @@ trait HasRoles
     /**
      * Determine if the model has, via roles, the given permission.
      *
-     * @param Permission $permission
+     * @param \Spatie\Permission\Contracts\Permission $permission
      *
      * @return bool
      */
-    protected function hasPermissionViaRole(Permission $permission)
+    protected function hasPermissionViaRole(Permission $permission): bool
     {
         return $this->hasRole($permission->roles);
     }
@@ -245,11 +243,11 @@ trait HasRoles
     /**
      * Determine if the model has the given permission.
      *
-     * @param string|Permission $permission
+     * @param string|\Spatie\Permission\Contracts\Permission $permission
      *
      * @return bool
      */
-    public function hasDirectPermission($permission)
+    public function hasDirectPermission($permission): bool
     {
         if (is_string($permission)) {
             $permission = app(Permission::class)->findByName($permission, $this->getOwnGuardName());
@@ -263,35 +261,17 @@ trait HasRoles
     }
 
     /**
-     * @param $role
-     *
-     * @return Role
-     */
-    protected function getStoredRole($role)
-    {
-        if (is_string($role)) {
-            return app(Role::class)->findByName($role, $this->getOwnGuardName());
-        }
-
-        return $role;
-    }
-
-    /**
      * Return all permissions the directory coupled to the model.
-     *
-     * @return \Illuminate\Support\Collection
      */
-    public function getDirectPermissions()
+    public function getDirectPermissions(): Collection
     {
         return $this->permissions;
     }
 
     /**
      * Return all the permissions the model has via roles.
-     *
-     * @return \Illuminate\Support\Collection
      */
-    public function getPermissionsViaRoles()
+    public function getPermissionsViaRoles(): Collection
     {
         return $this->load('roles', 'roles.permissions')
             ->roles->flatMap(function ($role) {
@@ -301,11 +281,21 @@ trait HasRoles
 
     /**
      * Return all the permissions the model has, both directly and via roles.
-     *
-     * @return \Illuminate\Support\Collection
      */
-    public function getAllPermissions()
+    public function getAllPermissions(): Collection
     {
-        return $this->permissions->merge($this->getPermissionsViaRoles())->sort()->values();
+        return $this->permissions
+            ->merge($this->getPermissionsViaRoles())
+            ->sort()
+            ->values();
+    }
+
+    protected function getStoredRole($role): Role
+    {
+        if (is_string($role)) {
+            return app(Role::class)->findByName($role, $this->getOwnGuardName());
+        }
+
+        return $role;
     }
 }

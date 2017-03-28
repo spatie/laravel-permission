@@ -3,6 +3,7 @@
 namespace Spatie\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
@@ -18,11 +19,6 @@ class Permission extends Model implements PermissionContract
      */
     public $guarded = ['id'];
 
-    /**
-     * Create a new Eloquent model instance.
-     *
-     * @param array $attributes
-     */
     public function __construct(array $attributes = [])
     {
         if (empty($attributes['guard_name'])) {
@@ -36,10 +32,8 @@ class Permission extends Model implements PermissionContract
 
     /**
      * A permission can be applied to roles.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function roles()
+    public function roles(): BelongsToMany
     {
         return $this->belongsToMany(
             config('laravel-permission.models.role'),
@@ -48,14 +42,14 @@ class Permission extends Model implements PermissionContract
     }
 
     /**
-     * Find a permission by its name.
+     * Find a permission by its name (and optionally guardName).
      *
      * @param string $name
-     * @param string $guardName
+     * @param string|null $guardName
      *
-     * @throws PermissionDoesNotExist
+     * @throws \Spatie\Permission\Exceptions\PermissionDoesNotExist
      *
-     * @return PermissionContract
+     * @return \Spatie\Permission\Contracts\Permission
      */
     public static function findByName(string $name, $guardName = null): PermissionContract
     {

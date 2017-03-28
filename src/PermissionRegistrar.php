@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission;
 
+use Illuminate\Support\Collection;
 use Log;
 use Exception;
 use Illuminate\Contracts\Auth\Access\Gate;
@@ -25,10 +26,6 @@ class PermissionRegistrar
      */
     protected $cacheKey = 'spatie.permission.cache';
 
-    /**
-     * @param Gate $gate
-     * @param Repository $cache
-     */
     public function __construct(Gate $gate, Repository $cache)
     {
         $this->gate = $gate;
@@ -37,10 +34,8 @@ class PermissionRegistrar
 
     /**
      *  Register the permissions.
-     *
-     * @return bool
      */
-    public function registerPermissions()
+    public function registerPermissions(): bool
     {
         try {
             $this->getPermissions()->map(function ($permission) {
@@ -71,20 +66,15 @@ class PermissionRegistrar
 
     /**
      * Get the current permissions.
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getPermissions()
+    public function getPermissions(): Collection
     {
         return $this->cache->remember($this->cacheKey, config('laravel-permission.cache_expiration_time'), function () {
             return app(Permission::class)->with('roles')->get();
         });
     }
 
-    /**
-     * @return bool
-     */
-    protected function shouldLogException()
+    protected function shouldLogException(): bool
     {
         $logSetting = config('laravel-permission.log_registration_exception');
 

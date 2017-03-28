@@ -2,6 +2,8 @@
 
 namespace Spatie\Permission\Contracts;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
 interface Permission
 {
     /**
@@ -9,7 +11,7 @@ interface Permission
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function roles();
+    public function roles(): BelongsToMany;
 
     /**
      * Find a permission by its name.

@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Traits;
 
+use Illuminate\Support\Collection;
 use Spatie\Permission\PermissionRegistrar;
 
 trait RefreshesPermissionCache
@@ -31,10 +32,8 @@ trait RefreshesPermissionCache
 
     /**
      * Get the current cached permissions.
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
      */
-    protected static function getPermissions()
+    protected static function getPermissions(): Collection
     {
         return app(PermissionRegistrar::class)->getPermissions();
     }

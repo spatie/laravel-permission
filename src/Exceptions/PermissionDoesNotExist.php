@@ -2,8 +2,8 @@
 
 namespace Spatie\Permission\Exceptions;
 
-use Exception;
+use InvalidArgumentException;
 
-class PermissionDoesNotExist extends Exception
+class PermissionDoesNotExist extends InvalidArgumentException
 {
 }

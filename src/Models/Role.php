@@ -3,6 +3,7 @@
 namespace Spatie\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Exceptions\GuardMismatch;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
@@ -14,18 +15,8 @@ class Role extends Model implements RoleContract
     use HasPermissions;
     use RefreshesPermissionCache;
 
-    /**
-     * The attributes that aren't mass assignable.
-     *
-     * @var array
-     */
     public $guarded = ['id'];
 
-    /**
-     * Create a new Eloquent model instance.
-     *
-     * @param array $attributes
-     */
     public function __construct(array $attributes = [])
     {
         if (empty($attributes['guard_name'])) {
@@ -39,10 +30,8 @@ class Role extends Model implements RoleContract
 
     /**
      * A role may be given various permissions.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function permissions()
+    public function permissions(): BelongsToMany
     {
         return $this->belongsToMany(
             config('laravel-permission.models.permission'),
@@ -82,7 +71,7 @@ class Role extends Model implements RoleContract
      *
      * @throws \Spatie\Permission\Exceptions\GuardMismatch
      */
-    public function hasPermissionTo($permission)
+    public function hasPermissionTo($permission): bool
     {
         if (is_string($permission)) {
             $permission = app(Permission::class)->findByName($permission, $this->getOwnGuardName());

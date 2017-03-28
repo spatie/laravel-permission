@@ -9,9 +9,6 @@ use Spatie\Permission\Contracts\Permission as PermissionContract;
 
 class PermissionServiceProvider extends ServiceProvider
 {
-    /**
-     * @param \Spatie\Permission\PermissionRegistrar $permissionLoader
-     */
     public function boot(PermissionRegistrar $permissionLoader)
     {
         $this->publishes([
