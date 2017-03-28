@@ -57,7 +57,7 @@ class Permission extends Model implements PermissionContract
      *
      * @return PermissionContract
      */
-    public static function findByName(string $name, ?string $guardName = null): PermissionContract
+    public static function findByName(string $name, $guardName = null): PermissionContract
     {
         $guardName = $guardName ?? config('auth.defaults.guard');
 

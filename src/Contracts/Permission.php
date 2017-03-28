@@ -15,11 +15,11 @@ interface Permission
      * Find a permission by its name.
      *
      * @param string $name
-     * @param string $guardName
+     * @param string|null $guardName
      *
      * @throws \Spatie\Permission\Exceptions\PermissionDoesNotExist
      *
      * @return Permission
      */
-    public static function findByName(string $name, ?string $guardName): Permission;
+    public static function findByName(string $name, $guardName): Permission;
 }

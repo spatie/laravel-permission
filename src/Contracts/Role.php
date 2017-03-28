@@ -15,13 +15,13 @@ interface Role
      * Find a role by its name and guard name.
      *
      * @param string $name
-     * @param string $guardName
+     * @param string|null $guardName
      *
      * @return \Spatie\Permission\Contracts\Role
      *
      * @throws RoleDoesNotExist
      */
-    public static function findByName(string $name, ?string $guardName): Role;
+    public static function findByName(string $name, $guardName): Role;
 
     /**
      * Determine if the user may perform the given permission.

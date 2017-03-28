@@ -54,13 +54,13 @@ class Role extends Model implements RoleContract
      * Find a role by its name and guard name.
      *
      * @param string $name
-     * @param string $guardName
+     * @param string|null $guardName
      *
      * @return \Spatie\Permission\Contracts\Role|\Spatie\Permission\Models\Role
      *
      * @throws \Spatie\Permission\Exceptions\RoleDoesNotExist
      */
-    public static function findByName(string $name, ?string $guardName = null): RoleContract
+    public static function findByName(string $name, $guardName = null): RoleContract
     {
         $guardName = $guardName ?? config('auth.defaults.guard');
 
