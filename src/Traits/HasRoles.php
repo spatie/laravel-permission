@@ -5,7 +5,6 @@ namespace Spatie\Permission\Traits;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Contracts\Permission;
-use Spatie\Permission\Exceptions\GuardMismatch;
 
 trait HasRoles
 {
