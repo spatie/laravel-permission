@@ -24,6 +24,7 @@ class GateTest extends TestCase
 
         $this->assertFalse($this->testUser->can('admin-permission'));
     }
+
     /** @test */
     public function it_can_determine_if_a_user_with_a_different_guard_has_a_permission_when_using_roles()
     {
