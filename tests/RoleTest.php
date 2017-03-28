@@ -2,10 +2,10 @@
 
 namespace Spatie\Permission\Test;
 
+use Spatie\Permission\Contracts\Role;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Exceptions\GuardMismatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Contracts\Role;
 
 class RoleTest extends TestCase
 {
