@@ -12,13 +12,16 @@ interface Role
     public function permissions();
 
     /**
-     * Find a role by its name.
+     * Find a role by its name and guard name.
      *
      * @param string $name
+     * @param string $guardName
+     *
+     * @return \Spatie\Permission\Contracts\Role
      *
      * @throws RoleDoesNotExist
      */
-    public static function findByName($name);
+    public static function findByName(string $name, ?string $guardName): Role;
 
     /**
      * Determine if the user may perform the given permission.

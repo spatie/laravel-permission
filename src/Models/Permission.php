@@ -25,6 +25,10 @@ class Permission extends Model implements PermissionContract
      */
     public function __construct(array $attributes = [])
     {
+        if (empty($attributes['guard_name'])) {
+            $attributes['guard_name'] = config('auth.defaults.guard');
+        }
+
         parent::__construct($attributes);
 
         $this->setTable(config('laravel-permission.table_names.permissions'));
@@ -44,27 +48,20 @@ class Permission extends Model implements PermissionContract
     }
 
     /**
-     * A permission can be applied to models.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function users()
-    {
-        // Todo: return a relationship to the users that this permission belongs to
-    }
-
-    /**
      * Find a permission by its name.
      *
      * @param string $name
+     * @param string $guardName
      *
      * @throws PermissionDoesNotExist
      *
-     * @return Permission
+     * @return PermissionContract
      */
-    public static function findByName($name)
+    public static function findByName(string $name, ?string $guardName = null): PermissionContract
     {
-        $permission = static::getPermissions()->where('name', $name)->first();
+        $guardName = $guardName ?? config('auth.defaults.guard');
+
+        $permission = static::getPermissions()->where('name', $name)->where('guard_name', $guardName)->first();
 
         if (! $permission) {
             throw new PermissionDoesNotExist();

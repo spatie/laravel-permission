@@ -87,7 +87,7 @@ class CacheTest extends TestCase
     /** @test */
     public function adding_a_permission_to_a_role_should_flush_the_cache()
     {
-        $this->testRole->givePermissionTo($this->testPermission);
+        $this->testUserRole->givePermissionTo($this->testUserPermission);
         $this->assertCount(3, DB::getQueryLog());
 
         $this->registrar->registerPermissions();
@@ -97,7 +97,7 @@ class CacheTest extends TestCase
     /** @test */
     public function has_permission_to_should_use_the_cache()
     {
-        $this->testRole->givePermissionTo(['edit-articles', 'edit-news']);
+        $this->testUserRole->givePermissionTo(['edit-articles', 'edit-news']);
         $this->testUser->assignRole('testRole');
         $this->assertCount(6, DB::getQueryLog());
 

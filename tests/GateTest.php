@@ -10,41 +10,50 @@ class GateTest extends TestCase
     /** @test */
     public function it_can_determine_if_a_user_has_a_permission_when_using_roles()
     {
-        $this->testRole->givePermissionTo($this->testPermission);
+        $this->testUserRole->givePermissionTo($this->testUserPermission);
 
-        $this->testUser->assignRole($this->testRole);
+        $this->testUser->assignRole($this->testUserRole);
 
-        $this->assertTrue($this->testUser->hasPermissionTo($this->testPermission));
+        $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission));
 
         $this->assertTrue($this->reloadPermissions());
 
         $this->assertTrue($this->testUser->can('edit-articles'));
 
         $this->assertFalse($this->testUser->can('non-existing-permission'));
+
+        $this->assertFalse($this->testUser->can('admin-permission'));
     }
-
     /** @test */
-    public function it_can_determine_if_a_user_has_a_permission_via_a_role()
+    public function it_can_determine_if_a_user_with_a_different_guard_has_a_permission_when_using_roles()
     {
-        $this->testRole->givePermissionTo($this->testPermission);
+        $this->testAdminRole->givePermissionTo($this->testAdminPermission);
 
-        $this->testUser->assignRole($this->testRole);
+        $this->testAdmin->assignRole($this->testAdminRole);
+
+        $this->assertTrue($this->testAdmin->hasPermissionTo($this->testAdminPermission));
 
         $this->assertTrue($this->reloadPermissions());
 
-        $this->assertTrue($this->testUser->can('edit-articles'));
+        $this->assertTrue($this->testAdmin->can('admin-permission'));
+
+        $this->assertFalse($this->testAdmin->can('non-existing-permission'));
+
+        $this->assertFalse($this->testAdmin->can('edit-articles'));
     }
 
     /** @test */
     public function it_can_determine_if_a_user_has_a_permission_when_direct_permissions()
     {
-        $this->testUser->givePermissionTo($this->testPermission);
+        $this->testUser->givePermissionTo($this->testUserPermission);
 
         $this->assertTrue($this->reloadPermissions());
 
         $this->assertTrue($this->testUser->can('edit-articles'));
 
         $this->assertFalse($this->testUser->can('non-existing-permission'));
+
+        $this->assertFalse($this->testUser->can('admin-permission'));
     }
 
     /** @test */
@@ -52,7 +61,7 @@ class GateTest extends TestCase
     {
         $this->expectException(PermissionDoesNotExist::class);
 
-        $this->testRole->givePermissionTo('create-evil-empire');
+        $this->testUserRole->givePermissionTo('create-evil-empire');
     }
 
     /** @test */

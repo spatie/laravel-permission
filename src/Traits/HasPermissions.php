@@ -3,6 +3,7 @@
 namespace Spatie\Permission\Traits;
 
 use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Exceptions\GuardMismatch;
 
 trait HasPermissions
 {
@@ -19,6 +20,9 @@ trait HasPermissions
             ->flatten()
             ->map(function ($permission) {
                 return $this->getStoredPermission($permission);
+            })
+            ->each(function ($permission) {
+                $this->checkGuardMatching($permission);
             })
             ->all();
 
@@ -67,13 +71,38 @@ trait HasPermissions
     protected function getStoredPermission($permissions)
     {
         if (is_string($permissions)) {
-            return app(Permission::class)->findByName($permissions);
+            return app(Permission::class)->findByName($permissions, $this->getOwnGuardName());
         }
 
         if (is_array($permissions)) {
-            return app(Permission::class)->whereIn('name', $permissions)->get();
+            return app(Permission::class)->whereIn('name', $permissions)->where('guard_name', $this->getOwnGuardName())->get();
         }
 
         return $permissions;
+    }
+
+    protected function checkGuardMatching($roleOrPermission)
+    {
+        if ($roleOrPermission->guard_name !== $this->getOwnGuardName()) {
+            throw new GuardMismatch();
+        }
+    }
+
+    protected function isGuard(): bool
+    {
+        return (bool) $this->getOwnGuardName();
+    }
+
+    protected function getOwnGuardName()
+    {
+        return $this->guard_name ?? array_search(get_class($this), $this->getAllAuthGuardProviderModels());
+    }
+
+    protected function getAllAuthGuardProviderModels(): array
+    {
+        return collect(config('auth.guards'))
+            ->map(function ($guard) {
+                return config("auth.providers.{$guard['provider']}.model");
+            })->toArray();
     }
 }

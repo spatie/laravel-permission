@@ -5,6 +5,7 @@ namespace Spatie\Permission\Traits;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Exceptions\GuardMismatch;
 
 trait HasRoles
 {
@@ -46,6 +47,7 @@ trait HasRoles
     /**
      * Scope the model query to certain roles only.
      *
+     * @param $query
      * @param string|array|Role|\Illuminate\Support\Collection $roles
      *
      * @return bool
@@ -65,7 +67,9 @@ trait HasRoles
                 return $role;
             }
 
-            return app(Role::class)->findByName($role);
+            $guardName = $this->getOwnGuardName();
+
+            return app(Role::class)->findByName($role, $guardName);
         }, $roles);
 
         return $query->whereHas('roles', function ($query) use ($roles) {
@@ -90,6 +94,9 @@ trait HasRoles
             ->flatten()
             ->map(function ($role) {
                 return $this->getStoredRole($role);
+            })
+            ->each(function ($role) {
+                $this->checkGuardMatching($role);
             })
             ->all();
 
@@ -200,7 +207,7 @@ trait HasRoles
     public function hasPermissionTo($permission)
     {
         if (is_string($permission)) {
-            $permission = app(Permission::class)->findByName($permission);
+            $permission = app(Permission::class)->findByName($permission, $this->getOwnGuardName());
         }
 
         return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
@@ -246,7 +253,7 @@ trait HasRoles
     public function hasDirectPermission($permission)
     {
         if (is_string($permission)) {
-            $permission = app(Permission::class)->findByName($permission);
+            $permission = app(Permission::class)->findByName($permission, $this->getOwnGuardName());
 
             if (! $permission) {
                 return false;
@@ -264,7 +271,7 @@ trait HasRoles
     protected function getStoredRole($role)
     {
         if (is_string($role)) {
-            return app(Role::class)->findByName($role);
+            return app(Role::class)->findByName($role, $this->getOwnGuardName());
         }
 
         return $role;

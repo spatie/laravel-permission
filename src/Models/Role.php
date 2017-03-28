@@ -3,6 +3,7 @@
 namespace Spatie\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Exceptions\GuardMismatch;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Contracts\Role as RoleContract;
@@ -27,6 +28,10 @@ class Role extends Model implements RoleContract
      */
     public function __construct(array $attributes = [])
     {
+        if (empty($attributes['guard_name'])) {
+            $attributes['guard_name'] = config('auth.defaults.guard');
+        }
+
         parent::__construct($attributes);
 
         $this->setTable(config('laravel-permission.table_names.roles'));
@@ -46,27 +51,20 @@ class Role extends Model implements RoleContract
     }
 
     /**
-     * A role may be assigned to User models. Get the users that this model is assigned to.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function users()
-    {
-        // TODO: Get the users that this role morphs to
-    }
-
-    /**
-     * Find a role by its name.
+     * Find a role by its name and guard name.
      *
      * @param string $name
+     * @param string $guardName
      *
-     * @throws RoleDoesNotExist
+     * @return \Spatie\Permission\Contracts\Role|\Spatie\Permission\Models\Role
      *
-     * @return Role
+     * @throws \Spatie\Permission\Exceptions\RoleDoesNotExist
      */
-    public static function findByName($name)
+    public static function findByName(string $name, ?string $guardName = null): RoleContract
     {
-        $role = static::where('name', $name)->first();
+        $guardName = $guardName ?? config('auth.defaults.guard');
+
+        $role = static::where('name', $name)->where('guard_name', $guardName)->first();
 
         if (! $role) {
             throw new RoleDoesNotExist();
@@ -81,11 +79,17 @@ class Role extends Model implements RoleContract
      * @param string|Permission $permission
      *
      * @return bool
+     *
+     * @throws \Spatie\Permission\Exceptions\GuardMismatch
      */
     public function hasPermissionTo($permission)
     {
         if (is_string($permission)) {
-            $permission = app(Permission::class)->findByName($permission);
+            $permission = app(Permission::class)->findByName($permission, $this->getOwnGuardName());
+        }
+
+        if ($permission->guard_name !== $this->getOwnGuardName()) {
+            throw new GuardMismatch();
         }
 
         return $this->permissions->contains('id', $permission->id);
