@@ -2,11 +2,11 @@
 
 namespace Spatie\Permission\Traits;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Role;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\Permission\Contracts\Permission;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 trait HasRoles
 {
