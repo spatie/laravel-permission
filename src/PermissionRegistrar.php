@@ -2,9 +2,9 @@
 
 namespace Spatie\Permission;
 
-use Illuminate\Support\Collection;
 use Log;
 use Exception;
+use Illuminate\Support\Collection;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Cache\Repository;
 use Spatie\Permission\Contracts\Permission;
