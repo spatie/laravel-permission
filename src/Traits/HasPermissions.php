@@ -22,7 +22,7 @@ trait HasPermissions
                 return $this->getStoredPermission($permission);
             })
             ->each(function ($permission) {
-                $this->checkGuardMatching($permission);
+                $this->ensureGuardIsEqual($permission);
             })
             ->all();
 
@@ -36,7 +36,7 @@ trait HasPermissions
     /**
      * Remove all current permissions and set the given ones.
      *
-     * @param array ...$permissions
+     * @param string|array|\Spatie\Permission\Contracts\Permission|\Illuminate\Support\Collection $permissions
      *
      * @return $this
      */
@@ -71,11 +71,11 @@ trait HasPermissions
     protected function getStoredPermission($permissions): Permission
     {
         if (is_string($permissions)) {
-            return app(Permission::class)->findByName($permissions, $this->getOwnGuardName());
+            return app(Permission::class)->findByName($permissions, $this->getGuardName());
         }
 
         if (is_array($permissions)) {
-            return app(Permission::class)->whereIn('name', $permissions)->where('guard_name', $this->getOwnGuardName())->get();
+            return app(Permission::class)->whereIn('name', $permissions)->where('guard_name', $this->getGuardName())->get();
         }
 
         return $permissions;
@@ -86,9 +86,9 @@ trait HasPermissions
      *
      * @throws \Spatie\Permission\Exceptions\GuardMismatch
      */
-    protected function checkGuardMatching($roleOrPermission)
+    protected function ensureGuardIsEqual($roleOrPermission)
     {
-        if ($roleOrPermission->guard_name !== $this->getOwnGuardName()) {
+        if ($roleOrPermission->guard_name !== $this->getGuardName()) {
             throw new GuardMismatch();
         }
     }
@@ -98,14 +98,14 @@ trait HasPermissions
      */
     protected function isAssignedToGuard(): bool
     {
-        return (bool) $this->getOwnGuardName();
+        return (bool) $this->getGuardName();
     }
 
     /**
      * Get the name of the guard that this class is assigned to based on it's `guard_name` property or the auth config
      * file.
      */
-    protected function getOwnGuardName(): string
+    protected function getGuardName(): string
     {
         return $this->guard_name ?? array_search(get_class($this), $this->getAllAuthGuardProviderModels());
     }

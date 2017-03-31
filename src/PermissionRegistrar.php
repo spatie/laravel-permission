@@ -2,39 +2,34 @@
 
 namespace Spatie\Permission;
 
-use Log;
 use Exception;
 use Illuminate\Support\Collection;
+use Illuminate\Contracts\Logging\Log;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Cache\Repository;
 use Spatie\Permission\Contracts\Permission;
 
 class PermissionRegistrar
 {
-    /**
-     * @var Gate
-     */
+    /** @var \Illuminate\Contracts\Auth\Access\Gate */
     protected $gate;
 
-    /**
-     * @var Repository
-     */
+    /** @var \Illuminate\Contracts\Cache\Repository */
     protected $cache;
 
-    /**
-     * @var string
-     */
+    /** @var Illuminate\Contracts\Logging\Log */
+    protected $logger;
+
+    /** @var string */
     protected $cacheKey = 'spatie.permission.cache';
 
-    public function __construct(Gate $gate, Repository $cache)
+    public function __construct(Gate $gate, Repository $cache, Log $logger)
     {
         $this->gate = $gate;
         $this->cache = $cache;
+        $this->logger = $logger;
     }
 
-    /**
-     *  Register the permissions.
-     */
     public function registerPermissions(): bool
     {
         try {
@@ -47,26 +42,21 @@ class PermissionRegistrar
             return true;
         } catch (Exception $exception) {
             if ($this->shouldLogException()) {
-                Log::alert(
-                    "Could not register permissions because {$exception->getMessage()}".PHP_EOL
-                    .$exception->getTraceAsString());
+                $this->logger->alert(
+                    "Could not register permissions because {$exception->getMessage()}".PHP_EOL.
+                    $exception->getTraceAsString()
+                );
             }
 
             return false;
         }
     }
 
-    /**
-     *  Forget the cached permissions.
-     */
     public function forgetCachedPermissions()
     {
         $this->cache->forget($this->cacheKey);
     }
 
-    /**
-     * Get the current permissions.
-     */
     public function getPermissions(): Collection
     {
         return $this->cache->remember($this->cacheKey, config('laravel-permission.cache_expiration_time'), function () {
