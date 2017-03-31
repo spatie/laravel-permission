@@ -64,7 +64,7 @@ trait HasRoles
                 return $role;
             }
 
-            $guardName = $this->getOwnGuardName();
+            $guardName = $this->getGuardName();
 
             return app(Role::class)->findByName($role, $guardName);
         }, $roles);
@@ -93,7 +93,7 @@ trait HasRoles
                 return $this->getStoredRole($role);
             })
             ->each(function ($role) {
-                $this->checkGuardMatching($role);
+                $this->ensureGuardIsEqual($role);
             })
             ->all();
 
@@ -204,7 +204,7 @@ trait HasRoles
     public function hasPermissionTo($permission): bool
     {
         if (is_string($permission)) {
-            $permission = app(Permission::class)->findByName($permission, $this->getOwnGuardName());
+            $permission = app(Permission::class)->findByName($permission, $this->getGuardName());
         }
 
         return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
@@ -250,7 +250,7 @@ trait HasRoles
     public function hasDirectPermission($permission): bool
     {
         if (is_string($permission)) {
-            $permission = app(Permission::class)->findByName($permission, $this->getOwnGuardName());
+            $permission = app(Permission::class)->findByName($permission, $this->getGuardName());
 
             if (! $permission) {
                 return false;
@@ -293,7 +293,7 @@ trait HasRoles
     protected function getStoredRole($role): Role
     {
         if (is_string($role)) {
-            return app(Role::class)->findByName($role, $this->getOwnGuardName());
+            return app(Role::class)->findByName($role, $this->getGuardName());
         }
 
         return $role;
