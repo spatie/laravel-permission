@@ -3,7 +3,6 @@
 namespace Spatie\Permission\Traits;
 
 use Spatie\Permission\Contracts\Permission;
-use Spatie\Permission\Exceptions\GuardMismatch;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 
 trait HasPermissions
