@@ -12,11 +12,6 @@ class Permission extends Model implements PermissionContract
 {
     use RefreshesPermissionCache;
 
-    /**
-     * The attributes that aren't mass assignable.
-     *
-     * @var array
-     */
     public $guarded = ['id'];
 
     public function __construct(array $attributes = [])
