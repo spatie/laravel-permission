@@ -3,7 +3,7 @@
 namespace Spatie\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Permission\Exceptions\InvalidArgument;
+use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Exceptions\GuardMismatch;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
@@ -57,7 +57,7 @@ class Role extends Model implements RoleContract
         $role = static::where('name', $name)->where('guard_name', $guardName)->first();
 
         if (! $role) {
-            throw new RoleDoesNotExist();
+            throw RoleDoesNotExist::create($name);
         }
 
         return $role;
@@ -79,7 +79,7 @@ class Role extends Model implements RoleContract
         }
 
         if ($permission->guard_name !== $this->getGuardName()) {
-            throw InvalidArgument::guardDoesNotMatch($permission->guard_name, $this->getGuardName());
+            throw GuardDoesNotMatch::create($permission->guard_name, $this->getGuardName());
         }
 
         return $this->permissions->contains('id', $permission->id);

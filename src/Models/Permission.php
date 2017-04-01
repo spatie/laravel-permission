@@ -58,7 +58,7 @@ class Permission extends Model implements PermissionContract
         $permission = static::getPermissions()->where('name', $name)->where('guard_name', $guardName)->first();
 
         if (! $permission) {
-            throw new PermissionDoesNotExist();
+            throw PermissionDoesNotExist::create($name);
         }
 
         return $permission;
