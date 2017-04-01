@@ -3,7 +3,6 @@
 namespace Spatie\Permission\Test;
 
 use Spatie\Permission\Contracts\Role;
-use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
