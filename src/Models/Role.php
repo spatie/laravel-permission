@@ -3,10 +3,9 @@
 namespace Spatie\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Traits\HasPermissions;
-use Spatie\Permission\Exceptions\GuardMismatch;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
+use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Contracts\Role as RoleContract;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
