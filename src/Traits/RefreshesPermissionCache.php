@@ -2,8 +2,8 @@
 
 namespace Spatie\Permission\Traits;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\PermissionRegistrar;
 
 trait RefreshesPermissionCache
