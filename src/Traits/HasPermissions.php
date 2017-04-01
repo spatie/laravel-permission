@@ -4,6 +4,7 @@ namespace Spatie\Permission\Traits;
 
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\GuardMismatch;
+use Spatie\Permission\Exceptions\InvalidArgument;
 
 trait HasPermissions
 {
@@ -89,7 +90,7 @@ trait HasPermissions
     protected function ensureGuardIsEqual($roleOrPermission)
     {
         if ($roleOrPermission->guard_name !== $this->getGuardName()) {
-            throw new GuardMismatch();
+            throw InvalidArgument::guardDoesNotMatch($roleOrPermission->guard_name, $this->getGuardName());
         }
     }
 

@@ -3,6 +3,7 @@
 namespace Spatie\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Exceptions\InvalidArgument;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Exceptions\GuardMismatch;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
@@ -25,7 +26,7 @@ class Role extends Model implements RoleContract
 
         parent::__construct($attributes);
 
-        $this->setTable(config('laravel-permission.table_names.roles'));
+        $this->setTable(config('permission.table_names.roles'));
     }
 
     /**
@@ -34,8 +35,8 @@ class Role extends Model implements RoleContract
     public function permissions(): BelongsToMany
     {
         return $this->belongsToMany(
-            config('laravel-permission.models.permission'),
-            config('laravel-permission.table_names.role_has_permissions')
+            config('permission.models.permission'),
+            config('permission.table_names.role_has_permissions')
         );
     }
 
@@ -78,7 +79,7 @@ class Role extends Model implements RoleContract
         }
 
         if ($permission->guard_name !== $this->getGuardName()) {
-            throw new GuardMismatch("Expected `{$this->getGuardName()}` to match `{$permission->guard_name}`");
+            throw InvalidArgument::guardDoesNotMatch($permission->guard_name, $this->getGuardName());
         }
 
         return $this->permissions->contains('id', $permission->id);

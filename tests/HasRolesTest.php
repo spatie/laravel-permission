@@ -4,7 +4,7 @@ namespace Spatie\Permission\Test;
 
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Contracts\Permission;
-use Spatie\Permission\Exceptions\GuardMismatch;
+use Spatie\Permission\Exceptions\InvalidArgument;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
@@ -69,7 +69,7 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_throws_an_exception_when_assigning_a_role_from_a_different_guard()
     {
-        $this->expectException(GuardMismatch::class);
+        $this->expectException(InvalidArgument::class);
 
         $this->testUser->assignRole($this->testAdminRole);
     }
@@ -127,7 +127,7 @@ class HasRolesTest extends TestCase
 
         $this->testUser->syncRoles('testRole', 'testAdminRole');
 
-        $this->expectException(GuardMismatch::class);
+        $this->expectException(InvalidArgument::class);
 
         $this->testUser->syncRoles('testRole', $this->testAdminRole);
     }
@@ -195,7 +195,7 @@ class HasRolesTest extends TestCase
 
         User::role('testAdminRole')->get();
 
-        $this->expectException(GuardMismatch::class);
+        $this->expectException(InvalidArgument::class);
 
         User::role($this->testAdminRole)->get();
     }
@@ -317,7 +317,7 @@ class HasRolesTest extends TestCase
 
         $this->testUserRole->givePermissionTo('admin-permission');
 
-        $this->expectException(GuardMismatch::class);
+        $this->expectException(InvalidArgument::class);
 
         $this->testUserRole->givePermissionTo($this->testAdminPermission);
     }
@@ -377,7 +377,7 @@ class HasRolesTest extends TestCase
 
         $this->testUserRole->syncPermissions('admin-permission');
 
-        $this->expectException(GuardMismatch::class);
+        $this->expectException(InvalidArgument::class);
 
         $this->testUserRole->syncPermissions($this->testAdminPermission);
     }
@@ -435,7 +435,7 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_throws_an_exception_when_assigning_a_permission_to_a_user_from_a_different_guard()
     {
-        $this->expectException(GuardMismatch::class);
+        $this->expectException(InvalidArgument::class);
 
         $this->testUser->givePermissionTo($this->testAdminPermission);
 
