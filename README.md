@@ -35,7 +35,7 @@ You're free to use this package (it's [MIT-licensed](LICENSE.md)), but if it mak
 
 Our address is: Spatie, Samberstraat 69D, 2060 Antwerp, Belgium.
 
-The best postcards are published [on our website](https://spatie.be/en/opensource/postcards).
+All received postcards are published [on our website](https://spatie.be/en/opensource/postcards).
 
 ## Installation
 
@@ -454,7 +454,7 @@ keep the following things in mind:
   ```
   And update the `models.role` and `models.permission` values
 
-## Change log
+## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
 
