@@ -19,9 +19,9 @@ trait HasRoles
     public function roles(): MorphToMany
     {
         return $this->morphedByMany(
-            config('laravel-permission.models.role'),
+            config('permission.models.role'),
             'model',
-            config('laravel-permission.table_names.model_has_roles'),
+            config('permission.table_names.model_has_roles'),
             'role_id',
             'model_id'
         );
@@ -33,9 +33,9 @@ trait HasRoles
     public function permissions(): MorphToMany
     {
         return $this->morphedByMany(
-            config('laravel-permission.models.permission'),
+            config('permission.models.permission'),
             'model',
-            config('laravel-permission.table_names.model_has_permissions'),
+            config('permission.table_names.model_has_permissions'),
             'permission_id',
             'model_id'
         );
@@ -72,7 +72,7 @@ trait HasRoles
         return $query->whereHas('roles', function ($query) use ($roles) {
             $query->where(function ($query) use ($roles) {
                 foreach ($roles as $role) {
-                    $query->orWhere(config('laravel-permission.table_names.roles').'.id', $role->id);
+                    $query->orWhere(config('permission.table_names.roles').'.id', $role->id);
                 }
             });
         });
@@ -155,7 +155,7 @@ trait HasRoles
             return false;
         }
 
-        return (bool) $roles->intersect($this->roles)->count();
+        return $roles->intersect($this->roles)->isNotEmpty();
     }
 
     /**

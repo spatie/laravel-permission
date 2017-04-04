@@ -59,19 +59,13 @@ class PermissionRegistrar
 
     public function getPermissions(): Collection
     {
-        return $this->cache->remember($this->cacheKey, config('laravel-permission.cache_expiration_time'), function () {
+        return $this->cache->remember($this->cacheKey, config('permission.cache_expiration_time'), function () {
             return app(Permission::class)->with('roles')->get();
         });
     }
 
     protected function shouldLogException(): bool
     {
-        $logSetting = config('laravel-permission.log_registration_exception');
-
-        if (is_null($logSetting)) {
-            return true;
-        }
-
-        return $logSetting;
+        return config('permission.log_registration_exception');
     }
 }

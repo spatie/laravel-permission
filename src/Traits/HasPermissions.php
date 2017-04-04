@@ -3,7 +3,7 @@
 namespace Spatie\Permission\Traits;
 
 use Spatie\Permission\Contracts\Permission;
-use Spatie\Permission\Exceptions\GuardMismatch;
+use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 
 trait HasPermissions
 {
@@ -75,7 +75,10 @@ trait HasPermissions
         }
 
         if (is_array($permissions)) {
-            return app(Permission::class)->whereIn('name', $permissions)->where('guard_name', $this->getGuardName())->get();
+            return app(Permission::class)
+                ->whereIn('name', $permissions)
+                ->where('guard_name', $this->getGuardName())
+                ->get();
         }
 
         return $permissions;
@@ -89,7 +92,7 @@ trait HasPermissions
     protected function ensureGuardIsEqual($roleOrPermission)
     {
         if ($roleOrPermission->guard_name !== $this->getGuardName()) {
-            throw new GuardMismatch();
+            throw GuardDoesNotMatch::create($roleOrPermission->guard_name, $this->getGuardName());
         }
     }
 

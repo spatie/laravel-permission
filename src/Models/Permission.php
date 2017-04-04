@@ -12,11 +12,6 @@ class Permission extends Model implements PermissionContract
 {
     use RefreshesPermissionCache;
 
-    /**
-     * The attributes that aren't mass assignable.
-     *
-     * @var array
-     */
     public $guarded = ['id'];
 
     public function __construct(array $attributes = [])
@@ -27,7 +22,7 @@ class Permission extends Model implements PermissionContract
 
         parent::__construct($attributes);
 
-        $this->setTable(config('laravel-permission.table_names.permissions'));
+        $this->setTable(config('permission.table_names.permissions'));
     }
 
     /**
@@ -36,8 +31,8 @@ class Permission extends Model implements PermissionContract
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(
-            config('laravel-permission.models.role'),
-            config('laravel-permission.table_names.role_has_permissions')
+            config('permission.models.role'),
+            config('permission.table_names.role_has_permissions')
         );
     }
 
@@ -58,7 +53,7 @@ class Permission extends Model implements PermissionContract
         $permission = static::getPermissions()->where('name', $name)->where('guard_name', $guardName)->first();
 
         if (! $permission) {
-            throw new PermissionDoesNotExist();
+            throw PermissionDoesNotExist::create($name);
         }
 
         return $permission;

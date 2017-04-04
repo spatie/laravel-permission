@@ -3,27 +3,28 @@
 namespace Spatie\Permission\Traits;
 
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\PermissionRegistrar;
 
 trait RefreshesPermissionCache
 {
     public static function bootRefreshesPermissionCache()
     {
-        static::created(function ($model) {
+        static::created(function (Model $model) {
             $model->forgetCachedPermissions();
         });
 
-        static::updated(function ($model) {
+        static::updated(function (Model $model) {
             $model->forgetCachedPermissions();
         });
 
-        static::deleted(function ($model) {
+        static::deleted(function (Model $model) {
             $model->forgetCachedPermissions();
         });
     }
 
     /**
-     *  Forget the cached permissions.
+     * Forget the cached permissions.
      */
     public function forgetCachedPermissions()
     {

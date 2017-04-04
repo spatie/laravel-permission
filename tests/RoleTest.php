@@ -4,7 +4,7 @@ namespace Spatie\Permission\Test;
 
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Exceptions\GuardMismatch;
+use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class RoleTest extends TestCase
@@ -69,7 +69,7 @@ class RoleTest extends TestCase
     /** @test */
     public function it_throws_an_exception_when_a_permission_of_the_wrong_guard_is_passed_in()
     {
-        $this->expectException(GuardMismatch::class);
+        $this->expectException(GuardDoesNotMatch::class);
 
         $permission = app(Permission::class)->findByName('wrong-guard-permission', 'admin');
 
