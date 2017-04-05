@@ -22,7 +22,7 @@ $role->givePermissionTo('edit articles');
 
 If you're using multiple guards we've got you covered as well. Every guard will have its own set of permissions and roles that can be assigned to the guard's users. Read about it in the [using multiple guards](#using-multiple-guards) section of the readme.
 
-Because all permissions will be registered on Laravel's Gate, you can test if a user has a permission with Laravel's default `can` function:
+Because all permissions will be registered on [Laravel's gate](https://laravel.com/docs/5.4/authorization), you can test if a user has a permission with Laravel's default `can` function:
 
 ```php
 $user->can('edit articles');
