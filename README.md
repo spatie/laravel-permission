@@ -72,6 +72,7 @@ php artisan migrate
 ```
 
 You can publish the config file with:
+
 ```bash
 php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="config"
 ```
@@ -209,6 +210,7 @@ The `HasRoles` also adds a scope to your models to scope the query to certain ro
 ```php
 $users = User::role('writer')->get(); // Only returns users with the role 'writer'
 ```
+
 The scope can accept a string, a `Spatie\Permission\Models\Role` object or an `\Illuminate\Support\Collection` object.
 
 ### Using permissions
@@ -226,11 +228,13 @@ $user->givePermissionTo(['edit articles', 'delete articles']);
 ```
 
 A permission can be revoked from a user:
+
 ```php
 $user->revokePermissionTo('edit articles');
 ```
 
 You can test if a user has a permission:
+
 ```php
 $user->hasPermissionTo('edit articles');
 ```
@@ -326,7 +330,7 @@ $user->assignRole('writer');
 $user->givePermissionTo('delete articles');
 ```
 
-In above example a role is given permission to edit articles and this role is assigned to a user. Now user can edit articles and additionaly delete articles. The permission of 'delete articles' is his direct permission because it is assigned directly to him. When we call `$user->hasDirectPermission('delete articles')` it returns `true` and `false` for `$user->hasDirectPermission('edit articles')`. 
+In above example a role is given permission to edit articles and this role is assigned to a user. Now user can edit articles and additionally delete articles. The permission of 'delete articles' is his direct permission because it is assigned directly to him. When we call `$user->hasDirectPermission('delete articles')` it returns `true` and `false` for `$user->hasDirectPermission('edit articles')`. 
 
 This method is useful if one has a form for setting permissions for roles and users in his application and want to restrict to change inherited permissions of roles of user, i.e. allowing to change only direct permissions of user.
 
@@ -462,7 +466,6 @@ Don't forget to add the route middleware to `app/Http/Kernel.php` file:
 protected $routeMiddleware = [
     // ...
     'role' => \App\Http\Middleware\RoleMiddleware::class,
-    // ...
 ];
 ```
 
@@ -494,7 +497,7 @@ Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recen
 ## Testing
 
 ``` bash
-$ composer test
+composer test
 ```
 
 ## Contributing
