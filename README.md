@@ -1,4 +1,4 @@
-# Associate users with roles and permissions
+# Associate users with permissions and roles
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/spatie/laravel-permission.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-permission)
 [![Build Status](https://img.shields.io/travis/spatie/laravel-permission/master.svg?style=flat-square)](https://travis-ci.org/spatie/laravel-permission)
@@ -6,7 +6,7 @@
 [![StyleCI](https://styleci.io/repos/42480275/shield)](https://styleci.io/repos/42480275)
 [![Total Downloads](https://img.shields.io/packagist/dt/spatie/laravel-permission.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-permission)
 
-This package allows to save permissions and roles in a database.
+This package allows you to manage user permissions and roles in a database.
 
 Once installed you can do stuff like this:
 
@@ -20,7 +20,9 @@ $user->assignRole('writer');
 $role->givePermissionTo('edit articles');
 ```
 
-Because all permissions will be registered against Laravel's Gate, you can test if a user has a permission with Laravel's default `can` function:
+If you're using multiple guards we've got you covered as well. Every guard will have its own set of permissions and roles that can be assigned to the guard's users. Read about it in the [using multiple guards](#using-multiple-guards) section of the readme.
+
+Because all permissions will be registered on Laravel's Gate, you can test if a user has a permission with Laravel's default `can` function:
 
 ```php
 $user->can('edit articles');
@@ -61,9 +63,6 @@ You can publish the migration with:
 ```bash
 php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="migrations"
 ```
-
-The package assumes that your users table name is called `users`. If this is not the case
-you should manually edit the published migration to use your custom table name.
 
 After the migration has been published you can create the role- and permission-tables by
 running the migrations:
@@ -111,13 +110,6 @@ return [
     'table_names' => [
 
         /*
-         * The table that your application uses for users. This table's model will
-         * be using the "HasRoles" and "HasPermissions" traits.
-         */
-
-        'users' => 'users',
-
-        /*
          * When using the "HasRoles" trait from this package, we need to know which
          * table should be used to retrieve your roles. We have chosen a basic
          * default value but you may easily change it to any table you like.
@@ -135,19 +127,19 @@ return [
 
         /*
          * When using the "HasRoles" trait from this package, we need to know which
-         * table should be used to retrieve your users permissions. We have chosen a
+         * table should be used to retrieve your models permissions. We have chosen a
          * basic default value but you may easily change it to any table you like.
          */
 
-        'user_has_permissions' => 'user_has_permissions',
+        'model_has_permissions' => 'model_has_permissions',
 
         /*
          * When using the "HasRoles" trait from this package, we need to know which
-         * table should be used to retrieve your users roles. We have chosen a
+         * table should be used to retrieve your models roles. We have chosen a
          * basic default value but you may easily change it to any table you like.
          */
 
-        'user_has_roles' => 'user_has_roles',
+        'model_has_roles' => 'model_has_roles',
 
         /*
          * When using the "HasRoles" trait from this package, we need to know which
@@ -158,16 +150,14 @@ return [
         'role_has_permissions' => 'role_has_permissions',
     ],
 
-    'foreign_keys' => [
-        
-        /*
-         * The name of the foreign key to the users table.
-         */
-        'users' => 'user_id',
-    ],
+    /*
+     * By default all permissions will be cached for 24 hours unless a permission or
+     * role is updated. Then the cache will be flushed immediately.
+     */
+     
+    'cache_expiration_time' => 60 * 24,
 
     /*
-     *
      * By default we'll make an entry in the application log when the permissions
      * could not be loaded. Normally this only occurs while installing the packages.
      *
@@ -180,7 +170,7 @@ return [
 
 ## Usage
 
-First add the `Spatie\Permission\Traits\HasRoles` trait to your User model:
+First add the `Spatie\Permission\Traits\HasRoles` trait to your User model(s):
 
 ```php
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -194,8 +184,8 @@ class User extends Authenticatable
 }
 ```
 
-This package allows for users to be associated with roles. Permissions can be associated with roles.
-A `Role` and a `Permission` are regular Eloquent models. They can have a name and can be created like this:
+This package allows for users to be associated with permissions and roles. Every role is associated with multiple permissions.
+A `Role` and a `Permission` are regular Eloquent models. They have a name and can be created like this:
 
 ```php
 use Spatie\Permission\Models\Role;
@@ -204,6 +194,8 @@ use Spatie\Permission\Models\Permission;
 $role = Role::create(['name' => 'writer']);
 $permission = Permission::create(['name' => 'edit articles']);
 ```
+
+If you're using multiple guards the `guard_name` attribute needs to be set as well. Read about it in the [using multiple guards](#using-multiple-guards) section of the readme.
 
 The `HasRoles` adds Eloquent relationships to your models, which can be accessed directly or used as a base query:
 
@@ -221,7 +213,7 @@ The scope can accept a string, a `Spatie\Permission\Models\Role` object or an `\
 
 ### Using permissions
 
-A permission can be given to a user:
+A permission can be given to any user with the `HasRoles` trait:
 
 ```php
 $user->givePermissionTo('edit articles');
@@ -243,15 +235,16 @@ You can test if a user has a permission:
 $user->hasPermissionTo('edit articles');
 ```
 
-Saved permissions will be registered with the `Illuminate\Auth\Access\Gate` class. So you can
+Saved permissions will be registered with the `Illuminate\Auth\Access\Gate` class for the default guard. So you can
 test if a user has a permission with Laravel's default `can` function:
 
 ```php
 $user->can('edit articles');
 ```
 
-### Using roles and permissions
-A role can be assigned to a user:
+### Using permissions and roles
+
+A role can be assigned to any user with the `HasRoles` trait:
 
 ```php
 $user->assignRole('writer');
@@ -327,6 +320,7 @@ user automatically. In addition to these permissions particular permission can b
 
 ```php
 $role->givePermissionTo('edit articles');
+
 $user->assignRole('writer');
 
 $user->givePermissionTo('delete articles');
@@ -351,11 +345,12 @@ $user->getAllPermissions();
 
 All theses responses are collections of `Spatie\Permission\Models\Permission` objects.
 
-If we follow the previous example, the first response will be a collection with the 'delete article' permission, the second will be a collection with the 'edit article' permission and the third will contain both.
+If we follow the previous example, the first response will be a collection with the 'delete article' permission, the 
+second will be a collection with the 'edit article' permission and the third will contain both.
 
 ### Using Blade directives
-This package also adds Blade directives to verify whether the
-currently logged in user has all or any of a given list of roles.
+This package also adds Blade directives to verify whether the currently logged in user has all or any of a given list of
+roles. Optionally you can pass in the `guard` that the check will be performed on as a second argument.
 
 ```php
 @role('writer')
@@ -391,8 +386,46 @@ currently logged in user has all or any of a given list of roles.
 
 You can use Laravel's native `@can` directive to check if a user has a certain permission.
 
+## Using multiple guards
+
+When using the default Laravel auth configuration all of the above methods will work out of the box, no extra configuration required.
+
+However when using multiple guards they will act like namespaces for your permissions and roles. Meaning every guard has its own set of permissions and roles that can be assigned to their user model.
+
+### Using permissions and roles with multiple guards
+
+By default the default guard (`auth.default.guard`) will be used as the guard for new permissions and roles. When creating permissions and roles for specific guards you'll have to specify their `guard_name` on the model:
+
+```php
+// Create a superadmin role for the admin users
+$role = Role::create(['guard_name' => 'admin', 'name' => 'superadmin']);
+
+// Define a `create posts` permission for the admin users beloninging to the admin guard
+$permission = Permission::create(['guard_name' => 'admin', 'name' => 'create posts']);
+
+// Define a different `create posts` permission for the regular users belonging to the web guard
+$permission = Permission::create(['guard_name' => 'web', 'name' => 'create posts']);
+```
+
+### Assigning permissions and roles to guard users
+
+You can use the same methods to assign permissions and roles to users as described above in [using permissions and roles](#sing permissions-and-roles). Just make sure the `guard_name`s on the permission or role match the guard of the user, otherwise a `GuardDoesNotMatch` exception will be thrown.
+
+### Using blade directives with multiple guards
+
+You can use all of the blade directives listed in [using blade directives](#using-blade-directives) by passing in the guard you wish to use as the second argument to the directive:
+
+```php
+@role('super-admin', 'admin')
+    I'm a super-admin!
+@else
+    I'm not a super-admin...
+@endrole
+```
+
 ## Using a middleware
-The package doesn't contain a middleware to check permissions but it's very trivial to add this yourself:
+
+The package doesn't include a middleware to check permissions but it's very trivial to add this yourself:
 
 ``` bash
 $ php artisan make:middleware RoleMiddleware
@@ -478,7 +511,7 @@ If you discover any security related issues, please email [freek@spatie.be](mail
 - [All Contributors](../../contributors)
 
 This package is heavily based on [Jeffrey Way](https://twitter.com/jeffrey_way)'s awesome [Laracasts](https://laracasts.com) lessons
-on [roles and permissions](https://laracasts.com/series/whats-new-in-laravel-5-1/episodes/16). His original code
+on [permissions and roles](https://laracasts.com/series/whats-new-in-laravel-5-1/episodes/16). His original code
 can be found [in this repo on GitHub](https://github.com/laracasts/laravel-5-roles-and-permissions-demo).
 
 Special thanks to [Alex Vanderbist](https://github.com/AlexVanderbist) who greatly helped with `v2`.
