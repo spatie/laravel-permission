@@ -51,6 +51,7 @@ class PermissionServiceProvider extends ServiceProvider
         $this->app->afterResolving('blade.compiler', function (BladeCompiler $bladeCompiler) {
             $bladeCompiler->directive('role', function ($arguments) {
                 list($role, $guard) = explode(',', $arguments.',');
+
                 return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasRole({$role})): ?>";
             });
             $bladeCompiler->directive('endrole', function () {
@@ -59,6 +60,7 @@ class PermissionServiceProvider extends ServiceProvider
 
             $bladeCompiler->directive('hasrole', function ($arguments) {
                 list($role, $guard) = explode(',', $arguments.',');
+
                 return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasRole({$role})): ?>";
             });
             $bladeCompiler->directive('endhasrole', function () {
@@ -67,6 +69,7 @@ class PermissionServiceProvider extends ServiceProvider
 
             $bladeCompiler->directive('hasanyrole', function ($arguments) {
                 list($roles, $guard) = explode(',', $arguments.',');
+
                 return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasAnyRole({$roles})): ?>";
             });
             $bladeCompiler->directive('endhasanyrole', function () {
@@ -75,6 +78,7 @@ class PermissionServiceProvider extends ServiceProvider
 
             $bladeCompiler->directive('hasallroles', function ($arguments) {
                 list($roles, $guard) = explode(',', $arguments.',');
+
                 return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasAllRoles({$roles})): ?>";
             });
             $bladeCompiler->directive('endhasallroles', function () {
