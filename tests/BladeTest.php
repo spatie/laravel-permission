@@ -70,7 +70,7 @@ class BladeTest extends TestCase
     public function the_can_directive_will_evaluate_true_when_the_logged_in_user_has_the_permission()
     {
         $user = $this->getWriter();
-        
+
         $user->givePermissionTo('edit-articles');
 
         auth()->setUser($user);
