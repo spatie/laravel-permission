@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 trait HasRoles
 {
     use HasPermissions;
-    use RefreshesPermissionCache;
 
     /**
      * A model may have multiple roles.

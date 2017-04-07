@@ -2,7 +2,9 @@
 
 namespace Spatie\Permission\Models;
 
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -57,5 +59,13 @@ class Permission extends Model implements PermissionContract
         }
 
         return $permission;
+    }
+
+    /**
+     * Get the current cached permissions.
+     */
+    protected static function getPermissions(): Collection
+    {
+        return app(PermissionRegistrar::class)->getPermissions();
     }
 }

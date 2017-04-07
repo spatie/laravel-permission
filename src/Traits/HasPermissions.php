@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Traits;
 
+use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 
@@ -122,5 +123,13 @@ trait HasPermissions
             ->map(function ($guard) {
                 return config("auth.providers.{$guard['provider']}.model");
             })->toArray();
+    }
+
+    /**
+     * Forget the cached permissions.
+     */
+    public function forgetCachedPermissions()
+    {
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 }
