@@ -58,6 +58,14 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_throws_an_exception_when_assigning_a_role_that_does_not_exist()
+    {
+        $this->expectException(RoleDoesNotExist::class);
+
+        $this->testUser->assignRole('evil-emperor');
+    }
+
+    /** @test */
     public function it_can_only_assign_roles_from_the_correct_guard()
     {
         $this->expectException(RoleDoesNotExist::class);
@@ -297,174 +305,6 @@ class HasRolesTest extends TestCase
         $user = new User();
 
         $this->assertFalse($user->hasPermissionTo('edit-articles'));
-    }
-
-    /** @test */
-    public function it_can_assign_a_permission_to_a_role()
-    {
-        $this->testUserRole->givePermissionTo('edit-articles');
-
-        $this->testUser->assignRole('testRole');
-
-        $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
-    }
-
-    /** @test */
-    public function it_throws_an_exception_when_trying_to_assign_a_permission_to_a_role_that_belongs_to_another_guard()
-    {
-        $this->expectException(PermissionDoesNotExist::class);
-
-        $this->testUserRole->givePermissionTo('admin-permission');
-
-        $this->expectException(GuardDoesNotMatch::class);
-
-        $this->testUserRole->givePermissionTo($this->testAdminPermission);
-    }
-
-    /** @test */
-    public function it_can_assign_multiple_permissions_to_a_role_using_an_array()
-    {
-        $this->testUserRole->givePermissionTo(['edit-articles', 'edit-news']);
-
-        $this->testUser->assignRole('testRole');
-
-        $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
-        $this->assertTrue($this->testUser->hasPermissionTo('edit-news'));
-    }
-
-    /** @test */
-    public function it_can_assign_multiple_permissions_to_a_role_using_multiple_arguments()
-    {
-        $this->testUserRole->givePermissionTo('edit-articles', 'edit-news');
-
-        $this->testUser->assignRole('testRole');
-
-        $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
-        $this->assertTrue($this->testUser->hasPermissionTo('edit-news'));
-    }
-
-    /** @test */
-    public function it_can_sync_permissions_on_a_role()
-    {
-        $this->testUserRole->givePermissionTo('edit-articles');
-
-        $this->testUserRole->syncPermissions('edit-news');
-
-        $this->testUser->assignRole('testRole');
-
-        $this->assertFalse($this->testUser->hasPermissionTo('edit-articles'));
-
-        $this->assertTrue($this->testUser->hasPermissionTo('edit-news'));
-    }
-
-    /** @test */
-    public function it_throws_an_exception_when_syncing_permissions_that_do_not_exist()
-    {
-        $this->testUserRole->givePermissionTo('edit-articles');
-
-        $this->expectException(PermissionDoesNotExist::class);
-
-        $this->testUserRole->syncPermissions('permission-does-not-exist');
-    }
-
-    /** @test */
-    public function it_throws_an_exception_when_syncing_permissions_on_a_role_that_belongs_to_a_different_guard()
-    {
-        $this->testUserRole->givePermissionTo('edit-articles');
-
-        $this->expectException(PermissionDoesNotExist::class);
-
-        $this->testUserRole->syncPermissions('admin-permission');
-
-        $this->expectException(GuardDoesNotMatch::class);
-
-        $this->testUserRole->syncPermissions($this->testAdminPermission);
-    }
-
-    /** @test */
-    public function it_will_remove_all_permission_on_a_role_when_passing_an_empty_array_to_sync_permissions()
-    {
-        $this->testUserRole->givePermissionTo('edit-articles');
-
-        $this->testUserRole->givePermissionTo('edit-news');
-
-        $this->testUserRole->syncPermissions([]);
-
-        $this->testUser->assignRole('testRole');
-
-        $this->assertFalse($this->testUser->hasPermissionTo('edit-articles'));
-
-        $this->assertFalse($this->testUser->hasPermissionTo('edit-news'));
-    }
-
-    /** @test */
-    public function it_can_revoke_a_permission_from_a_role()
-    {
-        $this->testUserRole->givePermissionTo('edit-articles');
-
-        $this->testUser->assignRole('testRole');
-
-        $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
-
-        $this->testUserRole->revokePermissionTo('edit-articles');
-
-        $this->assertFalse($this->testUser->hasPermissionTo('edit-articles'));
-    }
-
-    /** @test */
-    public function it_can_assign_a_permission_to_a_role_using_objects()
-    {
-        $this->testUserRole->givePermissionTo($this->testUserPermission);
-
-        $this->testUser->assignRole($this->testUserRole);
-
-        $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission));
-    }
-
-    /** @test */
-    public function it_can_assign_a_permission_to_a_user()
-    {
-        $this->testUser->givePermissionTo($this->testUserPermission);
-
-        $this->refreshTestUser();
-
-        $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission));
-    }
-
-    /** @test */
-    public function it_throws_an_exception_when_assigning_a_permission_to_a_user_from_a_different_guard()
-    {
-        $this->expectException(GuardDoesNotMatch::class);
-
-        $this->testUser->givePermissionTo($this->testAdminPermission);
-
-        $this->expectException(PermissionDoesNotExist::class);
-
-        $this->testUser->givePermissionTo('admin-permission');
-    }
-
-    /** @test */
-    public function it_throws_an_exception_when_assigning_a_permission_that_does_not_exist()
-    {
-        $this->expectException(PermissionDoesNotExist::class);
-
-        $this->testUser->givePermissionTo('permission-does-not-exist');
-    }
-
-    /** @test */
-    public function it_can_revoke_a_permission_from_a_user()
-    {
-        $this->testUser->givePermissionTo($this->testUserPermission);
-
-        $this->refreshTestUser();
-
-        $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission));
-
-        $this->testUser->revokePermissionTo($this->testUserPermission);
-
-        $this->refreshTestUser();
-
-        $this->assertFalse($this->testUser->hasPermissionTo($this->testUserPermission));
     }
 
     /** @test */
