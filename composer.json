@@ -20,8 +20,10 @@
     ],
     "require": {
         "php" : ">=7.0",
-        "laravel/framework": "~5.4.0",
-        "illuminate/contracts": "~5.4.0"
+        "illuminate/auth": "~5.4.0",
+        "illuminate/container": "~5.4.0",
+        "illuminate/contracts": "~5.4.0",
+        "illuminate/database": "~5.4.0"
     },
     "require-dev": {
         "monolog/monolog": "^1.22",
