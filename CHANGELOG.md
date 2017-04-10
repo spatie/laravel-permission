@@ -2,7 +2,7 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
-## 2.0.0 - 2017-04-01
+## 2.0.0 - 2017-04-10
 
 - cache expiration is now configurable and set to one day by default
 - roles and permissions can now be assigned to any model through the `HasRoles` trait
