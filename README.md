@@ -44,7 +44,7 @@ The best postcards will get published on the open source page on our website.
 
 You can install the package via Composer:
 ``` bash
-$ composer require spatie/laravel-permission
+composer require spatie/laravel-permission:^1.3
 ```
 
 Now add the service provider in `config/app.php` file:
