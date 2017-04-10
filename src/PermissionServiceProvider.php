@@ -12,14 +12,14 @@ class PermissionServiceProvider extends ServiceProvider
     public function boot(PermissionRegistrar $permissionLoader)
     {
         $this->publishes([
-            __DIR__ . '/../config/permission.php' => $this->app->configPath().'/permission.php',
+            __DIR__.'/../config/permission.php' => $this->app->configPath().'/permission.php',
         ], 'config');
 
         if (! class_exists('CreatePermissionTables')) {
             $timestamp = date('Y_m_d_His', time());
 
             $this->publishes([
-                __DIR__ . '/../database/migrations/create_permission_tables.php.stub' => $this->app->databasePath()."/migrations/{$timestamp}_create_permission_tables.php",
+                __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->app->databasePath()."/migrations/{$timestamp}_create_permission_tables.php",
             ], 'migrations');
         }
 
@@ -31,7 +31,7 @@ class PermissionServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/permission.php',
+            __DIR__.'/../config/permission.php',
             'permission'
         );
 
