@@ -40,7 +40,7 @@ All received postcards are published [on our website](https://spatie.be/en/opens
 
 ## Installation
 
-This package can be used in Laravel 5.4 or higher. If you are using an older version of Laravel, take a look at the v1 branch of this package.
+This package can be used in Laravel 5.4 or higher. If you are using an older version of Laravel, take a look at [the v1 branch of this package]().
 
 You can install the package via composer:
 
