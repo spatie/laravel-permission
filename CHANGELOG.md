@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.0.1 - 2017-04-11
+
+- fix the order of the `foreignKey` and `relatedKey` in the relations
+
 ## 2.0.0 - 2017-04-10
 
 - cache expiration is now configurable and set to one day by default
