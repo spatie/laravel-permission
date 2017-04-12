@@ -3,6 +3,7 @@
 namespace Spatie\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Exceptions\RoleAlreadyExists;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
@@ -19,13 +20,22 @@ class Role extends Model implements RoleContract
 
     public function __construct(array $attributes = [])
     {
-        if (empty($attributes['guard_name'])) {
-            $attributes['guard_name'] = config('auth.defaults.guard');
-        }
+        $attributes['guard_name'] = $attributes['guard_name'] ?? config('auth.defaults.guard');
 
         parent::__construct($attributes);
 
         $this->setTable(config('permission.table_names.roles'));
+    }
+
+    public static function create(array $attributes = [])
+    {
+        $attributes['guard_name'] = $attributes['guard_name'] ?? config('auth.defaults.guard');
+
+        if (static::where('name', $attributes['name'])->where('guard_name', $attributes['guard_name'])->first()) {
+            throw RoleAlreadyExists::create($attributes['name'], $attributes['guard_name']);
+        }
+
+        return static::query()->create($attributes);
     }
 
     /**
