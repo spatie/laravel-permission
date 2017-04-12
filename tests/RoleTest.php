@@ -3,9 +3,9 @@
 namespace Spatie\Permission\Test;
 
 use Spatie\Permission\Contracts\Role;
-use Spatie\Permission\Exceptions\RoleAlreadyExists;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
+use Spatie\Permission\Exceptions\RoleAlreadyExists;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class RoleTest extends TestCase
