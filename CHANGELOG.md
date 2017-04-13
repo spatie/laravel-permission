@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.0.2 - 2017-04-13
+
+- check for duplicates when adding new roles and permissions
+
 ## 2.0.1 - 2017-04-11
 
 - fix the order of the `foreignKey` and `relatedKey` in the relations
