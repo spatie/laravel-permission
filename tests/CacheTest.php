@@ -59,17 +59,17 @@ class CacheTest extends TestCase
     public function role_creation_and_updating_should_flush_the_cache()
     {
         $role = app(Role::class)->create(['name' => 'new']);
-        $this->assertCount(1, DB::getQueryLog());
+        $this->assertCount(2, DB::getQueryLog());
 
         $this->registrar->registerPermissions();
-        $this->assertCount(3, DB::getQueryLog());
+        $this->assertCount(4, DB::getQueryLog());
 
         $role->name = 'other name';
         $role->save();
-        $this->assertCount(4, DB::getQueryLog());
+        $this->assertCount(5, DB::getQueryLog());
 
         $this->registrar->registerPermissions();
-        $this->assertCount(6, DB::getQueryLog());
+        $this->assertCount(7, DB::getQueryLog());
     }
 
     /** @test */

@@ -8,6 +8,7 @@ use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\Permission\Exceptions\PermissionAlreadyExists;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 
 class Permission extends Model implements PermissionContract
@@ -18,13 +19,22 @@ class Permission extends Model implements PermissionContract
 
     public function __construct(array $attributes = [])
     {
-        if (empty($attributes['guard_name'])) {
-            $attributes['guard_name'] = config('auth.defaults.guard');
-        }
+        $attributes['guard_name'] = $attributes['guard_name'] ?? config('auth.defaults.guard');
 
         parent::__construct($attributes);
 
         $this->setTable(config('permission.table_names.permissions'));
+    }
+
+    public static function create(array $attributes = [])
+    {
+        $attributes['guard_name'] = $attributes['guard_name'] ?? config('auth.defaults.guard');
+
+        if (static::getPermissions()->where('name', $attributes['name'])->where('guard_name', $attributes['guard_name'])->first()) {
+            throw PermissionAlreadyExists::create($attributes['name'], $attributes['guard_name']);
+        }
+
+        return static::query()->create($attributes);
     }
 
     /**

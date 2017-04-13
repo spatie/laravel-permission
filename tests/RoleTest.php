@@ -5,6 +5,7 @@ namespace Spatie\Permission\Test;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
+use Spatie\Permission\Exceptions\RoleAlreadyExists;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class RoleTest extends TestCase
@@ -16,6 +17,15 @@ class RoleTest extends TestCase
         Permission::create(['name' => 'other-permission']);
 
         Permission::create(['name' => 'wrong-guard-permission', 'guard_name' => 'admin']);
+    }
+
+    /** @test */
+    public function it_throws_an_exception_when_the_role_already_exists()
+    {
+        $this->expectException(RoleAlreadyExists::class);
+
+        app(Role::class)->create(['name' => 'test-role']);
+        app(Role::class)->create(['name' => 'test-role']);
     }
 
     /** @test */
@@ -45,8 +55,6 @@ class RoleTest extends TestCase
 
         $this->testUserRole->givePermissionTo($this->testAdminPermission);
     }
-
-    ///
 
     /** @test */
     public function it_can_be_given_multiple_permissions_using_an_array()
