@@ -17,7 +17,7 @@ trait HasRoles
      */
     public function roles(): MorphToMany
     {
-        return $this->morphedByMany(
+        return $this->morphToMany(
             config('permission.models.role'),
             'model',
             config('permission.table_names.model_has_roles'),
@@ -31,7 +31,7 @@ trait HasRoles
      */
     public function permissions(): MorphToMany
     {
-        return $this->morphedByMany(
+        return $this->morphToMany(
             config('permission.models.permission'),
             'model',
             config('permission.table_names.model_has_permissions'),
