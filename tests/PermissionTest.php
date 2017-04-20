@@ -2,7 +2,6 @@
 
 namespace Spatie\Permission\Test;
 
-use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\PermissionAlreadyExists;
 
