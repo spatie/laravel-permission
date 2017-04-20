@@ -20,6 +20,18 @@ class RoleTest extends TestCase
     }
 
     /** @test */
+    public function it_has_user_models_of_the_right_class()
+    {
+        $this->testAdmin->assignRole($this->testAdminRole);
+
+        $this->testUser->assignRole($this->testUserRole);
+
+        $this->assertCount(1, $this->testUserRole->users);
+        $this->assertTrue($this->testUserRole->users->first()->is($this->testUser));
+        $this->assertInstanceOf(User::class, $this->testUserRole->users->first());
+    }
+
+    /** @test */
     public function it_throws_an_exception_when_the_role_already_exists()
     {
         $this->expectException(RoleAlreadyExists::class);
