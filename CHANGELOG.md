@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.1.3 - 2017-04-21
+
+- fixed a bug where the role()/permission() relation to user models would be saved incorrectly
+- added users() relation on Permission and Role
+
 ## 2.1.2 - 2017-04-20
 
 - fix a bug where the `role()`/`permission()` relation to user models would be saved incorrectly
