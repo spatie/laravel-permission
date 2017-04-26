@@ -496,7 +496,7 @@ keep the following things in mind:
 If you manipulate permission/role data directly in the database instead of calling the supplied methods, then you will not see the changes reflected in the application, because role and permission data is cached to speed up performance.
 
 To manually reset the cache for this package, run:
-```php
+```bash
 php artisan cache:forget spatie.permission.cache
 ```
 
