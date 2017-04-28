@@ -57,7 +57,7 @@ Now add the service provider in `config/app.php` file:
 
 You can publish the migration with:
 ```bash
-$ php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="migrations"
+php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="migrations"
 ```
 
 The package assumes that your users table name is called "users". If this is not the case
@@ -72,7 +72,7 @@ $ php artisan migrate
 
 You can publish the config-file with:
 ```bash
-$ php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="config"
+php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="config"
 ```
 
 This is the contents of the published `config/laravel-permission.php` config file:
@@ -437,7 +437,7 @@ Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recen
 ## Testing
 
 ``` bash
-$ composer test
+composer test
 ```
 
 ## Contributing
