@@ -21,7 +21,7 @@ interface Role
      *
      * @return \Spatie\Permission\Contracts\Role
      *
-     * @throws RoleDoesNotExist
+     * @throws \Spatie\Permission\Exceptions\RoleDoesNotExist
      */
     public static function findByName(string $name, $guardName): Role;
 
