@@ -210,7 +210,7 @@ The `HasRoles` also adds a scope to your models to scope the query to certain ro
 $users = User::role('writer')->get(); // Only returns users with the role 'writer'
 ```
 
-The scope can accept a string, a `Spatie\Permission\Models\Role` object or an `\Illuminate\Support\Collection` object.
+The scope can accept a string, a `\Spatie\Permission\Models\Role` object or an `\Illuminate\Support\Collection` object.
 
 ### Using permissions
 
@@ -289,7 +289,7 @@ $user->hasAllRoles(Role::all());
 ```
 
 The `assignRole`, `hasRole`, `hasAnyRole`, `hasAllRoles`  and `removeRole` functions can accept a
- string, a `Spatie\Permission\Models\Role` object or an `\Illuminate\Support\Collection` object.
+ string, a `\Spatie\Permission\Models\Role` object or an `\Illuminate\Support\Collection` object.
 
 A permission can be given to a role:
 
