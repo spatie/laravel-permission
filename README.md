@@ -289,7 +289,7 @@ $user->hasAllRoles(Role::all());
 ```
 
 The `assignRole`, `hasRole`, `hasAnyRole`, `hasAllRoles`  and `removeRole` functions can accept a
- string, a `Spatie\Permission\Models\Role` object or an `\Illuminate\Support\Collection` object.
+ string, a `\Spatie\Permission\Models\Role` object or an `\Illuminate\Support\Collection` object.
 
 A permission can be given to a role:
 
