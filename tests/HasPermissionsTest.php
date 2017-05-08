@@ -18,6 +18,16 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    public function it_can_assign_a_scoped_permission_to_a_user()
+    {
+        $this->testUser->givePermissionTo($this->testUserPermission, $this->testRestrictable1);
+
+        $this->refreshTestUser();
+
+        $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission, $this->testRestrictable1));
+    }
+
+    /** @test */
     public function it_throws_an_exception_when_assigning_a_permission_that_does_not_exist()
     {
         $this->expectException(PermissionDoesNotExist::class);
@@ -51,5 +61,21 @@ class HasPermissionsTest extends TestCase
         $this->refreshTestUser();
 
         $this->assertFalse($this->testUser->hasPermissionTo($this->testUserPermission));
+    }
+
+    /** @test */
+    public function it_can_revoke_a_scoped_permission_from_a_user()
+    {
+        $this->testUser->givePermissionTo($this->testUserPermission, $this->testRestrictable1);
+
+        $this->refreshTestUser();
+
+        $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission, $this->testRestrictable1));
+
+        $this->testUser->revokePermissionTo($this->testUserPermission, $this->testRestrictable1);
+
+        $this->refreshTestUser();
+
+        $this->assertFalse($this->testUser->hasPermissionTo($this->testUserPermission, $this->testRestrictable1));
     }
 }

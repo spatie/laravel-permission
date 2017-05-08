@@ -3,9 +3,9 @@
 namespace Spatie\Permission\Test;
 
 use Spatie\Permission\Contracts\Role;
-use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
+use Spatie\Permission\Exceptions\RoleDoesNotExist;
 
 class HasRolesTest extends TestCase
 {
@@ -35,16 +35,6 @@ class HasRolesTest extends TestCase
         $this->testUser->assignRole($this->testUserRole);
 
         $this->assertTrue($this->testUser->hasRole($this->testUserRole));
-    }
-
-    /** @test */
-    public function it_can_assign_multiple_roles_at_once()
-    {
-        $this->testUser->assignRole('testRole', 'testRole2');
-
-        $this->assertTrue($this->testUser->hasRole('testRole'));
-
-        $this->assertTrue($this->testUser->hasRole('testRole2'));
     }
 
     /** @test */
@@ -89,16 +79,6 @@ class HasRolesTest extends TestCase
         $this->testUser->syncRoles('testRole2');
 
         $this->assertFalse($this->testUser->hasRole('testRole'));
-
-        $this->assertTrue($this->testUser->hasRole('testRole2'));
-    }
-
-    /** @test */
-    public function it_can_sync_multiple_roles()
-    {
-        $this->testUser->syncRoles('testRole', 'testRole2');
-
-        $this->assertTrue($this->testUser->hasRole('testRole'));
 
         $this->assertTrue($this->testUser->hasRole('testRole2'));
     }

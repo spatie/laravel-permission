@@ -11,6 +11,12 @@ class GateTest extends TestCase
     }
 
     /** @test */
+    public function it_can_determine_if_a_user_does_not_have_a_scoped_permission()
+    {
+        $this->assertFalse($this->testUser->can('edit-articles', $this->testRestrictable1));
+    }
+
+    /** @test */
     public function it_can_determine_if_a_user_has_a_direct_permission()
     {
         $this->testUser->givePermissionTo($this->testUserPermission);
@@ -22,6 +28,22 @@ class GateTest extends TestCase
         $this->assertFalse($this->testUser->can('non-existing-permission'));
 
         $this->assertFalse($this->testUser->can('admin-permission'));
+    }
+
+    /** @test */
+    public function it_can_determine_if_a_user_has_a_direct_scoped_permission()
+    {
+        $this->testUser->givePermissionTo($this->testUserPermission, $this->testRestrictable1);
+
+        $this->assertTrue($this->reloadPermissions());
+
+        // This will search for a global permission and fail
+        $this->assertFalse($this->testUser->can('edit-articles'));
+
+        // This will search for a permission scoped to the wrong Restrictable instance and fail
+        $this->assertFalse($this->testUser->can('edit-articles', $this->testRestrictable2));
+
+        $this->assertTrue($this->testUser->can('edit-articles', $this->testRestrictable1));
     }
 
     /** @test */
@@ -40,6 +62,29 @@ class GateTest extends TestCase
         $this->assertFalse($this->testUser->can('non-existing-permission'));
 
         $this->assertFalse($this->testUser->can('admin-permission'));
+    }
+
+    /** @test */
+    public function it_can_determine_if_a_user_has_a_permission_when_using_scoped_roles()
+    {
+        $this->testUserRole->givePermissionTo($this->testUserPermission);
+
+        $this->testUser->assignRole($this->testUserRole, $this->testRestrictable1);
+
+        // This will search for a permission in a global role and fail
+        $this->assertFalse($this->testUser->hasPermissionTo($this->testUserPermission));
+
+        $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission, $this->testRestrictable1));
+
+        $this->assertTrue($this->reloadPermissions());
+
+        // This will search for a global permission and fail
+        $this->assertFalse($this->testUser->can('edit-articles'));
+
+        // This will search for a permission scoped to the wrong Restrictable instance and fail
+        $this->assertFalse($this->testUser->can('edit-articles', $this->testRestrictable2));
+
+        $this->assertTrue($this->testUser->can('edit-articles', $this->testRestrictable1));
     }
 
     /** @test */

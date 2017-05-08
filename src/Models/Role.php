@@ -3,19 +3,22 @@
 namespace Spatie\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Permission\Traits\HasPermissions;
-use Spatie\Permission\Exceptions\RoleDoesNotExist;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Spatie\Permission\Contracts\Role as RoleContract;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\RoleAlreadyExists;
-use Spatie\Permission\Contracts\Role as RoleContract;
+use Spatie\Permission\Exceptions\RoleDoesNotExist;
+use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Role extends Model implements RoleContract
 {
-    use HasPermissions;
-    use RefreshesPermissionCache;
+    use RefreshesPermissionCache, HasPermissions {
+        givePermissionTo as public scopedGivePermissionTo;
+        revokePermissionTo as public scopedRevokePermissionTo;
+        syncPermissions as public scopedSyncPermissions;
+    }
 
     public $guarded = ['id'];
 
@@ -107,5 +110,38 @@ class Role extends Model implements RoleContract
         }
 
         return $this->permissions->contains('id', $permission->id);
+    }
+
+    /**
+     * Grant the given permission(s) to a role.
+     *
+     * @param string|array|\Spatie\Permission\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     * @return $this
+     */
+    public function givePermissionTo($permissions)
+    {
+        return $this->scopedGivePermissionTo($permissions);
+    }
+
+    /**
+     * Remove all current not scoped permissions and set the given ones.
+     *
+     * @param string|array|\Spatie\Permission\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     * @return $this
+     */
+    public function syncPermissions($permissions)
+    {
+        return $this->scopedSyncPermissions($permissions);
+    }
+
+    /**
+     * Revoke the given permission.
+     *
+     * @param \Spatie\Permission\Contracts\Permission|string $permission
+     * @return $this
+     */
+    public function revokePermissionTo($permission)
+    {
+        return $this->scopedRevokePermissionTo($permission);
     }
 }

@@ -4,22 +4,22 @@ namespace Spatie\Permission;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
-use Spatie\Permission\Contracts\Role as RoleContract;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
+use Spatie\Permission\Contracts\Role as RoleContract;
 
 class PermissionServiceProvider extends ServiceProvider
 {
     public function boot(PermissionRegistrar $permissionLoader)
     {
         $this->publishes([
-            __DIR__.'/../config/permission.php' => $this->app->configPath().'/permission.php',
+            __DIR__ . '/../config/permission.php' => $this->app->configPath() . '/permission.php',
         ], 'config');
 
-        if (! class_exists('CreatePermissionTables')) {
+        if (!class_exists('CreatePermissionTables')) {
             $timestamp = date('Y_m_d_His', time());
 
             $this->publishes([
-                __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->app->databasePath()."/migrations/{$timestamp}_create_permission_tables.php",
+                __DIR__ . '/../database/migrations/create_permission_tables.php.stub' => $this->app->databasePath() . "/migrations/{$timestamp}_create_permission_tables.php",
             ], 'migrations');
         }
 
@@ -31,7 +31,7 @@ class PermissionServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(
-            __DIR__.'/../config/permission.php',
+            __DIR__ . '/../config/permission.php',
             'permission'
         );
 
@@ -50,36 +50,60 @@ class PermissionServiceProvider extends ServiceProvider
     {
         $this->app->afterResolving('blade.compiler', function (BladeCompiler $bladeCompiler) {
             $bladeCompiler->directive('role', function ($arguments) {
-                list($role, $guard) = explode(',', $arguments.',');
+                list($role, $guard, $restrictableId, $restrictableTable) = explode(',', $arguments . ',');
 
-                return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasRole({$role})): ?>";
+                $restrictable = null;
+                // Write the code to retrieve the restrictable instance
+                if($restrictableId !== null && $restrictableTable !== null) {
+                    $restrictable = studly_case(str_singular($restrictableTable)) . "::find({$restrictableId})";
+                }
+
+                return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasRole({$role},{$restrictable})): ?>";
             });
             $bladeCompiler->directive('endrole', function () {
                 return '<?php endif; ?>';
             });
 
             $bladeCompiler->directive('hasrole', function ($arguments) {
-                list($role, $guard) = explode(',', $arguments.',');
+                list($role, $guard, $restrictableId, $restrictableTable) = explode(',', $arguments . ',');
 
-                return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasRole({$role})): ?>";
+                $restrictable = null;
+                // Write the code to retrieve the restrictable instance
+                if($restrictableId !== null && $restrictableTable !== null) {
+                    $restrictable = studly_case(str_singular($restrictableTable)) . "::find({$restrictableId})";
+                }
+
+                return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasRole({$role},{$restrictable})): ?>";
             });
             $bladeCompiler->directive('endhasrole', function () {
                 return '<?php endif; ?>';
             });
 
             $bladeCompiler->directive('hasanyrole', function ($arguments) {
-                list($roles, $guard) = explode(',', $arguments.',');
+                list($roles, $guard, $restrictableId, $restrictableTable) = explode(',', $arguments . ',');
 
-                return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasAnyRole({$roles})): ?>";
+                $restrictable = null;
+                // Write the code to retrieve the restrictable instance
+                if($restrictableId !== null && $restrictableTable !== null) {
+                    $restrictable = studly_case(str_singular($restrictableTable)) . "::find({$restrictableId})";
+                }
+
+                return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasAnyRole({$roles},{$restrictable})): ?>";
             });
             $bladeCompiler->directive('endhasanyrole', function () {
                 return '<?php endif; ?>';
             });
 
             $bladeCompiler->directive('hasallroles', function ($arguments) {
-                list($roles, $guard) = explode(',', $arguments.',');
+                list($roles, $guard, $restrictableId, $restrictableTable) = explode(',', $arguments . ',');
 
-                return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasAllRoles({$roles})): ?>";
+                $restrictable = null;
+                // Write the code to retrieve the restrictable instance
+                if($restrictableId !== null && $restrictableTable !== null) {
+                    $restrictable = studly_case(str_singular($restrictableTable)) . "::find({$restrictableId})";
+                }
+
+                return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasAllRoles({$roles},{$restrictable})): ?>";
             });
             $bladeCompiler->directive('endhasallroles', function () {
                 return '<?php endif; ?>';

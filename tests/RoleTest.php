@@ -3,10 +3,10 @@
 namespace Spatie\Permission\Test;
 
 use Spatie\Permission\Contracts\Role;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
-use Spatie\Permission\Exceptions\RoleAlreadyExists;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
+use Spatie\Permission\Exceptions\RoleAlreadyExists;
+use Spatie\Permission\Models\Permission;
 
 class RoleTest extends TestCase
 {
@@ -72,15 +72,6 @@ class RoleTest extends TestCase
     public function it_can_be_given_multiple_permissions_using_an_array()
     {
         $this->testUserRole->givePermissionTo(['edit-articles', 'edit-news']);
-
-        $this->assertTrue($this->testUserRole->hasPermissionTo('edit-articles'));
-        $this->assertTrue($this->testUserRole->hasPermissionTo('edit-news'));
-    }
-
-    /** @test */
-    public function it_can_be_given_multiple_permissions_using_multiple_arguments()
-    {
-        $this->testUserRole->givePermissionTo('edit-articles', 'edit-news');
 
         $this->assertTrue($this->testUserRole->hasPermissionTo('edit-articles'));
         $this->assertTrue($this->testUserRole->hasPermissionTo('edit-news'));

@@ -351,6 +351,42 @@ All theses responses are collections of `Spatie\Permission\Models\Permission` ob
 If we follow the previous example, the first response will be a collection with the 'delete article' permission, the 
 second will be a collection with the 'edit article' permission and the third will contain both.
 
+### Using permissions and roles with scopes
+
+If a scope is not explicitly specified, all methods will operate on a not scoped level, which means that a user's roles
+and permissions are valid per user.
+
+To grant permissions to a user related to a resource (eg. ability to edit all articles produced by a single department)
+it's possible to "scope" the permissions and roles to a particular model, which must implement the `Restrictable` 
+interface. A default implementation based on the Eloquent `Model` class can be added to your model(s) with 
+the `RestrictableTrait`.
+
+To scope permissions and roles, a `Restrictable` instance can be provided as second parameter to all the methods
+which grant, revoke, sync or get permissions or roles.
+
+```php
+$role->givePermissionTo('edit articles');
+
+$user->assignRole('writer', $department);
+
+$user->givePermissionTo('delete articles', $department);
+
+$user->syncRoles(['writer', 'admin'], $department);
+
+// Scoped direct permissions
+$user->getDirectPermissions($department)
+
+// Permissions inherited from user's scoped roles
+$user->getPermissionsViaRoles($department);
+
+// All permissions which apply on the user for the given department
+$user->getAllPermissions($department);
+
+$user->can('edit articles', $departement);
+```
+
+Do note that Roles and Permissions can be scoped, but scoped permissions assigned to a role are not currently supported.
+
 ### Using Blade directives
 This package also adds Blade directives to verify whether the currently logged in user has all or any of a given list of
 roles. Optionally you can pass in the `guard` that the check will be performed on as a second argument.
@@ -425,6 +461,11 @@ You can use all of the blade directives listed in [using blade directives](#usin
     I'm not a super-admin...
 @endrole
 ```
+
+### Using blade directives with scoped roles
+
+To use Blade directives with scoped roles, parameters to provide are `role_name, guard_name, restrictable_table, restrictable_id, restrictable_primary_key_name`.
+Most of the time, you want to provide a null `guard_name` and omit `restrictable_primary_key_name` (it will default to 'id'). 
 
 ## Using a middleware
 
