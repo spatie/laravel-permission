@@ -2,12 +2,12 @@
 
 namespace Spatie\Permission\Traits;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Collection;
+use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Restrictable;
 use Spatie\Permission\Contracts\Role;
-use Illuminate\Database\Eloquent\Builder;
-use Spatie\Permission\Contracts\Permission;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 trait HasRoles
 {
@@ -97,7 +97,12 @@ trait HasRoles
      */
     public function assignRole($roles, Restrictable $restrictable = null)
     {
-        $roles = collect($roles)
+        // Role objects, if directly collected, becomes arrays of fields and the flatten() messes with
+        // the map function giving every single Role field as parameter for getStoredRole.
+        // To avoid this, if a Role is given an empty collection is created and the role is pushed inside.
+        // In this way, in case of a Role instance, the object is not flattened,
+        // but for arrays, collections and string everything works as expected.
+        $roles = (($roles instanceof Role) ? collect()->push($roles) : collect($roles))
             ->flatten()
             ->map(function ($role) {
                 return $this->getStoredRole($role);

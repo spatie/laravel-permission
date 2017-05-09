@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Traits;
 
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Restrictable;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
@@ -17,7 +18,7 @@ trait HasPermissions
      * @param \Spatie\Permission\Contracts\Restrictable $restrictable
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeRestrictTo($query, Restrictable $restrictable)
+    public function scopeRestrictTo(Builder $query, Restrictable $restrictable)
     {
         return $query->wherePivot('restrictable_id', is_null($restrictable) ? null : $restrictable->getRestrictableId())
             ->wherePivot('restrictable_type', is_null($restrictable) ? null : $restrictable->getRestrictableTable());
@@ -34,7 +35,12 @@ trait HasPermissions
      */
     public function givePermissionTo($permissions, Restrictable $restrictable = null)
     {
-        $permissions = collect($permissions)
+        // Permission objects, if directly collected, becomes arrays of fields and the flatten() messes with
+        // the map function giving every single Permission field as parameter for getStoredPermission.
+        // To avoid this, if a Permission is given an empty collection is created and the permission is pushed inside.
+        // In this way, in case of a Permission instance, the object is not flattened,
+        // but for arrays, collections and string everything works as expected.
+        $permissions = (($permissions instanceof Permission) ? collect()->push($permissions) : collect($permissions))
             ->flatten()
             ->map(function ($permission) {
                 return $this->getStoredPermission($permission);

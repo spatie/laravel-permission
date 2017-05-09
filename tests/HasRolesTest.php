@@ -38,6 +38,26 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_assign_a_role_using_a_string()
+    {
+        $this->testUser->assignRole('testRole');
+
+        $this->assertTrue($this->testUser->hasRole('testRole'));
+    }
+
+    /** @test */
+    public function it_can_assign_multiple_roles_using_a_collection()
+    {
+        $collection = collect()->push($this->testUserRole)->push('testRole2');
+
+        $this->testUser->assignRole($collection);
+
+        $this->assertTrue($this->testUser->hasRole($this->testUserRole));
+
+        $this->assertTrue($this->testUser->hasRole('testRole2'));
+    }
+
+    /** @test */
     public function it_can_assign_multiple_roles_using_an_array()
     {
         $this->testUser->assignRole(['testRole', 'testRole2']);
@@ -112,7 +132,7 @@ class HasRolesTest extends TestCase
     {
         $this->expectException(RoleDoesNotExist::class);
 
-        $this->testUser->syncRoles('testRole', 'testAdminRole');
+        $this->testUser->syncRoles(['testRole', 'testAdminRole']);
 
         $this->expectException(GuardDoesNotMatch::class);
 
@@ -340,7 +360,7 @@ class HasRolesTest extends TestCase
         $roleModel->findByName('testRole2')->givePermissionTo('edit-news');
 
         $this->testUserRole->givePermissionTo('edit-articles');
-        $this->testUser->assignRole('testRole', 'testRole2');
+        $this->testUser->assignRole(['testRole', 'testRole2']);
 
         $this->assertEquals(
             collect(['edit-articles', 'edit-news']),
