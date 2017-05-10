@@ -464,8 +464,9 @@ You can use all of the blade directives listed in [using blade directives](#usin
 
 ### Using blade directives with scoped roles
 
-To use Blade directives with scoped roles, parameters to provide are `role_name, guard_name, restrictable_table, restrictable_id, restrictable_primary_key_name`.
-Most of the time, you want to provide a null `guard_name` and omit `restrictable_primary_key_name` (it will default to 'id'). 
+To use Blade directives with scoped roles, parameters to provide are `role_name, guard_name, restrictable_fully_qualified_class, restrictable_id`.
+Most of the time, you want to provide a null `guard_name`, while `restrictable_fully_qualified_class` and 
+`restrictable_id` must both be not null, or they will be ignored.
 
 ## Using a middleware
 
