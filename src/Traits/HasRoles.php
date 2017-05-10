@@ -170,12 +170,15 @@ trait HasRoles
      */
     public function hasRole($roles, Restrictable $restrictable = null): bool
     {
+        // Needed to preserve the caching mechanism at least for the not scoped roles
+        $roleCachedRelation = (is_null($restrictable) ? $this->roles : $this->roles($restrictable)->get());
+
         if (is_string($roles)) {
-            return $this->roles($restrictable)->get()->contains('name', $roles);
+            return $roleCachedRelation->contains('name', $roles);
         }
 
         if ($roles instanceof Role) {
-            return $this->roles($restrictable)->get()->contains('id', $roles->id);
+            return $roleCachedRelation->contains('id', $roles->id);
         }
 
         if (is_array($roles)) {
@@ -188,7 +191,7 @@ trait HasRoles
             return false;
         }
 
-        return $roles->intersect($this->roles($restrictable)->get())->isNotEmpty();
+        return $roles->intersect($roleCachedRelation)->isNotEmpty();
     }
 
     /**
@@ -214,19 +217,22 @@ trait HasRoles
      */
     public function hasAllRoles($roles, Restrictable $restrictable = null): bool
     {
+        // Needed to preserve the caching mechanism at least for the not scoped roles
+        $roleCachedRelation = (is_null($restrictable) ? $this->roles : $this->roles($restrictable)->get());
+
         if (is_string($roles)) {
-            return $this->roles($restrictable)->get()->contains('name', $roles);
+            return $roleCachedRelation->contains('name', $roles);
         }
 
         if ($roles instanceof Role) {
-            return $this->roles($restrictable)->get()->contains('id', $roles->id);
+            return $roleCachedRelation->contains('id', $roles->id);
         }
 
         $roles = collect()->make($roles)->map(function ($role) {
             return $role instanceof Role ? $role->name : $role;
         });
 
-        return $roles->intersect($this->roles($restrictable)->get()->pluck('name')) == $roles;
+        return $roles->intersect($roleCachedRelation->pluck('name')) == $roles;
     }
 
     /**
@@ -297,7 +303,9 @@ trait HasRoles
             }
         }
 
-        return $this->permissions($restrictable)->get()->contains('id', $permission->id);
+        // Needed to preserve the caching mechanism at least for the not scoped permissions
+        return (is_null($restrictable) ? $this->permissions : $this->permissions($restrictable)->get())
+            ->contains('id', $permission->id);
     }
 
     /**
@@ -309,7 +317,8 @@ trait HasRoles
      */
     public function getDirectPermissions(Restrictable $restrictable = null): Collection
     {
-        return $this->permissions($restrictable)->get();
+        // Needed to preserve the caching mechanism at least for the not scoped permissions
+        return (is_null($restrictable) ? $this->permissions : $this->permissions($restrictable)->get());
     }
 
     /**
@@ -321,8 +330,11 @@ trait HasRoles
      */
     public function getPermissionsViaRoles(Restrictable $restrictable = null): Collection
     {
-        return $this->load('roles', 'roles.permissions')
-            ->roles($restrictable)->get()->flatMap(function ($role) {
+        $this->load('roles', 'roles.permissions');
+
+
+        return (is_null($restrictable) ? $this->roles : $this->roles($restrictable)->get())
+            ->flatMap(function ($role) {
                 return $role->permissions;
             })->sort()->values();
     }
@@ -336,8 +348,8 @@ trait HasRoles
      */
     public function getAllPermissions(Restrictable $restrictable = null): Collection
     {
-        return $this->permissions($restrictable)->get()
-            ->merge($this->getPermissionsViaRoles())
+        return $this->getDirectPermissions($restrictable)
+            ->merge($this->getPermissionsViaRoles($restrictable))
             ->sort()
             ->values();
     }

@@ -57,6 +57,8 @@ class PermissionRegistrar
         $this->cache->forget($this->cacheKey);
     }
 
+    // The getPermissions() cache implementation is used via the Permission's findByName() method, which is called by
+    // the hasPermissionTo() method (and the similar ones) of HasRoles Trait
     public function getPermissions(): Collection
     {
         return $this->cache->remember($this->cacheKey, config('permission.cache_expiration_time'), function () {
