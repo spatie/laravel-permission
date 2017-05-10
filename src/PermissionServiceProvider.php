@@ -53,14 +53,14 @@ class PermissionServiceProvider extends ServiceProvider
                 $arguments = explode(',', $arguments);
 
                 $role = $arguments[0];
-                $guard = $arguments[1] ?? null;
-                $restrictableTable = $arguments[2] ?? null;
+                $guard = $arguments[1] ?? '';
+                $restrictableClass = $arguments[2] ?? null;
                 $restrictableId = $arguments[3] ?? null;
 
                 $restrictable = "null";
                 // Write the code to retrieve the restrictable instance
-                if($restrictableId !== null && $restrictableTable !== null) {
-                    $restrictable = studly_case(str_singular($restrictableTable)) . "::find({$restrictableId})";
+                if($restrictableId !== null && $restrictableClass !== null) {
+                    $restrictable = "{$restrictableClass}::find({$restrictableId})";
                 }
 
                 return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasRole({$role},{$restrictable})): ?>";
@@ -73,14 +73,14 @@ class PermissionServiceProvider extends ServiceProvider
                 $arguments = explode(',', $arguments);
 
                 $role = $arguments[0];
-                $guard = $arguments[1] ?? null;
-                $restrictableTable = $arguments[2] ?? null;
+                $guard = $arguments[1] ?? '';
+                $restrictableClass = $arguments[2] ?? null;
                 $restrictableId = $arguments[3] ?? null;
 
                 $restrictable = "null";
                 // Write the code to retrieve the restrictable instance
-                if($restrictableId !== null && $restrictableTable !== null) {
-                    $restrictable = studly_case(str_singular($restrictableTable)) . "::find({$restrictableId})";
+                if($restrictableId !== null && $restrictableClass !== null) {
+                    $restrictable = "{$restrictableClass}::find({$restrictableId})";
                 }
 
                 return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasRole({$role},{$restrictable})): ?>";
@@ -93,14 +93,14 @@ class PermissionServiceProvider extends ServiceProvider
                 $arguments = explode(',', $arguments);
 
                 $roles = $arguments[0];
-                $guard = $arguments[1] ?? null;
-                $restrictableTable = $arguments[2] ?? null;
+                $guard = $arguments[1] ?? '';
+                $restrictableClass = $arguments[2] ?? null;
                 $restrictableId = $arguments[3] ?? null;
 
                 $restrictable = "null";
                 // Write the code to retrieve the restrictable instance
-                if($restrictableId !== null && $restrictableTable !== null) {
-                    $restrictable = studly_case(str_singular($restrictableTable)) . "::find({$restrictableId})";
+                if($restrictableId !== null && $restrictableClass !== null) {
+                    $restrictable = "{$restrictableClass}::find({$restrictableId})";
                 }
 
                 return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasAnyRole({$roles},{$restrictable})): ?>";
@@ -113,14 +113,14 @@ class PermissionServiceProvider extends ServiceProvider
                 $arguments = explode(',', $arguments);
 
                 $roles = $arguments[0];
-                $guard = $arguments[1] ?? null;
-                $restrictableTable = $arguments[2] ?? null;
+                $guard = $arguments[1] ?? '';
+                $restrictableClass = $arguments[2] ?? null;
                 $restrictableId = $arguments[3] ?? null;
 
                 $restrictable = "null";
                 // Write the code to retrieve the restrictable instance
-                if($restrictableId !== null && $restrictableTable !== null) {
-                    $restrictable = studly_case(str_singular($restrictableTable)) . "::find({$restrictableId})";
+                if($restrictableId !== null && $restrictableClass !== null) {
+                    $restrictable = "{$restrictableClass}::find({$restrictableId})";
                 }
 
                 return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasAllRoles({$roles},{$restrictable})): ?>";
