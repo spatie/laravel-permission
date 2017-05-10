@@ -15,9 +15,9 @@ use Spatie\Permission\Traits\RefreshesPermissionCache;
 class Role extends Model implements RoleContract
 {
     use RefreshesPermissionCache, HasPermissions {
-        givePermissionTo as public scopedGivePermissionTo;
-        revokePermissionTo as public scopedRevokePermissionTo;
-        syncPermissions as public scopedSyncPermissions;
+        givePermissionTo as private scopedGivePermissionTo;
+        revokePermissionTo as private scopedRevokePermissionTo;
+        syncPermissions as private scopedSyncPermissions;
     }
 
     public $guarded = ['id'];
@@ -83,7 +83,7 @@ class Role extends Model implements RoleContract
 
         $role = static::where('name', $name)->where('guard_name', $guardName)->first();
 
-        if (! $role) {
+        if (!$role) {
             throw RoleDoesNotExist::create($name);
         }
 

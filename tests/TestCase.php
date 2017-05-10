@@ -30,10 +30,10 @@ abstract class TestCase extends Orchestra
     /** @var \Spatie\Permission\Models\Permission */
     protected $testAdminPermission;
 
-    /** @var \Spatie\Permission\Models\Permission */
+    /** @var \Spatie\Permission\Test\Department */
     protected $testRestrictable1;
 
-    /** @var \Spatie\Permission\Models\Permission */
+    /** @var \Spatie\Permission\Test\Department */
     protected $testRestrictable2;
 
     public function setUp()

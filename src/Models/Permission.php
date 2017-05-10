@@ -2,15 +2,15 @@
 
 namespace Spatie\Permission\Models;
 
-use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Collection;
+use Spatie\Permission\Contracts\Permission as PermissionContract;
+use Spatie\Permission\Exceptions\PermissionAlreadyExists;
+use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Spatie\Permission\Exceptions\PermissionDoesNotExist;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Spatie\Permission\Exceptions\PermissionAlreadyExists;
-use Spatie\Permission\Contracts\Permission as PermissionContract;
 
 class Permission extends Model implements PermissionContract
 {

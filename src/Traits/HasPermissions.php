@@ -2,7 +2,8 @@
 
 namespace Spatie\Permission\Traits;
 
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Restrictable;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
@@ -11,18 +12,10 @@ use Spatie\Permission\PermissionRegistrar;
 trait HasPermissions
 {
     /**
-     * Scope a query to retrieve only the permission selection related to the given restrictable instance.
-     * If the restrictable instance is null, not scoped permissions will be retrieved.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param \Spatie\Permission\Contracts\Restrictable $restrictable
-     * @return \Illuminate\Database\Eloquent\Builder
+     * A model may have multiple direct permissions.
+     * @return BelongsToMany|Relation
      */
-    public function scopeRestrictTo(Builder $query, Restrictable $restrictable)
-    {
-        return $query->wherePivot('restrictable_id', is_null($restrictable) ? null : $restrictable->getRestrictableId())
-            ->wherePivot('restrictable_type', is_null($restrictable) ? null : $restrictable->getRestrictableTable());
-    }
+    abstract public function permissions(): BelongsToMany;
 
     /**
      * Grant the given permission(s) to a role.
@@ -48,17 +41,19 @@ trait HasPermissions
             ->each(function ($permission) {
                 $this->ensureGuardIsEqual($permission);
             })
+            // Attach takes ids, we retrieve them
+            ->map(function ($permission) {
+                return $permission->id;
+            })
             ->all();
 
         // If there is no restrictable instance, we won't add anything on the pivot table,
         //  which will default to null values on the restrictable morph.
         // Otherwise we set the references to it
-        $restrictable = is_null($restrictable) ? [] : [
+        $this->permissions()->attach($permissions, is_null($restrictable) ? [] : [
             'restrictable_id' => $restrictable->getRestrictableId(),
             'restrictable_type' => $restrictable->getRestrictableTable(),
-        ];
-
-        $this->permissions()->saveMany($permissions, $restrictable);
+        ]);
 
         $this->forgetCachedPermissions();
 
@@ -75,7 +70,7 @@ trait HasPermissions
      */
     public function syncPermissions($permissions, Restrictable $restrictable = null)
     {
-        $this->permissions()->restrictTo($restrictable)->detach();
+        $this->permissions($permissions)->detach();
 
         return $this->givePermissionTo($permissions, $restrictable);
     }
@@ -90,7 +85,7 @@ trait HasPermissions
      */
     public function revokePermissionTo($permission, Restrictable $restrictable = null)
     {
-        $this->permissions()->restrictTo($restrictable)->detach($this->getStoredPermission($permission));
+        $this->permissions($restrictable)->detach($this->getStoredPermission($permission)->id);
 
         $this->forgetCachedPermissions();
 

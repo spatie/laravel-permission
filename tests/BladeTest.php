@@ -2,7 +2,7 @@
 
 namespace Spatie\Permission\Test;
 
-use Artisan;
+use Illuminate\Support\Facades\Artisan;
 use Spatie\Permission\Contracts\Role;
 
 class BladeTest extends TestCase
@@ -21,21 +21,21 @@ class BladeTest extends TestCase
     }
 
     /** @test */
-    public function all_blade_directives_will_evaluate_falsly_when_there_is_nobody_logged_in()
+    public function all_blade_directives_will_evaluate_falsely_when_there_is_nobody_logged_in()
     {
         $permission = 'edit-articles';
         $role = 'writer';
-        $roles = [$role];
+        $roles = ['member','intern'];
 
         $this->assertEquals('does not have permission', $this->renderView('can', ['permission' => $permission]));
-        $this->assertEquals('does not have role', $this->renderView('role', [$role]));
-        $this->assertEquals('does not have role', $this->renderView('hasRole', [$role]));
+        $this->assertEquals('does not have role', $this->renderView('role', $role));
+        $this->assertEquals('does not have role', $this->renderView('hasRole', $role));
         $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', $roles));
         $this->assertEquals('does not have any of the given roles', $this->renderView('hasAnyRole', $roles));
     }
 
     /** @test */
-    public function all_blade_directives_will_evaluate_falsy_when_somebody_without_roles_or_permissions_is_logged_in()
+    public function all_blade_directives_will_evaluate_falsely_when_somebody_without_roles_or_permissions_is_logged_in()
     {
         $permission = 'edit-articles';
         $role = 'writer';
@@ -51,7 +51,7 @@ class BladeTest extends TestCase
     }
 
     /** @test */
-    public function all_blade_directives_will_evaluate_falsy_when_somebody_with_another_guard_is_logged_in()
+    public function all_blade_directives_will_evaluate_falsely_when_somebody_with_another_guard_is_logged_in()
     {
         $permission = 'edit-articles';
         $role = 'writer';

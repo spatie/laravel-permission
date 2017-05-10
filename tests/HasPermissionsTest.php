@@ -44,17 +44,17 @@ class HasPermissionsTest extends TestCase
     /** @test */
     public function it_can_assign_multiple_permissions_using_an_array()
     {
-        $this->testUser->assignRole(['edit-articles', 'edit-news']);
+        $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
 
         $this->refreshTestUser();
 
-        $this->assertTrue($this->testUser->hasRole('edit-articles'));
+        $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
 
-        $this->assertTrue($this->testUser->hasRole('edit-news'));
+        $this->assertTrue($this->testUser->hasPermissionTo('edit-news'));
     }
 
     /** @test */
-    public function it_can_assign_a_scoped_permission_to_a_user()
+    public function it_can_assign_a_scoped_permission_using_an_object()
     {
         $this->testUser->givePermissionTo($this->testUserPermission, $this->testRestrictable1);
 

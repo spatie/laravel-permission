@@ -50,9 +50,14 @@ class PermissionServiceProvider extends ServiceProvider
     {
         $this->app->afterResolving('blade.compiler', function (BladeCompiler $bladeCompiler) {
             $bladeCompiler->directive('role', function ($arguments) {
-                list($role, $guard, $restrictableId, $restrictableTable) = explode(',', $arguments . ',');
+                $arguments = explode(',', $arguments);
 
-                $restrictable = null;
+                $role = $arguments[0];
+                $guard = $arguments[1] ?? null;
+                $restrictableTable = $arguments[2] ?? null;
+                $restrictableId = $arguments[3] ?? null;
+
+                $restrictable = "null";
                 // Write the code to retrieve the restrictable instance
                 if($restrictableId !== null && $restrictableTable !== null) {
                     $restrictable = studly_case(str_singular($restrictableTable)) . "::find({$restrictableId})";
@@ -65,9 +70,14 @@ class PermissionServiceProvider extends ServiceProvider
             });
 
             $bladeCompiler->directive('hasrole', function ($arguments) {
-                list($role, $guard, $restrictableId, $restrictableTable) = explode(',', $arguments . ',');
+                $arguments = explode(',', $arguments);
 
-                $restrictable = null;
+                $role = $arguments[0];
+                $guard = $arguments[1] ?? null;
+                $restrictableTable = $arguments[2] ?? null;
+                $restrictableId = $arguments[3] ?? null;
+
+                $restrictable = "null";
                 // Write the code to retrieve the restrictable instance
                 if($restrictableId !== null && $restrictableTable !== null) {
                     $restrictable = studly_case(str_singular($restrictableTable)) . "::find({$restrictableId})";
@@ -80,9 +90,14 @@ class PermissionServiceProvider extends ServiceProvider
             });
 
             $bladeCompiler->directive('hasanyrole', function ($arguments) {
-                list($roles, $guard, $restrictableId, $restrictableTable) = explode(',', $arguments . ',');
+                $arguments = explode(',', $arguments);
 
-                $restrictable = null;
+                $roles = $arguments[0];
+                $guard = $arguments[1] ?? null;
+                $restrictableTable = $arguments[2] ?? null;
+                $restrictableId = $arguments[3] ?? null;
+
+                $restrictable = "null";
                 // Write the code to retrieve the restrictable instance
                 if($restrictableId !== null && $restrictableTable !== null) {
                     $restrictable = studly_case(str_singular($restrictableTable)) . "::find({$restrictableId})";
@@ -95,9 +110,14 @@ class PermissionServiceProvider extends ServiceProvider
             });
 
             $bladeCompiler->directive('hasallroles', function ($arguments) {
-                list($roles, $guard, $restrictableId, $restrictableTable) = explode(',', $arguments . ',');
+                $arguments = explode(',', $arguments);
 
-                $restrictable = null;
+                $roles = $arguments[0];
+                $guard = $arguments[1] ?? null;
+                $restrictableTable = $arguments[2] ?? null;
+                $restrictableId = $arguments[3] ?? null;
+
+                $restrictable = "null";
                 // Write the code to retrieve the restrictable instance
                 if($restrictableId !== null && $restrictableTable !== null) {
                     $restrictable = studly_case(str_singular($restrictableTable)) . "::find({$restrictableId})";

@@ -274,7 +274,7 @@ class HasRolesTest extends TestCase
 
         $this->assertTrue($this->testUser->hasAnyRole(['testRole', 'testAdminRole']));
 
-        $this->assertFalse($this->testUser->hasAnyRole('testAdminRole', $this->testAdminRole));
+        $this->assertFalse($this->testUser->hasAnyRole(['testAdminRole', $this->testAdminRole]));
     }
 
     /** @test */
@@ -310,13 +310,13 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_can_determine_that_the_user_has_any_of_the_permissions_directly()
     {
-        $this->assertFalse($this->testUser->hasAnyPermission('edit-articles'));
+        $this->assertFalse($this->testUser->hasAnyPermission(['edit-articles']));
 
         $this->testUser->givePermissionTo('edit-articles');
 
         $this->refreshTestUser();
 
-        $this->assertTrue($this->testUser->hasAnyPermission('edit-news', 'edit-articles'));
+        $this->assertTrue($this->testUser->hasAnyPermission(['edit-news', 'edit-articles']));
 
         $this->testUser->givePermissionTo('edit-news');
 
@@ -324,7 +324,7 @@ class HasRolesTest extends TestCase
 
         $this->testUser->revokePermissionTo($this->testUserPermission);
 
-        $this->assertTrue($this->testUser->hasAnyPermission('edit-articles', 'edit-news'));
+        $this->assertTrue($this->testUser->hasAnyPermission(['edit-articles', 'edit-news']));
     }
 
     /** @test */
@@ -334,7 +334,7 @@ class HasRolesTest extends TestCase
 
         $this->testUser->assignRole('testRole');
 
-        $this->assertTrue($this->testUser->hasAnyPermission('edit-news', 'edit-articles'));
+        $this->assertTrue($this->testUser->hasAnyPermission(['edit-news', 'edit-articles']));
     }
 
     /** @test */

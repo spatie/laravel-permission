@@ -28,7 +28,9 @@ trait HasRoles
             config('permission.table_names.model_has_roles'),
             'model_id',
             'role_id'
-        )->restrictTo($restrictable);
+        )->withPivot('restrictable_id', 'restrictable_type')
+            ->wherePivot('restrictable_id', is_null($restrictable) ? null : $restrictable->getRestrictableId())
+            ->wherePivot('restrictable_type', is_null($restrictable) ? null : $restrictable->getRestrictableTable());
     }
 
     /**
@@ -46,7 +48,9 @@ trait HasRoles
             config('permission.table_names.model_has_permissions'),
             'model_id',
             'permission_id'
-        )->restrictTo($restrictable);
+        )->withPivot('restrictable_id', 'restrictable_type')
+            ->wherePivot('restrictable_id', is_null($restrictable) ? null : $restrictable->getRestrictableId())
+            ->wherePivot('restrictable_type', is_null($restrictable) ? null : $restrictable->getRestrictableTable());
     }
 
     /**
@@ -110,17 +114,19 @@ trait HasRoles
             ->each(function ($role) {
                 $this->ensureGuardIsEqual($role);
             })
+            // Attach takes ids, we retrieve them
+            ->map(function ($role) {
+                return $role->id;
+            })
             ->all();
 
         // If there is no restrictable instance, we won't add anything on the pivot table,
         //  which will default to null values on the restrictable morph.
         // Otherwise we set the references to it
-        $restrictable = is_null($restrictable) ? [] : [
+        $this->roles()->attach($roles, is_null($restrictable) ? [] : [
             'restrictable_id' => $restrictable->getRestrictableId(),
             'restrictable_type' => $restrictable->getRestrictableTable(),
-        ];
-
-        $this->roles()->saveMany($roles, $restrictable);
+        ]);
 
         $this->forgetCachedPermissions();
 
@@ -136,7 +142,7 @@ trait HasRoles
      */
     public function removeRole($role, Restrictable $restrictable = null)
     {
-        $this->roles()->restrictTo($restrictable)->detach($this->getStoredRole($role));
+        $this->roles($restrictable)->detach($this->getStoredRole($role));
     }
 
     /**
@@ -149,7 +155,7 @@ trait HasRoles
      */
     public function syncRoles($roles, Restrictable $restrictable = null)
     {
-        $this->roles()->restrictTo($restrictable)->detach();
+        $this->roles($restrictable)->detach();
 
         return $this->assignRole($roles, $restrictable);
     }
@@ -189,7 +195,7 @@ trait HasRoles
      * Determine if the model has any of the given role(s).
      * If a Restrictable instance is given, the check will be performed only for that instance scope.
      *
-     * @param string|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
+     * @param array|string|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
      * @param \Spatie\Permission\Contracts\Restrictable $restrictable
      * @return bool
      */
@@ -202,7 +208,7 @@ trait HasRoles
      * Determine if the model has all of the given role(s).
      * If a Restrictable instance is given, the check will be performed only for that instance scope.
      *
-     * @param string|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
+     * @param array|string|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
      * @param \Spatie\Permission\Contracts\Restrictable $restrictable
      * @return bool
      */
