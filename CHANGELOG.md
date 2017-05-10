@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.1.4 - 2017-05-10
+
+- add `model_type` to the primary key of tables that use a polymorphic relationship
+
 ## 2.1.3 - 2017-04-21
 
 - fixed a bug where the role()/permission() relation to user models would be saved incorrectly
