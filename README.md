@@ -60,7 +60,7 @@ Being a modded version, it's not present on packagist for now; for this reason y
     ],
     "require": {
         ...
-        "IlCallo/laravel-permission": "^2.2.0"
+        "spatie/laravel-permission": "^2.2.0"
         ...
     }
 ```
