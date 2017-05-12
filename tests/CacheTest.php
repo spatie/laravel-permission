@@ -3,9 +3,9 @@
 namespace Spatie\Permission\Test;
 
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\PermissionRegistrar;
-use Spatie\Permission\Contracts\Permission;
 
 class CacheTest extends TestCase
 {
@@ -97,15 +97,15 @@ class CacheTest extends TestCase
     {
         $this->testUserRole->givePermissionTo(['edit-articles', 'edit-news']);
         $this->testUser->assignRole('testRole');
-        $this->assertCount(4, DB::getQueryLog());
+        $this->assertCount(3, DB::getQueryLog());
 
         $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
-        $this->assertCount(8, DB::getQueryLog());
+        $this->assertCount(7, DB::getQueryLog());
 
         $this->assertTrue($this->testUser->hasPermissionTo('edit-news'));
-        $this->assertCount(8, DB::getQueryLog());
+        $this->assertCount(7, DB::getQueryLog());
 
         $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
-        $this->assertCount(8, DB::getQueryLog());
+        $this->assertCount(7, DB::getQueryLog());
     }
 }

@@ -3,10 +3,10 @@
 namespace Spatie\Permission;
 
 use Exception;
-use Illuminate\Support\Collection;
-use Illuminate\Contracts\Logging\Log;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Contracts\Logging\Log;
+use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Permission;
 
 class PermissionRegistrar
@@ -17,7 +17,7 @@ class PermissionRegistrar
     /** @var \Illuminate\Contracts\Cache\Repository */
     protected $cache;
 
-    /** @var Illuminate\Contracts\Logging\Log */
+    /** @var \Illuminate\Contracts\Logging\Log */
     protected $logger;
 
     /** @var string */
@@ -34,8 +34,8 @@ class PermissionRegistrar
     {
         try {
             $this->getPermissions()->map(function ($permission) {
-                $this->gate->define($permission->name, function ($user) use ($permission) {
-                    return $user->hasPermissionTo($permission);
+                $this->gate->define($permission->name, function ($user, $restrictable = null) use ($permission) {
+                    return $user->hasPermissionTo($permission, $restrictable);
                 });
             });
 
@@ -43,7 +43,7 @@ class PermissionRegistrar
         } catch (Exception $exception) {
             if ($this->shouldLogException()) {
                 $this->logger->alert(
-                    "Could not register permissions because {$exception->getMessage()}".PHP_EOL.
+                    "Could not register permissions because {$exception->getMessage()}" . PHP_EOL .
                     $exception->getTraceAsString()
                 );
             }
@@ -57,6 +57,8 @@ class PermissionRegistrar
         $this->cache->forget($this->cacheKey);
     }
 
+    // The getPermissions() cache implementation is used via the Permission's findByName() method, which is called by
+    // the hasPermissionTo() method (and the similar ones) of HasRoles Trait
     public function getPermissions(): Collection
     {
         return $this->cache->remember($this->cacheKey, config('permission.cache_expiration_time'), function () {

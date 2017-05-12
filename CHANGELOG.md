@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.2.0 - 2017-05-08
+
+- added the ability to scope permissions and role against a model implementing the `Restrictable` interface
+- it's no more possible to give multiple permissions and roles as multiple parameters
+
 ## 2.1.3 - 2017-04-21
 
 - fixed a bug where the role()/permission() relation to user models would be saved incorrectly

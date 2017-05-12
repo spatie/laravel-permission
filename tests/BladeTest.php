@@ -2,7 +2,7 @@
 
 namespace Spatie\Permission\Test;
 
-use Artisan;
+use Illuminate\Support\Facades\Artisan;
 use Spatie\Permission\Contracts\Role;
 
 class BladeTest extends TestCase
@@ -18,24 +18,26 @@ class BladeTest extends TestCase
         $roleModel->create(['name' => 'intern']);
         $roleModel->create(['name' => 'super-admin', 'guard_name' => 'admin']);
         $roleModel->create(['name' => 'moderator', 'guard_name' => 'admin']);
+        $roleModel->create(['name' => 'dep-manager']);
+        $roleModel->create(['name' => 'quality-supervisor']);
     }
 
     /** @test */
-    public function all_blade_directives_will_evaluate_falsly_when_there_is_nobody_logged_in()
+    public function all_blade_directives_will_evaluate_false_when_there_is_nobody_logged_in()
     {
         $permission = 'edit-articles';
         $role = 'writer';
-        $roles = [$role];
+        $roles = ['member','intern'];
 
         $this->assertEquals('does not have permission', $this->renderView('can', ['permission' => $permission]));
-        $this->assertEquals('does not have role', $this->renderView('role', [$role]));
-        $this->assertEquals('does not have role', $this->renderView('hasRole', [$role]));
+        $this->assertEquals('does not have role', $this->renderView('role', $role));
+        $this->assertEquals('does not have role', $this->renderView('hasRole', $role));
         $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', $roles));
         $this->assertEquals('does not have any of the given roles', $this->renderView('hasAnyRole', $roles));
     }
 
     /** @test */
-    public function all_blade_directives_will_evaluate_falsy_when_somebody_without_roles_or_permissions_is_logged_in()
+    public function all_blade_directives_will_evaluate_false_when_somebody_without_roles_or_permissions_is_logged_in()
     {
         $permission = 'edit-articles';
         $role = 'writer';
@@ -51,7 +53,7 @@ class BladeTest extends TestCase
     }
 
     /** @test */
-    public function all_blade_directives_will_evaluate_falsy_when_somebody_with_another_guard_is_logged_in()
+    public function all_blade_directives_will_evaluate_false_when_somebody_with_another_guard_is_logged_in()
     {
         $permission = 'edit-articles';
         $role = 'writer';
@@ -95,6 +97,15 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    public function the_role_directive_will_evaluate_true_when_the_logged_in_user_has_the_scoped_role()
+    {
+        auth()->setUser($this->getDepManager());
+
+        $this->assertEquals('has scoped role', $this->renderView('scopedRole',
+            ['role' => 'dep-manager', 'class' => '\Spatie\Permission\Test\Department', 'id' => 1]));
+    }
+
+    /** @test */
     public function the_hasrole_directive_will_evaluate_true_when_the_logged_in_user_has_the_role()
     {
         auth()->setUser($this->getWriter());
@@ -108,6 +119,15 @@ class BladeTest extends TestCase
         auth('admin')->setUser($this->getSuperAdmin());
 
         $this->assertEquals('has role', $this->renderView('guardHasRole', ['role' => 'super-admin', 'guard' => 'admin']));
+    }
+
+    /** @test */
+    public function the_hasrole_directive_will_evaluate_true_when_the_logged_in_user_has_the_scoped_role()
+    {
+        auth()->setUser($this->getDepManager());
+
+        $this->assertEquals('has scoped role', $this->renderView('scopedHasRole',
+            ['role' => 'dep-manager', 'guard' => null, 'class' => '\Spatie\Permission\Test\Department', 'id' => 1]));
     }
 
     /** @test */
@@ -139,6 +159,20 @@ class BladeTest extends TestCase
         auth('admin')->setUser($this->getSuperAdmin());
 
         $this->assertEquals('does have some of the roles', $this->renderView('guardHasAnyRole', compact('roles', 'guard')));
+    }
+
+    /** @test */
+    public function the_hasanyrole_directive_will_evaluate_true_when_the_logged_in_user_does_have_some_of_the_required_roles_for_the_given_scope()
+    {
+        $roles = ['dep-manager', 'quality-supervisor'];
+        $guard = null;
+        $class = '\Spatie\Permission\Test\Department';
+        $id = 1;
+
+        auth()->setUser($this->getDepManager());
+
+        $this->assertEquals('does have some of the scoped roles', $this->renderView('scopedHasAnyRole',
+            compact('roles', 'guard', 'class', 'id')));
     }
 
     /** @test */
@@ -184,6 +218,26 @@ class BladeTest extends TestCase
         $this->assertEquals('does have all of the given roles', $this->renderView('guardHasAllRoles', compact('roles', 'guard')));
     }
 
+    /** @test */
+    public function the_hasallroles_directive_will_evaluate_true_when_the_logged_in_user_does_have_all_required_roles_for_the_given_scope()
+    {
+        $roles = ['dep-manager', 'quality-supervisor'];
+        $guard = null;
+        $class = '\Spatie\Permission\Test\Department';
+        $id = 1;
+
+        $user = $this->getDepManager();
+
+        $user->assignRole('quality-supervisor', $this->testRestrictable1);
+
+        $this->refreshTestUser();
+
+        auth()->setUser($user);
+
+        $this->assertEquals('does have all of the given scoped roles', $this->renderView('scopedHasAllRoles',
+            compact('roles', 'guard', 'class', 'id')));
+    }
+
     protected function getWriter()
     {
         $this->testUser->assignRole('writer');
@@ -209,6 +263,15 @@ class BladeTest extends TestCase
         $this->refreshTestAdmin();
 
         return $this->testAdmin;
+    }
+
+    protected function getDepManager()
+    {
+        $this->testUser->assignRole('dep-manager', $this->testRestrictable1);
+
+        $this->refreshTestUser();
+
+        return $this->testUser;
     }
 
     protected function renderView($view, $parameters)

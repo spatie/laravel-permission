@@ -3,9 +3,9 @@
 namespace Spatie\Permission\Test;
 
 use Spatie\Permission\Contracts\Role;
-use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
+use Spatie\Permission\Exceptions\RoleDoesNotExist;
 
 class HasRolesTest extends TestCase
 {
@@ -38,11 +38,21 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_assign_multiple_roles_at_once()
+    public function it_can_assign_a_role_using_a_string()
     {
-        $this->testUser->assignRole('testRole', 'testRole2');
+        $this->testUser->assignRole('testRole');
 
         $this->assertTrue($this->testUser->hasRole('testRole'));
+    }
+
+    /** @test */
+    public function it_can_assign_multiple_roles_using_a_collection()
+    {
+        $collection = collect()->push($this->testUserRole)->push('testRole2');
+
+        $this->testUser->assignRole($collection);
+
+        $this->assertTrue($this->testUser->hasRole($this->testUserRole));
 
         $this->assertTrue($this->testUser->hasRole('testRole2'));
     }
@@ -94,16 +104,6 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_sync_multiple_roles()
-    {
-        $this->testUser->syncRoles('testRole', 'testRole2');
-
-        $this->assertTrue($this->testUser->hasRole('testRole'));
-
-        $this->assertTrue($this->testUser->hasRole('testRole2'));
-    }
-
-    /** @test */
     public function it_can_sync_multiple_roles_from_an_array()
     {
         $this->testUser->syncRoles(['testRole', 'testRole2']);
@@ -132,7 +132,7 @@ class HasRolesTest extends TestCase
     {
         $this->expectException(RoleDoesNotExist::class);
 
-        $this->testUser->syncRoles('testRole', 'testAdminRole');
+        $this->testUser->syncRoles(['testRole', 'testAdminRole']);
 
         $this->expectException(GuardDoesNotMatch::class);
 
@@ -274,7 +274,7 @@ class HasRolesTest extends TestCase
 
         $this->assertTrue($this->testUser->hasAnyRole(['testRole', 'testAdminRole']));
 
-        $this->assertFalse($this->testUser->hasAnyRole('testAdminRole', $this->testAdminRole));
+        $this->assertFalse($this->testUser->hasAnyRole(['testAdminRole', $this->testAdminRole]));
     }
 
     /** @test */
@@ -310,13 +310,13 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_can_determine_that_the_user_has_any_of_the_permissions_directly()
     {
-        $this->assertFalse($this->testUser->hasAnyPermission('edit-articles'));
+        $this->assertFalse($this->testUser->hasAnyPermission(['edit-articles']));
 
         $this->testUser->givePermissionTo('edit-articles');
 
         $this->refreshTestUser();
 
-        $this->assertTrue($this->testUser->hasAnyPermission('edit-news', 'edit-articles'));
+        $this->assertTrue($this->testUser->hasAnyPermission(['edit-news', 'edit-articles']));
 
         $this->testUser->givePermissionTo('edit-news');
 
@@ -324,7 +324,7 @@ class HasRolesTest extends TestCase
 
         $this->testUser->revokePermissionTo($this->testUserPermission);
 
-        $this->assertTrue($this->testUser->hasAnyPermission('edit-articles', 'edit-news'));
+        $this->assertTrue($this->testUser->hasAnyPermission(['edit-articles', 'edit-news']));
     }
 
     /** @test */
@@ -334,7 +334,7 @@ class HasRolesTest extends TestCase
 
         $this->testUser->assignRole('testRole');
 
-        $this->assertTrue($this->testUser->hasAnyPermission('edit-news', 'edit-articles'));
+        $this->assertTrue($this->testUser->hasAnyPermission(['edit-news', 'edit-articles']));
     }
 
     /** @test */
@@ -360,7 +360,7 @@ class HasRolesTest extends TestCase
         $roleModel->findByName('testRole2')->givePermissionTo('edit-news');
 
         $this->testUserRole->givePermissionTo('edit-articles');
-        $this->testUser->assignRole('testRole', 'testRole2');
+        $this->testUser->assignRole(['testRole', 'testRole2']);
 
         $this->assertEquals(
             collect(['edit-articles', 'edit-news']),

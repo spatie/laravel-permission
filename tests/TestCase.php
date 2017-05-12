@@ -2,12 +2,12 @@
 
 namespace Spatie\Permission\Test;
 
-use Monolog\Handler\TestHandler;
-use Spatie\Permission\Contracts\Role;
 use Illuminate\Database\Schema\Blueprint;
-use Spatie\Permission\PermissionRegistrar;
-use Spatie\Permission\Contracts\Permission;
+use Monolog\Handler\TestHandler;
 use Orchestra\Testbench\TestCase as Orchestra;
+use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Contracts\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\PermissionServiceProvider;
 
 abstract class TestCase extends Orchestra
@@ -30,6 +30,12 @@ abstract class TestCase extends Orchestra
     /** @var \Spatie\Permission\Models\Permission */
     protected $testAdminPermission;
 
+    /** @var \Spatie\Permission\Test\Department */
+    protected $testRestrictable1;
+
+    /** @var \Spatie\Permission\Test\Department */
+    protected $testRestrictable2;
+
     public function setUp()
     {
         parent::setUp();
@@ -45,6 +51,9 @@ abstract class TestCase extends Orchestra
         $this->testAdmin = Admin::first();
         $this->testAdminRole = app(Role::class)->find(3);
         $this->testAdminPermission = app(Permission::class)->find(3);
+
+        $this->testRestrictable1 = Department::find(1);
+        $this->testRestrictable2 = Department::find(2);
 
         $this->clearLogTestHandler();
     }
@@ -104,6 +113,11 @@ abstract class TestCase extends Orchestra
             $table->string('email');
         });
 
+        $app['db']->connection()->getSchemaBuilder()->create('departments', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+        });
+
         include_once __DIR__.'/../database/migrations/create_permission_tables.php.stub';
 
         (new \CreatePermissionTables())->up();
@@ -116,6 +130,8 @@ abstract class TestCase extends Orchestra
         $app[Permission::class]->create(['name' => 'edit-articles']);
         $app[Permission::class]->create(['name' => 'edit-news']);
         $app[Permission::class]->create(['name' => 'admin-permission', 'guard_name' => 'admin']);
+        Department::create(['name' => 'News from the world']);
+        Department::create(['name' => 'Europe news']);
     }
 
     /**
