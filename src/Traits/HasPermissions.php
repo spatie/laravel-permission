@@ -3,9 +3,9 @@
 namespace Spatie\Permission\Traits;
 
 use Illuminate\Support\Collection;
+use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
-use Spatie\Permission\PermissionRegistrar;
 
 trait HasPermissions
 {
