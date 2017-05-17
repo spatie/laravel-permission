@@ -70,7 +70,7 @@ trait HasPermissions
      */
     public function syncPermissions($permissions, Restrictable $restrictable = null)
     {
-        $this->permissions($permissions)->detach();
+        $this->permissions($restrictable)->detach();
 
         return $this->givePermissionTo($permissions, $restrictable);
     }
