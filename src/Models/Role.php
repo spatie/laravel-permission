@@ -99,11 +99,11 @@ class Role extends Model implements RoleContract
     public function hasPermissionTo($permission): bool
     {
         if (is_string($permission)) {
-            $permission = app(Permission::class)->findByName($permission, $this->getGuardName());
+            $permission = app(Permission::class)->findByName($permission, $this->getDefaultGuardName());
         }
 
-        if ($permission->guard_name !== $this->getGuardName()) {
-            throw GuardDoesNotMatch::create($permission->guard_name, $this->getGuardName());
+        if (! $this->getGuardNames()->contains($permission->guard_name)) {
+            throw GuardDoesNotMatch::create($permission->guard_name, $this->getGuardNames());
         }
 
         return $this->permissions->contains('id', $permission->id);

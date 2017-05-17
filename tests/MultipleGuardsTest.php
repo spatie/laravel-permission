@@ -7,7 +7,7 @@ use Spatie\Permission\Models\Permission;
 class MultipleGuardsTest extends TestCase
 {
     /** @test */
-    public function it_can_give_a_permission_to_a_model_that_uses_multiple_guards()
+    public function it_can_give_a_permission_to_a_model_that_is_used_by_multiple_guards()
     {
         $this->testUser->givePermissionTo(Permission::create([
             'name' => 'cannnn_dooooo',
