@@ -19,6 +19,8 @@ class MultipleGuardsTest extends TestCase
             'guard_name' => 'api',
         ]));
 
+        $this->assertTrue($this->testUser->hasPermissionTo('cannnn_dooooo', 'web'));
+        $this->assertTrue($this->testUser->hasPermissionTo('cannnn_dooooo', 'api'));
     }
 
     protected function getEnvironmentSetUp($app)
