@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.1.5 - 2017-05-17
+- fixed a bug that didn't allow you to assign a role or permission when using multiple guards
+
 ## 2.1.4 - 2017-05-10
 
 - add `model_type` to the primary key of tables that use a polymorphic relationship
