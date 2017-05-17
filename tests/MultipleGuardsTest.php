@@ -18,7 +18,6 @@ class MultipleGuardsTest extends TestCase
             'name' => 'cannnn_dooooo',
             'guard_name' => 'api',
         ]));
-
     }
 
     protected function getEnvironmentSetUp($app)
