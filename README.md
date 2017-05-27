@@ -412,7 +412,7 @@ $permission = Permission::create(['guard_name' => 'web', 'name' => 'create posts
 
 ### Assigning permissions and roles to guard users
 
-You can use the same methods to assign permissions and roles to users as described above in [using permissions and roles](#sing permissions-and-roles). Just make sure the `guard_name`s on the permission or role match the guard of the user, otherwise a `GuardDoesNotMatch` exception will be thrown.
+You can use the same methods to assign permissions and roles to users as described above in [using permissions and roles](#using-permissions-and-roles). Just make sure the `guard_name`s on the permission or role match the guard of the user, otherwise a `GuardDoesNotMatch` exception will be thrown.
 
 ### Using blade directives with multiple guards
 
