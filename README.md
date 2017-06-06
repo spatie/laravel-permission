@@ -413,9 +413,10 @@ $permission = Permission::create(['guard_name' => 'web', 'name' => 'create posts
 This is how you can check if a user has permission for a specific guard:
 
 ```php
+$permissionName = 'edit articles';
 $guardName = 'api';
 
-$user->hasPermissionTo('edit articles', $guardName);
+$user->hasPermissionTo($permissionName, $guardName);
 ```
 
 ### Assigning permissions and roles to guard users
