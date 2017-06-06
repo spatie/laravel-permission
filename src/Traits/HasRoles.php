@@ -250,6 +250,10 @@ trait HasRoles
      */
     public function hasDirectPermission($permission): bool
     {
+        if( ! $this->permissions) {
+            return false;
+        }
+        
         if (is_string($permission)) {
             $permission = app(Permission::class)->findByName($permission, $this->getDefaultGuardName());
 
