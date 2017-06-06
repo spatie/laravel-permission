@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.1.6 - 2017-06-06
+- fixed a bug where `hasPermissionTo` wouldn't use the right guard name
+
 ## 2.1.5 - 2017-05-17
 - fixed a bug that didn't allow you to assign a role or permission when using multiple guards
 
