@@ -15,12 +15,12 @@ class MultipleGuardsTest extends TestCase
         ]));
 
         $this->testUser->givePermissionTo(Permission::create([
-            'name' => 'do_this',
+            'name' => 'do_that',
             'guard_name' => 'api',
         ]));
 
         $this->assertTrue($this->testUser->hasPermissionTo('do_this', 'web'));
-        $this->assertTrue($this->testUser->hasPermissionTo('do_this', 'api'));
+        $this->assertTrue($this->testUser->hasPermissionTo('do_that', 'api'));
     }
 
     protected function getEnvironmentSetUp($app)

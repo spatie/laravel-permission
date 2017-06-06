@@ -195,13 +195,17 @@ trait HasRoles
      * Determine if the model may perform the given permission.
      *
      * @param string|\Spatie\Permission\Contracts\Permission $permission
+     * @param string|null $guardName
      *
      * @return bool
      */
-    public function hasPermissionTo($permission): bool
+    public function hasPermissionTo($permission, $guardName = null): bool
     {
         if (is_string($permission)) {
-            $permission = app(Permission::class)->findByName($permission, $this->getDefaultGuardName());
+            $permission = app(Permission::class)->findByName(
+                $permission,
+                $guardName ?? $this->getDefaultGuardName()
+            );
         }
 
         return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
