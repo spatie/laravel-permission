@@ -387,6 +387,14 @@ roles. Optionally you can pass in the `guard` that the check will be performed o
 @endhasallroles
 ```
 
+```php
+@permission('edit articles')
+I have permission to 'edit articles'
+@else
+I don't have permission to 'edit articles'...
+@endpermission
+```
+
 You can use Laravel's native `@can` directive to check if a user has a certain permission.
 
 ## Using multiple guards
