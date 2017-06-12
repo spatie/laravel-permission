@@ -17,7 +17,7 @@ class PermissionRegistrar
     /** @var \Illuminate\Contracts\Cache\Repository */
     protected $cache;
 
-    /** @var Illuminate\Contracts\Logging\Log */
+    /** @var \Illuminate\Contracts\Logging\Log */
     protected $logger;
 
     /** @var string */
