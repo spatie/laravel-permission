@@ -48,5 +48,12 @@
     },
     "config": {
         "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Spatie\\Permission\\PermissionServiceProvider"
+            ]
+        }
     }
 }
