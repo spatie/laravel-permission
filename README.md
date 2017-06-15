@@ -60,7 +60,7 @@ Now add the service provider in `config/app.php` file:
 You can publish the migration with:
 
 ```bash
-php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="migrations"
+php artisan vendor:publish --provider=Spatie\Permission\PermissionServiceProvider --tag=migrations
 ```
 
 After the migration has been published you can create the role- and permission-tables by
@@ -73,7 +73,7 @@ php artisan migrate
 You can publish the config file with:
 
 ```bash
-php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="config"
+php artisan vendor:publish --provider=Spatie\Permission\PermissionServiceProvider --tag=config
 ```
 
 This is the contents of the published `config/permission.php` config file:
