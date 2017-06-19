@@ -74,8 +74,14 @@ class PermissionRegistrar
      */
     protected function getPermissions()
     {
+
+        if (env('APP_DEBUG', false)) {
+            return app(Permission::class)->with('roles')->get();
+        };
+
         return $this->cache->rememberForever($this->cacheKey, function () {
             return app(Permission::class)->with('roles')->get();
         });
+
     }
 }
