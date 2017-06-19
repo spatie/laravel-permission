@@ -59,7 +59,7 @@ class PermissionRegistrar
 
     public function getPermissions(): Collection
     {
-        if (config('permission.cache')) {
+        if (!config('permission.cache')) {
             return app(Permission::class)->with('roles')->get();
         }
 
