@@ -13,7 +13,7 @@ class PermissionDefaultsCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'permission:defaults {--m|migrate : Whether to refresh the database} {--p|print : Whether to print the roles/permission map';
+    protected $signature = 'permission:defaults {--y : Use affirmative response when confirmation required} {--m|migrate : Whether to refresh the database} {--p|print : Whether to print the roles/permission map';
 
     /**
      * The console command description.
@@ -41,16 +41,17 @@ class PermissionDefaultsCommand extends Command
     {
         if($this->option('migrate')) 
         {
-            $this->call('migrate:refresh');
-            $this->warn('Database cleared.');
+            if($this->hasOption('y') || $this->confirm('Are you sure you want to refresh the database?')) {
+                $this->warn('Running migrate:refresh to reset the database..');
+                $this->call('migrate:refresh');
+                $this->warn('Database cleared');
+            }
         }
 
         $this->info('Creating permissions...');
 
         $roles = \Config::get('permission.roles_permissions');
-        
-        $this->info('Here is the current permissions map:');
-        
+                
         foreach($roles as $role => $permissions)
         {
             $r = Role::firstOrCreate(['name' => $role]);
@@ -75,6 +76,7 @@ class PermissionDefaultsCommand extends Command
         $this->info('Adding all permissions to "admin" role');
 
         if($this->option('print')) {
+            $this->info('This is the current permissions map:');
             $this->info(print_r($roles, true));
         }
     }
