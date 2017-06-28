@@ -14,10 +14,10 @@ class PermissionDefaultsCommand extends Command
      * @var string
      */
     protected $signature = 'permission:defaults
-    {--y|yes : Use affirmative response when confirmation required}
-    {--m|migrate : Whether to refresh the database}
-    {--p|print : Whether to print the roles/permission map}
-    {--a|admin : Whether to create the admin role}';
+    {--yes : Use affirmative response when confirmation required}
+    {--migrate : Whether to refresh the database}
+    {--print : Whether to print the roles/permission map}
+    {--admin : Whether to create the admin role}';
 
     /**
      * The console command description.
