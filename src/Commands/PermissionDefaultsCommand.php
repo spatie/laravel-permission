@@ -16,7 +16,8 @@ class PermissionDefaultsCommand extends Command
     protected $signature = 'permission:defaults
     {--y|yes : Use affirmative response when confirmation required}
     {--m|migrate : Whether to refresh the database}
-    {--p|print : Whether to print the roles/permission map}';
+    {--p|print : Whether to print the roles/permission map}
+    {--a|admin : Whether to create the admin role}';
 
     /**
      * The console command description.
@@ -74,12 +75,14 @@ class PermissionDefaultsCommand extends Command
             }
         }
 
-        $role = Role::firstOrCreate(['name' => 'admin']);
-        $this->info('Added "admin" role');
-        $role->syncPermissions(Permission::all());
-        $this->info('Adding all permissions to "admin" role');
+        if($this->hasOption('admin')) {
+            $role = Role::firstOrCreate(['name' => 'admin']);
+            $this->info('Added "admin" role');
+            $role->syncPermissions(Permission::all());
+            $this->info('Adding all permissions to "admin" role');
+        }
 
-        if($this->option('print')) {
+        if($this->hasOption('print')) {
             $this->info('This is the current permissions map:');
             $this->info(print_r($roles, true));
         }
