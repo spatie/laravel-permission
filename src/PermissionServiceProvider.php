@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
 use Spatie\Permission\Contracts\Role as RoleContract;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
+use Spatie\Permission\Commands\CreatePermissionsMap;
 
 class PermissionServiceProvider extends ServiceProvider
 {
@@ -36,6 +37,14 @@ class PermissionServiceProvider extends ServiceProvider
         );
 
         $this->registerBladeExtensions();
+        $this->registerPermissionsCommand();
+    }
+
+    protected function registerPermissionsCommand() {
+        $this->app->singleton('command.permission.defaults', function ($app) {
+            return new CreatePermissionsMap();
+        });
+        $this->commands('command.permission.defaults');
     }
 
     protected function registerModelBindings()
@@ -85,5 +94,17 @@ class PermissionServiceProvider extends ServiceProvider
                 return '<?php endif; ?>';
             });
         });
+    }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides()
+    {
+        return [
+            'command.permission.defaults',
+        ];
     }
 }
