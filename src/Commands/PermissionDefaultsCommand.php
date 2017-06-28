@@ -13,11 +13,11 @@ class PermissionDefaultsCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'permission:defaults
-    {--yes : Use affirmative response when confirmation required}
-    {--migrate : Whether to refresh the database}
-    {--print : Whether to print the roles/permission map}
-    {--admin : Whether to create the admin role}';
+    protected $signature = 'permission:defaults 
+        {--yes : Use affirmative response when confirmation required} 
+        {--migrate : Whether to refresh the database}
+        {--print : Whether to print the roles/permission map} 
+        {--admin : Whether to create the admin role}';
 
     /**
      * The console command description.
@@ -43,14 +43,12 @@ class PermissionDefaultsCommand extends Command
      */
     public function handle()
     {
-        if($this->hasOption('migrate')) {
-            if($this->hasOption('yes')) {
-                if($this->option('yes') || $this->confirm('Are you sure you want to refresh the database?')) {
+        if($this->option('migrate') != null) {
+                if($this->option('yes') != null || $this->confirm('Are you sure you want to refresh the database?')) {
                     $this->warn('Running migrate:refresh to reset the database...');
                     $this->call('migrate:refresh');
                     $this->warn('Database cleared');
                 }
-            }
         }
 
         $this->info('Creating permissions...');
@@ -75,14 +73,14 @@ class PermissionDefaultsCommand extends Command
             }
         }
 
-        if($this->hasOption('admin')) {
+        if($this->option('admin') != null) {
             $role = Role::firstOrCreate(['name' => 'admin']);
             $this->info('Added "admin" role');
             $role->syncPermissions(Permission::all());
             $this->info('Adding all permissions to "admin" role');
         }
 
-        if($this->hasOption('print')) {
+        if($this->option('print') != null) {
             $this->info('This is the current permissions map:');
             $this->info(print_r($roles, true));
         }
