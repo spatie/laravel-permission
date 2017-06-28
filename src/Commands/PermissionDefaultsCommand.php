@@ -79,7 +79,7 @@ class PermissionDefaultsCommand extends Command
         $role->syncPermissions(Permission::all());
         $this->info('Adding all permissions to "admin" role');
 
-        if($this->hasOption('print')) {
+        if($this->option('print')) {
             $this->info('This is the current permissions map:');
             $this->info(print_r($roles, true));
         }
