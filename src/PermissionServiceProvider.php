@@ -37,12 +37,12 @@ class PermissionServiceProvider extends ServiceProvider
         );
 
         $this->registerBladeExtensions();
-        $this->registerPermissionsCommand();
+        $this->registerPermissionDefaultsCommand();
     }
 
-    protected function registerPermissionsCommand() {
+    protected function registerPermissionDefaultsCommand() {
         $this->app->singleton('command.permission.defaults', function ($app) {
-            return new CreatePermissionsMap();
+            return new PermissionDefaultsCommand();
         });
         $this->commands('command.permission.defaults');
     }
