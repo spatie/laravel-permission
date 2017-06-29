@@ -41,16 +41,15 @@ class PermissionAssignRoleCommand extends Command
      */
     public function handle()
     {
-            $user = \App\User::find($this->argument('user'));
+        $user = \App\User::find($this->argument('user'));
 
-            $ra = explode(':', $this->option('roles'));
+        $ra = explode(':', $this->option('roles'));
 
-            foreach($ra as $r) {
-                $s = explode(':', $r);
-                
-                $user->assignRole($s[0]);
-                $this->info('Assigned user '.$user->name.' to role '.$s[0]);
-            }
+        foreach($ra as $r) {
+            $s = explode(':', $r);
+            
+            $user->assignRole($s[0]);
+            $this->info('Assigned user '.$user->name.' to role '.$s[0]);
         }
     }
 }
