@@ -14,10 +14,11 @@ class PermissionDefaultsCommand extends Command
      * @var string
      */
     protected $signature = 'permission:defaults 
-        {--yes : Use affirmative response when confirmation required} 
-        {--migrate : Whether to refresh the database}
-        {--print : Whether to print the roles/permission map} 
-        {--admin : Whether to create the admin role}';
+    {--yes : Use affirmative response when confirmation required} 
+    {--migrate : Whether to refresh the database}
+    {--print : Whether to print the roles/permission map} 
+    {--admin : Whether to create the admin role}
+    {--s|seed : Whether to run db:seed after refreshing the database}';
 
     /**
      * The console command description.
@@ -44,11 +45,19 @@ class PermissionDefaultsCommand extends Command
     public function handle()
     {
         if($this->option('migrate') != null) {
-                if($this->option('yes') != null || $this->confirm('Are you sure you want to refresh the database?')) {
-                    $this->warn('Running migrate:refresh to reset the database...');
-                    $this->call('migrate:refresh');
-                    $this->warn('Database cleared');
+            if($this->option('yes') != null || $this->confirm('Are you sure you want to refresh the database?')) {
+                $this->warn('Running migrate:refresh to reset the database...');
+                $this->call('migrate:refresh');
+                $this->warn('Database cleared');
+
+                if($this->option('seed') != null) {
+                    if($this->option('yes') != null || $this->confirm('Are you sure you want to seed the database?')) {
+                        $this->warn('Running db:seed to seed the database...');
+                        $this->call('db:seed');
+                        $this->warn('Seeding complete');
+                    }
                 }
+            }
         }
 
         $this->info('Creating permissions...');
