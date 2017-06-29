@@ -41,16 +41,15 @@ class PermissionAssignPermissionCommand extends Command
      */
     public function handle()
     {
-            $user = \App\User::find($this->argument('user'));
+        $user = \App\User::find($this->argument('user'));
 
-            $ra = explode(':', $this->option('permissions'));
+        $ra = explode(':', $this->option('permissions'));
 
-            foreach($ra as $r) {
-                $s = explode(':', $r);
-                
-                $user->assignPerssion($s[0]);
-                $this->info('Assigned user '.$user->name.' permission '.$s[0]);
-            }
+        foreach($ra as $r) {
+            $s = explode(':', $r);
+            
+            $user->assignPerssion($s[0]);
+            $this->info('Assigned user '.$user->name.' permission '.$s[0]);
         }
     }
 }
