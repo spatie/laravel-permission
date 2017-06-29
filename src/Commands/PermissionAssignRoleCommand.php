@@ -15,14 +15,14 @@ class PermissionAssignRoleCommand extends Command
      */
     protected $signature = 'permission:assign:role 
     {user : User\' Id}
-    {--r|roles= : Roles to assign to user (role_name1:role_name2, etc)}';
+    {--r|roles= : Role(s) to assign to user (role_name1:role_name2, etc)}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Creates roles/permissions for spatie/laravel-permission.';
+    protected $description = 'Assign role(s) to user';
 
     /**
      * Create a new command instance.
