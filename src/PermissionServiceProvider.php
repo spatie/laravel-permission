@@ -38,6 +38,7 @@ class PermissionServiceProvider extends ServiceProvider
 
         $this->registerBladeExtensions();
         $this->registerPermissionDefaultsCommand();
+        $this->registerPermissionAssignRoleCommand();
     }
 
     protected function registerPermissionDefaultsCommand() {
@@ -45,6 +46,13 @@ class PermissionServiceProvider extends ServiceProvider
             return new PermissionDefaultsCommand();
         });
         $this->commands('command.permission.defaults');
+    }
+
+    protected function registerPermissionAssignRoleCommand() {
+        $this->app->singleton('command.permission.assign.role', function ($app) {
+            return new PermissionAssignRoleCommand();
+        });
+        $this->commands('command.permission.assign.role');
     }
 
     protected function registerModelBindings()
@@ -105,6 +113,7 @@ class PermissionServiceProvider extends ServiceProvider
     {
         return [
             'command.permission.defaults',
+            'command.permission.assign.role',
         ];
     }
 }
