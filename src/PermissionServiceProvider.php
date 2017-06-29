@@ -69,7 +69,16 @@ class PermissionServiceProvider extends ServiceProvider
 
             $bladeCompiler->directive('hasanyrole', function ($arguments) {
                 list($roles, $guard) = explode(',', $arguments.',');
-                $roles = "[" . implode("','", explode("|", $roles)) ."]";
+                $roles = trim($roles);
+                if (strlen($roles) > 2 ) {
+                  $char = substr($roles, 0, 1);
+                  if (in_array($char, ["'","\""])) {
+                    $endChar = substr($roles, -1, 1);
+                    if ($char == $endChar) {
+                      $roles = "[" . implode($char . "," . $char, explode("|", $roles)) ."]";
+                    }
+                  }
+                }
 
                 return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasAnyRole({$roles})): ?>";
             });
@@ -79,7 +88,16 @@ class PermissionServiceProvider extends ServiceProvider
 
             $bladeCompiler->directive('hasallroles', function ($arguments) {
                 list($roles, $guard) = explode(',', $arguments.',');
-                $roles = "[" . implode("','", explode("|", $roles)) ."]";
+                $roles = trim($roles);
+                if (strlen($roles) > 2 ) {
+                  $char = substr($roles, 0, 1);
+                  if (in_array($char, ["'","\""])) {
+                    $endChar = substr($roles, -1, 1);
+                    if ($char == $endChar) {
+                      $roles = "[" . implode($char . "," . $char, explode("|", $roles)) ."]";
+                    }
+                  }
+                }
 
                 return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasAllRoles({$roles})): ?>";
             });
