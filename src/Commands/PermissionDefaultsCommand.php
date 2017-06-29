@@ -14,11 +14,13 @@ class PermissionDefaultsCommand extends Command
      * @var string
      */
     protected $signature = 'permission:defaults 
-    {--yes : Use affirmative response when confirmation required} 
-    {--migrate : Whether to refresh the database}
-    {--print : Whether to print the roles/permission map} 
-    {--admin : Whether to create the admin role}
-    {--s|seed : Whether to run db:seed after refreshing the database}';
+    {--a|admin : Create the admin role}
+    {--m|migrate : Refresh the database (migrate:refresh)}
+    {--p|print : Print the roles/permission map} 
+    {--P|process : Process the roles/permission map and add to database}
+    {--r|role=* : Assign user roles (user_id:role_name)}
+    {--s|seed : Run db:seed after refreshing the database}
+    {--y|yes : Use affirmative response when confirmation required} ';
 
     /**
      * The console command description.
@@ -60,33 +62,48 @@ class PermissionDefaultsCommand extends Command
             }
         }
 
-        $this->info('Creating permissions...');
+        if($this->option('process') != null) {
+            $this->info('Creating permissions...');
 
-        $roles = \Config::get('permission.roles_permissions');
-        
-        foreach($roles as $role => $permissions)
-        {
-            $r = Role::firstOrCreate(['name' => $role]);
-            $this->info('Adding role: '.$role);
+            $roles = \Config::get('permission.roles_permissions');
 
-            foreach($permissions as $permission)
+            foreach($roles as $role => $permissions)
             {
-                Permission::firstOrCreate(['name' => $permission]);
-                $this->info('Adding permission: '.$permission);
+                $r = Role::firstOrCreate(['name' => $role]);
+                $this->info('Adding role: '.$role);
 
-                if(!$r->hasPermissionTo($permission))
+                foreach($permissions as $permission)
                 {
-                    $r->givePermissionTo($permission);
-                    $this->info('Adding permission '.$permission.' to role '.$role);
+                    Permission::firstOrCreate(['name' => $permission]);
+                    $this->info('Adding permission: '.$permission);
+
+                    if(!$r->hasPermissionTo($permission))
+                    {
+                        $r->givePermissionTo($permission);
+                        $this->info('Adding permission '.$permission.' to role '.$role);
+                    }
                 }
+            }
+
+            if($this->option('admin') != null) {
+                $role = Role::firstOrCreate(['name' => 'admin']);
+                $this->info('Added "admin" role');
+                $role->syncPermissions(Permission::all());
+                $this->info('Adding all permissions to "admin" role');
             }
         }
 
-        if($this->option('admin') != null) {
-            $role = Role::firstOrCreate(['name' => 'admin']);
-            $this->info('Added "admin" role');
-            $role->syncPermissions(Permission::all());
-            $this->info('Adding all permissions to "admin" role');
+        $ra = $this->option('role');
+
+        if($ra != null) {
+            $this->info('Assigning roles based on command-line input...');
+            foreach($ra as $r) {
+                $s = explode(':', $r, 2);
+                $this->info('Assign roles for '.$s[0]);
+                $user = \App\User::find($s[0]);
+                $user->assignRole($s[1]);
+                $this->info('Assigned user '.$user->name.' to role '.$s[1]);
+            }
         }
 
         if($this->option('print') != null) {
