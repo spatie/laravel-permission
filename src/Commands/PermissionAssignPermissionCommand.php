@@ -45,9 +45,9 @@ class PermissionAssignPermissionCommand extends Command
 
         $ra = explode(':', $this->option('permissions'));
 
-        foreach($ra as $r) {
+        foreach ($ra as $r) {
             $s = explode(':', $r);
-            
+
             $user->assignPerssion($s[0]);
             $this->info('Assigned user '.$user->name.' permission '.$s[0]);
         }

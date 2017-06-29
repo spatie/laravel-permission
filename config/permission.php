@@ -89,11 +89,10 @@ return [
 
     /*
      * Default roles and permissions
-     * 
+     *
     */
     'roles_permissions' => [
-        'user' => 
-            [
+        'user' => [
                 'view-post',
                 'create-post',
                 'edit-post',

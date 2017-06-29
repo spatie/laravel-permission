@@ -5,10 +5,10 @@ namespace Spatie\Permission;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
 use Spatie\Permission\Contracts\Role as RoleContract;
-use Spatie\Permission\Contracts\Permission as PermissionContract;
 use Spatie\Permission\Commands\PermissionDefaultsCommand;
 use Spatie\Permission\Commands\PermissionAssignRoleCommand;
 use Spatie\Permission\Commands\PermissionAssignPermissionCommand;
+use Spatie\Permission\Contracts\Permission as PermissionContract;
 
 class PermissionServiceProvider extends ServiceProvider
 {
@@ -44,21 +44,24 @@ class PermissionServiceProvider extends ServiceProvider
         $this->registerPermissionAssignPermissionCommand();
     }
 
-    protected function registerPermissionDefaultsCommand() {
+    protected function registerPermissionDefaultsCommand()
+    {
         $this->app->singleton('command.permission.defaults', function ($app) {
             return new PermissionDefaultsCommand();
         });
         $this->commands('command.permission.defaults');
     }
 
-    protected function registerPermissionAssignRoleCommand() {
+    protected function registerPermissionAssignRoleCommand()
+    {
         $this->app->singleton('command.permission.assign.role', function ($app) {
             return new PermissionAssignRoleCommand();
         });
         $this->commands('command.permission.assign.role');
     }
 
-    protected function registerPermissionAssignPermissionCommand() {
+    protected function registerPermissionAssignPermissionCommand()
+    {
         $this->app->singleton('command.permission.assign.permission', function ($app) {
             return new PermissionAssignPermissionCommand();
         });
