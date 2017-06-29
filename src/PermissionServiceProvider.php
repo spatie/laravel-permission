@@ -6,7 +6,9 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
 use Spatie\Permission\Contracts\Role as RoleContract;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
-use Spatie\Permission\Commands\PermissionDefaultsCommand;;
+use Spatie\Permission\Commands\PermissionDefaultsCommand;
+use Spatie\Permission\Commands\PermissionAssignRoleCommand;
+use Spatie\Permission\Commands\PermissionAssignPermissionCommand;
 
 class PermissionServiceProvider extends ServiceProvider
 {
