@@ -86,4 +86,17 @@ return [
      */
 
     'log_registration_exception' => true,
+
+    /*
+     * Default roles and permissions
+     *
+    */
+    'roles_permissions' => [
+        'user' => [
+                'view-post',
+                'create-post',
+                'edit-post',
+                'delete-post',
+            ],
+    ],
 ];

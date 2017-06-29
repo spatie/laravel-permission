@@ -5,6 +5,9 @@ namespace Spatie\Permission;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
 use Spatie\Permission\Contracts\Role as RoleContract;
+use Spatie\Permission\Commands\PermissionDefaultsCommand;
+use Spatie\Permission\Commands\PermissionAssignRoleCommand;
+use Spatie\Permission\Commands\PermissionAssignPermissionCommand;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 
 class PermissionServiceProvider extends ServiceProvider
@@ -13,14 +16,14 @@ class PermissionServiceProvider extends ServiceProvider
     {
         $this->publishes([
             __DIR__.'/../config/permission.php' => $this->app->configPath().'/permission.php',
-        ], 'config');
+            ], 'config');
 
         if (! class_exists('CreatePermissionTables')) {
             $timestamp = date('Y_m_d_His', time());
 
             $this->publishes([
                 __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->app->databasePath()."/migrations/{$timestamp}_create_permission_tables.php",
-            ], 'migrations');
+                ], 'migrations');
         }
 
         $this->registerModelBindings();
@@ -33,9 +36,36 @@ class PermissionServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             __DIR__.'/../config/permission.php',
             'permission'
-        );
+            );
 
         $this->registerBladeExtensions();
+        $this->registerPermissionDefaultsCommand();
+        $this->registerPermissionAssignRoleCommand();
+        $this->registerPermissionAssignPermissionCommand();
+    }
+
+    protected function registerPermissionDefaultsCommand()
+    {
+        $this->app->singleton('command.permission.defaults', function ($app) {
+            return new PermissionDefaultsCommand();
+        });
+        $this->commands('command.permission.defaults');
+    }
+
+    protected function registerPermissionAssignRoleCommand()
+    {
+        $this->app->singleton('command.permission.assign.role', function ($app) {
+            return new PermissionAssignRoleCommand();
+        });
+        $this->commands('command.permission.assign.role');
+    }
+
+    protected function registerPermissionAssignPermissionCommand()
+    {
+        $this->app->singleton('command.permission.assign.permission', function ($app) {
+            return new PermissionAssignPermissionCommand();
+        });
+        $this->commands('command.permission.assign.permission');
     }
 
     protected function registerModelBindings()
@@ -85,5 +115,19 @@ class PermissionServiceProvider extends ServiceProvider
                 return '<?php endif; ?>';
             });
         });
+    }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides()
+    {
+        return [
+        'command.permission.defaults',
+        'command.permission.assign.role',
+        'command.permission.assign.permission',
+        ];
     }
 }
