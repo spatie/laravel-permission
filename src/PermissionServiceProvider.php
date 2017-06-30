@@ -101,6 +101,7 @@ class PermissionServiceProvider extends ServiceProvider
                 }
             }
         }
+        
         return $pipeString;
     }
 }
