@@ -89,19 +89,28 @@ class PermissionServiceProvider extends ServiceProvider
         });
     }
 
-    protected function convertPipeToArray(string $pipeString)
+    public function convertPipeToArray(string $pipeString)
     {
         $pipeString = trim($pipeString);
-        if (strlen($pipeString) > 2) {
-            $char = substr($pipeString, 0, 1);
-            if (in_array($char, ["'", '"'])) {
-                $endChar = substr($pipeString, -1, 1);
-                if ($char == $endChar) {
-                    $pipeString = '['.implode($char.','.$char, explode('|', $pipeString)).']';
-                }
-            }
+
+        if (strlen($pipeString) <= 2) {
+            return $pipeString;
         }
 
-        return $pipeString;
+        $quoteCharacter = substr($pipeString, 0, 1);
+
+        if (! in_array($quoteCharacter, ["'", '"'])) {
+            return $pipeString;
+        }
+
+        $endCharacter = substr($quoteCharacter, -1, 1);
+
+        if ($quoteCharacter !== $endCharacter) {
+            return $pipeString;
+        }
+
+        $roleString = '['.implode($quoteCharacter.','.$quoteCharacter, explode('|', $pipeString)).']';
+
+        return $roleString;
     }
 }
