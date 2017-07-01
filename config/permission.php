@@ -72,6 +72,12 @@ return [
     ],
 
     /*
+     * We can cache all permissions.
+     */
+
+    'cache' => false,
+
+    /*
      * By default all permissions will be cached for 24 hours unless a permission or
      * role is updated. Then the cache will be flushed immediately.
      */
