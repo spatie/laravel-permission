@@ -377,10 +377,22 @@ roles. Optionally you can pass in the `guard` that the check will be performed o
 @else
     I have none of these roles...
 @endhasanyrole
+// or
+@hasanyrole('writer|admin')
+    I have one or more of these roles!
+@else
+    I have none of these roles...
+@endhasanyrole
 ```
 
 ```php
 @hasallroles(Role::all())
+    I have all of these roles!
+@else
+    I don't have all of these roles...
+@endhasallroles
+//or
+@hasallroles('writer|admin')
     I have all of these roles!
 @else
     I don't have all of these roles...
