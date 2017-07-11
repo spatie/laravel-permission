@@ -212,6 +212,14 @@ $users = User::role('writer')->get(); // Only returns users with the role 'write
 
 The scope can accept a string, a `\Spatie\Permission\Models\Role` object or an `\Illuminate\Support\Collection` object.
 
+The `HasRoles` also adds a scope to your models to scope the query to except roles:
+
+```php
+$users = User::exceptRole('writer')->get(); // Only returns users which not having the role 'writer'.
+```
+
+The scope can accept a array.
+
 ### Using permissions
 
 A permission can be given to any user with the `HasRoles` trait:
