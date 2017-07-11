@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.2.0 - 2017-07-01
+- `hasanyrole` and `hasallrole` can accept multiple roles
+
 ## 2.1.6 - 2017-06-06
 - fixed a bug where `hasPermissionTo` wouldn't use the right guard name
 

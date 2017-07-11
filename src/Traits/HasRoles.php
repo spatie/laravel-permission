@@ -74,7 +74,22 @@ trait HasRoles
             });
         });
     }
-
+    
+    /**
+     * Scope the model query to except roles only.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param array $roles
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeExceptRole(Builder $query, $roles): Builder
+    {
+        return $query->whereHas('roles', function ($query) use ($roles) {
+            $query->whereNotIn('name', $roles);
+        });
+    }
+    
     /**
      * Assign the given role to the model.
      *
