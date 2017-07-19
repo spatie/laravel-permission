@@ -232,7 +232,7 @@ A permission can be revoked from a user:
 $user->revokePermissionTo('edit articles');
 ```
 
-Or revoke & add new permissions in one go
+Or revoke & add new permissions in one go:
 
 ```php
 $user->syncPermissions(['edit articles', 'delete articles']);
