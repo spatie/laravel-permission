@@ -232,6 +232,12 @@ A permission can be revoked from a user:
 $user->revokePermissionTo('edit articles');
 ```
 
+Or revoke & add new permissions in one go
+
+```php
+$user->syncPermissions(['edit articles', 'delete articles']);
+```
+
 You can test if a user has a permission:
 
 ```php
