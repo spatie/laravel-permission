@@ -184,7 +184,7 @@ class User extends Authenticatable
 }
 ```
 
-> - note that if you need to use `HasRoles` trait with another model ex.`Page` you will also need to add `protected $guard_name = 'web';` aswell to that model or you would get an error
+> - note that if you need to use `HasRoles` trait with another model ex.`Page` you will also need to add `protected $guard_name = 'web';` as well to that model or you would get an error
 >
 >```php
 >use Illuminate\Database\Eloquent\Model;
