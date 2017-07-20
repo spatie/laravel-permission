@@ -592,9 +592,7 @@ Special thanks to [Alex Vanderbist](https://github.com/AlexVanderbist) who great
 
 ## Alternatives
 
-- [JosephSilber/bouncer](https://github.com/JosephSilber/bouncer)
-- [Zizaco/entrust](https://github.com/Zizaco/entrust)
-- [bican/roles](https://github.com/romanbican/roles)
+[Povilas Korop](https://twitter.com/@povilaskorop) did an excellent job listing the alternatives [in an article on Laravel News](https://laravel-news.com/two-best-roles-permissions-packages). In that same article he compares laravel-permission to [Joseph Silber](https://github.com/JosephSilber)'s [Bouncer]((https://github.com/JosephSilber/bouncer)), which in our book is also an excellent package.
 
 ## About Spatie
 
