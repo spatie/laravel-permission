@@ -38,15 +38,14 @@ class AddRole extends Command
      */
     public function handle()
     {
-        $role_data=['name' => $this->argument('name')];
+        $role_data = ['name' => $this->argument('name')];
 
-        $guard=$this->argument('guard');
-        if ($guard)
-        {
+        $guard = $this->argument('guard');
+        if ($guard) {
             $role_data['guard_name'] = $guard;
         }
-        
-        $role=Role::create($role_data);
+
+        $role = Role::create($role_data);
         $this->info('Role `'.$role->name.'` created at ID: '.$role->id);
     }
 }

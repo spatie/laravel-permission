@@ -38,15 +38,14 @@ class AddPermission extends Command
      */
     public function handle()
     {
-        $permission_data=['name' => $this->argument('name')];
+        $permission_data = ['name' => $this->argument('name')];
 
-        $guard=$this->argument('guard');
-        if ($guard)
-        {
+        $guard = $this->argument('guard');
+        if ($guard) {
             $permission_data['guard_name'] = $guard;
         }
 
-        $permission=Permission::create($permission_data);
+        $permission = Permission::create($permission_data);
         $this->info('Permission `'.$permission->name.'` created at ID: '.$permission->id);
     }
 }
