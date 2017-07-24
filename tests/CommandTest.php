@@ -8,7 +8,6 @@ use Spatie\Permission\Models\Permission;
 
 class CommandTest extends TestCase
 {
-
     /** @test */
     public function evaluate_command_add_role()
     {
@@ -26,5 +25,4 @@ class CommandTest extends TestCase
         $permission = Permission::where('name', 'permissionbycommand')->first();
         $this->assertStringStartsWith('Permission `permissionbycommand` created at ID: '.$permission->id."\n", $resultAsText);
     }
-
 }
