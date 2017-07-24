@@ -14,8 +14,8 @@ class CommandTest extends TestCase
     {
         Artisan::call('permission:add_role', ['name' => 'rolebycommand']);
         $resultAsText = Artisan::output();
-        $role=Role::where('name','rolebycommand')->first();
-        $this->assertStringStartsWith("Role `rolebycommand` created at ID: ".$role->id."\n",$resultAsText);
+        $role = Role::where('name', 'rolebycommand')->first();
+        $this->assertStringStartsWith("Role `rolebycommand` created at ID: ".$role->id."\n", $resultAsText);
     }
 
     /** @test */
@@ -23,8 +23,8 @@ class CommandTest extends TestCase
     {
         Artisan::call('permission:add_permission', ['name' => 'permissionbycommand']);
         $resultAsText = Artisan::output();
-        $permission=Permission::where('name','permissionbycommand')->first();
-        $this->assertStringStartsWith("Permission `permissionbycommand` created at ID: ".$permission->id."\n",$resultAsText);
+        $permission = Permission::where('name', 'permissionbycommand')->first();
+        $this->assertStringStartsWith("Permission `permissionbycommand` created at ID: ".$permission->id."\n", $resultAsText);
     }
 
 }
