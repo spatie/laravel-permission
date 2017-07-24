@@ -490,7 +490,10 @@ public function handle($request, Closure $next, $role, $permission=null)
         return redirect($urlOfYourLoginPage);
     }
 
-    $role=(is_array($role) ? $role : explode('|', $role));
+    $role = is_array($role) 
+        ? $role 
+        : explode('|', $role));
+        
     if (! $request->user()->hasAnyRole($role)) {
         abort(403);
     }
