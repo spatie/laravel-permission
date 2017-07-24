@@ -12,14 +12,14 @@ class AddPermission extends Command
      *
      * @var string
      */
-    protected $signature = 'permission:add_permission {name : The name of the permission} {guard? : Optional guard, default web}';
+    protected $signature = 'permission:create-permission {name : The name of the permission} {guard? : Optional guard, default web}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Add a permission';
+    protected $description = 'Create a permission';
 
     /**
      * Create a new command instance.

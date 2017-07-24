@@ -12,14 +12,14 @@ class AddRole extends Command
      *
      * @var string
      */
-    protected $signature = 'permission:add_role {name : The name of the role} {guard? : Optional guard, default web}';
+    protected $signature = 'permission:create-role {name : The name of the role} {guard? : Optional guard, default web}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Add a role';
+    protected $description = 'Create a role';
 
     /**
      * Create a new command instance.
