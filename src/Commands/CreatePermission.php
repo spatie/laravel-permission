@@ -13,22 +13,12 @@ class CreatePermission extends Command
 
     protected $description = 'Create a permission';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function handle()
     {
-        $attributes = ['name' => $this->argument('name')];
-
-        $guard = $this->argument('guard');
-
-        if ($guard) {
-            $attributes['guard_name'] = $guard;
-        }
-
-        $permission = Permission::create($attributes);
+        $permission = Permission::create([
+            'name' => $this->argument('name'),
+            'guard_name' => $this->argument('guard'),
+        ]);
 
         $this->info("Permission `{$permission->name}` created");
     }

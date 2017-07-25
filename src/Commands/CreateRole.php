@@ -13,23 +13,13 @@ class CreateRole extends Command
 
     protected $description = 'Create a role';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function handle()
     {
-        $attributes = ['name' => $this->argument('name')];
+        $permission = Role::create([
+            'name' => $this->argument('name'),
+            'guard_name' => $this->argument('guard'),
+        ]);
 
-        $guard = $this->argument('guard');
-
-        if ($guard) {
-            $attributes['guard_name'] = $guard;
-        }
-
-        $role = Role::create($attributes);
-
-        $this->info("Role `{$role->name}` created ");
+        $this->info("Role `{$permission->name}` created");
     }
 }
