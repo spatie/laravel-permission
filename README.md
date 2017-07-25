@@ -492,7 +492,7 @@ public function handle($request, Closure $next, $role, $permission=null)
 
     $role = is_array($role) 
         ? $role 
-        : explode('|', $role));
+        : explode('|', $role);
         
     if (! $request->user()->hasAnyRole($role)) {
         abort(403);
