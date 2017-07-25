@@ -9,20 +9,18 @@ use Spatie\Permission\Models\Permission;
 class CommandTest extends TestCase
 {
     /** @test */
-    public function evaluate_command_create_role()
+    public function it_can_create_a_role()
     {
-        Artisan::call('permission:create-role', ['name' => 'rolebycommand']);
-        $resultAsText = Artisan::output();
-        $role = Role::where('name', 'rolebycommand')->first();
-        $this->assertStringStartsWith('Role `rolebycommand` created at ID: '.$role->id."\n", $resultAsText);
+        Artisan::call('permission:create-role', ['name' => 'new-role']);
+
+        $this->assertCount(1, Role::where('name', 'new-role')->get());
     }
 
     /** @test */
-    public function evaluate_command_create_permission()
+    public function it_can_create_a_permission()
     {
-        Artisan::call('permission:create-permission', ['name' => 'permissionbycommand']);
-        $resultAsText = Artisan::output();
-        $permission = Permission::where('name', 'permissionbycommand')->first();
-        $this->assertStringStartsWith('Permission `permissionbycommand` created at ID: '.$permission->id."\n", $resultAsText);
+        Artisan::call('permission:create-permission', ['name' => 'new-permission']);
+
+        $this->assertCount(1, Permission::where('name', 'new-permission')->get());
     }
 }
