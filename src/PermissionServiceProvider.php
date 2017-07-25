@@ -23,6 +23,13 @@ class PermissionServiceProvider extends ServiceProvider
             ], 'migrations');
         }
 
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                Commands\CreateRole::class,
+                Commands\CreatePermission::class,
+            ]);
+        }
+
         $this->registerModelBindings();
 
         $permissionLoader->registerPermissions();

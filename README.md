@@ -27,7 +27,7 @@ Because all permissions will be registered on [Laravel's gate](https://laravel.c
 $user->can('edit articles');
 ```
 
-Spatie is webdesign agency in Antwerp, Belgium. You'll find an overview of all 
+Spatie is webdesign agency in Antwerp, Belgium. You'll find an overview of all
 our open source projects [on our website](https://spatie.be/opensource).
 
 ## Postcardware
@@ -154,7 +154,7 @@ return [
      * By default all permissions will be cached for 24 hours unless a permission or
      * role is updated. Then the cache will be flushed immediately.
      */
-     
+
     'cache_expiration_time' => 60 * 24,
 
     /*
@@ -179,7 +179,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     use HasRoles;
-    
+
     // ...
 }
 ```
@@ -331,7 +331,7 @@ A permission can be revoked from a role:
 $role->revokePermissionTo('edit articles');
 ```
 
-The `givePermissionTo` and `revokePermissionTo` functions can accept a 
+The `givePermissionTo` and `revokePermissionTo` functions can accept a
 string or a `Spatie\Permission\Models\Permission` object.
 
 Saved permission and roles are also registered with the `Illuminate\Auth\Access\Gate` class.
@@ -340,8 +340,8 @@ Saved permission and roles are also registered with the `Illuminate\Auth\Access\
 $user->can('edit articles');
 ```
 
-All permissions of roles that user is assigned to are inherited to the 
-user automatically. In addition to these permissions particular permission can be assigned to the user too. For instance: 
+All permissions of roles that user is assigned to are inherited to the
+user automatically. In addition to these permissions particular permission can be assigned to the user too. For instance:
 
 ```php
 $role->givePermissionTo('edit articles');
@@ -351,7 +351,7 @@ $user->assignRole('writer');
 $user->givePermissionTo('delete articles');
 ```
 
-In above example a role is given permission to edit articles and this role is assigned to a user. Now user can edit articles and additionally delete articles. The permission of 'delete articles' is his direct permission because it is assigned directly to him. When we call `$user->hasDirectPermission('delete articles')` it returns `true` and `false` for `$user->hasDirectPermission('edit articles')`. 
+In above example a role is given permission to edit articles and this role is assigned to a user. Now user can edit articles and additionally delete articles. The permission of 'delete articles' is his direct permission because it is assigned directly to him. When we call `$user->hasDirectPermission('delete articles')` it returns `true` and `false` for `$user->hasDirectPermission('edit articles')`.
 
 This method is useful if one has a form for setting permissions for roles and users in his application and want to restrict to change inherited permissions of roles of user, i.e. allowing to change only direct permissions of user.
 
@@ -370,7 +370,7 @@ $user->getAllPermissions();
 
 All theses responses are collections of `Spatie\Permission\Models\Permission` objects.
 
-If we follow the previous example, the first response will be a collection with the 'delete article' permission, the 
+If we follow the previous example, the first response will be a collection with the 'delete article' permission, the
 second will be a collection with the 'edit article' permission and the third will contain both.
 
 ### Using Blade directives
@@ -490,10 +490,10 @@ public function handle($request, Closure $next, $role, $permission=null)
         return redirect($urlOfYourLoginPage);
     }
 
-    $role = is_array($role) 
-        ? $role 
+    $role = is_array($role)
+        ? $role
         : explode('|', $role);
-        
+
     if (! $request->user()->hasAnyRole($role)) {
         abort(403);
     }
@@ -523,9 +523,31 @@ Route::group(['middleware' => ['role:admin,access_backend']], function () {
 });
 ```
 
+## Using artisan commands
+
+You can create a role or permission from console with artisan commands.
+
+```bash
+php artisan permission:create-role "writer"
+```
+
+```bash
+php artisan permission:create-permission "edit articles"
+```
+
+When creating permissions and roles for specific guards you'll have to specify their guard_name on the second argument:
+
+```bash
+php artisan permission:create-role "writer" "web"
+```
+
+```bash
+php artisan permission:create-permission "edit articles" "web"
+```
+
 ## Extending
 
-If you need to extend or replace the existing `Role` or `Permission` models you just need to 
+If you need to extend or replace the existing `Role` or `Permission` models you just need to
 keep the following things in mind:
 
 - Your `Role` model needs to implement the `Spatie\Permission\Contracts\Role` contract
