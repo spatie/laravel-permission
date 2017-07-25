@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.3.0 - 2017-07-25
+- add `create-permission` and `create-role` commands
+
 ## 2.2.0 - 2017-07-01
 - `hasanyrole` and `hasallrole` can accept multiple roles
 
