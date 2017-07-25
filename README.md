@@ -525,23 +525,23 @@ Route::group(['middleware' => ['role:admin,access_backend']], function () {
 
 ## Using artisan commands
 
-You can create a role or permission from console with artisan command.
+You can create a role or permission from console with artisan commands.
 
-```bash
+```sh
 php artisan permission:create-role "writer"
 ```
 
-```bash
+```sh
 php artisan permission:create-permission "edit articles"
 ```
 
-By default the default guard (auth.default.guard) will be used as the guard for new permissions and roles. When creating permissions and roles for specific guards you'll have to specify their guard_name on the second argument:
+When creating permissions and roles for specific guards you'll have to specify their guard_name on the second argument:
 
-```bash
+```sh
 php artisan permission:create-role "writer" "web"
 ```
 
-```bash
+```sh
 php artisan permission:create-permission "edit articles" "web"
 ```
 
