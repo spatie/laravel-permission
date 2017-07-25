@@ -9,7 +9,7 @@ class CreatePermission extends Command
 {
     protected $signature = 'permission:create-permission 
                 {name : The name of the permission} 
-                {guard? : Optional guard, default web}';
+                {guard? : The name of the guard}';
 
     protected $description = 'Create a permission';
 

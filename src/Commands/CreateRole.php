@@ -9,7 +9,7 @@ class CreateRole extends Command
 {
     protected $signature = 'permission:create-role
         {name : The name of the role}
-        {guard? : Optional guard, default web}';
+        {guard? : The name of the guard}';
 
     protected $description = 'Create a role';
 
