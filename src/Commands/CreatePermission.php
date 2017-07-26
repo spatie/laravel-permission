@@ -15,11 +15,20 @@ class CreatePermission extends Command
 
     public function handle()
     {
-        $permission = Permission::create([
+        $permissionModel = $this->resolvePermission();
+
+        $permission = $permissionModel::create([
             'name' => $this->argument('name'),
             'guard_name' => $this->argument('guard'),
         ]);
 
         $this->info("Permission `{$permission->name}` created");
+    }
+
+    private function resolvePermission()
+    {
+        $class = Config::get('permission.models.permission');
+
+        return app($class);
     }
 }
