@@ -260,6 +260,12 @@ You can test if a user has a permission:
 $user->hasPermissionTo('edit articles');
 ```
 
+...or if a user has multiple permissions:
+
+```php
+$user->hasAnyPermission(['edit articles', 'publish articles', 'unpublish articles']);
+```
+
 Saved permissions will be registered with the `Illuminate\Auth\Access\Gate` class for the default guard. So you can
 test if a user has a permission with Laravel's default `can` function:
 
