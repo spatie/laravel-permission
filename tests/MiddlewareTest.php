@@ -8,7 +8,7 @@ use Illuminate\Http\Response;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
-class MiddelwareTest extends TestCase
+class MiddlewareTest extends TestCase
 {
     public function setUp()
     {

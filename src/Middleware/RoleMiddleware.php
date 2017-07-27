@@ -1,8 +1,9 @@
 <?php
+
 namespace Spatie\Permission\Middleware;
 
-use Closure;
 use Auth;
+use Closure;
 
 class RoleMiddleware
 {
