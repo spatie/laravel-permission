@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.3.1 - 2017-07-27
+- fix commands not using custom models
+
 ## 2.3.0 - 2017-07-25
 - add `create-permission` and `create-role` commands
 
