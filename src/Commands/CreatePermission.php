@@ -3,7 +3,7 @@
 namespace Spatie\Permission\Commands;
 
 use Illuminate\Console\Command;
-use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Contracts\Permission as PermissionContract;
 
 class CreatePermission extends Command
 {
@@ -15,7 +15,9 @@ class CreatePermission extends Command
 
     public function handle()
     {
-        $permission = Permission::create([
+        $permissionClass = app(PermissionContract::class);
+
+        $permission = $permissionClass::create([
             'name' => $this->argument('name'),
             'guard_name' => $this->argument('guard'),
         ]);

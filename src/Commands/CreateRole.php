@@ -4,6 +4,7 @@ namespace Spatie\Permission\Commands;
 
 use Illuminate\Console\Command;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Contracts\Role as RoleContract;
 
 class CreateRole extends Command
 {
@@ -15,11 +16,13 @@ class CreateRole extends Command
 
     public function handle()
     {
-        $permission = Role::create([
+        $roleClass = app(RoleContract::class);
+
+        $role = $roleClass::create([
             'name' => $this->argument('name'),
             'guard_name' => $this->argument('guard'),
         ]);
 
-        $this->info("Role `{$permission->name}` created");
+        $this->info("Role `{$role->name}` created");
     }
 }
