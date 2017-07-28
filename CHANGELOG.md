@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.3.2 - 2017-07-28
+- allow `hasAnyPmerission` to take an array of permissions
+
 ## 2.3.1 - 2017-07-27
 - fix commands not using custom models
 
