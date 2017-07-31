@@ -10,7 +10,7 @@ class RoleMiddleware
     public function handle($request, Closure $next, $role)
     {
         if (Auth::guest()) {
-            return $next($request);
+            abort(403);
         }
 
         $role = (is_array($role)

@@ -10,10 +10,14 @@ class PermissionMiddleware
     public function handle($request, Closure $next, $permission)
     {
         if (Auth::guest()) {
-            return $next($request);
+            abort(403);
         }
 
-        if ($permission && ! Auth::user()->can($permission)) {
+        $permission = (is_array($permission)
+        ? $permission
+        : explode('|', $permission));
+
+        if (! Auth::user()->hasAnyPermission(...$permission)) {
             abort(403);
         }
 
