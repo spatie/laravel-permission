@@ -149,7 +149,6 @@ class MiddlewareTest extends TestCase
         $this->assertEquals($result->status(), 200);
     }
 
-
     /**
      * @test
      * @expectedException Symfony\Component\HttpKernel\Exception\HttpException
