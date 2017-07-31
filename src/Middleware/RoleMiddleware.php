@@ -17,7 +17,7 @@ class RoleMiddleware
         ? $role
         : explode('|', $role));
 
-        if ($role && ! Auth::user()->hasAnyRole($role)) {
+        if (! Auth::user()->hasAnyRole($role)) {
             abort(403);
         }
 
