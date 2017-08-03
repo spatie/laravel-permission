@@ -218,13 +218,9 @@ trait HasRoles
      *
      * @return bool
      */
-    public function hasAnyPermission(...$permissions): bool
+    public function hasAnyPermission($permissions): bool
     {
-        if (is_array($permissions[0])) {
-            $permissions = $permissions[0];
-        }
-
-        foreach ($permissions as $permission) {
+        foreach ((array)$permissions as $permission) {
             if ($this->hasPermissionTo($permission)) {
                 return true;
             }
