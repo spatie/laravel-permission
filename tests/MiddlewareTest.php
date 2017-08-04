@@ -3,194 +3,157 @@
 namespace Spatie\Permission\Test;
 
 use Auth;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Spatie\Permission\Test\TestHelper;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\PermissionMiddleware;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class MiddlewareTest extends TestCase
 {
-    /**
-     * @test
-     * @expectedException Symfony\Component\HttpKernel\Exception\HttpException
-     */
-    public function it_can_not_access_with_middleware_role_if_is_guest()
-    {
-        $request = new Request();
-        $middleware = new RoleMiddleware($this->app);
+    protected $RoleMiddleware, $PermissionMiddleware;
 
-        $result = $middleware->handle($request, function ($request) {
-            return (new Response())->setContent('<html></html>');
-        }, 'testRole');
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->RoleMiddleware = new RoleMiddleware($this->app);
+        $this->PermissionMiddleware = new PermissionMiddleware($this->app);
     }
 
     /**
      * @test
-     * @expectedException Symfony\Component\HttpKernel\Exception\HttpException
      */
-    public function it_can_not_access_with_middleware_permission_if_is_guest()
+    public function a_guest_cannot_access_a_route_protected_by_the_role_middleware()
     {
-        $request = new Request();
-        $middleware = new PermissionMiddleware($this->app);
-
-        $result = $middleware->handle($request, function ($request) {
-            return (new Response())->setContent('<html></html>');
-        }, $this->testUserPermission->name);
+        $this->assertEquals(
+            (new TestHelper)->testMiddleware(
+                $this->RoleMiddleware, 'testRole'
+            ), 403);
     }
 
     /** @test */
-    public function it_can_access_if_the_user_has_role()
+    public function a_user_can_access_a_route_protected_by_role_middleware_if_have_this_role()
     {
         Auth::login($this->testUser);
         $this->testUser->assignRole('testRole');
 
-        $request = new Request();
-        $middleware = new RoleMiddleware($this->app);
-
-        $result = $middleware->handle($request, function ($request) {
-            return (new Response())->setContent('<html></html>');
-        }, 'testRole');
-
-        $this->assertEquals($result->status(), 200);
+        $this->assertEquals(
+            (new TestHelper)->testMiddleware(
+                $this->RoleMiddleware, 'testRole'
+            ), 200);
     }
 
     /** @test */
-    public function it_can_access_if_the_user_has_one_of_two_roles()
+    public function a_user_can_access_a_route_protected_by_this_role_middleware_if_have_one_of_the_roles()
     {
         Auth::login($this->testUser);
         $this->testUser->assignRole('testRole');
 
-        $request = new Request();
-        $middleware = new RoleMiddleware($this->app);
-
-        $result = $middleware->handle($request, function ($request) {
-            return (new Response())->setContent('<html></html>');
-        }, 'testRole|testRole2');
-
-        $this->assertEquals($result->status(), 200);
+        $this->assertEquals(
+            (new TestHelper)->testMiddleware(
+                $this->RoleMiddleware, 'testRole|testRole2'
+            ), 200);
     }
 
     /**
      * @test
-     * @expectedException Symfony\Component\HttpKernel\Exception\HttpException
      */
-    public function it_can_not_access_if_the_user_has_not_role()
+    public function a_user_cannot_access_a_route_protected_by_the_role_middleware_if_have_a_different_role()
     {
         Auth::login($this->testUser);
         $this->testUser->assignRole(['testRole']);
 
-        $request = new Request();
-        $middleware = new RoleMiddleware($this->app);
-
-        $result = $middleware->handle($request, function ($request) {
-            return (new Response())->setContent('<html></html>');
-        }, 'testRole2');
+        $this->assertEquals(
+            (new TestHelper)->testMiddleware(
+                $this->RoleMiddleware, 'testRole2'
+            ), 403);
     }
 
     /**
      * @test
-     * @expectedException Symfony\Component\HttpKernel\Exception\HttpException
      */
-    public function it_can_not_access_if_the_user_has_any_of_two_roles()
+    public function a_user_cannot_access_a_route_protected_by_role_middleware_if_have_not_roles()
     {
         Auth::login($this->testUser);
-        $request = new Request();
-        $middleware = new RoleMiddleware($this->app);
 
-        $result = $middleware->handle($request, function ($request) {
-            return (new Response())->setContent('<html></html>');
-        }, 'testRole|testrole2');
+        $this->assertEquals(
+            (new TestHelper)->testMiddleware(
+                $this->RoleMiddleware, 'testRole|testRole2'
+            ), 403);
     }
 
     /**
      * @test
-     * @expectedException Symfony\Component\HttpKernel\Exception\HttpException
      */
-    public function it_can_not_access_if_middleware_does_not_has_role()
+    public function a_user_cannot_access_a_route_protected_by_role_middleware_if_role_is_undefined()
     {
         Auth::login($this->testUser);
-        $request = new Request();
-        $middleware = new RoleMiddleware($this->app);
 
-        $result = $middleware->handle($request, function ($request) {
-            return (new Response())->setContent('<html></html>');
-        }, '');
+        $this->assertEquals(
+            (new TestHelper)->testMiddleware(
+                $this->RoleMiddleware, ''
+            ), 403);
+    }
+
+    /**
+     * @test
+     */
+    public function a_guest_cannot_access_a_route_protected_by_the_permission_middleware()
+    {
+        $this->assertEquals(
+            (new TestHelper)->testMiddleware(
+                $this->PermissionMiddleware, 'edit-articles'
+            ), 403);
     }
 
     /** @test */
-    public function it_can_access_if_the_user_has_permission()
+    public function a_user_can_access_a_route_protected_by_permission_middleware_if_have_this_permission()
     {
         Auth::login($this->testUser);
         $this->testUser->givePermissionTo('edit-articles');
 
-        $request = new Request();
-        $middleware = new PermissionMiddleware($this->app);
-
-        $result = $middleware->handle($request, function ($request) {
-            return (new Response())->setContent('<html></html>');
-        }, 'edit-articles');
-
-        $this->assertEquals($result->status(), 200);
+        $this->assertEquals(
+            (new TestHelper)->testMiddleware(
+                $this->PermissionMiddleware, 'edit-articles'
+            ), 200);
     }
 
     /** @test */
-    public function it_can_access_if_the_user_has_one_of_two_permission()
+    public function a_user_can_access_a_route_protected_by_this_permission_middleware_if_have_one_of_the_permissions()
     {
         Auth::login($this->testUser);
         $this->testUser->givePermissionTo('edit-articles');
 
-        $request = new Request();
-        $middleware = new PermissionMiddleware($this->app);
-
-        $result = $middleware->handle($request, function ($request) {
-            return (new Response())->setContent('<html></html>');
-        }, 'edit-articles|edit-news');
-
-        $this->assertEquals($result->status(), 200);
+        $this->assertEquals(
+            (new TestHelper)->testMiddleware(
+                $this->PermissionMiddleware, 'edit-articles|edit-news'
+            ), 200);
     }
 
     /**
      * @test
-     * @expectedException Symfony\Component\HttpKernel\Exception\HttpException
      */
-    public function it_can_not_access_if_the_user_has_not_permisson()
+    public function a_user_cannot_access_a_route_protected_by_the_permission_middleware_if_have_a_different_permission()
     {
         Auth::login($this->testUser);
-        $request = new Request();
-        $middleware = new PermissionMiddleware($this->app);
+        $this->testUser->givePermissionTo('edit-articles');
 
-        $result = $middleware->handle($request, function ($request) {
-            return (new Response())->setContent('<html></html>');
-        }, 'edit-articles');
+        $this->assertEquals(
+            (new TestHelper)->testMiddleware(
+                $this->PermissionMiddleware, 'edit-news'
+            ), 403);
     }
 
     /**
      * @test
-     * @expectedException Symfony\Component\HttpKernel\Exception\HttpException
      */
-    public function it_can_not_access_if_the_user_has_any_of_two_permissions()
+    public function a_user_cannot_access_a_route_protected_by_permission_middleware_if_have_not_permissions()
     {
         Auth::login($this->testUser);
-        $request = new Request();
-        $middleware = new PermissionMiddleware($this->app);
 
-        $result = $middleware->handle($request, function ($request) {
-            return (new Response())->setContent('<html></html>');
-        }, 'edit-articles|edit-news');
-    }
-
-    /**
-     * @test
-     * @expectedException Spatie\Permission\Exceptions\PermissionDoesNotExist
-     */
-    public function it_can_not_access_if_middleware_does_not_has_permission()
-    {
-        Auth::login($this->testUser);
-        $request = new Request();
-        $middleware = new PermissionMiddleware($this->app);
-
-        $result = $middleware->handle($request, function ($request) {
-            return (new Response())->setContent('<html></html>');
-        }, '');
+        $this->assertEquals(
+            (new TestHelper)->testMiddleware(
+                $this->PermissionMiddleware, 'edit-articles|edit-news'
+            ), 403);
     }
 }
