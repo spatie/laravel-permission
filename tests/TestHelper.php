@@ -12,10 +12,11 @@ class TestHelper
      * @param string $middleware
      * @param object $parameter
      *
-     * @return integer
+     * @return int
      */
-    public function testMiddleware($middleware, $parameter) {
-        try{
+    public function testMiddleware($middleware, $parameter)
+    {
+        try {
             return $middleware->handle(new Request(), function () {
                 return (new Response())->setContent('<html></html>');
             }, $parameter)->status();

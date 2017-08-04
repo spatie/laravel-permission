@@ -3,14 +3,13 @@
 namespace Spatie\Permission\Test;
 
 use Auth;
-use Spatie\Permission\Test\TestHelper;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\PermissionMiddleware;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class MiddlewareTest extends TestCase
 {
-    protected $RoleMiddleware, $PermissionMiddleware;
+    protected $RoleMiddleware;
+    protected $PermissionMiddleware;
 
     public function setUp()
     {
