@@ -551,6 +551,43 @@ php artisan permission:create-role writer web
 php artisan permission:create-permission edit-articles web
 ```
 
+## Database Seeding
+
+Two notes about Database Seeding:
+
+1. It is best to flush the `spatie.permission.cache` before seeding, to avoid cache conflict errors. This can be done from an Artisan command (see Troubleshooting: Cache section, later) or directly in a seeder class (see example below).
+
+2. Here's a sample seeder, which clears the cache, creates permissions, and then assigns permissions to roles:
+
+	```php
+	use Illuminate\Database\Seeder;
+	use Spatie\Permission\Models\Role;
+	use Spatie\Permission\Models\Permission;
+
+	class RolesAndPermissionsSeeder extends Seeder
+	{
+	    public function run()
+    	{
+        	// Reset cached roles and permissions
+	        app()['cache']->forget('spatie.permission.cache');
+
+	        // create permissions
+	        Permission::create(['name' => 'edit posts']);
+	        Permission::create(['name' => 'delete posts']);
+	        Permission::create(['name' => 'delete users']);
+
+	        // create roles and assign existing permissions
+	        $role = Role::create(['name' => 'Author']);
+	        $role->givePermissionTo('edit posts');
+	        $role->givePermissionTo('delete posts');
+
+	        $role = Role::create(['name' => 'Manager']);
+	        $role->givePermissionTo('delete users');
+	    }
+	}
+
+	```
+
 ## Extending
 
 If you need to extend or replace the existing `Role` or `Permission` models you just need to
