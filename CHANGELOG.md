@@ -2,7 +2,7 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
-## 2.4.0 -2017-07-05
+## 2.4.0 -2017-08-05
 - add `PermissionMiddleware` and `RoleMiddleware`
 
 ## 2.3.2 - 2017-07-28
