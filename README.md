@@ -477,54 +477,28 @@ You can use all of the blade directives listed in [using blade directives](#usin
 
 ## Using a middleware
 
-The package doesn't include a middleware to check permissions but it's very trivial to add this yourself:
-
-``` bash
-$ php artisan make:middleware RoleMiddleware
-```
-
-This will create a `app/Http/Middleware/RoleMiddleware.php` file for you, where you can handle your role and permissions check:
-
-```php
-use Auth;
-
-// ...
-
-public function handle($request, Closure $next, $role, $permission=null)
-{
-    if (Auth::guest()) {
-        return redirect($urlOfYourLoginPage);
-    }
-
-    $role = is_array($role)
-        ? $role
-        : explode('|', $role);
-
-    if (! $request->user()->hasAnyRole($role)) {
-        abort(403);
-    }
-
-    if ($permission && ! $request->user()->can($permission)) {
-        abort(403);
-    }
-
-    return $next($request);
-}
-```
-
-Don't forget to add the route middleware to `app/Http/Kernel.php` file:
+This package comes with `RoleMiddleware` and `PermissionMiddleware` middleware. You can add them inside your `app/Http/Kernel.php` file.
 
 ```php
 protected $routeMiddleware = [
     // ...
-    'role' => \App\Http\Middleware\RoleMiddleware::class,
+    'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+    'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
 ];
 ```
 
 Now you can protect your routes using the middleware you just set up:
 
 ```php
-Route::group(['middleware' => ['role:admin,access_backend']], function () {
+Route::group(['middleware' => ['role:admin']], function () {
+    //
+});
+
+Route::group(['middleware' => ['permission:access_backend']], function () {
+    //
+});
+
+Route::group(['middleware' => ['role:admin','permission:access_backend']], function () {
     //
 });
 ```
