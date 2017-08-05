@@ -2,12 +2,12 @@
 
 namespace Spatie\Permission\Test;
 
-use Illuminate\Support\Facades\Auth;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Middlewares\RoleMiddleware;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class MiddlewareTest extends TestCase
 {
