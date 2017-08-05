@@ -482,8 +482,8 @@ This package comes with `RoleMiddleware` and `PermissionMiddleware` middleware. 
 ```php
 protected $routeMiddleware = [
     // ...
-    'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
-    'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+    'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
+    'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
 ];
 ```
 

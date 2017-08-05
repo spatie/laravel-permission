@@ -1,9 +1,9 @@
 <?php
 
-namespace Spatie\Permission\Middleware;
+namespace Spatie\Permission\Middlewares;
 
-use Auth;
 use Closure;
+use Illuminate\Support\Facades\Auth;
 
 class PermissionMiddleware
 {
@@ -13,9 +13,9 @@ class PermissionMiddleware
             abort(403);
         }
 
-        $permission = (is_array($permission)
-        ? $permission
-        : explode('|', $permission));
+        $permission = is_array($permission)
+            ? $permission
+            : explode('|', $permission);
 
         if (! Auth::user()->hasAnyPermission(...$permission)) {
             abort(403);

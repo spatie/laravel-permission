@@ -1,9 +1,9 @@
 <?php
 
-namespace Spatie\Permission\Middleware;
+namespace Spatie\Permission\Middlewares;
 
-use Auth;
 use Closure;
+use Illuminate\Support\Facades\Auth;
 
 class RoleMiddleware
 {
@@ -13,9 +13,9 @@ class RoleMiddleware
             abort(403);
         }
 
-        $role = (is_array($role)
-        ? $role
-        : explode('|', $role));
+        $role = is_array($role)
+            ? $role
+            : explode('|', $role);
 
         if (! Auth::user()->hasAnyRole($role)) {
             abort(403);
