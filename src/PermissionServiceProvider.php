@@ -76,7 +76,6 @@ class PermissionServiceProvider extends ServiceProvider
 
             $bladeCompiler->directive('hasanyrole', function ($arguments) {
                 list($roles, $guard) = explode(',', $arguments.',');
-                $roles = $this->convertPipeToArray($roles);
 
                 return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasAnyRole({$roles})): ?>";
             });
@@ -86,7 +85,6 @@ class PermissionServiceProvider extends ServiceProvider
 
             $bladeCompiler->directive('hasallroles', function ($arguments) {
                 list($roles, $guard) = explode(',', $arguments.',');
-                $roles = $this->convertPipeToArray($roles);
 
                 return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasAllRoles({$roles})): ?>";
             });
@@ -94,30 +92,5 @@ class PermissionServiceProvider extends ServiceProvider
                 return '<?php endif; ?>';
             });
         });
-    }
-
-    public function convertPipeToArray(string $pipeString)
-    {
-        $pipeString = trim($pipeString);
-
-        if (strlen($pipeString) <= 2) {
-            return $pipeString;
-        }
-
-        $quoteCharacter = substr($pipeString, 0, 1);
-
-        if (! in_array($quoteCharacter, ["'", '"'])) {
-            return $pipeString;
-        }
-
-        $endCharacter = substr($quoteCharacter, -1, 1);
-
-        if ($quoteCharacter !== $endCharacter) {
-            return $pipeString;
-        }
-
-        $roleString = '['.implode($quoteCharacter.','.$quoteCharacter, explode('|', $pipeString)).']';
-
-        return $roleString;
     }
 }
