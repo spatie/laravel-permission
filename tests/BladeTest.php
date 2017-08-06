@@ -31,7 +31,9 @@ class BladeTest extends TestCase
         $this->assertEquals('does not have role', $this->renderView('role', [$role]));
         $this->assertEquals('does not have role', $this->renderView('hasRole', [$role]));
         $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', $roles));
+        $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', ['roles' => implode('|', $roles)]));
         $this->assertEquals('does not have any of the given roles', $this->renderView('hasAnyRole', $roles));
+        $this->assertEquals('does not have any of the given roles', $this->renderView('hasAnyRole', ['roles' => implode('|', $roles)]));
     }
 
     /** @test */
@@ -63,6 +65,7 @@ class BladeTest extends TestCase
         $this->assertEquals('does not have role', $this->renderView('role', compact('role')));
         $this->assertEquals('does not have role', $this->renderView('hasRole', compact('role')));
         $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', compact('roles')));
+        $this->assertEquals('does not have any of the given roles', $this->renderView('hasAnyRole', compact('roles')));
         $this->assertEquals('does not have any of the given roles', $this->renderView('hasAnyRole', compact('roles')));
     }
 
@@ -118,6 +121,7 @@ class BladeTest extends TestCase
         auth()->setUser($this->getMember());
 
         $this->assertEquals('does not have any of the given roles', $this->renderView('hasAnyRole', compact('roles')));
+        $this->assertEquals('does not have any of the given roles', $this->renderView('hasAnyRole', ['roles' => implode('|', $roles)]));
     }
 
     /** @test */
@@ -128,6 +132,7 @@ class BladeTest extends TestCase
         auth()->setUser($this->getMember());
 
         $this->assertEquals('does have some of the roles', $this->renderView('hasAnyRole', compact('roles')));
+        $this->assertEquals('does have some of the roles', $this->renderView('hasAnyRole', ['roles' => implode('|', $roles)]));
     }
 
     /** @test */
@@ -169,6 +174,7 @@ class BladeTest extends TestCase
         auth()->setUser($this->getMember());
 
         $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', compact('roles')));
+        $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', ['roles' => implode('|', $roles)]));
     }
 
     /** @test */
@@ -185,6 +191,7 @@ class BladeTest extends TestCase
         auth()->setUser($user);
 
         $this->assertEquals('does have all of the given roles', $this->renderView('hasAllRoles', compact('roles')));
+        $this->assertEquals('does have all of the given roles', $this->renderView('hasAllRoles', ['roles' => implode('|', $roles)]));
     }
 
     /** @test */
