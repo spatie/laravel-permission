@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.4.1 -2017-08-05
+- Fix processing of pipe symbols in `@hasanyrole` and `@hasallroles` Blade directives
+
 ## 2.4.0 -2017-08-05
 - add `PermissionMiddleware` and `RoleMiddleware`
 
