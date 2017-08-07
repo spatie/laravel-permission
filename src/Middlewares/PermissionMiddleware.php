@@ -3,21 +3,25 @@
 namespace Spatie\Permission\Middlewares;
 
 use Closure;
-use Illuminate\Support\Facades\Auth;
 
 class PermissionMiddleware
 {
     public function handle($request, Closure $next, $permission)
     {
-        if (Auth::guest()) {
+        if (auth()->guest()) {
             abort(403);
         }
 
-        $permission = is_array($permission)
-            ? $permission
-            : explode('|', $permission);
+        if (is_array($permission)) {
+            if (strpos($permission, '|')) {
+               $permission = explode('|', $permission);
+            }
+            if (strpos($permission, ',')) {
+               $permission = explode(',', $permission);
+            }
+        };
 
-        if (! Auth::user()->hasAnyPermission(...$permission)) {
+        if (! auth()->user()->hasAnyPermission($permission)) {
             abort(403);
         }
 

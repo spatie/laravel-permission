@@ -12,6 +12,15 @@ trait HasRoles
 {
     use HasPermissions;
 
+    public static function bootHasRoles()
+    {
+        // Delete associated relations roles/permissions
+        static::deleting(function($model) {
+            $model->roles()->detach();
+            $model->permissions()->detach();
+        });
+    }
+
     /**
      * A model may have multiple roles.
      */
