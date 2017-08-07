@@ -14,10 +14,10 @@ class RoleMiddleware
 
         if (is_array($role)) {
             if (strpos($role, '|')) {
-               $role = explode('|', $role);
+                $role = explode('|', $role);
             }
             if (strpos($role, ',')) {
-               $role = explode(',', $role);
+                $role = explode(',', $role);
             }
         };
 

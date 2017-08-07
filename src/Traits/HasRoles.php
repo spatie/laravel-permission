@@ -15,7 +15,7 @@ trait HasRoles
     public static function bootHasRoles()
     {
         // Delete associated relations roles/permissions
-        static::deleting(function($model) {
+        static::deleting(function ($model) {
             $model->roles()->detach();
             $model->permissions()->detach();
         });

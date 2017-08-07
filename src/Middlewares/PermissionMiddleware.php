@@ -14,10 +14,10 @@ class PermissionMiddleware
 
         if (is_array($permission)) {
             if (strpos($permission, '|')) {
-               $permission = explode('|', $permission);
+                $permission = explode('|', $permission);
             }
             if (strpos($permission, ',')) {
-               $permission = explode(',', $permission);
+                $permission = explode(',', $permission);
             }
         };
 
