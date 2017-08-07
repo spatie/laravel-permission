@@ -19,7 +19,7 @@ class PermissionMiddleware
             if (strpos($permission, ',')) {
                 $permission = explode(',', $permission);
             }
-        };
+        }
 
         if (! auth()->user()->hasAnyPermission($permission)) {
             abort(403);

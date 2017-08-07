@@ -19,7 +19,7 @@ class RoleMiddleware
             if (strpos($role, ',')) {
                 $role = explode(',', $role);
             }
-        };
+        }
 
         if (! auth()->user()->hasAnyRole($role)) {
             abort(403);
