@@ -3,25 +3,21 @@
 namespace Spatie\Permission\Middlewares;
 
 use Closure;
+use Illuminate\Support\Facades\Auth;
 
 class RoleMiddleware
 {
     public function handle($request, Closure $next, $role)
     {
-        if (auth()->guest()) {
+        if (Auth::guest()) {
             abort(403);
         }
 
-        if (is_array($role)) {
-            if (strpos($role, '|')) {
-                $role = explode('|', $role);
-            }
-            if (strpos($role, ',')) {
-                $role = explode(',', $role);
-            }
-        }
+        $role = is_array($role)
+            ? $role
+            : explode('|', $role);
 
-        if (! auth()->user()->hasAnyRole($role)) {
+        if (! Auth::user()->hasAnyRole($role)) {
             abort(403);
         }
 
