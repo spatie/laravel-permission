@@ -9,11 +9,7 @@ trait RefreshesPermissionCache
 {
     public static function bootRefreshesPermissionCache()
     {
-        static::created(function (Model $model) {
-            app(PermissionRegistrar::class)->forgetCachedPermissions();
-        });
-
-        static::updated(function (Model $model) {
+        static::saved(function (Model $model) {
             app(PermissionRegistrar::class)->forgetCachedPermissions();
         });
 
