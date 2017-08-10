@@ -151,6 +151,13 @@ return [
     ],
 
     /*
+     * By default all permissions will be cached for 24 hours unless a permission or
+     * role is updated. Then the cache will be flushed immediately.
+     */
+
+    'cache_expiration_time' => 60 * 24,
+
+    /*
      * By default we'll make an entry in the application log when the permissions
      * could not be loaded. Normally this only occurs while installing the packages.
      *
@@ -210,7 +217,7 @@ The `HasRoles` adds Eloquent relationships to your models, which can be accessed
 
 ```php
 $permissions = $user->permissions;
-$roles = $user->roles()->pluck('name'); // Returns a collection
+$roles = $user->roles->pluck('name'); // Returns a collection
 ```
 
 The `HasRoles` also adds a scope to your models to scope the query to certain roles:

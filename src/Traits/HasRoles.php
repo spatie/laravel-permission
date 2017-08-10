@@ -19,6 +19,11 @@ trait HasRoles
             $model->roles()->detach();
             $model->permissions()->detach();
         });
+
+        // Eager load relations by default
+        static::addGlobalScope('relations', function (Builder $builder) {
+            $builder->with(['roles', 'permissions']);
+        });
     }
 
     /**
