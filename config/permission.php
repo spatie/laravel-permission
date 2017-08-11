@@ -14,6 +14,7 @@ return [
          */
 
         'permission' => Spatie\Permission\Models\Permission::class,
+        'permissions_connection' => env('DB_CONNECTION', 'mysql'),
 
         /*
          * When using the "HasRoles" trait from this package, we need to know which
@@ -25,6 +26,7 @@ return [
          */
 
         'role' => Spatie\Permission\Models\Role::class,
+        'roles_connection' => env('DB_CONNECTION', 'mysql'),
 
     ],
 
