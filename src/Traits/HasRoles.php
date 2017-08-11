@@ -14,15 +14,9 @@ trait HasRoles
 
     public static function bootHasRoles()
     {
-        // Delete associated relations roles/permissions
         static::deleting(function ($model) {
             $model->roles()->detach();
             $model->permissions()->detach();
-        });
-
-        // Eager load relations by default
-        static::addGlobalScope('relations', function (Builder $builder) {
-            $builder->with(['roles', 'permissions']);
         });
     }
 
