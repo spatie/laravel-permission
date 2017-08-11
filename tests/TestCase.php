@@ -14,19 +14,22 @@ abstract class TestCase extends Orchestra
 {
     /** @var \Spatie\Permission\Test\User */
     protected $testUser;
-
+    /** @var \Spatie\Permission\Test\PrefixedUser */
+    protected $testPrefixedUser;
     /** @var \Spatie\Permission\Test\Admin */
     protected $testAdmin;
 
     /** @var \Spatie\Permission\Models\Role */
     protected $testUserRole;
-
+    /** @var \Spatie\Permission\Models\Role */
+    protected $testPrefixedUserRole;
     /** @var \Spatie\Permission\Models\Role */
     protected $testAdminRole;
 
     /** @var \Spatie\Permission\Models\Permission */
     protected $testUserPermission;
-
+    /** @var \Spatie\Permission\Models\Permission */
+    protected $testPrefixedUserPermission;
     /** @var \Spatie\Permission\Models\Permission */
     protected $testAdminPermission;
 
@@ -45,7 +48,9 @@ abstract class TestCase extends Orchestra
         $this->testAdmin = Admin::first();
         $this->testAdminRole = app(Role::class)->find(3);
         $this->testAdminPermission = app(Permission::class)->find(3);
-
+        $this->testPrefixedUser = PrefixedUser::first();
+        $this->testPrefixedUserRole = app(Role::class)->find(4);
+        $this->testPrefixedUserPermission = app(Permission::class)->find(4);
         $this->clearLogTestHandler();
     }
 
@@ -68,6 +73,9 @@ abstract class TestCase extends Orchestra
      */
     protected function getEnvironmentSetUp($app)
     {
+        $app['config']->set('permission.models.roles_connection', 'sqlite');
+        $app['config']->set('permission.models.permissions_connection', 'sqlite');
+
         $app['config']->set('database.default', 'sqlite');
         $app['config']->set('database.connections.sqlite', [
             'driver'   => 'sqlite',
@@ -75,12 +83,19 @@ abstract class TestCase extends Orchestra
             'prefix'   => '',
         ]);
 
+        $app['config']->set('database.connections.prefixed_sqlite', [
+            'driver'   => 'sqlite',
+            'database' => ':memory:',
+            'prefix'   => 'pre_',
+        ]);
+
         $app['config']->set('view.paths', [__DIR__.'/resources/views']);
 
         // Set-up admin guard
         $app['config']->set('auth.guards.admin', ['driver' => 'session', 'provider' => 'admins']);
         $app['config']->set('auth.providers.admins', ['driver' => 'eloquent', 'model' => Admin::class]);
-
+        $app['config']->set('auth.guards.prefixed_user', ['driver' => 'session', 'provider' => 'prefixed_users']);
+        $app['config']->set('auth.providers.prefixed_users', ['driver' => 'eloquent', 'model' => PrefixedUser::class]);
         // Use test User model for users provider
         $app['config']->set('auth.providers.users.model', User::class);
 
@@ -99,6 +114,11 @@ abstract class TestCase extends Orchestra
             $table->string('email');
         });
 
+        $app['db']->connection('prefixed_sqlite')->getSchemaBuilder()->create('users', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('email');
+        });
+
         $app['db']->connection()->getSchemaBuilder()->create('admins', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
@@ -110,12 +130,17 @@ abstract class TestCase extends Orchestra
 
         User::create(['email' => 'test@user.com']);
         Admin::create(['email' => 'admin@user.com']);
+        PrefixedUser::create(['email' => 'prefixed@user.com']);
+
         $app[Role::class]->create(['name' => 'testRole']);
         $app[Role::class]->create(['name' => 'testRole2']);
         $app[Role::class]->create(['name' => 'testAdminRole', 'guard_name' => 'admin']);
         $app[Permission::class]->create(['name' => 'edit-articles']);
         $app[Permission::class]->create(['name' => 'edit-news']);
         $app[Permission::class]->create(['name' => 'admin-permission', 'guard_name' => 'admin']);
+
+        $app[Role::class]->create(['name' => 'prefixedUserRole', 'guard_name' => 'prefixed_user']);
+        $app[Permission::class]->create(['name' => 'prefixed-user-permission', 'guard_name' => 'prefixed_user']);
     }
 
     /**
@@ -136,6 +161,14 @@ abstract class TestCase extends Orchestra
     public function refreshTestUser()
     {
         $this->testUser = $this->testUser->fresh();
+    }
+
+    /**
+     * Refresh the testPrefixedUser.
+     */
+    public function refreshTestPrefixedUser()
+    {
+        $this->testPrefixedUser = $this->testPrefixedUser->fresh();
     }
 
     /**
