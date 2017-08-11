@@ -193,9 +193,9 @@ class User extends Authenticatable
 >class Page extends Model
 >{
 >    use HasRoles;
->    
+>
 >    protected $guard_name = 'web'; // or whatever guard you want to use
->    
+>
 >    // ...
 >}
 >```
@@ -217,7 +217,7 @@ The `HasRoles` adds Eloquent relationships to your models, which can be accessed
 
 ```php
 $permissions = $user->permissions;
-$roles = $user->roles()->pluck('name'); // Returns a collection
+$roles = $user->roles->pluck('name'); // Returns a collection
 ```
 
 The `HasRoles` also adds a scope to your models to scope the query to certain roles:
