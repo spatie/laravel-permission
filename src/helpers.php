@@ -25,6 +25,7 @@ function getRoleNames(App\User $user): string
     if ($user) {
         return ucwords($user->roles->pluck('name')->implode(', '));
     }
+
     return '';
 }
 
@@ -40,5 +41,6 @@ function getRoleNamesRaw(App\User $user): string
     if ($user) {
         return $user->roles->pluck('name');
     }
+
     return '';
 }
