@@ -2,6 +2,8 @@
 
 namespace Spatie\Permission\Test;
 
+use Spatie\Permission\Contracts\Role;
+
 class RoleNamesTest extends TestCase
 {
     public function setUp()
