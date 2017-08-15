@@ -76,7 +76,7 @@ You can publish the config file with:
 php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="config"
 ```
 
-This is the contents of the published `config/permission.php` config file:
+These are the contents of the published `config/permission.php` config file:
 
 ```php
 return [
@@ -419,7 +419,7 @@ roles. Optionally you can pass in the `guard` that the check will be performed o
 @else
     I don't have all of these roles...
 @endhasallroles
-//or
+// or
 @hasallroles('writer|admin')
     I have all of these roles!
 @else
