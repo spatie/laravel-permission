@@ -57,14 +57,13 @@ Now add the service provider in `config/app.php` file:
 ];
 ```
 
-You can publish the migration with:
+You can publish [the migration](https://github.com/spatie/laravel-permission/blob/master/database/migrations/create_permission_tables.php.stub) with:
 
 ```bash
 php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="migrations"
 ```
 
-After the migration has been published you can create the role- and permission-tables by
-running the migrations:
+After the migration has been published you can create the role- and permission-tables by running the migrations:
 
 ```bash
 php artisan migrate
@@ -76,7 +75,7 @@ You can publish the config file with:
 php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="config"
 ```
 
-These are the contents of the published `config/permission.php` config file:
+When published, [the `config/permission.php` config file](https://github.com/spatie/laravel-permission/blob/master/config/permission.php) contains:
 
 ```php
 return [
@@ -170,7 +169,7 @@ return [
 
 ## Usage
 
-First add the `Spatie\Permission\Traits\HasRoles` trait to your User model(s):
+First add the `Spatie\Permission\Traits\HasRoles` trait to your `User` model(s):
 
 ```php
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -201,7 +200,7 @@ class User extends Authenticatable
 >```
 
 This package allows for users to be associated with permissions and roles. Every role is associated with multiple permissions.
-A `Role` and a `Permission` are regular Eloquent models. They have a name and can be created like this:
+A `Role` and a `Permission` are regular Eloquent models. They require a `name` and can be created like this:
 
 ```php
 use Spatie\Permission\Models\Role;
@@ -213,24 +212,30 @@ $permission = Permission::create(['name' => 'edit articles']);
 
 If you're using multiple guards the `guard_name` attribute needs to be set as well. Read about it in the [using multiple guards](#using-multiple-guards) section of the readme.
 
-The `HasRoles` adds Eloquent relationships to your models, which can be accessed directly or used as a base query:
+The `HasRoles` trait adds Eloquent relationships to your models, which can be accessed directly or used as a base query:
 
 ```php
+// get a list of all permissions directly assigned to the user
 $permissions = $user->permissions;
+
+// get all permissions inherited by the user via roles
+$permissions = $user->getAllPermissions();
+
+// get a collection of all defined roles
 $roles = $user->roles->pluck('name'); // Returns a collection
 ```
 
-The `HasRoles` also adds a scope to your models to scope the query to certain roles:
+The `HasRoles` trait also adds a scope to your models to scope the query to certain roles:
 
 ```php
-$users = User::role('writer')->get(); // Only returns users with the role 'writer'
+$users = User::role('writer')->get(); // Returns only users with the role 'writer'
 ```
 
 The scope can accept a string, a `\Spatie\Permission\Models\Role` object or an `\Illuminate\Support\Collection` object.
 
-### Using permissions
+### Using "direct" permissions (see below to use both roles and permissions)
 
-A permission can be given to any user with the `HasRoles` trait:
+A permission can be given to any user:
 
 ```php
 $user->givePermissionTo('edit articles');
@@ -273,15 +278,16 @@ test if a user has a permission with Laravel's default `can` function:
 $user->can('edit articles');
 ```
 
-### Using permissions and roles
+### Using permissions via roles
 
-A role can be assigned to any user with the `HasRoles` trait:
+A role can be assigned to any user:
 
 ```php
 $user->assignRole('writer');
 
 // You can also assign multiple roles at once
 $user->assignRole('writer', 'admin');
+// or as an array
 $user->assignRole(['writer', 'admin']);
 ```
 
@@ -294,7 +300,7 @@ $user->removeRole('writer');
 Roles can also be synced:
 
 ```php
-// All current roles will be removed from the user and replace by the array given
+// All current roles will be removed from the user and replaced by the array given
 $user->syncRoles(['writer', 'admin']);
 ```
 
@@ -340,16 +346,13 @@ $role->revokePermissionTo('edit articles');
 The `givePermissionTo` and `revokePermissionTo` functions can accept a
 string or a `Spatie\Permission\Models\Permission` object.
 
-Saved permission and roles are also registered with the `Illuminate\Auth\Access\Gate` class.
+
+Permissions are inherited from roles automatically. 
+Additionally, individual permissions can be assigned to the user too. 
+For instance:
 
 ```php
-$user->can('edit articles');
-```
-
-All permissions of roles that user is assigned to are inherited to the
-user automatically. In addition to these permissions particular permission can be assigned to the user too. For instance:
-
-```php
+$role = Role::findByName('writer');
 $role->givePermissionTo('edit articles');
 
 $user->assignRole('writer');
@@ -357,48 +360,55 @@ $user->assignRole('writer');
 $user->givePermissionTo('delete articles');
 ```
 
-In above example a role is given permission to edit articles and this role is assigned to a user. Now user can edit articles and additionally delete articles. The permission of 'delete articles' is his direct permission because it is assigned directly to him. When we call `$user->hasDirectPermission('delete articles')` it returns `true` and `false` for `$user->hasDirectPermission('edit articles')`.
+In the above example a role is given permission to edit articles and this role is assigned to a user. 
+Now the user can edit articles and additionally delete articles. The permission of 'delete articles' is the user's direct permission because it is assigned directly to them.
+When we call `$user->hasDirectPermission('delete articles')` it returns `true`, 
+but `false` for `$user->hasDirectPermission('edit articles')`.
 
-This method is useful if one has a form for setting permissions for roles and users in his application and want to restrict to change inherited permissions of roles of user, i.e. allowing to change only direct permissions of user.
+This method is useful if one builds a form for setting permissions for roles and users in an application and wants to restrict or change inherited permissions of roles of the user, i.e. allowing to change only direct permissions of the user.
 
-You can list all of theses permissions:
+You can list all of these permissions:
 
 ```php
 // Direct permissions
 $user->getDirectPermissions() // Or $user->permissions;
 
-// Permissions inherited from user's roles
+// Permissions inherited from the user's roles
 $user->getPermissionsViaRoles();
 
-// All permissions which apply on the user
+// All permissions which apply on the user (inherited and direct)
 $user->getAllPermissions();
 ```
 
-All theses responses are collections of `Spatie\Permission\Models\Permission` objects.
+All these responses are collections of `Spatie\Permission\Models\Permission` objects.
 
 If we follow the previous example, the first response will be a collection with the 'delete article' permission, the
 second will be a collection with the 'edit article' permission and the third will contain both.
 
 ### Using Blade directives
-This package also adds Blade directives to verify whether the currently logged in user has all or any of a given list of
-roles. Optionally you can pass in the `guard` that the check will be performed on as a second argument.
+This package also adds Blade directives to verify whether the currently logged in user has all or any of a given list of roles. 
 
+Optionally you can pass in the `guard` that the check will be performed on as a second argument.
+
+#### Blade and Roles
+Test for a specific role:
 ```php
 @role('writer')
-    I'm a writer!
+    I am a writer!
 @else
-    I'm not a writer...
+    I am not a writer...
 @endrole
 ```
-
+is the same as
 ```php
 @hasrole('writer')
-    I'm a writer!
+    I am a writer!
 @else
-    I'm not a writer...
+    I am not a writer...
 @endhasrole
 ```
 
+Test for any role in a list:
 ```php
 @hasanyrole(Role::all())
     I have one or more of these roles!
@@ -407,27 +417,41 @@ roles. Optionally you can pass in the `guard` that the check will be performed o
 @endhasanyrole
 // or
 @hasanyrole('writer|admin')
-    I have one or more of these roles!
+    I am either a writer or an admin or both!
 @else
     I have none of these roles...
 @endhasanyrole
 ```
+Test for all roles:
 
 ```php
 @hasallroles(Role::all())
     I have all of these roles!
 @else
-    I don't have all of these roles...
+    I do not have all of these roles...
 @endhasallroles
 // or
 @hasallroles('writer|admin')
-    I have all of these roles!
+    I am both a writer and an admin!
 @else
-    I don't have all of these roles...
+    I do not have all of these roles...
 @endhasallroles
 ```
 
-You can use Laravel's native `@can` directive to check if a user has a certain permission.
+#### Blade and Permissions
+This package doesn't add any permission-specific Blade directives. Instead, use Laravel's native `@can` directive to check if a user has a certain permission.
+
+```php
+@can('edit articles')
+  //
+@endcan
+```
+or
+```php
+@if(auth()->user()->can('edit articles') && $some_other_condition)
+  //
+@endif
+```
 
 ## Using multiple guards
 
@@ -437,31 +461,28 @@ However when using multiple guards they will act like namespaces for your permis
 
 ### Using permissions and roles with multiple guards
 
-By default the default guard (`auth.default.guard`) will be used as the guard for new permissions and roles. When creating permissions and roles for specific guards you'll have to specify their `guard_name` on the model:
+By default the default guard (`config('auth.default.guard')`) will be used as the guard for new permissions and roles. When creating permissions and roles for specific guards you'll have to specify their `guard_name` on the model:
 
 ```php
 // Create a superadmin role for the admin users
 $role = Role::create(['guard_name' => 'admin', 'name' => 'superadmin']);
 
-// Define a `create posts` permission for the admin users beloninging to the admin guard
-$permission = Permission::create(['guard_name' => 'admin', 'name' => 'create posts']);
+// Define a `publish articles` permission for the admin users belonging to the admin guard
+$permission = Permission::create(['guard_name' => 'admin', 'name' => 'publish articles']);
 
-// Define a different `create posts` permission for the regular users belonging to the web guard
-$permission = Permission::create(['guard_name' => 'web', 'name' => 'create posts']);
+// Define a *different* `publish articles` permission for the regular users belonging to the web guard
+$permission = Permission::create(['guard_name' => 'web', 'name' => 'publish articles']);
 ```
 
-This is how you can check if a user has permission for a specific guard:
+To check if a user has permission for a specific guard:
 
 ```php
-$permissionName = 'edit articles';
-$guardName = 'api';
-
-$user->hasPermissionTo($permissionName, $guardName);
+$user->hasPermissionTo('publish articles', 'admin');
 ```
 
 ### Assigning permissions and roles to guard users
 
-You can use the same methods to assign permissions and roles to users as described above in [using permissions and roles](#using-permissions-and-roles). Just make sure the `guard_name`s on the permission or role match the guard of the user, otherwise a `GuardDoesNotMatch` exception will be thrown.
+You can use the same methods to assign permissions and roles to users as described above in [using permissions via roles](#using-permissions-via-roles). Just make sure the `guard_name` on the permission or role matches the guard of the user, otherwise a `GuardDoesNotMatch` exception will be thrown.
 
 ### Using blade directives with multiple guards
 
@@ -469,9 +490,9 @@ You can use all of the blade directives listed in [using blade directives](#usin
 
 ```php
 @role('super-admin', 'admin')
-    I'm a super-admin!
+    I am a super-admin!
 @else
-    I'm not a super-admin...
+    I am not a super-admin...
 @endrole
 ```
 
@@ -487,20 +508,28 @@ protected $routeMiddleware = [
 ];
 ```
 
-Now you can protect your routes using the middleware you just set up:
+Then you can protect your routes using middleware rules:
 
 ```php
-Route::group(['middleware' => ['role:admin']], function () {
+Route::group(['middleware' => ['role:super-admin']], function () {
     //
 });
 
-Route::group(['middleware' => ['permission:access_backend']], function () {
+Route::group(['middleware' => ['permission:publish articles']], function () {
     //
 });
 
-Route::group(['middleware' => ['role:admin','permission:access_backend']], function () {
+Route::group(['middleware' => ['role:super-admin','permission:publish articles']], function () {
     //
 });
+```
+You can protect your controllers similarly, by setting desired middleware in the constructor:
+
+```php
+public function __construct
+{
+    $this->middleware(['role:super-admin','permission:publish articles']);
+}
 ```
 
 ## Using artisan commands
@@ -512,17 +541,17 @@ php artisan permission:create-role writer
 ```
 
 ```bash
-php artisan permission:create-permission edit-articles
+php artisan permission:create-permission 'edit articles'
 ```
 
-When creating permissions and roles for specific guards you'll can to specify the guard names as a second argument:
+When creating permissions and roles for specific guards you can specify the guard names as a second argument:
 
 ```bash
 php artisan permission:create-role writer web
 ```
 
 ```bash
-php artisan permission:create-permission edit-articles web
+php artisan permission:create-permission 'edit articles' web
 ```
 
 ## Database Seeding
@@ -546,17 +575,19 @@ Two notes about Database Seeding:
 	        app()['cache']->forget('spatie.permission.cache');
 
 	        // create permissions
-	        Permission::create(['name' => 'edit posts']);
-	        Permission::create(['name' => 'delete posts']);
-	        Permission::create(['name' => 'delete users']);
+	        Permission::create(['name' => 'edit articles']);
+	        Permission::create(['name' => 'delete articles']);
+	        Permission::create(['name' => 'publish articles']);
+	        Permission::create(['name' => 'unpublish articles']);
 
 	        // create roles and assign existing permissions
-	        $role = Role::create(['name' => 'Author']);
-	        $role->givePermissionTo('edit posts');
-	        $role->givePermissionTo('delete posts');
+	        $role = Role::create(['name' => 'writer']);
+	        $role->givePermissionTo('edit articles');
+	        $role->givePermissionTo('delete articles');
 
-	        $role = Role::create(['name' => 'Manager']);
-	        $role->givePermissionTo('delete users');
+	        $role = Role::create(['name' => 'admin']);
+	        $role->givePermissionTo('publish articles');
+	        $role->givePermissionTo('unpublish articles');
 	    }
 	}
 
