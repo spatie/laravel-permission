@@ -417,7 +417,7 @@ Test for any role in a list:
 @endhasanyrole
 // or
 @hasanyrole('writer|admin')
-    I have one or more of these roles!
+    I am either a writer or an admin or both!
 @else
     I have none of these roles...
 @endhasanyrole
@@ -432,7 +432,7 @@ Test for all roles:
 @endhasallroles
 // or
 @hasallroles('writer|admin')
-    I have all of these roles!
+    I am both a writer and an admin!
 @else
     I do not have all of these roles...
 @endhasallroles
