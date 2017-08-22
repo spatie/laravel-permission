@@ -82,6 +82,41 @@ trait HasRoles
             });
         });
     }
+    
+    /**
+     * Scope the model query to certain permissions only.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string|array|Role|\Illuminate\Support\Collection $permissions
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopePermission(Builder $query, $permissions): Builder
+    {
+        if ($permissions instanceof Collection) {
+            $permissions = $permissions->toArray();
+        }
+
+        if (! is_array($permissions)) {
+            $permissions = [$permissions];
+        }
+
+        $permissions = array_map(function ($permission) {
+            if ($permission instanceof Role) {
+                return $permission;
+            }
+
+            return app(Permission::class)->findByName($permission, $this->getDefaultGuardName());
+        }, $permissions);
+
+        return $query->whereHas('permissions', function ($query) use ($permissions) {
+            $query->where(function ($query) use ($permissions) {
+                foreach ($permissions as $permission) {
+                    $query->orWhere(config('permission.table_names.permissions').'.id', $permission->id);
+                }
+            });
+        });
+    }
 
     /**
      * Assign the given role to the model.
