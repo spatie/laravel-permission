@@ -600,10 +600,12 @@ keep the following things in mind:
 
 - Your `Role` model needs to implement the `Spatie\Permission\Contracts\Role` contract
 - Your `Permission` model needs to implement the `Spatie\Permission\Contracts\Permission` contract
-- You must publish the configuration with this command:
+- You can publish the configuration with this command:
+
   ```bash
-  $ php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="config"
+ php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="config"
   ```
+  
   And update the `models.role` and `models.permission` values
 
 ## Troubleshooting
