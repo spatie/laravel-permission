@@ -603,7 +603,7 @@ keep the following things in mind:
 - You can publish the configuration with this command:
 
 ```bash
- php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="config"
+php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="config"
 ```
   
   And update the `models.role` and `models.permission` values
