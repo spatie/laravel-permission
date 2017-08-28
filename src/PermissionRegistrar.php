@@ -33,7 +33,7 @@ class PermissionRegistrar
     public function registerPermissions(): bool
     {
         try {
-            $this->getPermissions()->map(function ($permission) {
+            $this->getPermissions()->map(function (Permission $permission) {
                 $this->gate->define($permission->name, function ($user) use ($permission) {
                     return $user->hasPermissionTo($permission);
                 });

@@ -89,7 +89,7 @@ trait HasPermissions
     /**
      * @param \Spatie\Permission\Contracts\Permission|\Spatie\Permission\Contracts\Role $roleOrPermission
      *
-     * @throws \Spatie\Permission\Exceptions\GuardMismatch
+     * @throws \Spatie\Permission\Exceptions\GuardDoesNotMatch
      */
     protected function ensureModelSharesGuard($roleOrPermission)
     {

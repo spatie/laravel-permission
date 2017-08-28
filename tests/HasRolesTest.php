@@ -140,6 +140,23 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_deletes_pivot_table_entries_when_deleting_models()
+    {
+        $user = User::create(['email' => 'user@test.com']);
+
+        $user->assignRole('testRole');
+        $user->givePermissionTo('edit-articles');
+
+        $this->assertDatabaseHas('model_has_permissions', ['model_id' => $user->id]);
+        $this->assertDatabaseHas('model_has_roles', ['model_id' => $user->id]);
+
+        $user->delete();
+
+        $this->assertDatabaseMissing('model_has_permissions', ['model_id' => $user->id]);
+        $this->assertDatabaseMissing('model_has_roles', ['model_id' => $user->id]);
+    }
+
+    /** @test */
     public function it_can_scope_users_using_a_string()
     {
         $user1 = User::create(['email' => 'user1@test.com']);

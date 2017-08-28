@@ -52,7 +52,7 @@ trait HasRoles
      * Scope the model query to certain roles only.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string|array|Role|\Illuminate\Support\Collection $roles
+     * @param string|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
@@ -122,7 +122,7 @@ trait HasRoles
     /**
      * Remove all current roles and set the given ones.
      *
-     * @param array ...$roles
+     * @param array|\Spatie\Permission\Contracts\Role|string ...$roles
      *
      * @return $this
      */
