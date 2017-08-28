@@ -4,6 +4,7 @@ namespace Spatie\Permission;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
+use Spatie\Permission\Contracts\Group as GroupContract;
 use Spatie\Permission\Contracts\Role as RoleContract;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 
@@ -51,6 +52,7 @@ class PermissionServiceProvider extends ServiceProvider
 
         $this->app->bind(PermissionContract::class, $config['permission']);
         $this->app->bind(RoleContract::class, $config['role']);
+        $this->app->bind(GroupContract::class, $config['group']);
     }
 
     protected function registerBladeExtensions()
@@ -89,6 +91,41 @@ class PermissionServiceProvider extends ServiceProvider
                 return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasAllRoles({$roles})): ?>";
             });
             $bladeCompiler->directive('endhasallroles', function () {
+                return '<?php endif; ?>';
+            });
+            $bladeCompiler->directive('group', function ($arguments) {
+                list($group, $guard) = explode(',', $arguments.',');
+
+                return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasGroup({$group})): ?>";
+            });
+            $bladeCompiler->directive('endgroup', function () {
+                return '<?php endif; ?>';
+            });
+
+            $bladeCompiler->directive('hasgroup', function ($arguments) {
+                list($group, $guard) = explode(',', $arguments.',');
+
+                return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasGroup({$group})): ?>";
+            });
+            $bladeCompiler->directive('endhasgroup', function () {
+                return '<?php endif; ?>';
+            });
+
+            $bladeCompiler->directive('hasanygroup', function ($arguments) {
+                list($groups, $guard) = explode(',', $arguments.',');
+
+                return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasAnyGroup({$groups})): ?>";
+            });
+            $bladeCompiler->directive('endhasanygroup', function () {
+                return '<?php endif; ?>';
+            });
+
+            $bladeCompiler->directive('hasallgroups', function ($arguments) {
+                list($groups, $guard) = explode(',', $arguments.',');
+
+                return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasAllGroups({$groups})): ?>";
+            });
+            $bladeCompiler->directive('endhasallgroups', function () {
                 return '<?php endif; ?>';
             });
         });

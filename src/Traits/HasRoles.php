@@ -341,4 +341,30 @@ trait HasRoles
 
         return explode('|', trim($pipeString, $quoteCharacter));
     }
+
+    /**
+     * Grant the given role(s) to a group.
+     *
+     * @param string|array|\Spatie\Permission\Contracts\Group|\Illuminate\Support\Collection $roles
+     *
+     * @return $this
+     */
+    public function giveRoleTo(...$roles)
+    {
+        $roles = collect($roles)
+            ->flatten()
+            ->map(function ($role) {
+                return $this->getStoredRole($role);
+            })
+            ->each(function ($role) {
+                $this->ensureModelSharesGuard($role);
+            })
+            ->all();
+
+        $this->roles()->saveMany($roles);
+
+        $this->forgetCachedPermissions();
+
+        return $this;
+    }
 }

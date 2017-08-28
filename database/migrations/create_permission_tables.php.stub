@@ -71,6 +71,60 @@ class CreatePermissionTables extends Migration
 
             $table->primary(['permission_id', 'role_id']);
         });
+
+        Schema::create('role_groups', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('description');
+            $table->string('guard_name');
+            $table->timestamps();
+        });
+
+        Schema::create('model_has_groups', function (Blueprint $table) {
+            $table->integer('group_id')->unsigned();
+            $table->morphs('model');
+
+            $table->foreign('group_id')
+                ->references('id')
+                ->on('role_groups')
+                ->onDelete('cascade');
+
+            $table->primary(['group_id', 'model_id', 'model_type']);
+        });
+
+        Schema::create('group_has_roles', function (Blueprint $table) {
+            $table->integer('group_id')->unsigned();
+            $table->integer('role_id')->unsigned();
+
+            $table->foreign('group_id')
+                ->references('id')
+                ->on('role_groups')
+                ->onDelete('cascade');
+
+            $table->foreign('role_id')
+                ->references('id')
+                ->on('roles')
+                ->onDelete('cascade');
+
+            $table->primary(['group_id', 'role_id']);
+        });
+
+        Schema::create('group_has_permissions', function (Blueprint $table) {
+            $table->integer('group_id')->unsigned();
+            $table->integer('permission_id')->unsigned();
+
+            $table->foreign('group_id')
+                ->references('id')
+                ->on('role_groups')
+                ->onDelete('cascade');
+
+            $table->foreign('permission_id')
+                ->references('id')
+                ->on('permissions')
+                ->onDelete('cascade');
+
+            $table->primary(['group_id', 'permission_id']);
+        });
     }
 
     /**
@@ -85,7 +139,11 @@ class CreatePermissionTables extends Migration
         Schema::drop($tableNames['role_has_permissions']);
         Schema::drop($tableNames['model_has_roles']);
         Schema::drop($tableNames['model_has_permissions']);
+        Schema::drop($tableNames['group_has_permissions']);
+        Schema::drop($tableNames['model_has_groups']);
         Schema::drop($tableNames['roles']);
         Schema::drop($tableNames['permissions']);
+        Schema::dropIfExists('groups');
+
     }
 }
