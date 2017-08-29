@@ -98,12 +98,20 @@ return [
         'model_has_groups' => 'model_has_groups',
 
         /*
-         * When using the "HasRoles" trait from this package, we need to know which
-         * table should be used to retrieve your roles permissions. We have chosen a
+         * When using the "HasGroups" trait from this package, we need to know which
+         * table should be used to retrieve your groups permissions. We have chosen a
          * basic default value but you may easily change it to any table you like.
          */
 
         'group_has_permissions' => 'group_has_permissions',
+
+        /*
+         * When using the "HasGroups" trait from this package, we need to know which
+         * table should be used to retrieve your groups permissions. We have chosen a
+         * basic default value but you may easily change it to any table you like.
+         */
+
+        'group_has_roles' => 'group_has_roles',
     ],
 
     /*

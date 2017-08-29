@@ -70,14 +70,14 @@ class CreatePermissionTables extends Migration
             $table->primary(['permission_id', 'role_id']);
         });
 
-        Schema::create('role_groups', function (Blueprint $table) {
+        Schema::create($tableNames['groups'], function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('guard_name');
             $table->timestamps();
         });
 
-        Schema::create('model_has_groups', function (Blueprint $table) {
+        Schema::create($tableNames['model_has_groups'], function (Blueprint $table) {
             $table->integer('group_id')->unsigned();
             $table->morphs('model');
 
@@ -89,7 +89,7 @@ class CreatePermissionTables extends Migration
             $table->primary(['group_id', 'model_id', 'model_type']);
         });
 
-        Schema::create('group_has_roles', function (Blueprint $table) {
+        Schema::create($tableNames['group_has_roles'], function (Blueprint $table) {
             $table->integer('group_id')->unsigned();
             $table->integer('role_id')->unsigned();
 
@@ -106,7 +106,7 @@ class CreatePermissionTables extends Migration
             $table->primary(['group_id', 'role_id']);
         });
 
-        Schema::create('group_has_permissions', function (Blueprint $table) {
+        Schema::create($tableNames['group_has_permissions'], function (Blueprint $table) {
             $table->integer('group_id')->unsigned();
             $table->integer('permission_id')->unsigned();
 
@@ -140,7 +140,7 @@ class CreatePermissionTables extends Migration
         Schema::drop($tableNames['model_has_groups']);
         Schema::drop($tableNames['roles']);
         Schema::drop($tableNames['permissions']);
-        Schema::dropIfExists('groups');
+        Schema::drop($tableNames['groups']);
 
     }
 }
