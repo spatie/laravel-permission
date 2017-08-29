@@ -243,7 +243,7 @@ trait HasGroups
         {
             foreach ($group->roles as $role)
             {
-                if ($role->permissions->contain('id', $permission->id))
+                if ($role->permissions->contains('id', $permission->id))
                 {
                     return true;
                 }
