@@ -31,7 +31,7 @@ trait HasGroups
             'model',
             config('permission.table_names.model_has_groups'),
             'model_id',
-            'role_id'
+            'group_id'
         );
     }
 
