@@ -25,7 +25,7 @@ class CacheTest extends TestCase
 
         $this->registrar->registerPermissions();
 
-        $this->assertCount(2, DB::getQueryLog());
+        $this->assertCount(3, DB::getQueryLog());
 
         DB::flushQueryLog();
     }
@@ -45,14 +45,14 @@ class CacheTest extends TestCase
         $this->assertCount(1, DB::getQueryLog());
 
         $this->registrar->registerPermissions();
-        $this->assertCount(3, DB::getQueryLog());
+        $this->assertCount(4, DB::getQueryLog());
 
         $permission->name = 'other name';
         $permission->save();
-        $this->assertCount(4, DB::getQueryLog());
+        $this->assertCount(5, DB::getQueryLog());
 
         $this->registrar->registerPermissions();
-        $this->assertCount(6, DB::getQueryLog());
+        $this->assertCount(8, DB::getQueryLog());
     }
 
     /** @test */
@@ -62,14 +62,14 @@ class CacheTest extends TestCase
         $this->assertCount(2, DB::getQueryLog());
 
         $this->registrar->registerPermissions();
-        $this->assertCount(4, DB::getQueryLog());
+        $this->assertCount(5, DB::getQueryLog());
 
         $role->name = 'other name';
         $role->save();
-        $this->assertCount(5, DB::getQueryLog());
+        $this->assertCount(6, DB::getQueryLog());
 
         $this->registrar->registerPermissions();
-        $this->assertCount(7, DB::getQueryLog());
+        $this->assertCount(9, DB::getQueryLog());
     }
 
     /** @test */
@@ -89,7 +89,7 @@ class CacheTest extends TestCase
         $this->assertCount(1, DB::getQueryLog());
 
         $this->registrar->registerPermissions();
-        $this->assertCount(3, DB::getQueryLog());
+        $this->assertCount(4, DB::getQueryLog());
     }
 
     /** @test */
@@ -100,12 +100,12 @@ class CacheTest extends TestCase
         $this->assertCount(4, DB::getQueryLog());
 
         $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
-        $this->assertCount(8, DB::getQueryLog());
+        $this->assertCount(9, DB::getQueryLog());
 
         $this->assertTrue($this->testUser->hasPermissionTo('edit-news'));
-        $this->assertCount(8, DB::getQueryLog());
+        $this->assertCount(9, DB::getQueryLog());
 
         $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
-        $this->assertCount(8, DB::getQueryLog());
+        $this->assertCount(9, DB::getQueryLog());
     }
 }

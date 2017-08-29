@@ -3,7 +3,7 @@
 namespace Spatie\Permission\Test;
 
 use Illuminate\Auth\Authenticatable;
-use Spatie\Permission\Traits\HasRoles;
+use Spatie\Permission\Traits\HasGroups;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -11,7 +11,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 
 class User extends Model implements AuthorizableContract, AuthenticatableContract
 {
-    use HasRoles, Authorizable, Authenticatable;
+    use HasGroups, Authorizable, Authenticatable;
 
     /**
      * The attributes that are mass assignable.

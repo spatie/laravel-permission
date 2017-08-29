@@ -50,6 +50,17 @@ class Permission extends Model implements PermissionContract
     }
 
     /**
+     * A permission can be applied to groups.
+     */
+    public function groups(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            config('permission.models.group'),
+            config('permission.table_names.group_has_permissions')
+        );
+    }
+
+    /**
      * A permission belongs to some users of the model associated with its guard.
      */
     public function users(): MorphToMany

@@ -4,6 +4,7 @@ namespace Spatie\Permission\Test;
 
 use Monolog\Handler\TestHandler;
 use Spatie\Permission\Contracts\Role;
+use Spatie\Permission\Contracts\Group;
 use Illuminate\Database\Schema\Blueprint;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Contracts\Permission;
@@ -17,6 +18,12 @@ abstract class TestCase extends Orchestra
 
     /** @var \Spatie\Permission\Test\Admin */
     protected $testAdmin;
+
+    /** @var \Spatie\Permission\Models\Group */
+    protected $testUserGroup;
+
+    /** @var \Spatie\Permission\Models\Group */
+    protected $testAdminGroup;
 
     /** @var \Spatie\Permission\Models\Role */
     protected $testUserRole;
@@ -39,10 +46,12 @@ abstract class TestCase extends Orchestra
         $this->reloadPermissions();
 
         $this->testUser = User::first();
+        $this->testUserGroup = app(Group::class)->find(1);
         $this->testUserRole = app(Role::class)->find(1);
         $this->testUserPermission = app(Permission::class)->find(1);
 
         $this->testAdmin = Admin::first();
+        $this->testAdminGroup = app(Group::class)->find(3);
         $this->testAdminRole = app(Role::class)->find(3);
         $this->testAdminPermission = app(Permission::class)->find(3);
 
@@ -110,6 +119,9 @@ abstract class TestCase extends Orchestra
 
         User::create(['email' => 'test@user.com']);
         Admin::create(['email' => 'admin@user.com']);
+        $app[Group::class]->create(['name' => 'testGroup']);
+        $app[Group::class]->create(['name' => 'testGroup2']);
+        $app[Group::class]->create(['name' => 'testAdminGroup', 'guard_name' => 'admin']);
         $app[Role::class]->create(['name' => 'testRole']);
         $app[Role::class]->create(['name' => 'testRole2']);
         $app[Role::class]->create(['name' => 'testAdminRole', 'guard_name' => 'admin']);

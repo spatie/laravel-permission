@@ -59,4 +59,40 @@ class GateTest extends TestCase
 
         $this->assertFalse($this->testAdmin->can('edit-articles'));
     }
+
+    /** @test */
+    public function it_can_determine_if_a_user_has_a_permission_when_using_groups()
+    {
+        $this->testUserGroup->givePermissionTo($this->testUserPermission);
+
+        $this->testUser->assignGroup($this->testUserGroup);
+
+        $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission));
+
+        $this->assertTrue($this->reloadPermissions());
+
+        $this->assertTrue($this->testUser->can('edit-articles'));
+
+        $this->assertFalse($this->testUser->can('non-existing-permission'));
+
+        $this->assertFalse($this->testUser->can('admin-permission'));
+    }
+
+    /** @test */
+    public function it_can_determine_if_a_user_with_a_different_guard_has_a_permission_when_using_groups()
+    {
+        $this->testAdminGroup->givePermissionTo($this->testAdminPermission);
+
+        $this->testAdmin->assignGroup($this->testAdminGroup);
+
+        $this->assertTrue($this->testAdmin->hasPermissionTo($this->testAdminPermission));
+
+        $this->assertTrue($this->reloadPermissions());
+
+        $this->assertTrue($this->testAdmin->can('admin-permission'));
+
+        $this->assertFalse($this->testAdmin->can('non-existing-permission'));
+
+        $this->assertFalse($this->testAdmin->can('edit-articles'));
+    }
 }

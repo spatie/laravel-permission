@@ -2,14 +2,17 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
-## 2.4.1 -2017-08-05
-- Fix processing of pipe symbols in `@hasanyrole` and `@hasallroles` Blade directives
+## 2.4.2 - 2017-08-11
+- automatically detach roles and permissions when a user gets deleted
+
+## 2.4.1 - 2017-08-05
+- fix processing of pipe symbols in `@hasanyrole` and `@hasallroles` Blade directives
 
 ## 2.4.0 -2017-08-05
 - add `PermissionMiddleware` and `RoleMiddleware`
 
 ## 2.3.2 - 2017-07-28
-- allow `hasAnyPmerission` to take an array of permissions
+- allow `hasAnyPermission` to take an array of permissions
 
 ## 2.3.1 - 2017-07-27
 - fix commands not using custom models
@@ -27,29 +30,23 @@ All notable changes to `laravel-permission` will be documented in this file
 - fixed a bug that didn't allow you to assign a role or permission when using multiple guards
 
 ## 2.1.4 - 2017-05-10
-
 - add `model_type` to the primary key of tables that use a polymorphic relationship
 
 ## 2.1.3 - 2017-04-21
-
 - fixed a bug where the role()/permission() relation to user models would be saved incorrectly
 - added users() relation on Permission and Role
 
 ## 2.1.2 - 2017-04-20
-
 - fix a bug where the `role()`/`permission()` relation to user models would be saved incorrectly
 - add `users()` relation on `Permission` and `Role`
 
 ## 2.0.2 - 2017-04-13
-
 - check for duplicates when adding new roles and permissions
 
 ## 2.0.1 - 2017-04-11
-
 - fix the order of the `foreignKey` and `relatedKey` in the relations
 
 ## 2.0.0 - 2017-04-10
-
 - cache expiration is now configurable and set to one day by default
 - roles and permissions can now be assigned to any model through the `HasRoles` trait
 - removed deprecated `hasPermission` method

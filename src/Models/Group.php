@@ -3,19 +3,18 @@
 namespace Spatie\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Permission\Traits\HasPermissions;
-use Spatie\Permission\Exceptions\RoleDoesNotExist;
-use Spatie\Permission\Exceptions\GuardDoesNotMatch;
-use Spatie\Permission\Exceptions\RoleAlreadyExists;
-use Spatie\Permission\Contracts\Role as RoleContract;
-use Spatie\Permission\Traits\RefreshesPermissionCache;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\Permission\Exceptions\GroupAlreadyExists;
+use Spatie\Permission\Exceptions\GuardDoesNotMatch;
+use Spatie\Permission\Exceptions\GroupDoesNotExist;
+use Spatie\Permission\Traits\HasRoles;
+use Spatie\Permission\Traits\RefreshesPermissionCache;
+use Spatie\Permission\Contracts\Group as GroupContract;
 
-class Role extends Model implements RoleContract
+class Group extends Model implements GroupContract
 {
-    use HasPermissions;
-    use RefreshesPermissionCache;
+    use HasRoles, RefreshesPermissionCache;
 
     public $guarded = ['id'];
 
@@ -25,7 +24,7 @@ class Role extends Model implements RoleContract
 
         parent::__construct($attributes);
 
-        $this->setTable(config('permission.table_names.roles'));
+        $this->setTable(config('permission.table_names.groups'));
     }
 
     public static function create(array $attributes = [])
@@ -33,66 +32,66 @@ class Role extends Model implements RoleContract
         $attributes['guard_name'] = $attributes['guard_name'] ?? config('auth.defaults.guard');
 
         if (static::where('name', $attributes['name'])->where('guard_name', $attributes['guard_name'])->first()) {
-            throw RoleAlreadyExists::create($attributes['name'], $attributes['guard_name']);
+            throw GroupAlreadyExists::create($attributes['name'], $attributes['guard_name']);
         }
 
         return static::query()->create($attributes);
     }
 
     /**
-     * A role may be given various permissions.
+     * A group may be given various roles.
      */
-    public function permissions(): BelongsToMany
+    public function roles(): BelongsToMany
     {
         return $this->belongsToMany(
-            config('permission.models.permission'),
-            config('permission.table_names.role_has_permissions')
-        );
-    }
-
-    /**
-     * A role can be applied to groups.
-     */
-    public function groups(): BelongsToMany
-    {
-        return $this->belongsToMany(
-            config('permission.models.group'),
+            config('permission.models.role'),
             config('permission.table_names.group_has_roles')
         );
     }
 
     /**
-     * A role belongs to some users of the model associated with its guard.
+     * A group may be given various permissions.
+     */
+    public function permissions(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            config('permission.models.permission'),
+            config('permission.table_names.group_has_permissions')
+        );
+    }
+
+    /**
+     * A group belongs to some users of the model associated with its guard.
      */
     public function users(): MorphToMany
     {
         return $this->morphedByMany(
             getModelForGuard($this->attributes['guard_name']),
             'model',
-            config('permission.table_names.model_has_roles'),
-            'role_id',
+            config('permission.table_names.model_has_groups'),
+            'group_id',
             'model_id'
         );
     }
 
     /**
-     * Find a role by its name and guard name.
+     * Find a group by its name and guard name.
      *
      * @param string $name
      * @param string|null $guardName
      *
-     * @return \Spatie\Permission\Contracts\Role|\Spatie\Permission\Models\Role
+     * @return \Spatie\Permission\Contracts\Group|\Spatie\Permission\Models\Group
      *
      * @throws \Spatie\Permission\Exceptions\RoleDoesNotExist
      */
-    public static function findByName(string $name, $guardName = null): RoleContract
+    public static function findByName(string $name, $guardName = null): GroupContract
     {
         $guardName = $guardName ?? config('auth.defaults.guard');
 
         $role = static::where('name', $name)->where('guard_name', $guardName)->first();
 
         if (! $role) {
-            throw RoleDoesNotExist::create($name);
+            throw GroupDoesNotExist::create($name);
         }
 
         return $role;
@@ -117,6 +116,20 @@ class Role extends Model implements RoleContract
             throw GuardDoesNotMatch::create($permission->guard_name, $this->getGuardNames());
         }
 
-        return $this->permissions->contains('id', $permission->id);
+        if ($this->permissions->contains('id', $permission->id))
+        {
+            return true;
+        }
+
+        foreach ($this->roles as $role)
+        {
+            if ($role->permissions->contains('id', $permission->id))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
+
 }
