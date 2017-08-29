@@ -3,11 +3,33 @@
 namespace Spatie\Permission\Test;
 
 use Artisan;
+use Spatie\Permission\Models\Group;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
 class CommandTest extends TestCase
 {
+    /** @test */
+    public function it_can_create_a_group()
+    {
+        Artisan::call('permission:create-group', ['name' => 'new-group']);
+
+        $this->assertCount(1, Group::where('name', 'new-group')->get());
+    }
+
+    /** @test */
+    public function it_can_create_a_group_with_a_specific_guard()
+    {
+        Artisan::call('permission:create-group', [
+            'name' => 'new-group',
+            'guard' => 'api',
+        ]);
+
+        $this->assertCount(1, Group::where('name', 'new-group')
+            ->where('guard_name', 'api')
+            ->get());
+    }
+    
     /** @test */
     public function it_can_create_a_role()
     {

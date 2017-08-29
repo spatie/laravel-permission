@@ -11,6 +11,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class MiddlewareTest extends TestCase
 {
+    protected $groupMiddleware;
     protected $roleMiddleware;
     protected $permissionMiddleware;
 
@@ -18,11 +19,83 @@ class MiddlewareTest extends TestCase
     {
         parent::setUp();
 
+        $this->groupMiddleware = new GroupMiddleware($this->app);
+
         $this->roleMiddleware = new RoleMiddleware($this->app);
 
         $this->permissionMiddleware = new PermissionMiddleware($this->app);
     }
 
+    /** @test */
+    public function a_guest_cannot_access_a_route_protected_by_the_group_middleware()
+    {
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->groupMiddleware, 'testGroup'
+            ), 403);
+    }
+
+    /** @test */
+    public function a_user_can_access_a_route_protected_by_group_middleware_if_have_this_group()
+    {
+        Auth::login($this->testUser);
+
+        $this->testUser->assignGroup('testGroup');
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->groupMiddleware, 'testGroup'
+            ), 200);
+    }
+
+    /** @test */
+    public function a_user_can_access_a_route_protected_by_this_group_middleware_if_have_one_of_the_groups()
+    {
+        Auth::login($this->testUser);
+
+        $this->testUser->assignGroup('testGroup');
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->groupMiddleware, 'testGroup|testGroup2'
+            ), 200);
+    }
+
+    /** @test */
+    public function a_user_cannot_access_a_route_protected_by_the_group_middleware_if_have_a_different_group()
+    {
+        Auth::login($this->testUser);
+
+        $this->testUser->assignGroup(['testGroup']);
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->groupMiddleware, 'testGroup2'
+            ), 403);
+    }
+
+    /** @test */
+    public function a_user_cannot_access_a_route_protected_by_group_middleware_if_have_not_groups()
+    {
+        Auth::login($this->testUser);
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->groupMiddleware, 'testGroup|testGroup2'
+            ), 403);
+    }
+
+    /** @test */
+    public function a_user_cannot_access_a_route_protected_by_group_middleware_if_group_is_undefined()
+    {
+        Auth::login($this->testUser);
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->groupMiddleware, ''
+            ), 403);
+    }
+    
     /** @test */
     public function a_guest_cannot_access_a_route_protected_by_the_role_middleware()
     {
