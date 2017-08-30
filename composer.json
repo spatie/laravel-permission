@@ -27,7 +27,7 @@
     },
     "require-dev": {
         "monolog/monolog": "^1.22",
-        "orchestra/testbench": "~3.4.2|~5.5.0",
+        "orchestra/testbench": "~3.4.2|~3.5.0",
         "phpunit/phpunit" : "^6.2"
     },
     "autoload": {
