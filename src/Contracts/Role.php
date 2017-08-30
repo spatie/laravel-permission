@@ -21,14 +21,14 @@ interface Role
      *
      * @return \Spatie\Permission\Contracts\Role
      *
-     * @throws RoleDoesNotExist
+     * @throws \Spatie\Permission\Exceptions\RoleDoesNotExist
      */
     public static function findByName(string $name, $guardName): Role;
 
     /**
      * Determine if the user may perform the given permission.
      *
-     * @param string|Permission $permission
+     * @param string|\Spatie\Permission\Contracts\Permission $permission
      *
      * @return bool
      */

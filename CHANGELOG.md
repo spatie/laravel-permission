@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.5.0 - 2017-08-30
+- add compatiblity with Laravel 5.5
+
 ## 2.4.2 - 2017-08-11
 - automatically detach roles and permissions when a user gets deleted
 
