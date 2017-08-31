@@ -50,7 +50,7 @@ class GateTest extends TestCase
     /** @test */
     public function it_will_throw_an_exception_when_using_a_permission_that_does_not_exist()
     {
-        $this->setExpectedException(PermissionDoesNotExist::class);
+        $this->expectException(PermissionDoesNotExist::class);
 
         $this->testRole->givePermissionTo('create-evil-empire');
     }
@@ -58,7 +58,7 @@ class GateTest extends TestCase
     /** @test */
     public function it_will_throw_an_exception_when_assign_a_role_that_does_not_exist()
     {
-        $this->setExpectedException(RoleDoesNotExist::class);
+        $this->expectException(RoleDoesNotExist::class);
 
         $this->testUser->assignRole('evil-emperor');
     }
