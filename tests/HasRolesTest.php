@@ -230,7 +230,7 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_can_determine_that_the_user_does_not_have_a_permission_even_with_non_existing_permissions()
     {
-        $this->setExpectedException(PermissionDoesNotExist::class);
+        $this->expectException(PermissionDoesNotExist::class);
 
         $this->assertFalse($this->testUser->hasPermissionTo('this permission does not exists'));
     }
