@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 1.13.0 - 2017-08-31
+- added support for Laravel 5.5
+
 ## 1.12.0
 
 - made foreign key name to users table configurable
