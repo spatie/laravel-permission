@@ -17,10 +17,12 @@ class PermissionMiddleware
             ? $permission
             : explode('|', $permission);
 
-        if (! Auth::user()->hasAnyPermission(...$permission)) {
-            abort(403);
+        foreach ($permission as $p) {
+            if (Auth::user()->can($p)) {
+                return $next($request);
+            }
         }
 
-        return $next($request);
+        abort(403);
     }
 }
