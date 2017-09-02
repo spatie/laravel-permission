@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.5.1 - 2017-09-02
+- add getRoleNames() method to return a collection of assigned roles
+
 ## 2.5.0 - 2017-08-30
 - add compatiblity with Laravel 5.5
 

@@ -311,6 +311,11 @@ trait HasRoles
             ->values();
     }
 
+    public function getRoleNames(): Collection
+    {
+        return $this->roles->pluck('name');
+    }
+
     protected function getStoredRole($role): Role
     {
         if (is_string($role)) {

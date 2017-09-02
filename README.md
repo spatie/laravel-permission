@@ -222,7 +222,7 @@ $permissions = $user->permissions;
 $permissions = $user->getAllPermissions();
 
 // get a collection of all defined roles
-$roles = $user->roles->pluck('name'); // Returns a collection
+$roles = $user->getRoleNames(); // Returns a collection
 ```
 
 The `HasRoles` trait also adds a scope to your models to scope the query to certain roles:
