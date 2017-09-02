@@ -56,6 +56,11 @@ class MiddlewareTest extends TestCase
             $this->runMiddleware(
                 $this->roleMiddleware, 'testRole|testRole2'
             ), 200);
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->roleMiddleware, ['testRole2', 'testRole']
+            ), 200);
     }
 
     /** @test */
@@ -124,7 +129,12 @@ class MiddlewareTest extends TestCase
 
         $this->assertEquals(
             $this->runMiddleware(
-                $this->permissionMiddleware, 'edit-articles|edit-news'
+                $this->permissionMiddleware, 'edit-news|edit-articles'
+            ), 200);
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->permissionMiddleware, ['edit-news', 'edit-articles']
             ), 200);
     }
 
