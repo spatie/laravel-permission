@@ -312,7 +312,7 @@ trait HasRoles
     }
 
     /**
-     * Return a collection of role names associated with this user
+     * Return a collection of role names associated with this user.
      *
      * @return Collection
      */
