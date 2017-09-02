@@ -420,4 +420,15 @@ class HasRolesTest extends TestCase
             $this->testUser->getAllPermissions()->pluck('name')
         );
     }
+
+    /** @test */
+    public function it_can_retrieve_role_names()
+    {
+        $this->testUser->assignRole('testRole', 'testRole2');
+
+        $this->assertEquals(
+            collect(['testRole', 'testRole2']),
+            $this->testUser->getRoleNames()
+        );
+    }
 }

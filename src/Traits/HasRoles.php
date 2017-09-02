@@ -311,6 +311,16 @@ trait HasRoles
             ->values();
     }
 
+    /**
+     * Return a collection of role names associated with this user.
+     *
+     * @return Collection
+     */
+    public function getRoleNames(): Collection
+    {
+        return $this->roles->pluck('name');
+    }
+
     protected function getStoredRole($role): Role
     {
         if (is_string($role)) {
