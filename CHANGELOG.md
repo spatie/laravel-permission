@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.5.2 - 2017-09-05
+- let middleware use caching
+
 ## 2.5.1 - 2017-09-02
 - add getRoleNames() method to return a collection of assigned roles
 

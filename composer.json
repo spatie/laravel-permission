@@ -28,7 +28,7 @@
     "require-dev": {
         "monolog/monolog": "^1.22",
         "orchestra/testbench": "~3.4.2|~3.5.0",
-        "phpunit/phpunit" : "^6.2"
+        "phpunit/phpunit" : "^5.7|6.2"
     },
     "autoload": {
         "psr-4": {
