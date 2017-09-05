@@ -9,6 +9,10 @@ env:
   matrix:
     - COMPOSER_FLAGS="--prefer-lowest"
     - COMPOSER_FLAGS=""
+matrix:
+  exclude:
+  - php: 7.2
+    env: COMPOSER_FLAGS="--prefer-lowest"
 
 before_script:
   - travis_retry composer self-update
