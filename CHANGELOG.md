@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.5.3 - 2017-09-07
+- register the blade directives in the boot method of the service provider
+
 ## 2.5.2 - 2017-09-05
 - let middleware use caching
 
