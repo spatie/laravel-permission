@@ -155,5 +155,4 @@ class HasPermissionsTest extends TestCase
 
         User::permission($this->testAdminPermission)->get();
     }
-
 }
