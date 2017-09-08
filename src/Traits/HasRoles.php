@@ -109,7 +109,7 @@ trait HasRoles
                 $permissionModel = app(Permission::class)->findByName($permission, $this->getDefaultGuardName());
             }
             $rolesWithPermissions = $rolesWithPermissions->merge($permissionModel->roles);
-            
+
             return $permissionModel;
         }, $permissions);
 
