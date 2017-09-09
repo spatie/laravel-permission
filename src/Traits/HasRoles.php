@@ -84,6 +84,28 @@ trait HasRoles
     }
 
     /**
+     * @param string|array|\Spatie\Permission\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     *
+     * @return array
+     */
+    protected function convertToPermissionModels($permissions): array
+    {
+        if ($permissions instanceof Collection) {
+            $permissions = $permissions->toArray();
+        }
+
+        $permissions = array_wrap($permissions);
+
+        return array_map(function ($permission) {
+            if ($permission instanceof Permission) {
+                return $permission;
+            }
+
+            return app(Permission::class)->findByName($permission, $this->getDefaultGuardName());
+        }, $permissions);
+    }
+
+    /**
      * Scope the model query to certain permissions only.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
@@ -93,27 +115,11 @@ trait HasRoles
      */
     public function scopePermission(Builder $query, $permissions): Builder
     {
-        if ($permissions instanceof Collection) {
-            $permissions = $permissions->toArray();
-        }
+        $permissions = $this->convertToPermissionModels($permissions);
 
-        $permissions = array_wrap($permissions);
-
-        $permissions = array_map(function ($permission) {
-            if ($permission instanceof Permission) {
-                return $permission;
-            }
-
-            return app(Permission::class)->findByName($permission, $this->getDefaultGuardName());
-        }, $permissions);
-
-        $rolesWithPermissions = collect([]);
-
-        foreach ($permissions as $permission) {
-            $rolesWithPermissions = $rolesWithPermissions->merge($permission->roles);
-        }
-
-        $rolesWithPermissions = $rolesWithPermissions->unique();
+        $rolesWithPermissions = array_unique(array_reduce($permissions, function ($result, $permission) {
+            return array_merge($result, $permission->roles->all());
+        }, []));
 
         return $query->
             where(function ($query) use ($permissions, $rolesWithPermissions) {
@@ -124,7 +130,7 @@ trait HasRoles
                         }
                     });
                 });
-                if ($rolesWithPermissions->count() > 0) {
+                if (count($rolesWithPermissions) > 0) {
                     $query->orWhereHas('roles', function ($query) use ($rolesWithPermissions) {
                         $query->where(function ($query) use ($rolesWithPermissions) {
                             foreach ($rolesWithPermissions as $role) {
