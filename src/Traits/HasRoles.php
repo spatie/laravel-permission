@@ -104,12 +104,12 @@ trait HasRoles
                 return $permission;
             }
 
-             return app(Permission::class)->findByName($permission, $this->getDefaultGuardName());
+            return app(Permission::class)->findByName($permission, $this->getDefaultGuardName());
         }, $permissions);
 
         $rolesWithPermissions = collect([]);
 
-        foreach($permissions as $permission) {
+        foreach ($permissions as $permission) {
             $rolesWithPermissions = $rolesWithPermissions->merge($permission->roles);
         }
 
