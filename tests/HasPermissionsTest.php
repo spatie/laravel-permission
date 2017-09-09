@@ -59,7 +59,6 @@ class HasPermissionsTest extends TestCase
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
         $user1->givePermissionTo(['edit-articles', 'edit-news']);
-        // giving user2 permission throgth the role
         $this->testUserRole->givePermissionTo('edit-articles');
         $user2->assignRole('testRole');
 
@@ -76,7 +75,6 @@ class HasPermissionsTest extends TestCase
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
         $user1->givePermissionTo(['edit-articles', 'edit-news']);
-        // giving user2 permission throgth the role
         $this->testUserRole->givePermissionTo('edit-articles');
         $user2->assignRole('testRole');
 
@@ -93,7 +91,6 @@ class HasPermissionsTest extends TestCase
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
         $user1->givePermissionTo(['edit-articles', 'edit-news']);
-        // giving user2 permission throgth the role
         $this->testUserRole->givePermissionTo('edit-articles');
         $user2->assignRole('testRole');
 

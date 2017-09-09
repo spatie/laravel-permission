@@ -97,23 +97,23 @@ trait HasRoles
             $permissions = $permissions->toArray();
         }
 
-        if (! is_array($permissions)) {
-            $permissions = [$permissions];
-        }
+		$permissions = array_wrap($permissions);
 
-        $rolesWithPermissions = collect([]);
-        $permissions = array_map(function ($permission) use (&$rolesWithPermissions) {
+        $permissions = array_map(function ($permission) {
             if ($permission instanceof Permission) {
-                $permissionModel = $permission;
-            } else {
-                $permissionModel = app(Permission::class)->findByName($permission, $this->getDefaultGuardName());
+                return $permission;
             }
-            $rolesWithPermissions = $rolesWithPermissions->merge($permissionModel->roles);
 
-            return $permissionModel;
+ 			return app(Permission::class)->findByName($permission, $this->getDefaultGuardName());
         }, $permissions);
 
-        $rolesWithPermissions = $rolesWithPermissions->unique();
+        $rolesWithPermissions = collect([]);
+
+		foreach($permissions as $permission) {
+			$rolesWithPermissions = $rolesWithPermissions->merge($permission->roles);
+		}
+
+		$rolesWithPermissions = $rolesWithPermissions->unique();
 
         return $query->
             where(function ($query) use ($permissions, $rolesWithPermissions) {
