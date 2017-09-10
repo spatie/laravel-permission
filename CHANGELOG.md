@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.6.0 - 2017-09-10
+- add `permission` scope
+
 ## 2.5.4 - 2017-09-07
 - register the blade directives in the register method of the service provider
 
