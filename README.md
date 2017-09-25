@@ -531,6 +531,19 @@ Route::group(['middleware' => ['role:super-admin','permission:publish articles']
     //
 });
 ```
+
+Alternatively, you can separate multiple roles or permission with a `|` (pipe) character:
+
+```php
+Route::group(['middleware' => ['role:super-admin|writer']], function () {
+    //
+});
+
+Route::group(['middleware' => ['permission:publish articles|edit articles']], function () {
+    //
+});
+```
+
 You can protect your controllers similarly, by setting desired middleware in the constructor:
 
 ```php
