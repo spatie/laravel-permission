@@ -390,8 +390,8 @@ $user->getAllPermissions();
 
 All these responses are collections of `Spatie\Permission\Models\Permission` objects.
 
-If we follow the previous example, the first response will be a collection with the 'delete article' permission, the
-second will be a collection with the 'edit article' permission and the third will contain both.
+If we follow the previous example, the first response will be a collection with the `delete article` permission and 
+the second will be a collection with the `edit article` permission and the third will contain both.
 
 ### Using Blade directives
 This package also adds Blade directives to verify whether the currently logged in user has all or any of a given list of roles. 
@@ -418,7 +418,7 @@ is the same as
 
 Test for any role in a list:
 ```php
-@hasanyrole(Role::all())
+@hasanyrole($collectionOfRoles)
     I have one or more of these roles!
 @else
     I have none of these roles...
@@ -433,7 +433,7 @@ Test for any role in a list:
 Test for all roles:
 
 ```php
-@hasallroles(Role::all())
+@hasallroles($collectionOfRoles)
     I have all of these roles!
 @else
     I do not have all of these roles...
@@ -549,7 +549,7 @@ You can protect your controllers similarly, by setting desired middleware in the
 ```php
 public function __construct
 {
-    $this->middleware(['role:super-admin','permission:publish articles']);
+    $this->middleware(['role:super-admin','permission:publish articles|edit articles']);
 }
 ```
 
@@ -573,6 +573,21 @@ php artisan permission:create-role writer web
 
 ```bash
 php artisan permission:create-permission 'edit articles' web
+```
+
+## Unit Testing
+
+In your application's tests, if you are not seeding roles and permissions as part of your test `setUp()` then you may run into a chicken/egg situation where roles and permissions aren't registered with the gate (because your tests create them after that gate registration is done). Working around this is simple: In your tests simply add a `setUp()` instruction to re-register the permissions, like this:
+
+```php
+    public function setUp()
+    {
+        // first include all the normal setUp operations
+        parent::setUp();
+
+        // now re-register all the roles and permissions
+        $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->registerPermissions();
+    }
 ```
 
 ## Database Seeding
@@ -655,7 +670,10 @@ php artisan cache:forget spatie.permission.cache
 
 ### Cache Identifier
 
-TIP: If you are leveraging a caching service such as redis or memcached and there are other sites running on your server, you could run into cache clashes. It is prudent to set your own cache `prefix` in `/config/cache.php` for each application uniquely. This will prevent other applications from accidentally using/changing your cached data.
+TIP: If you are leveraging a caching service such as `redis` or `memcached` and there are other sites 
+running on your server, you could run into cache clashes. It is prudent to set your own cache `prefix` 
+in `/config/cache.php` to something unique for each application. This will prevent other applications 
+from accidentally using/changing your cached data.
 
 
 ## Need a UI?
