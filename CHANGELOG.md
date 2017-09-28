@@ -2,7 +2,7 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
-## 2.6.0 - 2017-09-27
+## 2.7.0 - 2017-09-27
 - add support for L5.3
 
 ## 2.6.0 - 2017-09-10
