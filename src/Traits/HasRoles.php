@@ -2,7 +2,10 @@
 
 namespace Spatie\Permission\Traits;
 
+use Throwable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Contracts\Role;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\Permission\Contracts\Permission;
@@ -15,8 +18,16 @@ trait HasRoles
     public static function bootHasRoles()
     {
         static::deleting(function ($model) {
-            $model->roles()->detach();
-            $model->permissions()->detach();
+            DB::beginTransaction();
+            try {
+                $model->roles()->detach();
+                $model->permissions()->detach();
+
+                DB::commit();
+            } catch (Throwable $e) {
+                DB::rollback();
+                Log::error($e->getMessage());
+            }
         });
     }
 
