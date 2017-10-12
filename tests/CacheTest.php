@@ -29,11 +29,11 @@ class CacheTest extends TestCase
     {
         $this->registrar->getPermissions();
 
-        $this->assertQueryCount(CacheTest::QUERIES_PER_CACHE_PROVISION);
+        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
 
         $this->registrar->getPermissions();
 
-        $this->assertQueryCount(CacheTest::QUERIES_PER_CACHE_PROVISION);
+        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
     }
 
     /** @test */
@@ -45,7 +45,7 @@ class CacheTest extends TestCase
 
         $this->registrar->getPermissions();
 
-        $this->assertQueryCount(CacheTest::QUERIES_PER_CACHE_PROVISION);
+        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
     }
 
     /** @test */
@@ -62,7 +62,7 @@ class CacheTest extends TestCase
 
         $this->registrar->getPermissions();
 
-        $this->assertQueryCount(CacheTest::QUERIES_PER_CACHE_PROVISION);
+        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
     }
 
     /** @test */
@@ -74,7 +74,7 @@ class CacheTest extends TestCase
 
         $this->registrar->getPermissions();
 
-        $this->assertQueryCount(CacheTest::QUERIES_PER_CACHE_PROVISION);
+        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
     }
 
     /** @test */
@@ -89,8 +89,7 @@ class CacheTest extends TestCase
 
         $this->registrar->getPermissions();
 
-        $this->assertQueryCount(CacheTest::QUERIES_PER_CACHE_PROVISION);
-
+        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
     }
 
     /** @test */
@@ -116,7 +115,7 @@ class CacheTest extends TestCase
 
         $this->registrar->getPermissions();
 
-        $this->assertQueryCount(CacheTest::QUERIES_PER_CACHE_PROVISION);
+        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
     }
 
     /** @test */
@@ -129,7 +128,7 @@ class CacheTest extends TestCase
 
         $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
 
-        $this->assertQueryCount(CacheTest::QUERIES_PER_CACHE_PROVISION + 2); // + 2 for getting the User's relations
+        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION + 2); // + 2 for getting the User's relations
         $this->resetQueryCount();
 
         $this->assertTrue($this->testUser->hasPermissionTo('edit-news'));
