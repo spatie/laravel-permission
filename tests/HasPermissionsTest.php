@@ -152,4 +152,16 @@ class HasPermissionsTest extends TestCase
 
         User::permission($this->testAdminPermission)->get();
     }
+
+    /** @test */
+    public function it_doesnt_detach_permissions_when_soft_deleting()
+    {
+        $user = SoftDeletingUser::create(['email' => 'test@example.com']);
+        $user->givePermissionTo(['edit-news']);
+        $user->delete();
+
+        $user = SoftDeletingUser::withTrashed()->find($user->id);
+
+        $this->assertTrue($user->hasPermissionTo('edit-news'));
+    }
 }

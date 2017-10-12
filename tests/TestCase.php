@@ -96,6 +96,7 @@ abstract class TestCase extends Orchestra
     {
         $app['db']->connection()->getSchemaBuilder()->create('users', function (Blueprint $table) {
             $table->increments('id');
+            $table->softDeletes();
             $table->string('email');
         });
 
