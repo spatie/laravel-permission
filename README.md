@@ -217,7 +217,7 @@ $permissions = $user->getAllPermissions();
 $roles = $user->getRoleNames(); // Returns a collection
 ```
 
-The `HasRoles` trait also add a `role` scopes to your models to scope the query to certain roles or permissions:
+The `HasRoles` trait also adds a `role` scope to your models to scope the query to certain roles or permissions:
 
 ```php
 $users = User::role('writer')->get(); // Returns only users with the role 'writer'
