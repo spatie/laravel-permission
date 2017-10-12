@@ -141,12 +141,12 @@ class CacheTest extends TestCase
         $this->assertQueryCount(0);
     }
 
-    protected function assertQueryCount(int $expected): void
+    protected function assertQueryCount(int $expected)
     {
         $this->assertCount($expected, DB::getQueryLog());
     }
 
-    protected function resetQueryCount(): void
+    protected function resetQueryCount()
     {
         DB::flushQueryLog();
     }
