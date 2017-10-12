@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.7.1 - 2017-10-12
+- fixed a bug where `Role`s and `Permission`s got detached when soft deleting a model
+
 ## 2.7.0 - 2017-09-27
 - add support for L5.3
 
