@@ -2,13 +2,11 @@
 
 namespace Spatie\Permission;
 
-use Exception;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
-use Illuminate\Contracts\Logging\Log;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Cache\Repository;
 use Spatie\Permission\Contracts\Permission;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class PermissionRegistrar
@@ -37,8 +35,6 @@ class PermissionRegistrar
                 }
             } catch (PermissionDoesNotExist $e) {
             }
-
-            return null;
         });
 
         return true;
