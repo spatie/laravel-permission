@@ -53,8 +53,6 @@ class CacheTest extends TestCase
     {
         $permission = app(Permission::class)->create(['name' => 'new']);
 
-        $this->resetQueryCount();
-
         $permission->name = 'other name';
         $permission->save();
 
@@ -99,7 +97,7 @@ class CacheTest extends TestCase
 
         User::create(['email' => 'new']);
 
-        $this->resetQueryCount(1);
+        $this->resetQueryCount();
 
         $this->registrar->getPermissions();
 

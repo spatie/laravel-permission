@@ -51,9 +51,4 @@ class PermissionRegistrar
             return app(Permission::class)->with('roles')->get();
         });
     }
-
-    protected function shouldLogException(): bool
-    {
-        return config('permission.log_registration_exception');
-    }
 }
