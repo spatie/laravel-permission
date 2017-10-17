@@ -44,7 +44,12 @@
         }
     },
     "scripts": {
-        "test": "phpunit"
+        "test": "phpunit",
+        "test-versions": [
+            "docker-compose run --rm php7.0 './vendor/bin/phpunit'",
+            "docker-compose run --rm php7.1 './vendor/bin/phpunit'",
+            "docker-compose run --rm php7.2 './vendor/bin/phpunit'"
+        ]
     },
     "config": {
         "sort-packages": true

@@ -678,6 +678,13 @@ The package doesn't come with any screens out of the box, you should build that 
 composer test
 ```
 
+### Testing with Docker
+
+https://www.docker.com/
+``` bash
+composer test-versions
+```
+
 ### Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
