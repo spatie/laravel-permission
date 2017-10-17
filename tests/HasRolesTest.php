@@ -431,4 +431,16 @@ class HasRolesTest extends TestCase
             $this->testUser->getRoleNames()
         );
     }
+
+    /** @test */
+    public function it_does_not_detach_roles_when_soft_deleting()
+    {
+        $user = SoftDeletingUser::create(['email' => 'test@example.com']);
+        $user->assignRole('testRole');
+        $user->delete();
+
+        $user = SoftDeletingUser::withTrashed()->find($user->id);
+
+        $this->assertTrue($user->hasRole('testRole'));
+    }
 }
