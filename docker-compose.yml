@@ -1,0 +1,20 @@
+version: "3"
+services:
+  php7.0:
+    image: php:7.0
+    volumes:
+      - ".:/project"
+    working_dir: "/project"
+    tty: true
+  php7.1:
+    image: php:7.1
+    volumes:
+      - ".:/project"
+    working_dir: "/project"
+    tty: true
+  php7.2:
+    image: php:7.2-rc
+    volumes:
+      - ".:/project"
+    working_dir: "/project"
+    tty: true
