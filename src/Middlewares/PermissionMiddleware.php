@@ -9,7 +9,13 @@ class PermissionMiddleware
 {
     public function handle($request, Closure $next, $permission)
     {
+        $routeNameRedirect = config('permission.unauthorized_route_name_redirect');
+
         if (Auth::guest()) {
+            if(! is_null($routeNameRedirect)) {
+                return redirect()
+                    ->route($routeNameRedirect);
+            }
             abort(403);
         }
 
@@ -23,6 +29,10 @@ class PermissionMiddleware
             }
         }
 
+        if(! is_null($routeNameRedirect)) {
+            return redirect()
+                ->route($routeNameRedirect);
+        }
         abort(403);
     }
 }

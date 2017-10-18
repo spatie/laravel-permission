@@ -9,7 +9,13 @@ class RoleMiddleware
 {
     public function handle($request, Closure $next, $role)
     {
+        $routeNameRedirect = config('permission.unauthorized_route_name_redirect');
+
         if (Auth::guest()) {
+            if(! is_null($routeNameRedirect)) {
+                return redirect()
+                    ->route($routeNameRedirect);
+            }
             abort(403);
         }
 
@@ -18,6 +24,10 @@ class RoleMiddleware
             : explode('|', $role);
 
         if (! Auth::user()->hasAnyRole($role)) {
+            if(! is_null($routeNameRedirect)) {
+                return redirect()
+                    ->route($routeNameRedirect);
+            }
             abort(403);
         }
 
