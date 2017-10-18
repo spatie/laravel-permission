@@ -98,7 +98,9 @@ trait HasRoles
             $permissions = $permissions->toArray();
         }
 
-        $permissions = array_wrap($permissions);
+        if (! is_array($permissions)) {
+            $permissions = [$permissions];
+        }
 
         return array_map(function ($permission) {
             if ($permission instanceof Permission) {
@@ -227,7 +229,7 @@ trait HasRoles
             return false;
         }
 
-        return $roles->intersect($this->roles)->isNotEmpty();
+        return ! $roles->intersect($this->roles)->isEmpty();
     }
 
     /**
