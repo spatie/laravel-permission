@@ -12,7 +12,7 @@ class PermissionMiddleware
         $routeNameRedirect = config('permission.unauthorized_route_name_redirect');
 
         if (Auth::guest()) {
-            if(! is_null($routeNameRedirect)) {
+            if (! is_null($routeNameRedirect)) {
                 return redirect()
                     ->route($routeNameRedirect);
             }
@@ -29,7 +29,7 @@ class PermissionMiddleware
             }
         }
 
-        if(! is_null($routeNameRedirect)) {
+        if (! is_null($routeNameRedirect)) {
             return redirect()
                 ->route($routeNameRedirect);
         }
