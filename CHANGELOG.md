@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.7.2 - 2017-10-18
+- refactor `PermissionRegistrar` to use `$gate->before()`
+- removed `log_registration_exception` as it is no longer relevant
+
 ## 2.7.1 - 2017-10-12
 - fixed a bug where `Role`s and `Permission`s got detached when soft deleting a model
 
