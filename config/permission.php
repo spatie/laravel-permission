@@ -78,6 +78,7 @@ return [
 
     'cache_expiration_time' => 60 * 24,
 
+
     /*
      * By default we'll make an entry in the application log when the permissions
      * could not be loaded. Normally this only occurs while installing the packages.
@@ -95,4 +96,6 @@ return [
      */
 
     'unauthorized_route_name_redirect' => null,
+
+
 ];

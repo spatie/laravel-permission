@@ -2,12 +2,12 @@
 
 namespace Spatie\Permission;
 
-use Exception;
 use Illuminate\Support\Collection;
-use Illuminate\Contracts\Logging\Log;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Cache\Repository;
 use Spatie\Permission\Contracts\Permission;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class PermissionRegistrar
 {
@@ -17,39 +17,27 @@ class PermissionRegistrar
     /** @var \Illuminate\Contracts\Cache\Repository */
     protected $cache;
 
-    /** @var \Illuminate\Contracts\Logging\Log */
-    protected $logger;
-
     /** @var string */
     protected $cacheKey = 'spatie.permission.cache';
 
-    public function __construct(Gate $gate, Repository $cache, Log $logger)
+    public function __construct(Gate $gate, Repository $cache)
     {
         $this->gate = $gate;
         $this->cache = $cache;
-        $this->logger = $logger;
     }
 
     public function registerPermissions(): bool
     {
-        try {
-            $this->getPermissions()->map(function (Permission $permission) {
-                $this->gate->define($permission->name, function ($user) use ($permission) {
-                    return $user->hasPermissionTo($permission);
-                });
-            });
-
-            return true;
-        } catch (Exception $exception) {
-            if ($this->shouldLogException()) {
-                $this->logger->alert(
-                    "Could not register permissions because {$exception->getMessage()}".PHP_EOL.
-                    $exception->getTraceAsString()
-                );
+        $this->gate->before(function (Authenticatable $user, string $ability) {
+            try {
+                if (method_exists($user, 'hasPermissionTo')) {
+                    return $user->hasPermissionTo($ability);
+                }
+            } catch (PermissionDoesNotExist $e) {
             }
+        });
 
-            return false;
-        }
+        return true;
     }
 
     public function forgetCachedPermissions()
@@ -62,10 +50,5 @@ class PermissionRegistrar
         return $this->cache->remember($this->cacheKey, config('permission.cache_expiration_time'), function () {
             return app(Permission::class)->with('roles')->get();
         });
-    }
-
-    protected function shouldLogException(): bool
-    {
-        return config('permission.log_registration_exception');
     }
 }

@@ -121,14 +121,10 @@ abstract class TestCase extends Orchestra
 
     /**
      * Reload the permissions.
-     *
-     * @return bool
      */
     protected function reloadPermissions()
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
-
-        return app(PermissionRegistrar::class)->registerPermissions();
     }
 
     /**

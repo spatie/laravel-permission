@@ -27,7 +27,7 @@ Because all permissions will be registered on [Laravel's gate](https://laravel.c
 $user->can('edit articles');
 ```
 
-Spatie is webdesign agency in Antwerp, Belgium. You'll find an overview of all
+Spatie is a web design agency in Antwerp, Belgium. You'll find an overview of all
 our open source projects [on our website](https://spatie.be/opensource).
 
 ## Installation
@@ -161,7 +161,7 @@ return [
 
 ## Usage
 
-First add the `Spatie\Permission\Traits\HasRoles` trait to your `User` model(s):
+First, add the `Spatie\Permission\Traits\HasRoles` trait to your `User` model(s):
 
 ```php
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -360,7 +360,7 @@ $user->assignRole('writer');
 $user->givePermissionTo('delete articles');
 ```
 
-In the above example a role is given permission to edit articles and this role is assigned to a user. 
+In the above example, a role is given permission to edit articles and this role is assigned to a user. 
 Now the user can edit articles and additionally delete articles. The permission of 'delete articles' is the user's direct permission because it is assigned directly to them.
 When we call `$user->hasDirectPermission('delete articles')` it returns `true`, 
 but `false` for `$user->hasDirectPermission('edit articles')`.
@@ -457,7 +457,7 @@ or
 
 When using the default Laravel auth configuration all of the above methods will work out of the box, no extra configuration required.
 
-However when using multiple guards they will act like namespaces for your permissions and roles. Meaning every guard has its own set of permissions and roles that can be assigned to their user model.
+However, when using multiple guards they will act like namespaces for your permissions and roles. Meaning every guard has its own set of permissions and roles that can be assigned to their user model.
 
 ### Using permissions and roles with multiple guards
 
@@ -547,7 +547,7 @@ public function __construct()
 
 ## Using artisan commands
 
-You can create a role or permission from console with artisan commands.
+You can create a role or permission from a console with artisan commands.
 
 ```bash
 php artisan permission:create-role writer
@@ -588,7 +588,7 @@ Two notes about Database Seeding:
 
 1. It is best to flush the `spatie.permission.cache` before seeding, to avoid cache conflict errors. This can be done from an Artisan command (see Troubleshooting: Cache section, later) or directly in a seeder class (see example below).
 
-2. Here's a sample seeder, which clears the cache, creates permissions, and then assigns permissions to roles:
+2. Here's a sample seeder, which clears the cache, creates permissions and then assigns permissions to roles:
 
 	```php
 	use Illuminate\Database\Seeder;
@@ -688,7 +688,7 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 ### Security
 
-If you discover any security related issues, please email [freek@spatie.be](mailto:freek@spatie.be) instead of using the issue tracker.
+If you discover any security-related issues, please email [freek@spatie.be](mailto:freek@spatie.be) instead of using the issue tracker.
 
 ## Postcardware
 
@@ -715,11 +715,11 @@ Special thanks to [Alex Vanderbist](https://github.com/AlexVanderbist) who great
 
 ## Alternatives
 
-[Povilas Korop](https://twitter.com/@povilaskorop) did an excellent job listing the alternatives [in an article on Laravel News](https://laravel-news.com/two-best-roles-permissions-packages). In that same article he compares laravel-permission to [Joseph Silber](https://github.com/JosephSilber)'s [Bouncer]((https://github.com/JosephSilber/bouncer)), which in our book is also an excellent package.
+[Povilas Korop](https://twitter.com/@povilaskorop) did an excellent job listing the alternatives [in an article on Laravel News](https://laravel-news.com/two-best-roles-permissions-packages). In that same article, he compares laravel-permission to [Joseph Silber](https://github.com/JosephSilber)'s [Bouncer]((https://github.com/JosephSilber/bouncer)), which in our book is also an excellent package.
 
 ## Support us
 
-Spatie is a webdesign agency based in Antwerp, Belgium. You'll find an overview of all our open source projects [on our website](https://spatie.be/opensource).
+Spatie is a web design agency based in Antwerp, Belgium. You'll find an overview of all our open source projects [on our website](https://spatie.be/opensource).
 
 Does your business depend on our contributions? Reach out and support us on [Patreon](https://www.patreon.com/spatie). 
 All pledges will be dedicated to allocating workforce on maintenance and new awesome stuff.
