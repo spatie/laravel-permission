@@ -88,11 +88,11 @@ return [
     'log_registration_exception' => true,
 
     /*
-    * By default it will return http 403 (unauthorized) status code
-    *
-    * Set the route name of you want to redirect if
-    * PermissionMiddleware or RoleMiddleware give 403
-    */
+     * By default the RoleMiddleware and PermissionMiddleware will trigger an abort with
+     * http 403 status code if the user doesn't have the specified permission or role.
+     *
+     * To override the default 403 response, provide a named route here.
+     */
 
     'unauthorized_route_name_redirect' => null,
 ];
