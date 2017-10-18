@@ -3,7 +3,6 @@
 namespace Spatie\Permission\Commands;
 
 use Illuminate\Console\Command;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Contracts\Role as RoleContract;
 
 class CreateRole extends Command
