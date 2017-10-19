@@ -14,7 +14,7 @@ class PermissionMiddleware
     {
 
         if (Auth::guest()) {
-            $this->responseUnauthorized();
+            $this->handleUnauthorized();
         }
 
         $permissions = is_array($permission)
@@ -27,6 +27,6 @@ class PermissionMiddleware
             }
         }
 
-        $this->responseUnauthorized();
+        $this->handleUnauthorized();
     }
 }

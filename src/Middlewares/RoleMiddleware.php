@@ -14,7 +14,7 @@ class RoleMiddleware
     {
 
         if (Auth::guest()) {
-            $this->responseUnauthorized();
+            $this->handleUnauthorized();
         }
 
         $role = is_array($role)
@@ -22,7 +22,7 @@ class RoleMiddleware
             : explode('|', $role);
 
         if (! Auth::user()->hasAnyRole($role)) {
-            $this->responseUnauthorized();
+            $this->handleUnauthorized();
         }
 
         return $next($request);
