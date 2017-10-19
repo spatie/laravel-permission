@@ -2,27 +2,21 @@
 
 namespace Spatie\Permission;
 
-use Log;
-use Exception;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Cache\Repository;
 use Spatie\Permission\Contracts\Permission;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class PermissionRegistrar
 {
-    /**
-     * @var Gate
-     */
+    /** @var \Illuminate\Contracts\Auth\Access\Gate */
     protected $gate;
 
-    /**
-     * @var Repository
-     */
+    /** @var \Illuminate\Contracts\Cache\Repository */
     protected $cache;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $cacheKey = 'spatie.permission.cache';
 
     /**
@@ -38,27 +32,21 @@ class PermissionRegistrar
     /**
      *  Register the permissions.
      *
+     * @var string
      * @return bool
      */
     public function registerPermissions()
     {
-        try {
-            $this->getPermissions()->map(function ($permission) {
-                $this->gate->define($permission->name, function ($user) use ($permission) {
-                    return $user->hasPermissionTo($permission);
-                });
-            });
-
-            return true;
-        } catch (Exception $exception) {
-            if ($this->shouldLogException()) {
-                Log::alert(
-                    "Could not register permissions because {$exception->getMessage()}".PHP_EOL
-                    .$exception->getTraceAsString());
+        $this->gate->before(function (Authenticatable $user, $ability) {
+            try {
+                if (method_exists($user, 'hasPermissionTo')) {
+                    return $user->hasPermissionTo($ability);
+                }
+            } catch (PermissionDoesNotExist $e) {
             }
+        });
 
-            return false;
-        }
+        return true;
     }
 
     /**
@@ -79,19 +67,5 @@ class PermissionRegistrar
         return $this->cache->rememberForever($this->cacheKey, function () {
             return app(Permission::class)->with('roles')->get();
         });
-    }
-
-    /**
-     * @return bool
-     */
-    protected function shouldLogException()
-    {
-        $logSetting = config('laravel-permission.log_registration_exception');
-
-        if (is_null($logSetting)) {
-            return true;
-        }
-
-        return $logSetting;
     }
 }

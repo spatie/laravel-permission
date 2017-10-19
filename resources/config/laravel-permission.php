@@ -85,14 +85,4 @@ return [
          */
         'users' => 'user_id',
     ],
-
-    /*
-     *
-     * By default we'll make an entry in the application log when the permissions
-     * could not be loaded. Normally this only occurs while installing the packages.
-     *
-     * If for some reason you want to disable that logging, set this value to false.
-     */
-
-    'log_registration_exception' => true,
 ];
