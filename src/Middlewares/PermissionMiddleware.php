@@ -12,7 +12,7 @@ class PermissionMiddleware
 
     public function handle($request, Closure $next, $permission)
     {
-        
+
         if (Auth::guest()) {
             $this->responseUnauthorized();
         }

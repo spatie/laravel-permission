@@ -12,4 +12,5 @@ trait HandleUnauthorized
         }
         abort(403);
     }
+    
 }

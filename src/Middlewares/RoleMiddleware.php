@@ -9,7 +9,7 @@ use Spatie\Permission\Traits\HandleUnauthorized;
 class RoleMiddleware
 {
     use HandleUnauthorized;
-    
+
     public function handle($request, Closure $next, $role)
     {
 
