@@ -8,16 +8,12 @@ trait RefreshesPermissionCache
 {
     public static function bootRefreshesPermissionCache()
     {
-        static::created(function ($model) {
-            $model->forgetCachedPermissions();
+        static::updated(function () {
+            app(PermissionRegistrar::class)->forgetCachedPermissions();
         });
 
-        static::updated(function ($model) {
-            $model->forgetCachedPermissions();
-        });
-
-        static::deleted(function ($model) {
-            $model->forgetCachedPermissions();
+        static::deleted(function () {
+            app(PermissionRegistrar::class)->forgetCachedPermissions();
         });
     }
 

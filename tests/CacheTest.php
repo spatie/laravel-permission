@@ -9,6 +9,8 @@ use Spatie\Permission\Contracts\Permission;
 
 class CacheTest extends TestCase
 {
+    const QUERIES_PER_CACHE_PROVISION = 2;
+
     protected $registrar;
 
     public function setUp()
@@ -20,78 +22,100 @@ class CacheTest extends TestCase
         $this->registrar->forgetCachedPermissions();
 
         DB::connection()->enableQueryLog();
-
-        $this->assertCount(0, DB::getQueryLog());
-
-        //cache was empty, some queries should have been performed
-        $this->registrar->registerPermissions();
-
-        $this->assertCount(2, DB::getQueryLog());
     }
 
     /** @test */
     public function it_can_cache_the_permissions()
     {
-        //permission should be cached an no queries should be performed
-        $this->registrar->registerPermissions();
-        $this->assertCount(2, DB::getQueryLog());
+        $this->registrar->getPermissions();
+
+        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
+
+        $this->registrar->getPermissions();
+
+        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
     }
 
     /** @test */
-    public function permission_creation_and_updating_should_flush_the_cache()
+    public function it_flushes_the_cache_when_creating_a_permission()
+    {
+        app(Permission::class)->create(['name' => 'new']);
+
+        $this->resetQueryCount();
+
+        $this->registrar->getPermissions();
+
+        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
+    }
+
+    /** @test */
+    public function it_flushes_the_cache_when_updating_a_permission()
     {
         $permission = app(Permission::class)->create(['name' => 'new']);
-        $this->assertCount(3, DB::getQueryLog());
-
-        $this->registrar->registerPermissions();
-        $this->assertCount(5, DB::getQueryLog());
 
         $permission->name = 'other name';
         $permission->save();
-        $this->assertCount(6, DB::getQueryLog());
 
-        $this->registrar->registerPermissions();
-        $this->assertCount(8, DB::getQueryLog());
+        $this->resetQueryCount();
+
+        $this->registrar->getPermissions();
+
+        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
     }
 
     /** @test */
-    public function role_creation_and_updating_should_flush_the_cache()
+    public function it_flushes_the_cache_when_creating_a_role()
+    {
+        app(Role::class)->create(['name' => 'new']);
+
+        $this->resetQueryCount();
+
+        $this->registrar->getPermissions();
+
+        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
+    }
+
+    /** @test */
+    public function it_flushes_the_cache_when_updating_a_role()
     {
         $role = app(Role::class)->create(['name' => 'new']);
-        $this->assertCount(3, DB::getQueryLog());
-
-        $this->registrar->registerPermissions();
-        $this->assertCount(5, DB::getQueryLog());
 
         $role->name = 'other name';
         $role->save();
-        $this->assertCount(6, DB::getQueryLog());
 
-        $this->registrar->registerPermissions();
-        $this->assertCount(8, DB::getQueryLog());
+        $this->resetQueryCount();
+
+        $this->registrar->getPermissions();
+
+        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
     }
 
     /** @test */
     public function user_creation_should_not_flush_the_cache()
     {
+        $this->registrar->getPermissions();
+
+        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
+
         User::create(['email' => 'new']);
-        $this->assertCount(3, DB::getQueryLog());
 
-        $this->registrar->registerPermissions();
-        $this->assertCount(5, DB::getQueryLog());
+        $this->resetQueryCount();
 
-        $this->registrar->registerPermissions();
-        $this->assertCount(5, DB::getQueryLog());
+        $this->registrar->getPermissions();
+
+        $this->assertQueryCount(0);
     }
 
     /** @test */
-    public function adding_a_permission_to_a_role_should_flush_the_cache()
+    public function it_flushes_the_cache_when_giving_a_permission_to_a_role()
     {
         $this->testRole->givePermissionTo($this->testPermission);
-        $this->assertCount(3, DB::getQueryLog());
 
-        $this->registrar->registerPermissions();
-        $this->assertCount(5, DB::getQueryLog());
+        $this->resetQueryCount();
+
+        $this->registrar->getPermissions();
+
+        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
     }
 
     /** @test */
@@ -99,15 +123,30 @@ class CacheTest extends TestCase
     {
         $this->testRole->givePermissionTo(['edit-articles', 'edit-news']);
         $this->testUser->assignRole('testRole');
-        $this->assertCount(6, DB::getQueryLog());
+
+        $this->resetQueryCount();
 
         $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
-        $this->assertCount(10, DB::getQueryLog());
+
+        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION + 2); // + 2 for getting the User's relations
+        $this->resetQueryCount();
 
         $this->assertTrue($this->testUser->hasPermissionTo('edit-news'));
-        $this->assertCount(10, DB::getQueryLog());
+
+        $this->assertQueryCount(0);
 
         $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
-        $this->assertCount(10, DB::getQueryLog());
+
+        $this->assertQueryCount(0);
+    }
+
+    protected function assertQueryCount($expected)
+    {
+        $this->assertCount($expected, DB::getQueryLog());
+    }
+
+    protected function resetQueryCount()
+    {
+        DB::flushQueryLog();
     }
 }
