@@ -4,19 +4,17 @@ namespace Spatie\Permission\Middlewares;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Traits\HandleUnauthorized;
 
 class RoleMiddleware
 {
+    use HandleUnauthorized;
+    
     public function handle($request, Closure $next, $role)
     {
-        $routeNameRedirect = config('permission.unauthorized_route_name_redirect');
 
         if (Auth::guest()) {
-            if (! is_null($routeNameRedirect)) {
-                return redirect()
-                    ->route($routeNameRedirect);
-            }
-            abort(403);
+            $this->responseUnauthorized();
         }
 
         $role = is_array($role)
@@ -24,11 +22,7 @@ class RoleMiddleware
             : explode('|', $role);
 
         if (! Auth::user()->hasAnyRole($role)) {
-            if (! is_null($routeNameRedirect)) {
-                return redirect()
-                    ->route($routeNameRedirect);
-            }
-            abort(403);
+            $this->responseUnauthorized();
         }
 
         return $next($request);

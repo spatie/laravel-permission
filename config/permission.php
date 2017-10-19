@@ -85,5 +85,5 @@ return [
      * To override the default 403 response, provide a named route here.
      */
 
-    'unauthorized_route_name_redirect' => null,
+    'redirect_unauthorized_users_to_url' => null,
 ];

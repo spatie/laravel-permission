@@ -4,19 +4,17 @@ namespace Spatie\Permission\Middlewares;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Traits\HandleUnauthorized;
 
 class PermissionMiddleware
 {
+    use HandleUnauthorized;
+
     public function handle($request, Closure $next, $permission)
     {
-        $routeNameRedirect = config('permission.unauthorized_route_name_redirect');
-
+        
         if (Auth::guest()) {
-            if (! is_null($routeNameRedirect)) {
-                return redirect()
-                    ->route($routeNameRedirect);
-            }
-            abort(403);
+            $this->responseUnauthorized();
         }
 
         $permissions = is_array($permission)
@@ -29,10 +27,6 @@ class PermissionMiddleware
             }
         }
 
-        if (! is_null($routeNameRedirect)) {
-            return redirect()
-                ->route($routeNameRedirect);
-        }
-        abort(403);
+        $this->responseUnauthorized();
     }
 }
