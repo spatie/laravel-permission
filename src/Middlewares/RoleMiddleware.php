@@ -4,13 +4,17 @@ namespace Spatie\Permission\Middlewares;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Traits\HandleUnauthorized;
 
 class RoleMiddleware
 {
+    use HandleUnauthorized;
+
     public function handle($request, Closure $next, $role)
     {
+
         if (Auth::guest()) {
-            abort(403);
+            $this->handleUnauthorized();
         }
 
         $role = is_array($role)
@@ -18,7 +22,7 @@ class RoleMiddleware
             : explode('|', $role);
 
         if (! Auth::user()->hasAnyRole($role)) {
-            abort(403);
+            $this->handleUnauthorized();
         }
 
         return $next($request);

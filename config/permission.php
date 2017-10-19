@@ -77,4 +77,13 @@ return [
      */
 
     'cache_expiration_time' => 60 * 24,
+
+    /*
+     * By default the RoleMiddleware and PermissionMiddleware will trigger an abort with
+     * http 403 status code if the user doesn't have the specified permission or role.
+     *
+     * To override the default 403 response, provide a named route here.
+     */
+
+    'redirect_unauthorized_users_to_url' => null,
 ];
