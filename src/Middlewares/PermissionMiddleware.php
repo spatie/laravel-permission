@@ -4,13 +4,14 @@ namespace Spatie\Permission\Middlewares;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Exceptions\UnauthorizedException;
 
 class PermissionMiddleware
 {
     public function handle($request, Closure $next, $permission)
     {
         if (Auth::guest()) {
-            abort(403);
+            throw UnauthorizedException::notLoggedIn();
         }
 
         $permissions = is_array($permission)
@@ -23,6 +24,6 @@ class PermissionMiddleware
             }
         }
 
-        abort(403);
+        throw UnauthorizedException::forPermissions($permissions);
     }
 }
