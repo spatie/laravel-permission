@@ -545,6 +545,20 @@ public function __construct()
 }
 ```
 
+You can add something in Laravel exception handler:
+
+```php
+public function render($request, Exception $exception)
+{
+    if ($exception instanceof \Spatie\Permission\Exceptions\UnauthorizedException) {
+        // Code here ...
+    }
+
+    return parent::render($request, $exception);
+}
+
+```
+
 ## Using artisan commands
 
 You can create a role or permission from a console with artisan commands.
