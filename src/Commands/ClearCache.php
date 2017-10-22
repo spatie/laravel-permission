@@ -3,8 +3,7 @@
 namespace Spatie\Permission\Commands;
 
 use Illuminate\Console\Command;
-use Spatie\Permission\Contracts\Permission as PermissionContract;
-use \Spatie\Permission\Traits\HasPermissions;
+use Spatie\Permission\Traits\HasPermissions;
 
 class ClearCache extends Command
 {
@@ -18,6 +17,6 @@ class ClearCache extends Command
     public function handle()
     {
         $this->forgetCachedPermissions();
-        $this->info("Permissions chache was cleard");
+        $this->info('Permissions cache was cleared');
     }
 }
