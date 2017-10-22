@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.7.3 - 2017-10-21
+- refactor middleware to throw custom `UnauthorizedException` (which raises an HttpException with 403 response)
+The 403 response is backward compatible
+
 ## 2.7.2 - 2017-10-18
 - refactor `PermissionRegistrar` to use `$gate->before()`
 - removed `log_registration_exception` as it is no longer relevant
