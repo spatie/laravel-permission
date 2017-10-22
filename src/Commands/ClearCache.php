@@ -11,7 +11,6 @@ class ClearCache extends Command
 
     protected $signature = 'permission:clear-cache';
 
-
     protected $description = 'Clear permissions cache';
 
     public function handle()
