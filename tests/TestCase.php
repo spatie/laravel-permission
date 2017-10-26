@@ -36,8 +36,6 @@ abstract class TestCase extends Orchestra
 
         $this->setUpDatabase($this->app);
 
-        $this->reloadPermissions();
-
         $this->testUser = User::first();
         $this->testUserRole = app(Role::class)->find(1);
         $this->testUserPermission = app(Permission::class)->find(1);

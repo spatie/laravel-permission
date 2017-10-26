@@ -67,6 +67,8 @@ class CreatePermissionTables extends Migration
                 ->onDelete('cascade');
 
             $table->primary(['permission_id', 'role_id']);
+
+            Artisan::call('cache:forget', ['key' => 'spatie.permission.cache']);
         });
     }
 
