@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Test;
 
+use Illuminate\Contracts\Auth\Access\Gate;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
@@ -15,6 +16,12 @@ class GateTest extends TestCase
         $this->testUser->assignRole($this->testRole);
 
         $this->assertTrue($this->testUser->hasPermissionTo($this->testPermission));
+    }
+
+    /** @test */
+    public function it_can_determine_if_a_user_has_a_direct_permission()
+    {
+        $this->testUser->givePermissionTo('edit-articles');
 
         $this->assertTrue($this->testUser->can('edit-articles'));
 
@@ -51,5 +58,17 @@ class GateTest extends TestCase
     public function it_can_determine_if_a_user_does_not_have_a_permission()
     {
         $this->assertFalse($this->testUser->can('edit-articles'));
+    }
+
+    /** @test */
+    public function it_allows_other_gate_before_callbacks_to_run_if_a_user_does_not_have_a_permission()
+    {
+        $this->assertFalse($this->testUser->can('edit-articles'));
+
+        app(Gate::class)->before(function () {
+            return true;
+        });
+
+        $this->assertTrue($this->testUser->can('edit-articles'));
     }
 }
