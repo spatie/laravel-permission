@@ -12,7 +12,7 @@ class PermissionServiceProvider extends ServiceProvider
     public function boot(PermissionRegistrar $permissionLoader)
     {
         $this->publishes([
-            __DIR__.'/../config/permission.php' => $this->app->configPath().'/permission.php',
+            __DIR__.'/../config/permission.php' => config_path('permission.php'),
         ], 'config');
 
         if (! class_exists('CreatePermissionTables')) {
