@@ -27,6 +27,7 @@ class PermissionServiceProvider extends ServiceProvider
             $this->commands([
                 Commands\CreateRole::class,
                 Commands\CreatePermission::class,
+                Commands\ClearCache::class,
             ]);
         }
 
