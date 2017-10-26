@@ -2,9 +2,9 @@
 
 namespace Spatie\Permission\Test;
 
+use Illuminate\Contracts\Auth\Access\Gate;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
-use Illuminate\Contracts\Auth\Access\Gate;
 
 class GateTest extends TestCase
 {
