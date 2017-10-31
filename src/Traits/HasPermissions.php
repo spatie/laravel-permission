@@ -25,7 +25,7 @@ trait HasPermissions
             })
             ->each(function ($permission) {
                 $this->ensureModelSharesGuard($permission);
-                if(! $this->hasPermissionTo($permission->name)) {
+                if (! $this->hasPermissionTo($permission->name)) {
                     $this->permissions()->attach($permission->id);
                 }
             })
