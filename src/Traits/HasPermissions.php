@@ -25,10 +25,13 @@ trait HasPermissions
             })
             ->each(function ($permission) {
                 $this->ensureModelSharesGuard($permission);
+		        if(!$this->can($permission->name)) {
+                    $this->permissions()->attach($permission->id);
+                }
             })
             ->all();
 
-        $this->permissions()->saveMany($permissions);
+        //$this->permissions()->saveMany($permissions);
 
         $this->forgetCachedPermissions();
 
