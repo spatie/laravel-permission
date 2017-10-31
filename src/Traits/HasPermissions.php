@@ -18,14 +18,14 @@ trait HasPermissions
      */
     public function givePermissionTo(...$permissions)
     {
-        $permissions = collect($permissions)
+        collect($permissions)
             ->flatten()
             ->map(function ($permission) {
                 return $this->getStoredPermission($permission);
             })
             ->each(function ($permission) {
                 $this->ensureModelSharesGuard($permission);
-		        if(! $this->can($permission->name)) {
+                if(! $this->hasPermissionTo($permission->name)) {
                     $this->permissions()->attach($permission->id);
                 }
             })
