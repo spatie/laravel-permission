@@ -162,13 +162,11 @@ trait HasRoles
             })
             ->each(function ($role) {
                 $this->ensureModelSharesGuard($role);
-		        if(!$this->hasRole($role->name)) {
+		        if(! $this->hasRole($role->name)) {
                     $this->roles()->attach($role->id);
                 }
             })
             ->all();
-
-        //$this->roles()->saveMany($roles);
 
         $this->forgetCachedPermissions();
 
