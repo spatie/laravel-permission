@@ -2,13 +2,15 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.7.6 - 2017-11-1
+- `HasRole::assignRole` and `HasRole::syncRoles` now accept role id's in addition to role names as arguments
+
 ## 2.7.5 - 2017-10-26
 - fixed `Gate::before` for custom gate callbacks
 
 ## 2.7.4 - 2017-10-26
 - added cache clearing command in `up` migration for permission tables
-- use config_path helper for beter Lumen support
-
+- use config_path helper for better Lumen support
 
 ## 2.7.3 - 2017-10-21
 - refactor middleware to throw custom `UnauthorizedException` (which raises an HttpException with 403 response)
@@ -40,7 +42,7 @@ The 403 response is backward compatible
 - add getRoleNames() method to return a collection of assigned roles
 
 ## 2.5.0 - 2017-08-30
-- add compatiblity with Laravel 5.5
+- add compatibility with Laravel 5.5
 
 ## 2.4.2 - 2017-08-11
 - automatically detach roles and permissions when a user gets deleted
@@ -125,7 +127,7 @@ The 403 response is backward compatible
 - added `Role` scope
 
 ## 1.5.3 - 2016-12-15
-- moved some things to `boot` method in SP to solve some compatibilty problems with other packages
+- moved some things to `boot` method in SP to solve some compatibility problems with other packages
 
 ## 1.5.2 - 2016-08-26
 - make compatible with L5.3
@@ -162,7 +164,7 @@ The 403 response is backward compatible
 
 ## 1.3.0 - 2015-12-25
 
-- added compatiblity for Laravel 5.2
+- added compatibility for Laravel 5.2
 
 ## 1.2.1 - 2015-12-22
 
