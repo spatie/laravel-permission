@@ -104,7 +104,6 @@ class Role extends Model implements RoleContract
         return $role;
     }
 
-
     /**
      * Determine if the user may perform the given permission.
      *

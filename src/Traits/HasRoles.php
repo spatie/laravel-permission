@@ -383,7 +383,7 @@ trait HasRoles
     {
         if (is_numeric($role)) {
             return app(Role::class)->findById($role, $this->getDefaultGuardName());
-        }else if (is_string($role)) {
+        } elseif (is_string($role)) {
             return app(Role::class)->findByName($role, $this->getDefaultGuardName());
         }
 

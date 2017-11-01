@@ -65,8 +65,6 @@ class HasRolesTest extends TestCase
         $this->assertTrue($this->testUser->hasRole('testRole2'));
     }
 
-
-
     /** @test */
     public function it_throws_an_exception_when_assigning_a_role_that_does_not_exist()
     {
