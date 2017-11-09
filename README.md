@@ -75,7 +75,7 @@ return [
     'models' => [
 
         /*
-         * When using the "HasRoles" trait from this package, we need to know which
+         * When using the "HasTentants" trait from this package, we need to know which
          * Eloquent model should be used to retrieve your permissions. Of course, it
          * is often just the "Permission" model but you may use whatever you like.
          *
@@ -86,7 +86,7 @@ return [
         'permission' => Spatie\Permission\Models\Permission::class,
 
         /*
-         * When using the "HasRoles" trait from this package, we need to know which
+         * When using the "HasTenants" trait from this package, we need to know which
          * Eloquent model should be used to retrieve your roles. Of course, it
          * is often just the "Role" model but you may use whatever you like.
          *
@@ -101,7 +101,7 @@ return [
     'table_names' => [
 
         /*
-         * When using the "HasRoles" trait from this package, we need to know which
+         * When using the "HasTenants" trait from this package, we need to know which
          * table should be used to retrieve your roles. We have chosen a basic
          * default value but you may easily change it to any table you like.
          */
@@ -109,7 +109,7 @@ return [
         'roles' => 'roles',
 
         /*
-         * When using the "HasRoles" trait from this package, we need to know which
+         * When using the "HasTenants" trait from this package, we need to know which
          * table should be used to retrieve your permissions. We have chosen a basic
          * default value but you may easily change it to any table you like.
          */
@@ -117,7 +117,7 @@ return [
         'permissions' => 'permissions',
 
         /*
-         * When using the "HasRoles" trait from this package, we need to know which
+         * When using the "HasTenants" trait from this package, we need to know which
          * table should be used to retrieve your models permissions. We have chosen a
          * basic default value but you may easily change it to any table you like.
          */
@@ -125,7 +125,7 @@ return [
         'model_has_permissions' => 'model_has_permissions',
 
         /*
-         * When using the "HasRoles" trait from this package, we need to know which
+         * When using the "HasTenants" trait from this package, we need to know which
          * table should be used to retrieve your models roles. We have chosen a
          * basic default value but you may easily change it to any table you like.
          */
@@ -133,7 +133,7 @@ return [
         'model_has_roles' => 'model_has_roles',
 
         /*
-         * When using the "HasRoles" trait from this package, we need to know which
+         * When using the "HasTenants" trait from this package, we need to know which
          * table should be used to retrieve your roles permissions. We have chosen a
          * basic default value but you may easily change it to any table you like.
          */
@@ -152,29 +152,29 @@ return [
 
 ## Usage
 
-First, add the `Spatie\Permission\Traits\HasRoles` trait to your `User` model(s):
+First, add the `Spatie\Permission\Traits\HasTenants` trait to your `User` model(s):
 
 ```php
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Spatie\Permission\Traits\HasRoles;
+use Spatie\Permission\Traits\HasTenants;
 
 class User extends Authenticatable
 {
-    use HasRoles;
+    use HasTenants;
 
     // ...
 }
 ```
 
-> - note that if you need to use `HasRoles` trait with another model ex.`Page` you will also need to add `protected $guard_name = 'web';` as well to that model or you would get an error
+> - note that if you need to use `HasTenants` trait with another model ex.`Page` you will also need to add `protected $guard_name = 'web';` as well to that model or you would get an error
 >
 >```php
 >use Illuminate\Database\Eloquent\Model;
->use Spatie\Permission\Traits\HasRoles;
+>use Spatie\Permission\Traits\HasTenants;
 >
 >class Page extends Model
 >{
->    use HasRoles;
+>    use HasTenants;
 >
 >    protected $guard_name = 'web'; // or whatever guard you want to use
 >
@@ -195,7 +195,7 @@ $permission = Permission::create(['name' => 'edit articles']);
 
 If you're using multiple guards the `guard_name` attribute needs to be set as well. Read about it in the [using multiple guards](#using-multiple-guards) section of the readme.
 
-The `HasRoles` trait adds Eloquent relationships to your models, which can be accessed directly or used as a base query:
+The `HasTenants` trait adds Eloquent relationships to your models, which can be accessed directly or used as a base query:
 
 ```php
 // get a list of all permissions directly assigned to the user
@@ -208,7 +208,7 @@ $permissions = $user->getAllPermissions();
 $roles = $user->getRoleNames(); // Returns a collection
 ```
 
-The `HasRoles` trait also adds a `role` scope to your models to scope the query to certain roles or permissions:
+The `HasTenants` trait also adds a `role` scope to your models to scope the query to certain roles or permissions:
 
 ```php
 $users = User::role('writer')->get(); // Returns only users with the role 'writer'
@@ -376,6 +376,47 @@ All these responses are collections of `Spatie\Permission\Models\Permission` obj
 If we follow the previous example, the first response will be a collection with the `delete article` permission and 
 the second will be a collection with the `edit article` permission and the third will contain both.
 
+### Tenant functions
+
+The tenant implementation is completely optional, use as you see fit.  Currently there is no support for assigning guards to tenants nor is there the ability to assign tenant level permissions directly to a user.  
+
+You should assign permissions to roles and then assigns roles to users with the scope of tenant.
+
+Get a list of all roles and tenants assigned to the user
+```php
+$user->tenants;
+```
+
+Give permission via a role to a user for a tenant
+```php
+$user->assignRoleToTenant($roleId, $tenantId);
+
+// you may pass a class
+$user->assignRoleToTenant($role, $tenant);
+
+// or an array of Role Ids
+$user->assignRoleToTenant([1,2,3], $tenantId);
+```
+
+Determine if user has permission to tenant via role
+
+**Note:** Direct permissions are not supported at this time
+```php
+$user->hasPermissionToTenant('delete articles', $tenant);
+
+// you may also check via tenant name
+$user->hasPermissionToTenant('delete articles', 'The Chronicle');
+
+// or by tenant ids (must be an numeric id)
+$user->hasPermissionToTenant('delete articles', $tenantId);
+
+```
+
+If you would like to revoke permissions you can do so by
+```php
+$user->removeRoleFromTenant('admin', $tenant);
+```
+
 ### Using Blade directives
 This package also adds Blade directives to verify whether the currently logged in user has all or any of a given list of roles. 
 
@@ -427,6 +468,15 @@ Test for all roles:
 @else
     I do not have all of these roles...
 @endhasallroles
+```
+
+Test for user having permission to tenant
+```php
+@haspermission('edit articles', 1)
+    I am a writer!
+@else
+    I am not a writer...
+@endhaspermission
 ```
 
 #### Blade and Permissions

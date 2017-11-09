@@ -34,6 +34,8 @@ class BladeTest extends TestCase
         $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', ['roles' => implode('|', $roles)]));
         $this->assertEquals('does not have any of the given roles', $this->renderView('hasAnyRole', $roles));
         $this->assertEquals('does not have any of the given roles', $this->renderView('hasAnyRole', ['roles' => implode('|', $roles)]));
+        $this->assertEquals('does not have permission', $this->renderView('hasPermission',
+            ['permission' => $permission, 'tenantId' => 1]));
     }
 
     /** @test */
@@ -240,6 +242,38 @@ class BladeTest extends TestCase
         auth()->setUser($user);
 
         $this->assertEquals('does not have all of the given roles', $this->renderView('guardHasAllRolesPipe', compact('guard')));
+    }
+
+    /** @test */
+    public function the_has_permissions_will_evaluate_false_when_the_logged_in_user_doesnt_have_required_permission_to_tenant()
+    {
+        $user = $this->getMember();
+
+        $user->assignRoleToTenant('writer', 1);
+
+        $this->refreshTestUser();
+
+        auth()->setUser($user);
+
+        $this->assertEquals('does not have permission', $this->renderView('hasPermission',
+            ['permission' => 'edit-articles', 'tenantId' => 1]));
+    }
+
+    /** @test */
+    public function the_has_permissions_will_evaluate_true_when_the_logged_in_user_does_have_required_permission_to_tenant()
+    {
+        $user = $this->getMember();
+
+        $role = \Spatie\Permission\Models\Role::findByName('writer');
+        $role->givePermissionTo('edit-articles');
+        $user->assignRoleToTenant($role->id, 1);
+        dd($user->tenants);
+        $this->refreshTestUser();
+
+        auth()->setUser($user);
+
+        $this->assertEquals('has permission', $this->renderView('hasPermission',
+            ['permission' => 'edit-articles', 'tenant' => 1]));
     }
 
     protected function getWriter()
