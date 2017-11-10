@@ -55,6 +55,17 @@ class Role extends Model implements RoleContract
     }
 
     /**
+     * A role may belong to various tenants.
+     */
+    public function tenants(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            config('permission.models.tenant'),
+            config('permission.table_names.role_tenant_user')
+        );
+    }
+
+    /**
      * A role belongs to some users of the model associated with its guard.
      */
     public function users(): MorphToMany

@@ -5,6 +5,7 @@ namespace Spatie\Permission;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
 use Spatie\Permission\Contracts\Role as RoleContract;
+use Spatie\Permission\Contracts\Tenant as TenantContract;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 
 class PermissionServiceProvider extends ServiceProvider
@@ -20,6 +21,7 @@ class PermissionServiceProvider extends ServiceProvider
 
             $this->publishes([
                 __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->app->databasePath()."/migrations/{$timestamp}_create_permission_tables.php",
+                __DIR__.'/../database/migrations/create_tenant_tables.php.stub' => $this->app->databasePath()."/migrations/{$timestamp}_create_tenant_tables.php",
             ], 'migrations');
         }
 
@@ -51,6 +53,7 @@ class PermissionServiceProvider extends ServiceProvider
 
         $this->app->bind(PermissionContract::class, $config['permission']);
         $this->app->bind(RoleContract::class, $config['role']);
+        $this->app->bind(TenantContract::class, $config['tenant']);
     }
 
     protected function registerBladeExtensions()
@@ -89,6 +92,16 @@ class PermissionServiceProvider extends ServiceProvider
                 return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasAllRoles({$roles})): ?>";
             });
             $bladeCompiler->directive('endhasallroles', function () {
+                return '<?php endif; ?>';
+            });
+
+            $bladeCompiler->directive('haspermission', function ($arguments) {
+                list($permission, $tenant, $guard) = explode(',', $arguments.',');
+
+                return "<?php if(auth({$guard})->check() && 
+                    auth({$guard})->user()->hasPermissionToTenant({$permission}, {$tenant})): ?>";
+            });
+            $bladeCompiler->directive('endhaspermission', function () {
                 return '<?php endif; ?>';
             });
         });
