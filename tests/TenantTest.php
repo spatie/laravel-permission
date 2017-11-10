@@ -48,7 +48,6 @@ class TenantTest extends TestCase
     public function it_can_return_a_tenant_object()
     {
         $tenant = app(Tenant::class)->findById(1);
-        $this->assertEquals(1, count($tenant));
         $this->assertInstanceOf('\Spatie\Permission\Models\Tenant', $tenant);
     }
 }

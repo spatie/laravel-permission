@@ -2,14 +2,13 @@
 
 namespace Spatie\Permission\Traits;
 
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Spatie\Permission\Exceptions\RoleDoesNotExist;
-use Spatie\Permission\Exceptions\TenantDoesNotExist;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\RoleTenantUserPivot;
 use Spatie\Permission\Models\Tenant;
+use Spatie\Permission\Models\Permission;
+use Illuminate\Database\Eloquent\Collection;
+use Spatie\Permission\Models\RoleTenantUserPivot;
+use Spatie\Permission\Exceptions\RoleDoesNotExist;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 trait HasTenants
 {
@@ -37,7 +36,7 @@ trait HasTenants
      * Determine if the user may perform the given permission.
      *
      * @param string|\Spatie\Permission\Contracts\Permission $permission
-     * @param string|\Spatie\Permission\Contracts\Tenant $tenant
+     * @param string|\Spatie\Permission\Models\Tenant|\Spatie\Permission\Contracts\Tenant $tenant
      *
      * @return bool
      */
@@ -75,7 +74,7 @@ trait HasTenants
      * Determine if the user has, via roles, the given permission.
      *
      * @param \Spatie\Permission\Models\Permission $permission
-     * @param string|\Spatie\Permission\Models\Tenant $tenant
+     * @param string|\Spatie\Permission\Models\Tenant|\Spatie\Permission\Contracts\Tenant $tenant
      *
      * @return bool
      */
@@ -127,9 +126,6 @@ trait HasTenants
 
         if (is_string($roles)) {
             $roles = Role::findByName($roles)->id;
-            if (empty($roles)) {
-                throw new RoleDoesNotExist($roles);
-            }
         }
 
         $rtuPivot = new RoleTenantUserPivot();
@@ -152,6 +148,8 @@ trait HasTenants
      * @param string|\Spatie\Permission\Contracts\Tenant $tenant
      *
      * @return $this
+     *
+     * @throws RoleDoesNotExist when providing a role that is not found
      */
     public function removeRoleFromTenant($roles, $tenant)
     {
@@ -160,9 +158,6 @@ trait HasTenants
 
         if (is_string($roles)) {
             $roles = Role::findByName($roles)->id;
-            if (empty($roles)) {
-                throw new RoleDoesNotExist($roles);
-            }
         }
 
         if ($roles instanceof Collection) {

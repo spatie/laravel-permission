@@ -29,5 +29,5 @@ interface Tenant
      *
      * @throws \Spatie\Permission\Exceptions\TenantDoesNotExist
      */
-    public static function findById($id): Tenant;
+    public static function findById($id): self;
 }

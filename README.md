@@ -404,9 +404,6 @@ Determine if user has permission to tenant via role
 ```php
 $user->hasPermissionToTenant('delete articles', $tenant);
 
-// you may also check via tenant name
-$user->hasPermissionToTenant('delete articles', 'The Chronicle');
-
 // or by tenant ids (must be an numeric id)
 $user->hasPermissionToTenant('delete articles', $tenantId);
 

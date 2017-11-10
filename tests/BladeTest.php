@@ -13,7 +13,7 @@ class BladeTest extends TestCase
         parent::setUp();
 
         $roleModel = app(Role::class);
-        $tenantModel = app (Tenant::class);
+        $tenantModel = app(Tenant::class);
 
         $roleModel->create(['name' => 'member']);
         $roleModel->create(['name' => 'writer']);

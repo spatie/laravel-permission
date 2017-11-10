@@ -4,7 +4,6 @@ namespace Spatie\Permission\Test;
 
 use Spatie\Permission\Contracts\Tenant;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
-use Spatie\Permission\Exceptions\TenantDoesNotExist;
 
 class HasTenantsPrimaryKeyStringTest extends TestCase
 {
@@ -45,7 +44,7 @@ class HasTenantsPrimaryKeyStringTest extends TestCase
     /** @test */
     public function it_can_determine_that_the_user_does_not_have_a_role_with_the_tenant_id()
     {
-       $this->assertFalse($this->testUser->hasPermissionToTenant('edit-articles', 1));
+        $this->assertFalse($this->testUser->hasPermissionToTenant('edit-articles', 1));
     }
 
     /** @test */
