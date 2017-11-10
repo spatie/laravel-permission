@@ -2,14 +2,13 @@
     "name": "chadlross/laravel-permission",
     "description": "Permission handling for Laravel 5.4 and up",
     "keywords": [
-        "chadlross",
         "spatie",
         "laravel",
         "permission",
         "acl",
         "security"
     ],
-    "homepage": "https://github.com/ChadLRoss/laravel-permission",
+    "homepage": "https://github.com/spatie/laravel-permission",
     "license": "MIT",
     "authors": [
         {
