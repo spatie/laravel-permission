@@ -7,8 +7,8 @@ use Spatie\Permission\Contracts\Permission as PermissionContract;
 
 class CreatePermission extends Command
 {
-    protected $signature = 'permission:create-permission 
-                {name : The name of the permission} 
+    protected $signature = 'make:permission
+                {name : The name of the permission}
                 {guard? : The name of the guard}';
 
     protected $description = 'Create a permission';
