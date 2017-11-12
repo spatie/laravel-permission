@@ -338,8 +338,8 @@ The `givePermissionTo` and `revokePermissionTo` functions can accept a
 string or a `Spatie\Permission\Models\Permission` object.
 
 
-Permissions are inherited from roles automatically. 
-Additionally, individual permissions can be assigned to the user too. 
+Permissions are inherited from roles automatically.
+Additionally, individual permissions can be assigned to the user too.
 For instance:
 
 ```php
@@ -351,9 +351,9 @@ $user->assignRole('writer');
 $user->givePermissionTo('delete articles');
 ```
 
-In the above example, a role is given permission to edit articles and this role is assigned to a user. 
+In the above example, a role is given permission to edit articles and this role is assigned to a user.
 Now the user can edit articles and additionally delete articles. The permission of 'delete articles' is the user's direct permission because it is assigned directly to them.
-When we call `$user->hasDirectPermission('delete articles')` it returns `true`, 
+When we call `$user->hasDirectPermission('delete articles')` it returns `true`,
 but `false` for `$user->hasDirectPermission('edit articles')`.
 
 This method is useful if one builds a form for setting permissions for roles and users in an application and wants to restrict or change inherited permissions of roles of the user, i.e. allowing to change only direct permissions of the user.
@@ -373,11 +373,11 @@ $user->getAllPermissions();
 
 All these responses are collections of `Spatie\Permission\Models\Permission` objects.
 
-If we follow the previous example, the first response will be a collection with the `delete article` permission and 
+If we follow the previous example, the first response will be a collection with the `delete article` permission and
 the second will be a collection with the `edit article` permission and the third will contain both.
 
 ### Using Blade directives
-This package also adds Blade directives to verify whether the currently logged in user has all or any of a given list of roles. 
+This package also adds Blade directives to verify whether the currently logged in user has all or any of a given list of roles.
 
 Optionally you can pass in the `guard` that the check will be performed on as a second argument.
 
@@ -556,21 +556,21 @@ public function render($request, Exception $exception)
 You can create a role or permission from a console with artisan commands.
 
 ```bash
-php artisan permission:create-role writer
+php artisan make:role writer
 ```
 
 ```bash
-php artisan permission:create-permission 'edit articles'
+php artisan make:permission 'edit articles'
 ```
 
 When creating permissions and roles for specific guards you can specify the guard names as a second argument:
 
 ```bash
-php artisan permission:create-role writer web
+php artisan make:role writer web
 ```
 
 ```bash
-php artisan permission:create-permission 'edit articles' web
+php artisan make:permission 'edit articles' web
 ```
 
 ## Unit Testing
@@ -639,7 +639,7 @@ keep the following things in mind:
 ```bash
 php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="config"
 ```
-  
+
   And update the `models.role` and `models.permission` values
 
 
@@ -668,9 +668,9 @@ php artisan cache:forget spatie.permission.cache
 
 ### Cache Identifier
 
-TIP: If you are leveraging a caching service such as `redis` or `memcached` and there are other sites 
-running on your server, you could run into cache clashes. It is prudent to set your own cache `prefix` 
-in `/config/cache.php` to something unique for each application. This will prevent other applications 
+TIP: If you are leveraging a caching service such as `redis` or `memcached` and there are other sites
+running on your server, you could run into cache clashes. It is prudent to set your own cache `prefix`
+in `/config/cache.php` to something unique for each application. This will prevent other applications
 from accidentally using/changing your cached data.
 
 
@@ -727,7 +727,7 @@ Special thanks to [Alex Vanderbist](https://github.com/AlexVanderbist) who great
 
 Spatie is a web design agency based in Antwerp, Belgium. You'll find an overview of all our open source projects [on our website](https://spatie.be/opensource).
 
-Does your business depend on our contributions? Reach out and support us on [Patreon](https://www.patreon.com/spatie). 
+Does your business depend on our contributions? Reach out and support us on [Patreon](https://www.patreon.com/spatie).
 All pledges will be dedicated to allocating workforce on maintenance and new awesome stuff.
 
 ## License

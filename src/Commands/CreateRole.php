@@ -7,7 +7,7 @@ use Spatie\Permission\Contracts\Role as RoleContract;
 
 class CreateRole extends Command
 {
-    protected $signature = 'permission:create-role
+    protected $signature = 'make:role
         {name : The name of the role}
         {guard? : The name of the guard}';
 
