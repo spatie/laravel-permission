@@ -12,3 +12,8 @@ function getModelForGuard(string $guard)
             return config("auth.providers.{$guard['provider']}.model");
         })->get($guard);
 }
+
+function isNotLumen() : bool
+{
+    return !preg_match('/lumen/i', app()->version());
+}
