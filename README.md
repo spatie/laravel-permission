@@ -5,6 +5,19 @@
 [![StyleCI](https://styleci.io/repos/42480275/shield)](https://styleci.io/repos/42480275)
 [![Total Downloads](https://img.shields.io/packagist/dt/spatie/laravel-permission.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-permission)
 
+* [Installation](#installation)
+* [Usage](#usage)
+  * [Using "direct" permissions](#using-direct-permissions-see-below-to-use-both-roles-and-permissions)
+  * [Using permissions via roles](#using-permissions-via-roles)
+  * [Using Blade directives](#using-blade-directives)
+  * [Using multiple guards](#using-multiple-guards)
+  * [Using a middleware](#using-a-middleware)
+  * [Using artisan commands](#using-artisan-commands)
+* [Unit Testing](#unit-testing)
+* [Database Seeding](#database-seeding)
+* [Extending](#extending)
+* [Cache](#cache)
+
 This package allows you to manage user permissions and roles in a database.
 
 Once installed you can do stuff like this:
