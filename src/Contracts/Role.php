@@ -23,7 +23,7 @@ interface Role
      *
      * @throws \Spatie\Permission\Exceptions\RoleDoesNotExist
      */
-    public static function findByName(string $name, $guardName): Role;
+    public static function findByName(string $name, $guardName): self;
 
     /**
      * Determine if the user may perform the given permission.
