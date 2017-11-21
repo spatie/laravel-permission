@@ -4,6 +4,7 @@ namespace Spatie\Permission\Test;
 
 use Monolog\Handler\TestHandler;
 use Spatie\Permission\Contracts\Role;
+use Spatie\Permission\Contracts\Tenant;
 use Illuminate\Database\Schema\Blueprint;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Contracts\Permission;
@@ -30,6 +31,12 @@ abstract class TestCase extends Orchestra
     /** @var \Spatie\Permission\Models\Permission */
     protected $testAdminPermission;
 
+    /** @var \Spatie\Permission\Models\Tenant */
+    protected $testUserTenant;
+
+    /** @var \Spatie\Permission\Models\Tenant */
+    protected $testAdminTenant;
+
     public function setUp()
     {
         parent::setUp();
@@ -39,10 +46,12 @@ abstract class TestCase extends Orchestra
         $this->testUser = User::first();
         $this->testUserRole = app(Role::class)->find(1);
         $this->testUserPermission = app(Permission::class)->find(1);
+        $this->testUserTenant = app(Tenant::class)->find(1);
 
         $this->testAdmin = Admin::first();
         $this->testAdminRole = app(Role::class)->find(3);
         $this->testAdminPermission = app(Permission::class)->find(3);
+        $this->testAdminTenant = app(Tenant::class)->find(2);
 
         $this->clearLogTestHandler();
     }
@@ -104,9 +113,10 @@ abstract class TestCase extends Orchestra
         });
 
         include_once __DIR__.'/../database/migrations/create_permission_tables.php.stub';
+        include_once __DIR__.'/../database/migrations/create_tenant_tables.php.stub';
 
         (new \CreatePermissionTables())->up();
-
+        (new \CreateTenantTables())->up();
         User::create(['email' => 'test@user.com']);
         Admin::create(['email' => 'admin@user.com']);
         $app[Role::class]->create(['name' => 'testRole']);
