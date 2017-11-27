@@ -68,7 +68,7 @@ class CreatePermissionTables extends Migration
 
             $table->primary(['permission_id', 'role_id']);
 
-            Artisan::call('cache:forget', ['key' => 'spatie.permission.cache']);
+            Cache::forget('spatie.permission.cache');
         });
     }
 

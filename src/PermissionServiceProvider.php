@@ -11,16 +11,18 @@ class PermissionServiceProvider extends ServiceProvider
 {
     public function boot(PermissionRegistrar $permissionLoader)
     {
-        $this->publishes([
-            __DIR__.'/../config/permission.php' => config_path('permission.php'),
-        ], 'config');
-
-        if (! class_exists('CreatePermissionTables')) {
-            $timestamp = date('Y_m_d_His', time());
-
+        if (isNotLumen()) {
             $this->publishes([
-                __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->app->databasePath()."/migrations/{$timestamp}_create_permission_tables.php",
-            ], 'migrations');
+                __DIR__.'/../config/permission.php' => config_path('permission.php'),
+            ], 'config');
+
+            if (! class_exists('CreatePermissionTables')) {
+                $timestamp = date('Y_m_d_His', time());
+
+                $this->publishes([
+                    __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->app->databasePath()."/migrations/{$timestamp}_create_permission_tables.php",
+                ], 'migrations');
+            }
         }
 
         if ($this->app->runningInConsole()) {
@@ -37,10 +39,12 @@ class PermissionServiceProvider extends ServiceProvider
 
     public function register()
     {
-        $this->mergeConfigFrom(
-            __DIR__.'/../config/permission.php',
-            'permission'
-        );
+        if (isNotLumen()) {
+            $this->mergeConfigFrom(
+                __DIR__.'/../config/permission.php',
+                'permission'
+            );
+        }
 
         $this->registerBladeExtensions();
     }
