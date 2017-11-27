@@ -41,4 +41,16 @@ class PermissionTest extends TestCase
         $this->assertTrue($this->testUserPermission->users->first()->is($this->testUser));
         $this->assertInstanceOf(User::class, $this->testUserPermission->users->first());
     }
+
+    /** @test */
+    public function it_can_give_and_revoke_multiple_permissions()
+    {
+        $this->testUserRole->givePermissionTo(['edit-articles', 'edit-news']);
+
+        $this->assertEquals(2, $this->testUserRole->permissions()->count());
+
+        $this->testUserRole->revokePermissionTo(['edit-articles', 'edit-news']);
+
+        $this->assertEquals(0, $this->testUserRole->permissions()->count());
+    }
 }
