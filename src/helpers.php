@@ -15,5 +15,5 @@ function getModelForGuard(string $guard)
 
 function isNotLumen() : bool
 {
-    return !preg_match('/lumen/i', app()->version());
+    return ! preg_match('/lumen/i', app()->version());
 }
