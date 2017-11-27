@@ -2,8 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
-## 2.7.6 - 2017-11-1
-- `HasRole::assignRole` and `HasRole::syncRoles` now accept role id's in addition to role names as arguments
+## 2.7.6 - 2017-11-27
+- added Lumen support
+- updated `HasRole::assignRole` and `HasRole::syncRoles` to accept role id's in addition to role names as arguments
 
 ## 2.7.5 - 2017-10-26
 - fixed `Gate::before` for custom gate callbacks
