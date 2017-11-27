@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.7.7 - 2017-11-27
+- updated `HasPermissions::getStoredPermission` to allow a collection to be returned, and to fix query when passing multiple permissions
+
 ## 2.7.6 - 2017-11-27
 - added Lumen support
 - updated `HasRole::assignRole` and `HasRole::syncRoles` to accept role id's in addition to role names as arguments
