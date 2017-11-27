@@ -381,7 +381,9 @@ trait HasRoles
 
     protected function getStoredRole($role): Role
     {
-        if (is_string($role)) {
+        if (is_numeric($role)) {
+            return app(Role::class)->findById($role, $this->getDefaultGuardName());
+        } elseif (is_string($role)) {
             return app(Role::class)->findByName($role, $this->getDefaultGuardName());
         }
 
