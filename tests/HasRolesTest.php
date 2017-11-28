@@ -38,9 +38,17 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_assign_a_role_using_an_id()
+    {
+        $this->testUser->assignRole($this->testUserRole->id);
+
+        $this->assertTrue($this->testUser->hasRole($this->testUserRole));
+    }
+
+    /** @test */
     public function it_can_assign_multiple_roles_at_once()
     {
-        $this->testUser->assignRole('testRole', 'testRole2');
+        $this->testUser->assignRole($this->testUserRole->id, 'testRole2');
 
         $this->assertTrue($this->testUser->hasRole('testRole'));
 
@@ -50,7 +58,7 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_can_assign_multiple_roles_using_an_array()
     {
-        $this->testUser->assignRole(['testRole', 'testRole2']);
+        $this->testUser->assignRole([$this->testUserRole->id, 'testRole2']);
 
         $this->assertTrue($this->testUser->hasRole('testRole'));
 

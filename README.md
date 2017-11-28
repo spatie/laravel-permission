@@ -45,6 +45,11 @@ our open source projects [on our website](https://spatie.be/opensource).
 
 ## Installation
 
+- [Laravel](#laravel)
+- [Lumen](#lumen)
+
+### Laravel
+
 This package can be used in Laravel 5.4 or higher. If you are using an older version of Laravel, take a look at [the v1 branch of this package](https://github.com/spatie/laravel-permission/tree/v1).
 
 You can install the package via composer:
@@ -161,6 +166,29 @@ return [
 
     'cache_expiration_time' => 60 * 24,
 ];
+```
+
+### Lumen
+
+You can install the package via Composer:
+
+``` bash
+composer require spatie/laravel-permission
+```
+
+Copy `vendor/spatie/laravel-permission/config/permission.php` to `config/permission.php`. Same for `vendor/spatie/laravel-permission/database/migrations/create_permission_tables.php.stub` to `database/migrations/create_permission_tables.php` (be sure to remove the ".stub" at the end of the file name).
+
+In `bootstrap/app.php`, add the following code below other services providers:
+
+```php
+$app->register(Spatie\Permission\PermissionServiceProvider::class);
+$app->configure('permission');
+```
+
+Then, run your migrations:
+
+```bash
+php artisan migrate
 ```
 
 ## Usage

@@ -2,11 +2,11 @@
 
 namespace Spatie\Permission\Traits;
 
-use Illuminate\Support\Collection;
-use Spatie\Permission\Contracts\Role;
 use Illuminate\Database\Eloquent\Builder;
-use Spatie\Permission\Contracts\Permission;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Collection;
+use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Contracts\Role;
 
 trait HasRoles
 {
@@ -385,6 +385,10 @@ trait HasRoles
 
     protected function getStoredRole($role, $guard): Role
     {
+        if (\is_numeric($role)) {
+            return app(Role::class)->findById($role, $guard);
+        }
+
         if (\is_string($role)) {
             return app(Role::class)->findByName($role, $guard);
         }
