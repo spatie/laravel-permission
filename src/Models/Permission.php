@@ -60,6 +60,7 @@ class Permission extends Model implements PermissionContract
     public function users(): MorphToMany
     {
         $permissionsForeignKeyName = Inflector::singularize(config('permission.table_names.permissions')).'_id';
+        
         return $this->morphedByMany(
             getModelForGuard($this->attributes['guard_name']),
             'model',
