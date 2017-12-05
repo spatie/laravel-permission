@@ -4,7 +4,6 @@ namespace Spatie\Permission\Traits;
 
 use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Role;
-use Doctrine\Common\Inflector\Inflector;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\Permission\Contracts\Permission;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -30,7 +29,7 @@ trait HasRoles
      */
     public function roles(): MorphToMany
     {
-        $rolesForeignKeyName = Inflector::singularize(config('permission.table_names.roles')).'_id';
+        $rolesForeignKeyName = str_singular(config('permission.table_names.roles')).'_id';
 
         return $this->morphToMany(
             config('permission.models.role'),
@@ -46,7 +45,7 @@ trait HasRoles
      */
     public function permissions(): MorphToMany
     {
-        $permissionsForeignKeyName = Inflector::singularize(config('permission.table_names.permissions')).'_id';
+        $permissionsForeignKeyName = str_singular(config('permission.table_names.permissions')).'_id';
         
         return $this->morphToMany(
             config('permission.models.permission'),

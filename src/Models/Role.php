@@ -3,7 +3,6 @@
 namespace Spatie\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Doctrine\Common\Inflector\Inflector;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
@@ -60,7 +59,7 @@ class Role extends Model implements RoleContract
      */
     public function users(): MorphToMany
     {
-        $rolesForeignKeyName = Inflector::singularize(config('permission.table_names.roles')).'_id';
+        $rolesForeignKeyName = str_singular(config('permission.table_names.roles')).'_id';
         return $this->morphedByMany(
             getModelForGuard($this->attributes['guard_name']),
             'model',

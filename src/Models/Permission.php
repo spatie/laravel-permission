@@ -4,7 +4,6 @@ namespace Spatie\Permission\Models;
 
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Doctrine\Common\Inflector\Inflector;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -59,7 +58,7 @@ class Permission extends Model implements PermissionContract
      */
     public function users(): MorphToMany
     {
-        $permissionsForeignKeyName = Inflector::singularize(config('permission.table_names.permissions')).'_id';
+        $permissionsForeignKeyName = str_singular(config('permission.table_names.permissions')).'_id';
         
         return $this->morphedByMany(
             getModelForGuard($this->attributes['guard_name']),

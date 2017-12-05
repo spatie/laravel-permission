@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Doctrine\Common\Inflector\Inflector;
 
 class CreatePermissionTables extends Migration
 {
@@ -30,7 +29,7 @@ class CreatePermissionTables extends Migration
         });
 
         Schema::create($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames) {
-            $permissionsForeignKeyName = Inflector::singularize($tableNames['permissions']).'_id';
+            $permissionsForeignKeyName = str_singular($tableNames['permissions']).'_id';
             $table->integer($permissionsForeignKeyName)->unsigned();
             $table->morphs('model');
 
@@ -43,7 +42,7 @@ class CreatePermissionTables extends Migration
         });
 
         Schema::create($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames) {
-            $rolesForeignKeyName = Inflector::singularize($tableNames['roles']).'_id';
+            $rolesForeignKeyName = str_singular($tableNames['roles']).'_id';
             $table->integer($rolesForeignKeyName)->unsigned();
             $table->morphs('model');
 
@@ -56,8 +55,8 @@ class CreatePermissionTables extends Migration
         });
 
         Schema::create($tableNames['role_has_permissions'], function (Blueprint $table) use ($tableNames) {
-            $permissionsForeignKeyName = Inflector::singularize($tableNames['permissions']).'_id';
-            $rolesForeignKeyName = Inflector::singularize($tableNames['roles']).'_id';
+            $permissionsForeignKeyName = str_singular($tableNames['permissions']).'_id';
+            $rolesForeignKeyName = str_singular($tableNames['roles']).'_id';
 
             $table->integer($permissionsForeignKeyName)->unsigned();
             $table->integer($rolesForeignKeyName)->unsigned();
