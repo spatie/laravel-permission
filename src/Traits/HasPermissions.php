@@ -52,7 +52,7 @@ trait HasPermissions
     /**
      * Revoke the given permission.
      *
-     * @param Permission|Permission[]|string|string[] $permission
+     * @param \Spatie\Permission\Contracts\Permission|\Spatie\Permission\Contracts\Permission[]|string|string[] $permission
      *
      * @return $this
      */
@@ -68,7 +68,7 @@ trait HasPermissions
     /**
      * @param string|array|\Spatie\Permission\Contracts\Permission|\Illuminate\Support\Collection $permissions
      *
-     * @return Permission|Permission[]|\Illuminate\Support\Collection
+     * @return \Spatie\Permission\Contracts\Permission|\Spatie\Permission\Contracts\Permission[]|\Illuminate\Support\Collection
      */
     protected function getStoredPermission($permissions)
     {
