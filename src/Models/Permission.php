@@ -91,6 +91,27 @@ class Permission extends Model implements PermissionContract
     }
 
     /**
+     * Find or create permission by its name (and optionally guardName).
+     *
+     * @param string $name
+     * @param string|null $guardName
+     *
+     * @return \Spatie\Permission\Contracts\Permission
+     */
+    public static function findOrCreate(string $name, $guardName = null): PermissionContract
+    {
+        $guardName = $guardName ?? config('auth.defaults.guard');
+
+        $permission = static::getPermissions()->where('name', $name)->where('guard_name', $guardName)->first();
+
+        if (! $permission) {
+            return static::create(['guard_name' => $guardName, 'name' => $name]);
+        }
+
+        return $permission;
+    }
+
+    /**
      * Get the current cached permissions.
      */
     protected static function getPermissions(): Collection
