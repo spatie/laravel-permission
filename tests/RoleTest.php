@@ -181,6 +181,14 @@ class RoleTest extends TestCase
     }
 
     /** @test */
+    public function it_creates_permission_object_if_it_does_not_have_a_permission_object()
+    {
+        $permission = app(Permission::class)->findOrCreate('other-permission');
+
+        $this->assertFalse($this->testUserRole->hasPermissionTo($permission));
+    }
+
+    /** @test */
     public function it_throws_an_exception_when_a_permission_of_the_wrong_guard_is_passed_in()
     {
         $this->expectException(GuardDoesNotMatch::class);
