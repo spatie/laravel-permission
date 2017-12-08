@@ -382,7 +382,7 @@ class HasRolesTest extends TestCase
 
         $this->refreshTestUser();
 
-        $this->testUser->revokePermissionTo($this->testUserPermission);
+        $this->testUser->revokePermissionTo($this->testPermission);
 
         $this->assertTrue($this->testUser->hasAnyPermission(['edit-articles', 'edit-news']));
     }
