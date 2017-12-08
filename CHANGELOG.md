@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 1.15 - 2017-12-08
+- allow `hasAnyPermission` to take an array of permissions
+
 ## 1.14.1 - 2017-10-26
 - fixed `Gate::before` for custom gate callbacks
 
