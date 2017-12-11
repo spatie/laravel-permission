@@ -117,8 +117,9 @@ trait HasPermissions
     protected function getDefaultGuardName(): string
     {
         $default = config('auth.defaults.guard');
+        $guardNames = $this->getGuardNames();
 
-        return $default ?: $this->getGuardNames()->first();
+        return $guardNames->contains($default) ? $default : $this->getGuardNames()->first();
     }
 
     /**
