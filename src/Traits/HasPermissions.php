@@ -118,7 +118,7 @@ trait HasPermissions
     {
         $default = config('auth.defaults.guard');
 
-        return $this->getGuardNames()->first() ?: $default;
+        return $default ?: $this->getGuardNames()->first();
     }
 
     /**
