@@ -60,7 +60,8 @@ class TenantPrimaryKeyStringTest extends TestCase
     public function it_can_return_a_tenant_object_when_the_primary_key_is_a_string()
     {
         $tenant = app(Tenant::class)->findById('FOOBAR');
-        $this->assertEquals(1, count($tenant));
+        $count = (int) count($tenant);
+        $this->assertEquals(1, $count);
         $this->assertInstanceOf('\Spatie\Permission\Contracts\Tenant', $tenant);
     }
 }
