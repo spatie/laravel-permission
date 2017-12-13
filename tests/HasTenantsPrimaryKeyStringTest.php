@@ -50,7 +50,7 @@ class HasTenantsPrimaryKeyStringTest extends TestCase
     /** @test */
     public function it_can_determine_that_the_user_does_not_have_a_role_with_the_tenant_class()
     {
-        $this->assertInstanceOf('\Spatie\Permission\Models\Tenant', $this->testUserTenant);
+        $this->assertInstanceOf('\Spatie\Permission\Contracts\Tenant', $this->testUserTenant);
         $this->assertFalse($this->testUser->hasPermissionToTenant('edit-articles', $this->testUserTenant));
     }
 

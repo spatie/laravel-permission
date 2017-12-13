@@ -3,8 +3,8 @@
 namespace Spatie\Permission\Traits;
 
 use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Tenant;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Contracts\Tenant;
 use Illuminate\Database\Eloquent\Collection;
 use Spatie\Permission\Models\RoleTenantUserPivot;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
@@ -36,7 +36,7 @@ trait HasTenants
      * Determine if the user may perform the given permission.
      *
      * @param string|\Spatie\Permission\Contracts\Permission $permission
-     * @param string|\Spatie\Permission\Models\Tenant|\Spatie\Permission\Contracts\Tenant $tenant
+     * @param string|\Spatie\Permission\Contracts\Tenant $tenant
      *
      * @return bool
      */
@@ -74,7 +74,7 @@ trait HasTenants
      * Determine if the user has, via roles, the given permission.
      *
      * @param \Spatie\Permission\Models\Permission $permission
-     * @param string|\Spatie\Permission\Models\Tenant|\Spatie\Permission\Contracts\Tenant $tenant
+     * @param string|\Spatie\Permission\Contracts\Tenant $tenant
      *
      * @return bool
      */
@@ -87,7 +87,7 @@ trait HasTenants
      * Determine if the user has (one of) the given role(s).
      *
      * @param string|\Illuminate\Database\Eloquent\Collection $role
-     * @param string|\Spatie\Permission\Models\Tenant $tenant
+     * @param string|\Spatie\Permission\Contracts\Tenant $tenant
      *
      * @return bool
      */
@@ -95,6 +95,7 @@ trait HasTenants
     {
         $columnTenantId = config('permission.foreign_keys.tenants.id');
         $tenantId = $tenant;
+
         if ($tenant instanceof Tenant) {
             $tenantId = $tenant->$columnTenantId;
         }

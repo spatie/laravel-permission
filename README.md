@@ -75,7 +75,7 @@ return [
     'models' => [
 
         /*
-         * When using the "HasTentants" trait from this package, we need to know which
+         * When using the "HasRoles" trait from this package, we need to know which
          * Eloquent model should be used to retrieve your permissions. Of course, it
          * is often just the "Permission" model but you may use whatever you like.
          *
@@ -86,7 +86,7 @@ return [
         'permission' => Spatie\Permission\Models\Permission::class,
 
         /*
-         * When using the "HasTenants" trait from this package, we need to know which
+         * When using the "HasRoles" trait from this package, we need to know which
          * Eloquent model should be used to retrieve your roles. Of course, it
          * is often just the "Role" model but you may use whatever you like.
          *
@@ -96,12 +96,31 @@ return [
 
         'role' => Spatie\Permission\Models\Role::class,
 
+        /*
+         * When using the "HasTenant" trait from this package, we need to know which
+         * Eloquent model should be used to retrieve your tenants.
+         *
+         * The model you want to use as a Tenant model needs to implement the
+         * `Spatie\Permission\Contracts\Tenant` contract.
+         */
+
+        'tenant' => App\Tenant::class,
+
+
+        /*
+         * When using the "HasRoles" trait from this package, we need to know which
+         * Eloquent model should be used to retrieve your roles. Of course, it
+         * is often just the "Role" model but you may use whatever you like.
+         */
+
+        'role_tenant_pivot' => \Spatie\Permission\Models\RoleTenantUserPivot::class,
+
     ],
 
     'table_names' => [
 
         /*
-         * When using the "HasTenants" trait from this package, we need to know which
+         * When using the "HasRoles" trait from this package, we need to know which
          * table should be used to retrieve your roles. We have chosen a basic
          * default value but you may easily change it to any table you like.
          */
@@ -109,7 +128,7 @@ return [
         'roles' => 'roles',
 
         /*
-         * When using the "HasTenants" trait from this package, we need to know which
+         * When using the "HasRoles" trait from this package, we need to know which
          * table should be used to retrieve your permissions. We have chosen a basic
          * default value but you may easily change it to any table you like.
          */
@@ -117,7 +136,7 @@ return [
         'permissions' => 'permissions',
 
         /*
-         * When using the "HasTenants" trait from this package, we need to know which
+         * When using the "HasRoles" trait from this package, we need to know which
          * table should be used to retrieve your models permissions. We have chosen a
          * basic default value but you may easily change it to any table you like.
          */
@@ -125,7 +144,7 @@ return [
         'model_has_permissions' => 'model_has_permissions',
 
         /*
-         * When using the "HasTenants" trait from this package, we need to know which
+         * When using the "HasRoles" trait from this package, we need to know which
          * table should be used to retrieve your models roles. We have chosen a
          * basic default value but you may easily change it to any table you like.
          */
@@ -133,12 +152,44 @@ return [
         'model_has_roles' => 'model_has_roles',
 
         /*
-         * When using the "HasTenants" trait from this package, we need to know which
+         * When using the "HasRoles" trait from this package, we need to know which
          * table should be used to retrieve your roles permissions. We have chosen a
          * basic default value but you may easily change it to any table you like.
          */
 
         'role_has_permissions' => 'role_has_permissions',
+
+        /*
+         * When using the "HasTentants" trait from this package, we need to know which
+         * table should be used to retrieve your roles_tenant_user permissions. We have chosen a
+         * basic default value but you may easily change it to any table you like.
+         */
+        'role_tenant_user' => 'role_tenant_user',
+
+        /*
+         * When using the "HasTentants" trait from this package, we need to know which
+         * table should be used to retrieve your roles_tenant_user permissions. We have chosen a
+         * basic default value but you may easily change it to any table you like.
+         */
+        'tenants' => 'tenants',
+
+        /*
+         * When using the "HasTentants" trait from this package, we need to know which
+        * table should be used to retrieve your roles_tenant_user permissions. We have chosen a
+        * basic default value but you may easily change it to any table you like.
+        */
+        'users' => 'users',
+    ],
+
+    /*
+     * Configure the foreign keys for the role_tenant_user table.
+     */
+    'foreign_keys' => [
+        'tenants' => [
+            'id' => 'id',
+            'key_type' => 'int',
+            'str_length' => null,
+        ], //Primary key for tenant table
     ],
 
     /*
@@ -380,7 +431,59 @@ the second will be a collection with the `edit article` permission and the third
 
 The tenant implementation is completely optional, use as you see fit.  Currently there is no support for assigning guards to tenants nor is there the ability to assign tenant level permissions directly to a user.  
 
-You should assign permissions to roles and then assigns roles to users with the scope of tenant.
+You must assign permissions to roles and then assigns roles to users with the scope of tenant.
+
+You will have to create your own tenant model and it will need to implement the Tenant Contract as well use the TenantBase trait.
+
+```php
+use Spatie\Permission\Traits\TenantBase;
+use Spatie\Permission\Contracts\Tenant as TenantContract;
+
+class Tenant implements TenantContract
+{
+    use TenantBase;
+
+    // ...
+}
+```
+
+If you don't have a tenant model here is a complete sample file.
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Exceptions\TenantAlreadyExist;
+use Spatie\Permission\Traits\RefreshesPermissionCache;
+use Spatie\Permission\Contracts\Tenant as TenantContract;
+use Spatie\Permission\Traits\TenantBase;
+
+class Tenant extends Model implements TenantContract
+{
+    use TenantBase;
+    use RefreshesPermissionCache;
+
+    public $guarded = [];
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->setTable(config('permission.table_names.tenants'));
+        $this->setKeyName(config('permission.foreign_keys.tenants.id'));
+        $this->setKeyType(config('permission.foreign_keys.tenants.key_type'));
+    }
+
+    public static function create(array $attributes = [])
+    {
+        $id = config('permission.foreign_keys.tenants.id');
+
+        if (! empty($attributes[$id]) && static::where($id, $attributes[$id])->first()) {
+            throw TenantAlreadyExist::create($attributes[$id]);
+        }
+
+        return static::query()->create($attributes);
+    }
+}
+```
 
 Get a list of all roles and tenants assigned to the user
 ```php
@@ -467,12 +570,12 @@ Test for all roles:
 @endhasallroles
 ```
 
-Test for user having permission to tenant
+Test for user having permission to tenant.
 ```php
 @haspermission('edit articles', 1)
-    I am a writer!
+    I am a writer for tenantId 1!
 @else
-    I am not a writer...
+    I am not a writer for tenantId 1...
 @endhaspermission
 ```
 

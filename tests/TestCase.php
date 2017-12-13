@@ -31,10 +31,10 @@ abstract class TestCase extends Orchestra
     /** @var \Spatie\Permission\Models\Permission */
     protected $testAdminPermission;
 
-    /** @var \Spatie\Permission\Models\Tenant */
+    /** @var \Spatie\Permission\Contracts\Tenant */
     protected $testUserTenant;
 
-    /** @var \Spatie\Permission\Models\Tenant */
+    /** @var \Spatie\Permission\Contracts\Tenant */
     protected $testAdminTenant;
 
     public function setUp()
@@ -88,9 +88,10 @@ abstract class TestCase extends Orchestra
         $app['config']->set('auth.guards.admin', ['driver' => 'session', 'provider' => 'admins']);
         $app['config']->set('auth.providers.admins', ['driver' => 'eloquent', 'model' => Admin::class]);
 
-        // Use test User model for users provider
+        // Use test User/Tenant model
         $app['config']->set('auth.providers.users.model', User::class);
-
+        $app['config']->set('permission.models.tenant', Tenant::class);
+        
         $app['log']->getMonolog()->pushHandler(new TestHandler());
     }
 

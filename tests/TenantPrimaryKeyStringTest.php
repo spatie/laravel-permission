@@ -62,6 +62,6 @@ class TenantPrimaryKeyStringTest extends TestCase
     {
         $tenant = app(Tenant::class)->findById('FOOBAR');
         $this->assertEquals(1, count($tenant));
-        $this->assertInstanceOf('\Spatie\Permission\Models\Tenant', $tenant);
+        $this->assertInstanceOf('\Spatie\Permission\Contracts\Tenant', $tenant);
     }
 }

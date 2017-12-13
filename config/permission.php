@@ -27,15 +27,14 @@ return [
         'role' => Spatie\Permission\Models\Role::class,
 
         /*
-         * When using the "HasRoles" trait from this package, we need to know which
-         * Eloquent model should be used to retrieve your roles. Of course, it
-         * is often just the "Role" model but you may use whatever you like.
+         * When using the "HasTenant" trait from this package, we need to know which
+         * Eloquent model should be used to retrieve your tenants.
          *
          * The model you want to use as a Tenant model needs to implement the
          * `Spatie\Permission\Contracts\Tenant` contract.
          */
 
-        'tenant' => Spatie\Permission\Models\Tenant::class,
+        'tenant' => App\Tenant::class,
 
 
         /*
