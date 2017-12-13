@@ -4,7 +4,7 @@ namespace Spatie\Permission\Test;
 
 use Monolog\Handler\TestHandler;
 use Spatie\Permission\Contracts\Role;
-use Spatie\Permission\Contracts\Tenant;
+use Spatie\Permission\Test\Tenant;
 use Illuminate\Database\Schema\Blueprint;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Contracts\Permission;
