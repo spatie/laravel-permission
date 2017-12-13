@@ -2,8 +2,8 @@
 
 namespace Spatie\Permission\Traits;
 
-use Spatie\Permission\Contracts\Tenant as TenantContact;
 use Spatie\Permission\Exceptions\TenantDoesNotExist;
+use Spatie\Permission\Contracts\Tenant as TenantContact;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 trait TenantBase

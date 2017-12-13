@@ -2,13 +2,12 @@
 
 namespace Spatie\Permission\Test;
 
+use Spatie\Permission\Contracts\Tenant;
 use Spatie\Permission\Exceptions\TenantAlreadyExist;
 use Spatie\Permission\Exceptions\TenantDoesNotExist;
-use Spatie\Permission\Contracts\Tenant;
 
 class TenantTest extends TestCase
 {
-
     public function setUp()
     {
         parent::setUp();

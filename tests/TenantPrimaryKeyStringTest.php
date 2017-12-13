@@ -26,7 +26,6 @@ class TenantPrimaryKeyStringTest extends TestCase
         $app[Tenant::class]->create(['tenant_name' => 'testTenant2', 'app_code' => 'BARFOO']);
     }
 
-
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('permission.foreign_keys.tenants', [

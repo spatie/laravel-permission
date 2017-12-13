@@ -36,7 +36,6 @@ return [
 
         'tenant' => App\Tenant::class,
 
-
         /*
          * When using the "HasRoles" trait from this package, we need to know which
          * Eloquent model should be used to retrieve your roles. Of course, it
