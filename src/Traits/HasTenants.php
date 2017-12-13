@@ -3,8 +3,8 @@
 namespace Spatie\Permission\Traits;
 
 use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Contracts\Tenant;
+use Spatie\Permission\Models\Permission;
 use Illuminate\Database\Eloquent\Collection;
 use Spatie\Permission\Models\RoleTenantUserPivot;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
@@ -139,6 +139,7 @@ trait HasTenants
             $rtuPivot->attach($this->id, $roles, $tenantId);
         }
         $this->forgetCachedPermissions();
+
         return $this;
     }
 
@@ -177,6 +178,7 @@ trait HasTenants
         }
 
         $this->forgetCachedPermissions();
+
         return $this;
     }
 

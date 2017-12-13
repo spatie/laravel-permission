@@ -164,5 +164,4 @@ class HasTenantsTest extends TestCase
 
         $this->testUser->assignRole('evil-emperor', 1);
     }
-
 }

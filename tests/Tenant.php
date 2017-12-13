@@ -3,10 +3,10 @@
 namespace Spatie\Permission\Test;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Traits\TenantBase;
 use Spatie\Permission\Exceptions\TenantAlreadyExist;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
 use Spatie\Permission\Contracts\Tenant as TenantContract;
-use Spatie\Permission\Traits\TenantBase;
 
 class Tenant extends Model implements TenantContract
 {

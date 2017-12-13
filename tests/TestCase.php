@@ -91,7 +91,7 @@ abstract class TestCase extends Orchestra
         // Use test User/Tenant model
         $app['config']->set('auth.providers.users.model', User::class);
         $app['config']->set('permission.models.tenant', Tenant::class);
-        
+
         $app['log']->getMonolog()->pushHandler(new TestHandler());
     }
 
