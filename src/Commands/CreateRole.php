@@ -9,6 +9,7 @@ class CreateRole extends Command
 {
     protected $signature = 'permission:create-role
         {name : The name of the role}
+        {flag : The flag of the role}
         {guard? : The name of the guard}';
 
     protected $description = 'Create a role';
@@ -19,6 +20,7 @@ class CreateRole extends Command
 
         $role = $roleClass::create([
             'name' => $this->argument('name'),
+            'flag' => $this->argument('flag'),
             'guard_name' => $this->argument('guard'),
         ]);
 

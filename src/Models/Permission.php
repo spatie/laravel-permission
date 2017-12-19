@@ -31,8 +31,8 @@ class Permission extends Model implements PermissionContract
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? config('auth.defaults.guard');
 
-        if (static::getPermissions()->where('name', $attributes['name'])->where('guard_name', $attributes['guard_name'])->first()) {
-            throw PermissionAlreadyExists::create($attributes['name'], $attributes['guard_name']);
+        if (static::getPermissions()->where('flag', $attributes['flag'])->where('guard_name', $attributes['guard_name'])->first()) {
+            throw PermissionAlreadyExists::create($attributes['name'],$attributes['flag'], $attributes['guard_name']);
         }
 
         if (isNotLumen() && app()::VERSION < '5.4') {
@@ -81,7 +81,7 @@ class Permission extends Model implements PermissionContract
     {
         $guardName = $guardName ?? config('auth.defaults.guard');
 
-        $permission = static::getPermissions()->where('name', $name)->where('guard_name', $guardName)->first();
+        $permission = static::getPermissions()->where('flag', $name)->where('guard_name', $guardName)->first();
 
         if (! $permission) {
             throw PermissionDoesNotExist::create($name, $guardName);
