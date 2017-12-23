@@ -32,8 +32,8 @@ class Role extends Model implements RoleContract
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? config('auth.defaults.guard');
 
-        if (static::where('name', $attributes['name'])->where('guard_name', $attributes['guard_name'])->first()) {
-            throw RoleAlreadyExists::create($attributes['name'], $attributes['guard_name']);
+        if (static::where('flag', $attributes['flag'])->where('guard_name', $attributes['guard_name'])->first()) {
+            throw RoleAlreadyExists::create($attributes['name'], $attributes['flag'], $attributes['guard_name']);
         }
 
         if (isNotLumen() && app()::VERSION < '5.4') {
@@ -82,7 +82,7 @@ class Role extends Model implements RoleContract
     {
         $guardName = $guardName ?? config('auth.defaults.guard');
 
-        $role = static::where('name', $name)->where('guard_name', $guardName)->first();
+        $role = static::where('flag', $name)->where('guard_name', $guardName)->first();
 
         if (! $role) {
             throw RoleDoesNotExist::named($name);

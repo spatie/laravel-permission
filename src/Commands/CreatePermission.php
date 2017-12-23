@@ -9,6 +9,7 @@ class CreatePermission extends Command
 {
     protected $signature = 'permission:create-permission 
                 {name : The name of the permission} 
+                {flag : The flag of the permission}
                 {guard? : The name of the guard}';
 
     protected $description = 'Create a permission';
@@ -19,6 +20,7 @@ class CreatePermission extends Command
 
         $permission = $permissionClass::create([
             'name' => $this->argument('name'),
+            'flag' => $this->argument('flag'),
             'guard_name' => $this->argument('guard'),
         ]);
 

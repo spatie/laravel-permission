@@ -210,7 +210,7 @@ trait HasRoles
         }
 
         if (is_string($roles)) {
-            return $this->roles->contains('name', $roles);
+            return $this->roles->contains('flag', $roles);
         }
 
         if ($roles instanceof Role) {
@@ -256,7 +256,7 @@ trait HasRoles
         }
 
         if (is_string($roles)) {
-            return $this->roles->contains('name', $roles);
+            return $this->roles->contains('flag', $roles);
         }
 
         if ($roles instanceof Role) {
@@ -267,7 +267,7 @@ trait HasRoles
             return $role instanceof Role ? $role->name : $role;
         });
 
-        return $roles->intersect($this->roles->pluck('name')) == $roles;
+        return $roles->intersect($this->roles->pluck('flag')) == $roles;
     }
 
     /**
@@ -377,6 +377,11 @@ trait HasRoles
     public function getRoleNames(): Collection
     {
         return $this->roles->pluck('name');
+    }
+
+    public function getRoleFlag(): Collection
+    {
+        return $this->roles->pluck('flag');
     }
 
     protected function getStoredRole($role): Role
