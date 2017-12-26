@@ -94,6 +94,7 @@ class Role extends Model implements RoleContract
     public static function findById(int $id, $guardName = null): RoleContract
     {
         $guardName = $guardName ?? config('auth.defaults.guard');
+
         $role = static::where('id', $id)->where('guard_name', $guardName)->first();
 
         if (! $role) {
