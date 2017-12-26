@@ -60,6 +60,7 @@ class Role extends Model implements RoleContract
     public function users(): MorphToMany
     {
         $rolesForeignKeyName = str_singular(config('permission.table_names.roles')).'_id';
+
         return $this->morphedByMany(
             getModelForGuard($this->attributes['guard_name']),
             'model',
