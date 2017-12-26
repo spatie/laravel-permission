@@ -164,4 +164,16 @@ class HasPermissionsTest extends TestCase
 
         $this->assertTrue($user->hasPermissionTo('edit-news'));
     }
+
+    /** @test */
+    public function it_can_give_and_revoke_multiple_permissions()
+    {
+        $this->testUserRole->givePermissionTo(['edit-articles', 'edit-news']);
+
+        $this->assertEquals(2, $this->testUserRole->permissions()->count());
+
+        $this->testUserRole->revokePermissionTo(['edit-articles', 'edit-news']);
+
+        $this->assertEquals(0, $this->testUserRole->permissions()->count());
+    }
 }
