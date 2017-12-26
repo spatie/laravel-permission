@@ -79,7 +79,7 @@ trait HasPermissions
         if (is_array($permissions)) {
             return app(Permission::class)
                 ->whereIn('name', $permissions)
-                ->whereId('guard_name', $this->getGuardNames())
+                ->whereIn('guard_name', $this->getGuardNames())
                 ->get();
         }
 
