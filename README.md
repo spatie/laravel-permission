@@ -176,9 +176,11 @@ You can install the package via Composer:
 composer require spatie/laravel-permission
 ```
 
-Copy `vendor/spatie/laravel-permission/config/permission.php` to `config/permission.php`. Same for `vendor/spatie/laravel-permission/database/migrations/create_permission_tables.php.stub` to `database/migrations/create_permission_tables.php` (be sure to remove the ".stub" at the end of the file name).
+Copy `vendor/spatie/laravel-permission/config/permission.php` to `config/permission.php`
 
-In `bootstrap/app.php`, add the following code below other services providers:
+Copy `vendor/spatie/laravel-permission/database/migrations/create_permission_tables.php.stub` to `database/migrations/2017_12_01_010101_create_permission_tables.php`
+
+In `bootstrap/app.php`, add the following code below other service providers:
 
 ```php
 $app->register(Spatie\Permission\PermissionServiceProvider::class);
