@@ -91,7 +91,7 @@ class Role extends Model implements RoleContract
         return $role;
     }
 
-    public static function findById(int $id, $guardName): RoleContract
+    public static function findById(int $id, $guardName = null): RoleContract
     {
         $guardName = $guardName ?? config('auth.defaults.guard');
 
