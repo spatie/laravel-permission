@@ -181,11 +181,17 @@ class RoleTest extends TestCase
     }
 
     /** @test */
-    public function it_creates_permission_object_if_it_does_not_have_a_permission_object()
+    public function it_creates_permission_object_with_findOrCreate_if_it_does_not_have_a_permission_object()
     {
-        $permission = app(Permission::class)->findOrCreate('other-permission');
+        $permission = app(Permission::class)->findOrCreate('another-permission');
 
         $this->assertFalse($this->testUserRole->hasPermissionTo($permission));
+
+        $this->testUserRole->givePermissionTo($permission);
+
+        $this->testUserRole = $this->testUserRole->fresh();
+
+        $this->assertTrue($this->testUserRole->hasPermissionTo('another-permission'));
     }
 
     /** @test */
