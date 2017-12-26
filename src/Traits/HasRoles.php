@@ -153,16 +153,19 @@ trait HasRoles
     /**
      * Assign the given role to the model.
      *
-     * @param array|string|\Spatie\Permission\Contracts\Role ...$roles
+     * @param array|string|\Spatie\Permission\Contracts\Role $roles
+     * @param string $guard
      *
      * @return $this
      */
-    public function assignRole(...$roles)
+    public function assignRole($roles, $guard = null)
     {
+        $roles = \is_string($roles) ? [$roles] : $roles;
+        $guard = $guard ? : $this->getDefaultGuardName();
         $roles = collect($roles)
             ->flatten()
-            ->map(function ($role) {
-                return $this->getStoredRole($role);
+            ->map(function ($role) use ($guard){
+                return $this->getStoredRole($role, $guard);
             })
             ->each(function ($role) {
                 $this->ensureModelSharesGuard($role);
@@ -189,15 +192,16 @@ trait HasRoles
     /**
      * Remove all current roles and set the given ones.
      *
-     * @param array|\Spatie\Permission\Contracts\Role|string ...$roles
+     * @param array|\Spatie\Permission\Contracts\Role|string $roles
+     * @param string $guard
      *
      * @return $this
      */
-    public function syncRoles(...$roles)
+    public function syncRoles($roles, $guard = null)
     {
         $this->roles()->detach();
 
-        return $this->assignRole($roles);
+        return $this->assignRole($roles, $guard);
     }
 
     /**
@@ -383,14 +387,14 @@ trait HasRoles
         return $this->roles->pluck('name');
     }
 
-    protected function getStoredRole($role): Role
+    protected function getStoredRole($role, $guard): Role
     {
-        if (is_numeric($role)) {
-            return app(Role::class)->findById($role, $this->getDefaultGuardName());
+        if (\is_numeric($role)) {
+            return app(Role::class)->findById($role, $guard);
         }
 
-        if (is_string($role)) {
-            return app(Role::class)->findByName($role, $this->getDefaultGuardName());
+        if (\is_string($role)) {
+            return app(Role::class)->findByName($role, $guard);
         }
 
         return $role;
