@@ -46,7 +46,7 @@ trait HasRoles
     public function permissions(): MorphToMany
     {
         $permissionsForeignKeyName = str_singular(config('permission.table_names.permissions')).'_id';
-        
+
         return $this->morphToMany(
             config('permission.models.permission'),
             'model',
