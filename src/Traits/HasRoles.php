@@ -29,12 +29,14 @@ trait HasRoles
      */
     public function roles(): MorphToMany
     {
+        $rolesForeignKeyName = str_singular(config('permission.table_names.roles')).'_id';
+
         return $this->morphToMany(
             config('permission.models.role'),
             'model',
             config('permission.table_names.model_has_roles'),
             'model_id',
-            'role_id'
+            $rolesForeignKeyName
         );
     }
 
@@ -43,12 +45,14 @@ trait HasRoles
      */
     public function permissions(): MorphToMany
     {
+        $permissionsForeignKeyName = str_singular(config('permission.table_names.permissions')).'_id';
+        
         return $this->morphToMany(
             config('permission.models.permission'),
             'model',
             config('permission.table_names.model_has_permissions'),
             'model_id',
-            'permission_id'
+            $permissionsForeignKeyName
         );
     }
 

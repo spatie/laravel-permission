@@ -58,11 +58,13 @@ class Permission extends Model implements PermissionContract
      */
     public function users(): MorphToMany
     {
+        $permissionsForeignKeyName = str_singular(config('permission.table_names.permissions')).'_id';
+        
         return $this->morphedByMany(
             getModelForGuard($this->attributes['guard_name']),
             'model',
             config('permission.table_names.model_has_permissions'),
-            'permission_id',
+            $permissionsForeignKeyName,
             'model_id'
         );
     }
