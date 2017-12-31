@@ -283,7 +283,17 @@ Now, run your migrations:
 php artisan migrate
 ```
 
-Then, in `bootstrap/app.php`, add the following code below other providers:
+Then, in `bootstrap/app.php`, register the middlewares:
+
+```php
+$app->routeMiddleware([
+    'auth'       => App\Http\Middleware\Authenticate::class,
+    'permission' => Spatie\Permission\Middlewares\PermissionMiddleware::class,
+    'role'       => Spatie\Permission\Middlewares\RoleMiddleware::class,
+]);
+```
+
+As well as the configuration and the service provider:
 
 ```php
 $app->configure('permission');
