@@ -176,21 +176,40 @@ You can install the package via Composer:
 composer require spatie/laravel-permission
 ```
 
-Copy `vendor/spatie/laravel-permission/config/permission.php` to `config/permission.php`
+Copy the required files:
 
-Copy `vendor/spatie/laravel-permission/database/migrations/create_permission_tables.php.stub` to `database/migrations/2017_12_01_010101_create_permission_tables.php`
-
-In `bootstrap/app.php`, add the following code below other service providers:
-
-```php
-$app->register(Spatie\Permission\PermissionServiceProvider::class);
-$app->configure('permission');
+```bash
+cp vendor/spatie/laravel-permission/config/permission.php config/permission.php
+cp vendor/spatie/laravel-permission/database/migrations/create_permission_tables.php.stub database/migrations/2018_01_01_000000_create_permission_tables.php
 ```
 
-Then, run your migrations:
+You will also need to create another configuration file at `config/auth.php`. Get it on the Laravel repository or just run the following command:
+
+```bash
+curl -Ls https://raw.githubusercontent.com/laravel/lumen-framework/5.5/config/auth.php -o config/auth.php
+```
+
+Now, run your migrations:
 
 ```bash
 php artisan migrate
+```
+
+Then, in `bootstrap/app.php`, register the middlewares:
+
+```php
+$app->routeMiddleware([
+    'auth'       => App\Http\Middleware\Authenticate::class,
+    'permission' => Spatie\Permission\Middlewares\PermissionMiddleware::class,
+    'role'       => Spatie\Permission\Middlewares\RoleMiddleware::class,
+]);
+```
+
+As well as the configuration and the service provider:
+
+```php
+$app->configure('permission');
+$app->register(Spatie\Permission\PermissionServiceProvider::class);
 ```
 
 ## Usage

@@ -10,7 +10,7 @@ class PermissionMiddleware
 {
     public function handle($request, Closure $next, $permission)
     {
-        if (Auth::guest()) {
+        if (app('auth')->guest()) {
             throw UnauthorizedException::notLoggedIn();
         }
 
@@ -19,7 +19,7 @@ class PermissionMiddleware
             : explode('|', $permission);
 
         foreach ($permissions as $permission) {
-            if (Auth::user()->can($permission)) {
+            if (app('auth')->user()->can($permission)) {
                 return $next($request);
             }
         }

@@ -74,7 +74,7 @@ class CreatePermissionTables extends Migration
 
             $table->primary([$permissionsForeignKeyName, $rolesForeignKeyName]);
 
-            Cache::forget('spatie.permission.cache');
+            app('cache')->forget('spatie.permission.cache');
         });
     }
 
