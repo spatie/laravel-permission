@@ -2,8 +2,13 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
-## 2.7.7 - 2017-11-27
+## 2.7.7 - 2017-12-31
 - updated `HasPermissions::getStoredPermission` to allow a collection to be returned, and to fix query when passing multiple permissions
+- Give and revoke multiple permissions 
+- Dynamic permission_id and role_id columns according to tables name 
+- Add findOrCreate function to Permission model 
+- Improved Lumen support
+- Allow guard name to be null for find role by id 
 
 ## 2.7.6 - 2017-11-27
 - added Lumen support
