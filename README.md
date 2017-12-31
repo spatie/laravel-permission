@@ -180,7 +180,7 @@ Copy the required files:
 
 ```bash
 cp vendor/spatie/laravel-permission/config/permission.php config/permission.php
-cp vendor/spatie/laravel-permission/database/migrations/create_permission_tables.php.stub database/migrations/create_permission_tables.php
+cp vendor/spatie/laravel-permission/database/migrations/create_permission_tables.php.stub database/migrations/2018_01_01_000000_create_permission_tables.php
 ```
 
 You will also need to create another configuration file at `config/auth.php`. You should paste the content below:
