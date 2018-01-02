@@ -30,49 +30,44 @@ class CreatePermissionTables extends Migration
         });
 
         Schema::create($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames) {
-            $permissionsForeignKeyName = str_singular($tableNames['permissions']).'_id';
-            $table->integer($permissionsForeignKeyName)->unsigned();
+            $table->integer('permission_id')->unsigned();
             $table->morphs('model');
 
-            $table->foreign($permissionsForeignKeyName)
+            $table->foreign('permission_id')
                 ->references('id')
                 ->on($tableNames['permissions'])
                 ->onDelete('cascade');
 
-            $table->primary([$permissionsForeignKeyName, 'model_id', 'model_type']);
+            $table->primary(['permission_id', 'model_id', 'model_type']);
         });
 
         Schema::create($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames) {
-            $rolesForeignKeyName = str_singular($tableNames['roles']).'_id';
-            $table->integer($rolesForeignKeyName)->unsigned();
+            $table->integer('role_id')->unsigned();
             $table->morphs('model');
 
-            $table->foreign($rolesForeignKeyName)
+            $table->foreign('role_id')
                 ->references('id')
                 ->on($tableNames['roles'])
                 ->onDelete('cascade');
 
-            $table->primary([$rolesForeignKeyName, 'model_id', 'model_type']);
+            $table->primary(['role_id', 'model_id', 'model_type']);
         });
 
         Schema::create($tableNames['role_has_permissions'], function (Blueprint $table) use ($tableNames) {
-            $permissionsForeignKeyName = str_singular($tableNames['permissions']).'_id';
-            $rolesForeignKeyName = str_singular($tableNames['roles']).'_id';
+            $table->integer('permission_id')->unsigned();
+            $table->integer('role_id')->unsigned();
 
-            $table->integer($permissionsForeignKeyName)->unsigned();
-            $table->integer($rolesForeignKeyName)->unsigned();
-
-            $table->foreign($permissionsForeignKeyName)
+            $table->foreign('permission_id')
                 ->references('id')
                 ->on($tableNames['permissions'])
                 ->onDelete('cascade');
 
-            $table->foreign($rolesForeignKeyName)
+            $table->foreign('role_id')
                 ->references('id')
                 ->on($tableNames['roles'])
                 ->onDelete('cascade');
 
-            $table->primary([$permissionsForeignKeyName, $rolesForeignKeyName]);
+            $table->primary(['permission_id', 'role_id']);
 
             app('cache')->forget('spatie.permission.cache');
         });

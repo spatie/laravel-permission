@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.7.8 - 2018-01-02
+- REVERTED: Dynamic permission_id and role_id columns according to tables name 
+NOTE: This Dynamic field naming was a breaking change, so we've removed it for now. 
+
+BEST NOT TO USE v2.7.7 if you've changed tablenames in the config file.
+
 ## 2.7.7 - 2017-12-31
 - updated `HasPermissions::getStoredPermission` to allow a collection to be returned, and to fix query when passing multiple permissions
 - Give and revoke multiple permissions 
