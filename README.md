@@ -622,7 +622,7 @@ php artisan permission:create-role writer
 ```
 
 ```bash
-php artisan permission:create-permission 'edit articles'
+php artisan permission:create-permission "edit articles"
 ```
 
 When creating permissions and roles for specific guards you can specify the guard names as a second argument:
@@ -632,7 +632,7 @@ php artisan permission:create-role writer web
 ```
 
 ```bash
-php artisan permission:create-permission 'edit articles' web
+php artisan permission:create-permission "edit articles" web
 ```
 
 ## Unit Testing
