@@ -2,8 +2,8 @@
 
 namespace Spatie\Permission\Traits;
 
-use Illuminate\Support\Collection;
 use Spatie\Permission\Guard;
+use Illuminate\Support\Collection;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
