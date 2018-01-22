@@ -73,6 +73,13 @@ You can publish [the migration](https://github.com/spatie/laravel-permission/blo
 php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="migrations"
 ```
 
+If you're using UUIDs or GUIDs for your `User` models you can update the `create_permission_tables.php` migration and replace `$table->morphs('model')` with:
+
+```php
+$table->uuid('model_id');
+$table->string('model_type');
+```
+
 After the migration has been published you can create the role- and permission-tables by running the migrations:
 
 ```bash
@@ -703,7 +710,6 @@ php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvid
 ```
   
   And update the `models.role` and `models.permission` values
-
 
 ## Cache
 
