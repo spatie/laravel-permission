@@ -6,28 +6,52 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class UnauthorizedException extends HttpException
 {
+    private $requiredRoles = [];
+
+    private $requiredPermissions = [];
+
     public static function forRoles(array $roles): self
     {
-        $permStr = '';
+        $message = 'User does not have the right roles.';
+
         if (config('permission.display_permission_in_exception')) {
-            $permStr = ' Necessary roles are '.implode(', ', $roles).'.';
+            $permStr = implode(', ', $roles);
+            $message = 'User does not have the right roles. Necessary roles are '.$permStr;
         }
 
-        return new static(403, 'User does not have the right roles.'.$permStr, null, []);
+        $exception = new static(403, $message, null, []);
+        $exception->requiredRoles = $roles;
+
+        return $exception;
     }
 
     public static function forPermissions(array $permissions): self
     {
-        $permStr = '';
+        $message = 'User does not have the right permissions.';
+
         if (config('permission.display_permission_in_exception')) {
-            $permStr = ' Necessary permissions are '.implode(', ', $permissions).'.';
+            $permStr = implode(', ', $permissions);
+            $message = 'User does not have the right permissions. Necessary permissions are '.$permStr;
         }
 
-        return new static(403, 'User does not have the right permissions.'.$permStr, null, []);
+        $exception = new static(403, $message, null, []);
+        $exception->requiredPermissions = $permissions;
+
+        return $exception;
     }
 
     public static function notLoggedIn(): self
     {
         return new static(403, 'User is not logged in.', null, []);
+    }
+
+    public function getRequiredRoles(): array
+    {
+        return $this->requiredRoles;
+    }
+
+    public function getRequiredPermissions(): array
+    {
+        return $this->requiredPermissions;
     }
 }

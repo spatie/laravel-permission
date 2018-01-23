@@ -162,6 +162,42 @@ class MiddlewareTest extends TestCase
             ), 403);
     }
 
+    /** @test */
+    public function the_required_roles_can_be_fetched_from_the_exception()
+    {
+        Auth::login($this->testUser);
+
+        $requiredRoles = [];
+
+        try {
+            $this->roleMiddleware->handle(new Request(), function () {
+                return (new Response())->setContent('<html></html>');
+            }, 'some-role');
+        } catch (UnauthorizedException $e) {
+            $requiredRoles = $e->getRequiredRoles();
+        }
+
+        $this->assertEquals(['some-role'], $requiredRoles);
+    }
+
+    /** @test */
+    public function the_required_permissions_can_be_fetched_from_the_exception()
+    {
+        Auth::login($this->testUser);
+
+        $requiredPermissions = [];
+
+        try {
+            $this->permissionMiddleware->handle(new Request(), function () {
+                return (new Response())->setContent('<html></html>');
+            }, 'some-permission');
+        } catch (UnauthorizedException $e) {
+            $requiredPermissions = $e->getRequiredPermissions();
+        }
+
+        $this->assertEquals(['some-permission'], $requiredPermissions);
+    }
+
     protected function runMiddleware($middleware, $parameter)
     {
         try {

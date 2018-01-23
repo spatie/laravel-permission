@@ -84,6 +84,5 @@ return [
      * so enable if you know what you're doing.
      */
 
-     'display_permission_in_exception' => false,
-
+    'display_permission_in_exception' => false,
 ];
