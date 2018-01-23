@@ -8,12 +8,22 @@ class UnauthorizedException extends HttpException
 {
     public static function forRoles(array $roles): self
     {
-        return new static(403, 'User does not have the right roles.', null, []);
+        $permStr = '';
+        if (config('permission.display_permission_in_exception')) {
+            $permStr = ' Necessary roles are '.implode(', ', $roles).'.';
+        }
+
+        return new static(403, 'User does not have the right roles.'.$permStr, null, []);
     }
 
     public static function forPermissions(array $permissions): self
     {
-        return new static(403, 'User does not have the right permissions.', null, []);
+        $permStr = '';
+        if (config('permission.display_permission_in_exception')) {
+            $permStr = ' Necessary permissions are '.implode(', ', $permissions).'.';
+        }
+
+        return new static(403, 'User does not have the right permissions.'.$permStr, null, []);
     }
 
     public static function notLoggedIn(): self
