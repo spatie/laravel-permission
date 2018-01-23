@@ -83,5 +83,6 @@ return [
      * exception message. This could be considered an information leak in some contexts,
      * so enable if you know what you're doing.
      */
+
     'display_permission_in_exception' => false,
 ];
