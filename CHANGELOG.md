@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.7.9 - 2018-01-23
+Changes related to throwing UnauthorizedException:
+ - When UnauthorizedException is thrown, a property is added with the expected role/permission which triggered it
+ - A configuration option may be set to include the list of required roles/permissions in the message
+
 ## 2.7.8 - 2018-01-02
 - REVERTED: Dynamic permission_id and role_id columns according to tables name 
 NOTE: This Dynamic field naming was a breaking change, so we've removed it for now. 
