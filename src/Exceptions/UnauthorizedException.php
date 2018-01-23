@@ -23,7 +23,7 @@ class UnauthorizedException extends HttpException
             $permStr = ' Necessary permissions are '.implode(', ', $permissions).'.';
         }
 
-        return new static(403, 'User does not have the right permissions.', null, []);
+        return new static(403, 'User does not have the right permissions.'.$permStr, null, []);
     }
 
     public static function notLoggedIn(): self
