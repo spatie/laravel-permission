@@ -8,18 +8,18 @@ class UnauthorizedException extends HttpException
 {
     public static function forRoles(array $roles): self
     {
+        $permStr = '';
         if(config('permission.display_permission_in_exception')) {
-            $permStr = implode(', ', $roles);
-            return new static(403, 'User does not have the right roles. Necessary roles are '.$permStr, null, []);
+            $permStr = ' Necessary roles are ' . implode(', ', $roles);
         }
-        return new static(403, 'User does not have the right roles.', null, []);
+        return new static(403, 'User does not have the right roles.'.$permStr, null, []);
     }
 
     public static function forPermissions(array $permissions): self
     {
+        $permStr = '';
         if(config('permission.display_permission_in_exception')) {
-            $permStr = implode(', ', $permissions);
-            return new static(403, 'User does not have the right permissions. Necessary permissions are '.$permStr, null, []);
+            $permStr = ' Necessary permissions are ' . implode(', ', $permissions);
         }
         return new static(403, 'User does not have the right permissions.', null, []);
     }
