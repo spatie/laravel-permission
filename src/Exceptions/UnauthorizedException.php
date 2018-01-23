@@ -9,7 +9,7 @@ class UnauthorizedException extends HttpException
     public static function forRoles(array $roles): self
     {
         $permStr = '';
-        if(config('permission.display_permission_in_exception')) {
+        if (config('permission.display_permission_in_exception')) {
             $permStr = ' Necessary roles are '.implode(', ', $roles).'.';
         }
 
@@ -19,7 +19,7 @@ class UnauthorizedException extends HttpException
     public static function forPermissions(array $permissions): self
     {
         $permStr = '';
-        if(config('permission.display_permission_in_exception')) {
+        if (config('permission.display_permission_in_exception')) {
             $permStr = ' Necessary permissions are '.implode(', ', $permissions).'.';
         }
 
@@ -31,4 +31,3 @@ class UnauthorizedException extends HttpException
         return new static(403, 'User is not logged in.', null, []);
     }
 }
-
