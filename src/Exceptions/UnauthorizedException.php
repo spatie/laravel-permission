@@ -10,7 +10,7 @@ class UnauthorizedException extends HttpException
     {
         $permStr = '';
         if(config('permission.display_permission_in_exception')) {
-            $permStr = ' Necessary roles are ' . implode(', ', $roles);
+            $permStr = ' Necessary roles are ' . implode(', ', $roles).'.';
         }
         return new static(403, 'User does not have the right roles.'.$permStr, null, []);
     }
@@ -19,7 +19,7 @@ class UnauthorizedException extends HttpException
     {
         $permStr = '';
         if(config('permission.display_permission_in_exception')) {
-            $permStr = ' Necessary permissions are ' . implode(', ', $permissions);
+            $permStr = ' Necessary permissions are ' . implode(', ', $permissions).'.';
         }
         return new static(403, 'User does not have the right permissions.', null, []);
     }
