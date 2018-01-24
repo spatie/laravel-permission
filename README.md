@@ -6,7 +6,7 @@
 <table>
    <tr>
       <td><img src="http://spatie.github.io/laravel-permission/sponsor-logo.png"></td>
-      <td>If you want to quickly add secure token-based authentication to Python projects, feel free to check Auth0's PHP SDK and free plan at <a href="https://auth0.com/overview">https://auth0.com/overview</a>.</td>
+      <td>If you want to quickly add secure token-based authentication to Laravel projects, feel free to check Auth0's PHP SDK and free plan at <a href="https://auth0.com/overview">https://auth0.com/overview</a>.</td>
    </tr>
 </table>
 
