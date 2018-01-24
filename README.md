@@ -1,5 +1,16 @@
 # Associate users with permissions and roles
 
+
+### Sponsor
+
+<table>
+   <tr>
+      <td><img src="http://spatie.github.io/laravel-permission/sponsor-logo.png"></td>
+      <td>If you want to quickly add secure token-based authentication to Python projects, feel free to check Auth0's PHP SDK and free plan at <a href="https://auth0.com/overview">https://auth0.com/overview</a>.</td>
+   </tr>
+</table>
+
+
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/spatie/laravel-permission.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-permission)
 [![Build Status](https://img.shields.io/travis/spatie/laravel-permission/master.svg?style=flat-square)](https://travis-ci.org/spatie/laravel-permission)
 [![StyleCI](https://styleci.io/repos/42480275/shield)](https://styleci.io/repos/42480275)
