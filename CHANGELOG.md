@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.8.0 - 2018-01-25
+- Support getting guard_name from extended model when using static methods
+
 ## 2.7.9 - 2018-01-23
 Changes related to throwing UnauthorizedException:
  - When UnauthorizedException is thrown, a property is added with the expected role/permission which triggered it
