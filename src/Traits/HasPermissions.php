@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Traits;
 
+use Spatie\Permission\Guard;
 use Illuminate\Support\Collection;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Contracts\Permission;
@@ -100,25 +101,12 @@ trait HasPermissions
 
     protected function getGuardNames(): Collection
     {
-        if ($this->guard_name) {
-            return collect($this->guard_name);
-        }
-
-        return collect(config('auth.guards'))
-            ->map(function ($guard) {
-                return config("auth.providers.{$guard['provider']}.model");
-            })
-            ->filter(function ($model) {
-                return get_class($this) === $model;
-            })
-            ->keys();
+        return Guard::getNames($this);
     }
 
     protected function getDefaultGuardName(): string
     {
-        $default = config('auth.defaults.guard');
-
-        return $this->getGuardNames()->first() ?: $default;
+        return Guard::getDefaultName($this);
     }
 
     /**
