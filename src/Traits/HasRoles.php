@@ -63,7 +63,7 @@ trait HasRoles
     public function scopeRole(Builder $query, $roles): Builder
     {
         if ($roles instanceof Collection) {
-            $roles = $roles->toArray();
+            $roles = $roles->all();
         }
 
         if (! is_array($roles)) {
@@ -95,7 +95,7 @@ trait HasRoles
     protected function convertToPermissionModels($permissions): array
     {
         if ($permissions instanceof Collection) {
-            $permissions = $permissions->toArray();
+            $permissions = $permissions->all();
         }
 
         $permissions = array_wrap($permissions);
