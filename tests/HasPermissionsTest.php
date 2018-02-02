@@ -109,9 +109,11 @@ class HasPermissionsTest extends TestCase
 
         $scopedUsers1 = User::permission($this->testUserPermission)->get();
         $scopedUsers2 = User::permission([$this->testUserPermission])->get();
+        $scopedUsers3 = User::permission(collect([$this->testUserPermission]))->get();
 
         $this->assertEquals($scopedUsers1->count(), 1);
         $this->assertEquals($scopedUsers2->count(), 1);
+        $this->assertEquals($scopedUsers3->count(), 1);
     }
 
     /** @test */

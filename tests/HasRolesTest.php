@@ -215,9 +215,13 @@ class HasRolesTest extends TestCase
         $user1->assignRole($this->testUserRole);
         $user2->assignRole('testRole2');
 
-        $scopedUsers = User::role($this->testUserRole)->get();
+        $scopedUsers1 = User::role($this->testUserRole)->get();
+        $scopedUsers2 = User::role([$this->testUserRole])->get();
+        $scopedUsers3 = User::role(collect([$this->testUserRole]))->get();
 
-        $this->assertEquals($scopedUsers->count(), 1);
+        $this->assertEquals($scopedUsers1->count(), 1);
+        $this->assertEquals($scopedUsers2->count(), 1);
+        $this->assertEquals($scopedUsers3->count(), 1);
     }
 
     /** @test */
