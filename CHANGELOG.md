@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.8.1 - 2018-02-03
+- Fix compatibility with Spark v2.0 to v5.0
+
 ## 2.8.0 - 2018-01-25
 - Support getting guard_name from extended model when using static methods
 
