@@ -281,6 +281,27 @@ $role = Role::create(['name' => 'writer']);
 $permission = Permission::create(['name' => 'edit articles']);
 ```
 
+A permission can be assigned to a role using 1 of these methods:
+
+```php
+$role->givePermissionTo($permission);
+$permission->assignRole($role);
+```
+
+Multiple permissions can be synced to a role using 1 of these methods:
+
+```php
+$role->syncPermissions($permissions);
+$permission->syncRoles($roles);
+```
+
+A permission can be removed from a role using 1 of these methods:
+
+```php
+$role->revokePermissionTo($permission);
+$permission->removeRole($role);
+```
+
 If you're using multiple guards the `guard_name` attribute needs to be set as well. Read about it in the [using multiple guards](#using-multiple-guards) section of the readme.
 
 The `HasRoles` trait adds Eloquent relationships to your models, which can be accessed directly or used as a base query:
@@ -684,36 +705,36 @@ Two notes about Database Seeding:
 
 2. Here's a sample seeder, which clears the cache, creates permissions and then assigns permissions to roles:
 
-	```php
-	use Illuminate\Database\Seeder;
-	use Spatie\Permission\Models\Role;
-	use Spatie\Permission\Models\Permission;
+    ```php
+    use Illuminate\Database\Seeder;
+    use Spatie\Permission\Models\Role;
+    use Spatie\Permission\Models\Permission;
 
-	class RolesAndPermissionsSeeder extends Seeder
-	{
-	    public function run()
-    	{
-        	// Reset cached roles and permissions
-	        app()['cache']->forget('spatie.permission.cache');
+    class RolesAndPermissionsSeeder extends Seeder
+    {
+        public function run()
+        {
+            // Reset cached roles and permissions
+            app()['cache']->forget('spatie.permission.cache');
 
-	        // create permissions
-	        Permission::create(['name' => 'edit articles']);
-	        Permission::create(['name' => 'delete articles']);
-	        Permission::create(['name' => 'publish articles']);
-	        Permission::create(['name' => 'unpublish articles']);
+            // create permissions
+            Permission::create(['name' => 'edit articles']);
+            Permission::create(['name' => 'delete articles']);
+            Permission::create(['name' => 'publish articles']);
+            Permission::create(['name' => 'unpublish articles']);
 
-	        // create roles and assign existing permissions
-	        $role = Role::create(['name' => 'writer']);
-	        $role->givePermissionTo('edit articles');
-	        $role->givePermissionTo('delete articles');
+            // create roles and assign existing permissions
+            $role = Role::create(['name' => 'writer']);
+            $role->givePermissionTo('edit articles');
+            $role->givePermissionTo('delete articles');
 
-	        $role = Role::create(['name' => 'admin']);
-	        $role->givePermissionTo('publish articles');
-	        $role->givePermissionTo('unpublish articles');
-	    }
-	}
+            $role = Role::create(['name' => 'admin']);
+            $role->givePermissionTo('publish articles');
+            $role->givePermissionTo('unpublish articles');
+        }
+    }
 
-	```
+    ```
 
 ## Extending
 
@@ -740,6 +761,9 @@ When you use the supplied methods for manipulating roles and permissions, the ca
 $user->assignRole('writer');
 $user->removeRole('writer');
 $user->syncRoles(params);
+$permission->assignRole('writer');
+$permission->removeRole('writer');
+$permission->syncRoles(params);
 $role->givePermissionTo('edit articles');
 $role->revokePermissionTo('edit articles');
 $role->syncPermissions(params);
