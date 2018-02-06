@@ -720,8 +720,8 @@ Two notes about Database Seeding:
 If you need to extend or replace the existing `Role` or `Permission` models you just need to
 keep the following things in mind:
 
-- Your `Role` model needs to implement the `Spatie\Permission\Contracts\Role` contract
-- Your `Permission` model needs to implement the `Spatie\Permission\Contracts\Permission` contract
+- Your `Role` model needs to extend the `Spatie\Permission\Models\Role` model
+- Your `Permission` model needs to extend the `Spatie\Permission\Models\Permission` model
 - You can publish the configuration with this command:
 
 ```bash
