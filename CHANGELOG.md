@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.8.2 - 2018-02-07
+- Allow a collection containing a model to be passed to role/permission scopes
+
 ## 2.8.1 - 2018-02-03
 - Fix compatibility with Spark v2.0 to v5.0
 
