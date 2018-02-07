@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 1.16.0 - 2018-02-07
+- added support for Laravel 5.5
+
 ## 1.15 - 2017-12-08
 - allow `hasAnyPermission` to take an array of permissions
 
@@ -48,7 +51,7 @@ All notable changes to `laravel-permission` will be documented in this file
 - added `Role` scope
 
 ## 1.5.3 - 2016-12-15
-- moved some things to `boot` method in SP to solve some compatibilty problems with other packages
+- moved some things to `boot` method in SP to solve some compatibility problems with other packages
 
 ## 1.5.2 - 2016-08-26
 - make compatible with L5.3
@@ -85,7 +88,7 @@ All notable changes to `laravel-permission` will be documented in this file
 
 ## 1.3.0 - 2015-12-25
 
-- added compatiblity for Laravel 5.2
+- added compatibility for Laravel 5.2
 
 ## 1.2.1 - 2015-12-22
 
