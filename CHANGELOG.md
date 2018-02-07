@@ -4,6 +4,7 @@ All notable changes to `laravel-permission` will be documented in this file
 
 ## 2.9.0 - 2018-02-07
 - add compatibility with Laravel 5.6
+- Allow assign/sync/remove Roles from Permission model
 
 ## 2.8.2 - 2018-02-07
 - Allow a collection containing a model to be passed to role/permission scopes
