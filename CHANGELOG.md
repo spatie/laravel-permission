@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.9.0 - 2018-02-07
+- add compatibility with Laravel 5.6
+
 ## 2.8.2 - 2018-02-07
 - Allow a collection containing a model to be passed to role/permission scopes
 
@@ -118,25 +121,40 @@ The 403 response is backward compatible
 - fix the order of the `foreignKey` and `relatedKey` in the relations
 
 ## 2.0.0 - 2017-04-10
+- Requires minimum Laravel 5.4
 - cache expiration is now configurable and set to one day by default
 - roles and permissions can now be assigned to any model through the `HasRoles` trait
 - removed deprecated `hasPermission` method
 - renamed config file from `laravel-permission` to `permission`.
 
-## 1.12.0
 
+
+## 1.16.0 - 2018-02-07
+- added support for Laravel 5.5
+
+## 1.15 - 2017-12-08
+- allow `hasAnyPermission` to take an array of permissions
+
+## 1.14.1 - 2017-10-26
+- fixed `Gate::before` for custom gate callbacks
+
+## 1.14.0 - 2017-10-18
+- refactor `PermissionRegistrar` to use `$gate->before()`
+- removed `log_registration_exception` as it is no longer relevant
+
+## 1.13.0 - 2017-08-31
+- added compatibility for Laravel 5.5
+
+## 1.12.0
 - made foreign key name to users table configurable
 
 ## 1.11.1
-
 - `hasPermissionTo` uses the cache to avoid extra queries when it is called multiple times
 
 ## 1.11.0
-
 - add `getDirectPermissions`, `getPermissionsViaRoles`, `getAllPermissions`
 
 ## 1.10.0 - 2017-02-22
-
 - add `hasAnyPermission`
 
 ## 1.9.0 - 2017-02-20
