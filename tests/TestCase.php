@@ -100,5 +100,4 @@ abstract class TestCase extends Orchestra
     {
         $this->testUser = $this->testUser->fresh();
     }
-
 }
