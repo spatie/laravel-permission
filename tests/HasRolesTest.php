@@ -30,6 +30,20 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_assign_and_remove_a_role_on_a_permission()
+    {
+        $this->testUserPermission->assignRole('testRole');
+
+        $this->assertTrue($this->testUserPermission->hasRole('testRole'));
+
+        $this->testUserPermission->removeRole('testRole');
+
+        $this->refreshTestUserPermission();
+
+        $this->assertFalse($this->testUserPermission->hasRole('testRole'));
+    }
+
+    /** @test */
     public function it_can_assign_a_role_using_an_object()
     {
         $this->testUser->assignRole($this->testUserRole);
@@ -102,6 +116,18 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_sync_roles_from_a_string_on_a_permission()
+    {
+        $this->testUserPermission->assignRole('testRole');
+
+        $this->testUserPermission->syncRoles('testRole2');
+
+        $this->assertFalse($this->testUserPermission->hasRole('testRole'));
+
+        $this->assertTrue($this->testUserPermission->hasRole('testRole2'));
+    }
+
+    /** @test */
     public function it_can_sync_multiple_roles()
     {
         $this->testUser->syncRoles('testRole', 'testRole2');
@@ -122,7 +148,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_will_remove_all_roles_when_an_empty_array_is_past_to_sync_roles()
+    public function it_will_remove_all_roles_when_an_empty_array_is_passed_to_sync_roles()
     {
         $this->testUser->assignRole('testRole');
 

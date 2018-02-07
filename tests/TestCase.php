@@ -121,7 +121,7 @@ abstract class TestCase extends Orchestra
     }
 
     /**
-     * Refresh the testuser.
+     * Refresh the testUser.
      */
     public function refreshTestUser()
     {
@@ -134,5 +134,13 @@ abstract class TestCase extends Orchestra
     public function refreshTestAdmin()
     {
         $this->testAdmin = $this->testAdmin->fresh();
+    }
+
+    /**
+     * Refresh the testUserPermission.
+     */
+    public function refreshTestUserPermission()
+    {
+        $this->testUserPermission = $this->testUserPermission->fresh();
     }
 }

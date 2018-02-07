@@ -4,6 +4,7 @@ namespace Spatie\Permission\Models;
 
 use Spatie\Permission\Guard;
 use Illuminate\Support\Collection;
+use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
@@ -15,6 +16,7 @@ use Spatie\Permission\Contracts\Permission as PermissionContract;
 
 class Permission extends Model implements PermissionContract
 {
+    use HasRoles;
     use RefreshesPermissionCache;
 
     public $guarded = ['id'];
