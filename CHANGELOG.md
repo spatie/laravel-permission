@@ -131,7 +131,7 @@ The 403 response is backward compatible
 
 
 ## 1.16.0 - 2018-02-07
-- added support for Laravel 5.5
+- added support for Laravel 5.6
 
 ## 1.15 - 2017-12-08
 - allow `hasAnyPermission` to take an array of permissions
