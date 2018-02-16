@@ -199,7 +199,7 @@ class HasPermissionsTest extends TestCase
     {
         $this->testUser->givePermissionTo('edit-news');
 
-        $ids = app( Permission::class )::whereIn('name', ['edit-articles', 'edit-blog'])->pluck('id');
+        $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-blog'])->pluck('id');
 
         $this->testUser->syncPermissions($ids);
 
@@ -209,5 +209,4 @@ class HasPermissionsTest extends TestCase
 
         $this->assertFalse($this->testUser->hasDirectPermission('edit-news'));
     }
-
 }

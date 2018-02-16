@@ -36,5 +36,4 @@ interface Permission
      * @return Permission
      */
     public static function findById(int $id, $guardName): self;
-
 }

@@ -45,8 +45,8 @@ class PermissionTest extends TestCase
     /** @test */
     public function it_is_retrievable_by_id()
     {
-        $permission_by_id = app( Permission::class )->findById( $this->testUserPermission->id );
+        $permission_by_id = app(Permission::class)->findById($this->testUserPermission->id);
 
-        $this->assertEquals( $this->testUserPermission->id, $permission_by_id->id );
+        $this->assertEquals($this->testUserPermission->id, $permission_by_id->id);
     }
 }
