@@ -41,7 +41,7 @@ abstract class TestCase extends Orchestra
 
         $this->testAdmin = Admin::first();
         $this->testAdminRole = app(Role::class)->find(3);
-        $this->testAdminPermission = app(Permission::class)->find(3);
+        $this->testAdminPermission = app(Permission::class)->find(4);
     }
 
     /**
@@ -109,6 +109,7 @@ abstract class TestCase extends Orchestra
         $app[Role::class]->create(['name' => 'testAdminRole', 'guard_name' => 'admin']);
         $app[Permission::class]->create(['name' => 'edit-articles']);
         $app[Permission::class]->create(['name' => 'edit-news']);
+        $app[Permission::class]->create(['name' => 'edit-blog']);
         $app[Permission::class]->create(['name' => 'admin-permission', 'guard_name' => 'admin']);
     }
 
