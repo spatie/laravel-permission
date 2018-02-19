@@ -1,3 +1,5 @@
+# This fork adds permission hierchy (parenting and children)
+
 # Associate users with permissions and roles
 
 
