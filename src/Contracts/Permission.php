@@ -23,5 +23,19 @@ interface Permission
      *
      * @return Permission
      */
-    public static function findByName(string $name, $guardName): self;
+    public static function findByName($name, $guardName): self;
+  
+      /**
+     * Find a permission by its id.
+     *
+     * @param string $id
+     * @param string|null $guardName
+     *
+     * @throws \Spatie\Permission\Exceptions\PermissionDoesNotExist
+     *
+     * @return Permission
+     */
+    public static function findById($name, $guardName): self;
+  
+    
 }
