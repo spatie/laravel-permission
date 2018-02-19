@@ -1,5 +1,5 @@
 {
-    "name": "spatie/laravel-permission",
+    "name": "pkeogan/laravel-permission",
     "description": "Permission handling for Laravel 5.4 and up",
     "keywords": [
         "spatie",
