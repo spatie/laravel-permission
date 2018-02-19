@@ -5,8 +5,8 @@ namespace Spatie\Permission;
 use Exception;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Contracts\Logging\Log;
 use Illuminate\Support\Collection;
+use Psr\Log\LoggerInterface as Log;
 use Spatie\Permission\Contracts\Permission;
 
 class PermissionRegistrar
@@ -17,7 +17,7 @@ class PermissionRegistrar
     /** @var \Illuminate\Contracts\Cache\Repository */
     protected $cache;
 
-    /** @var \Illuminate\Contracts\Logging\Log */
+    /** @var \Psr\Log\LoggerInterface */
     protected $logger;
 
     /** @var string */
