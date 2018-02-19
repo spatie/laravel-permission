@@ -1,5 +1,3 @@
-# This fork adds permission hierchy (parenting and children)
-
 # Associate users with permissions and roles
 
 
@@ -368,10 +366,24 @@ You can test if a user has a permission:
 $user->hasPermissionTo('edit articles');
 ```
 
+Or you may input a int, which will check against the permission's ID
+
+```php
+$user->hasPermissionTo('1');
+$user->hasPermissionTo(Permission::find(1)->id);
+$user->hasPermissionTo($somePermission->id);
+```
+
 ...or if a user has multiple permissions:
 
 ```php
 $user->hasAnyPermission(['edit articles', 'publish articles', 'unpublish articles']);
+```
+
+You may also input ints to be compares against the permission's IDs.
+
+```php
+$user->hasAnyPermission(['edit articles', 1, 5]);
 ```
 
 Saved permissions will be registered with the `Illuminate\Auth\Access\Gate` class for the default guard. So you can
