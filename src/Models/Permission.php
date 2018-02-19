@@ -93,10 +93,10 @@ class Permission extends Model implements PermissionContract
         return $permission;
     }
   
-      /**
+    /**
      * Find a permission by its id (and optionally guardName).
      *
-     * @param string $id
+     * @param integer $id
      * @param string|null $guardName
      *
      * @throws \Spatie\Permission\Exceptions\PermissionDoesNotExist
