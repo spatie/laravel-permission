@@ -286,6 +286,10 @@ trait HasRoles
                 $guardName ?? $this->getDefaultGuardName()
             );
         }
+      
+        if (is_integer($permission)) {
+          $permission = app(Permission::class)->findById($permission, $this->getDefaultGuardName());
+        }
 
         return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
     }
@@ -335,12 +339,19 @@ trait HasRoles
     {
         if (is_string($permission)) {
             $permission = app(Permission::class)->findByName($permission, $this->getDefaultGuardName());
-
             if (! $permission) {
                 return false;
             }
         }
-
+      
+      if (is_integer($permission)) {
+            $permission = app(Permission::class)->findById($permission, $this->getDefaultGuardName());
+            if (! $permission ) {
+                return false;
+            }
+        }
+       
+      
         return $this->permissions->contains('id', $permission->id);
     }
 
