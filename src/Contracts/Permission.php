@@ -25,17 +25,16 @@ interface Permission
      */
     public static function findByName(string $name, $guardName): self;
   
-      /**
+    /**
      * Find a permission by its id.
      *
-     * @param string $id
+     * @param int $id
      * @param string|null $guardName
      *
      * @throws \Spatie\Permission\Exceptions\PermissionDoesNotExist
      *
      * @return Permission
      */
-    public static function findById(integer $name, $guardName): self;
+    public static function findById(int $name, $guardName): self;
   
-    
 }
