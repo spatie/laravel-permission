@@ -366,7 +366,7 @@ You can test if a user has a permission:
 $user->hasPermissionTo('edit articles');
 ```
 
-Or you may input a int, which will check against the permission's ID
+Or you may pass an integer representing the permission id
 
 ```php
 $user->hasPermissionTo('1');
@@ -380,7 +380,7 @@ $user->hasPermissionTo($somePermission->id);
 $user->hasAnyPermission(['edit articles', 'publish articles', 'unpublish articles']);
 ```
 
-You may also input ints to be compares against the permission's IDs.
+You may also pass integers to lookup by permission id
 
 ```php
 $user->hasAnyPermission(['edit articles', 1, 5]);
