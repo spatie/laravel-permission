@@ -288,7 +288,7 @@ trait HasRoles
         }
       
         if (is_integer($permission)) {
-          $permission = app(Permission::class)->findById($permission, $this->getDefaultGuardName());
+            $permission = app(Permission::class)->findById($permission, $this->getDefaultGuardName());
         }
 
         return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
