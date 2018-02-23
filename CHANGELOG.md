@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.9.1 - 2018-02-23
+- Permissions now support passing integer id for sync, find, hasPermissionTo and hasDirectPermissionTo
+
 ## 2.9.0 - 2018-02-07
 - add compatibility with Laravel 5.6
 - Allow assign/sync/remove Roles from Permission model
