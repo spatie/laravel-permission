@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Test;
 
+use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
@@ -177,5 +178,35 @@ class HasPermissionsTest extends TestCase
         $this->testUserRole->revokePermissionTo(['edit-articles', 'edit-news']);
 
         $this->assertEquals(0, $this->testUserRole->permissions()->count());
+    }
+
+    /** @test */
+    public function it_can_sync_multiple_permissions()
+    {
+        $this->testUser->givePermissionTo('edit-news');
+
+        $this->testUser->syncPermissions('edit-articles', 'edit-blog');
+
+        $this->assertTrue($this->testUser->hasDirectPermission('edit-articles'));
+
+        $this->assertTrue($this->testUser->hasDirectPermission('edit-blog'));
+
+        $this->assertFalse($this->testUser->hasDirectPermission('edit-news'));
+    }
+
+    /** @test */
+    public function it_can_sync_multiple_permissions_by_id()
+    {
+        $this->testUser->givePermissionTo('edit-news');
+
+        $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-blog'])->pluck('id');
+
+        $this->testUser->syncPermissions($ids);
+
+        $this->assertTrue($this->testUser->hasDirectPermission('edit-articles'));
+
+        $this->assertTrue($this->testUser->hasDirectPermission('edit-blog'));
+
+        $this->assertFalse($this->testUser->hasDirectPermission('edit-news'));
     }
 }

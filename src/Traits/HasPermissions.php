@@ -73,6 +73,10 @@ trait HasPermissions
      */
     protected function getStoredPermission($permissions)
     {
+        if (is_numeric($permissions)) {
+            return app(Permission::class)->findById($permissions, $this->getDefaultGuardName());
+        }
+
         if (is_string($permissions)) {
             return app(Permission::class)->findByName($permissions, $this->getDefaultGuardName());
         }
