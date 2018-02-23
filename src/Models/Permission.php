@@ -92,30 +92,7 @@ class Permission extends Model implements PermissionContract
 
         return $permission;
     }
-  
-    /**
-     * Find a permission by its id (and optionally guardName).
-     *
-     * @param int $id
-     * @param string|null $guardName
-     *
-     * @throws \Spatie\Permission\Exceptions\PermissionDoesNotExist
-     *
-     * @return \Spatie\Permission\Contracts\Permission
-     */
-    public static function findById(int $id, $guardName = null): PermissionContract
-    {
-        $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $permission = app(Permission::class)->find($id);
-
-        if (! $permission) {
-            throw PermissionDoesNotExist::withId($id, $guardName);
-        }
-
-        return $permission;
-    }
-  
     /**
      * Find a permission by its id (and optionally guardName).
      *
@@ -133,7 +110,7 @@ class Permission extends Model implements PermissionContract
         $permission = static::getPermissions()->where('id', $id)->where('guard_name', $guardName)->first();
 
         if (! $permission) {
-            throw PermissionDoesNotExist::create($id, $guardName);
+            throw PermissionDoesNotExist::withId($id, $guardName);
         }
 
         return $permission;
