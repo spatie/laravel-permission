@@ -343,15 +343,14 @@ trait HasRoles
                 return false;
             }
         }
-      
+
       if (is_integer($permission)) {
             $permission = app(Permission::class)->findById($permission, $this->getDefaultGuardName());
             if (! $permission ) {
                 return false;
             }
         }
-       
-      
+
         return $this->permissions->contains('id', $permission->id);
     }
 
