@@ -286,7 +286,7 @@ trait HasRoles
                 $guardName ?? $this->getDefaultGuardName()
             );
         }
-      
+
         if (is_int($permission)) {
             $permission = app(Permission::class)->findById($permission, $this->getDefaultGuardName());
         }
@@ -344,7 +344,7 @@ trait HasRoles
             }
         }
 
-      if (is_int($permission)) {
+        if (is_int($permission)) {
             $permission = app(Permission::class)->findById($permission, $this->getDefaultGuardName());
             if (! $permission) {
                 return false;
