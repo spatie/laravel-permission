@@ -122,7 +122,6 @@ class Role extends Model implements RoleContract
       
         if (is_integer($permission)) {
             $permission = app(Permission::class)->findById($permission, $this->getDefaultGuardName());
-
         }
 
         if (! $this->getGuardNames()->contains($permission->guard_name)) {
