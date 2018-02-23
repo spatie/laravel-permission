@@ -24,7 +24,7 @@ interface Permission
      * @return Permission
      */
     public static function findByName(string $name, $guardName): self;
-  
+
     /**
      * Find a permission by its id.
      *
