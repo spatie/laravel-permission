@@ -54,24 +54,24 @@ trait HasPermissions
         }, []));
 
         return $query->
-            where(function ($query) use ($permissions, $rolesWithPermissions) {
-                $query->whereHas('permissions', function ($query) use ($permissions) {
-                    $query->where(function ($query) use ($permissions) {
-                        foreach ($permissions as $permission) {
-                            $query->orWhere(config('permission.table_names.permissions').'.id', $permission->id);
+        where(function ($query) use ($permissions, $rolesWithPermissions) {
+            $query->whereHas('permissions', function ($query) use ($permissions) {
+                $query->where(function ($query) use ($permissions) {
+                    foreach ($permissions as $permission) {
+                        $query->orWhere(config('permission.table_names.permissions').'.id', $permission->id);
+                    }
+                });
+            });
+            if (count($rolesWithPermissions) > 0) {
+                $query->orWhereHas('roles', function ($query) use ($rolesWithPermissions) {
+                    $query->where(function ($query) use ($rolesWithPermissions) {
+                        foreach ($rolesWithPermissions as $role) {
+                            $query->orWhere(config('permission.table_names.roles').'.id', $role->id);
                         }
                     });
                 });
-                if (count($rolesWithPermissions) > 0) {
-                    $query->orWhereHas('roles', function ($query) use ($rolesWithPermissions) {
-                        $query->where(function ($query) use ($rolesWithPermissions) {
-                            foreach ($rolesWithPermissions as $role) {
-                                $query->orWhere(config('permission.table_names.roles').'.id', $role->id);
-                            }
-                        });
-                    });
-                }
-            });
+            }
+        });
     }
 
     /**
@@ -82,7 +82,7 @@ trait HasPermissions
     protected function convertToPermissionModels($permissions): array
     {
         if ($permissions instanceof Collection) {
-            $permissions = $permissions->toArray();
+            $permissions = $permissions->all();
         }
 
         $permissions = array_wrap($permissions);
@@ -111,6 +111,10 @@ trait HasPermissions
                 $permission,
                 $guardName ?? $this->getDefaultGuardName()
             );
+        }
+
+        if (is_int($permission)) {
+            $permission = app(Permission::class)->findById($permission, $this->getDefaultGuardName());
         }
 
         return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
@@ -161,7 +165,13 @@ trait HasPermissions
     {
         if (is_string($permission)) {
             $permission = app(Permission::class)->findByName($permission, $this->getDefaultGuardName());
+            if (! $permission) {
+                return false;
+            }
+        }
 
+        if (is_int($permission)) {
+            $permission = app(Permission::class)->findById($permission, $this->getDefaultGuardName());
             if (! $permission) {
                 return false;
             }
