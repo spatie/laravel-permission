@@ -53,8 +53,7 @@ trait HasPermissions
             return array_merge($result, $permission->roles->all());
         }, []));
 
-        return $query->
-        where(function ($query) use ($permissions, $rolesWithPermissions) {
+        return $query->where(function ($query) use ($permissions, $rolesWithPermissions) {
             $query->whereHas('permissions', function ($query) use ($permissions) {
                 $query->where(function ($query) use ($permissions) {
                     foreach ($permissions as $permission) {
