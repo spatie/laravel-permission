@@ -2,7 +2,8 @@
 
 namespace Spatie\Permission\Test;
 
-use Spatie\Permission\Models\Role;
+use Spatie\Permission\Contracts\Role;
+use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
@@ -110,9 +111,11 @@ class HasPermissionsTest extends TestCase
 
         $scopedUsers1 = User::permission($this->testUserPermission)->get();
         $scopedUsers2 = User::permission([$this->testUserPermission])->get();
+        $scopedUsers3 = User::permission(collect([$this->testUserPermission]))->get();
 
         $this->assertEquals($scopedUsers1->count(), 1);
         $this->assertEquals($scopedUsers2->count(), 1);
+        $this->assertEquals($scopedUsers3->count(), 1);
     }
 
     /** @test */
@@ -307,5 +310,35 @@ class HasPermissionsTest extends TestCase
             collect(['edit-articles', 'edit-news']),
             $this->testUser->getAllPermissions()->pluck('name')
         );
+    }
+
+    /** @test */
+    public function it_can_sync_multiple_permissions()
+    {
+        $this->testUser->givePermissionTo('edit-news');
+
+        $this->testUser->syncPermissions('edit-articles', 'edit-blog');
+
+        $this->assertTrue($this->testUser->hasDirectPermission('edit-articles'));
+
+        $this->assertTrue($this->testUser->hasDirectPermission('edit-blog'));
+
+        $this->assertFalse($this->testUser->hasDirectPermission('edit-news'));
+    }
+
+    /** @test */
+    public function it_can_sync_multiple_permissions_by_id()
+    {
+        $this->testUser->givePermissionTo('edit-news');
+
+        $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-blog'])->pluck('id');
+
+        $this->testUser->syncPermissions($ids);
+
+        $this->assertTrue($this->testUser->hasDirectPermission('edit-articles'));
+
+        $this->assertTrue($this->testUser->hasDirectPermission('edit-blog'));
+
+        $this->assertFalse($this->testUser->hasDirectPermission('edit-news'));
     }
 }

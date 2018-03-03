@@ -281,6 +281,28 @@ $role = Role::create(['name' => 'writer']);
 $permission = Permission::create(['name' => 'edit articles']);
 ```
 
+
+A permission can be assigned to a role using 1 of these methods:
+
+```php
+$role->givePermissionTo($permission);
+$permission->assignRole($role);
+```
+
+Multiple permissions can be synced to a role using 1 of these methods:
+
+```php
+$role->syncPermissions($permissions);
+$permission->syncRoles($roles);
+```
+
+A permission can be removed from a role using 1 of these methods:
+
+```php
+$role->revokePermissionTo($permission);
+$permission->removeRole($role);
+```
+
 If you're using multiple guards the `guard_name` attribute needs to be set as well. Read about it in the [using multiple guards](#using-multiple-guards) section of the readme.
 
 The `HasRoles` trait adds Eloquent relationships to your models, which can be accessed directly or used as a base query:
@@ -344,10 +366,24 @@ You can test if a user has a permission:
 $user->hasPermissionTo('edit articles');
 ```
 
+Or you may pass an integer representing the permission id
+
+```php
+$user->hasPermissionTo('1');
+$user->hasPermissionTo(Permission::find(1)->id);
+$user->hasPermissionTo($somePermission->id);
+```
+
 ...or if a user has multiple permissions:
 
 ```php
 $user->hasAnyPermission(['edit articles', 'publish articles', 'unpublish articles']);
+```
+
+You may also pass integers to lookup by permission id
+
+```php
+$user->hasAnyPermission(['edit articles', 1, 5]);
 ```
 
 Saved permissions will be registered with the `Illuminate\Auth\Access\Gate` class for the default guard. So you can
@@ -705,11 +741,9 @@ Two notes about Database Seeding:
 	        // create roles and assign existing permissions
 	        $role = Role::create(['name' => 'writer']);
 	        $role->givePermissionTo('edit articles');
-	        $role->givePermissionTo('delete articles');
 
 	        $role = Role::create(['name' => 'admin']);
-	        $role->givePermissionTo('publish articles');
-	        $role->givePermissionTo('unpublish articles');
+            $role->givePermissionTo(['publish articles', 'unpublish articles']);
 	    }
 	}
 
@@ -717,18 +751,23 @@ Two notes about Database Seeding:
 
 ## Extending
 
-If you need to extend or replace the existing `Role` or `Permission` models you just need to
-keep the following things in mind:
+If you need to EXTEND the existing `Role` or `Permission` models note that:
+
+- Your `Role` model needs to extend the `Spatie\Permission\Models\Role` model
+- Your `Permission` model needs to extend the `Spatie\Permission\Models\Permission` model
+
+If you need to REPLACE the existing `Role` or `Permission` models you need to keep the
+following things in mind:
 
 - Your `Role` model needs to implement the `Spatie\Permission\Contracts\Role` contract
 - Your `Permission` model needs to implement the `Spatie\Permission\Contracts\Permission` contract
-- You can publish the configuration with this command:
+
+In BOTH cases, whether extending or replacing, you will need to specify your new models in the configuration. To do this you must update the `models.role` and `models.permission` values in the configuration file after publishing the configuration with this command:
 
 ```bash
 php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="config"
 ```
-  
-  And update the `models.role` and `models.permission` values
+ 
 
 ## Cache
 
@@ -743,6 +782,9 @@ $user->syncRoles(params);
 $role->givePermissionTo('edit articles');
 $role->revokePermissionTo('edit articles');
 $role->syncPermissions(params);
+$permission->assignRole('writer');
+$permission->removeRole('writer');
+$permission->syncRoles(params);
 ```
 
 HOWEVER, if you manipulate permission/role data directly in the database instead of calling the supplied methods, then you will not see the changes reflected in the application unless you manually reset the cache.

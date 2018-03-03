@@ -120,6 +120,10 @@ class Role extends Model implements RoleContract
             $permission = app(Permission::class)->findByName($permission, $this->getDefaultGuardName());
         }
 
+        if (is_int($permission)) {
+            $permission = app(Permission::class)->findById($permission, $this->getDefaultGuardName());
+        }
+
         if (! $this->getGuardNames()->contains($permission->guard_name)) {
             throw GuardDoesNotMatch::create($permission->guard_name, $this->getGuardNames());
         }

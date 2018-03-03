@@ -4,6 +4,7 @@ namespace Spatie\Permission\Models;
 
 use Spatie\Permission\Guard;
 use Illuminate\Support\Collection;
+use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
@@ -15,6 +16,7 @@ use Spatie\Permission\Contracts\Permission as PermissionContract;
 
 class Permission extends Model implements PermissionContract
 {
+    use HasRoles;
     use RefreshesPermissionCache;
 
     public $guarded = ['id'];
@@ -86,6 +88,29 @@ class Permission extends Model implements PermissionContract
 
         if (! $permission) {
             throw PermissionDoesNotExist::create($name, $guardName);
+        }
+
+        return $permission;
+    }
+
+    /**
+     * Find a permission by its id (and optionally guardName).
+     *
+     * @param int $id
+     * @param string|null $guardName
+     *
+     * @throws \Spatie\Permission\Exceptions\PermissionDoesNotExist
+     *
+     * @return \Spatie\Permission\Contracts\Permission
+     */
+    public static function findById(int $id, $guardName = null): PermissionContract
+    {
+        $guardName = $guardName ?? Guard::getDefaultName(static::class);
+
+        $permission = static::getPermissions()->where('id', $id)->where('guard_name', $guardName)->first();
+
+        if (! $permission) {
+            throw PermissionDoesNotExist::withId($id, $guardName);
         }
 
         return $permission;

@@ -47,7 +47,7 @@ trait HasRoles
     public function scopeRole(Builder $query, $roles): Builder
     {
         if ($roles instanceof Collection) {
-            $roles = $roles->toArray();
+            $roles = $roles->all();
         }
 
         if (! is_array($roles)) {
@@ -196,7 +196,7 @@ trait HasRoles
     }
 
     /**
-     * Return all permissions the directory coupled to the model.
+     * Return all permissions directly coupled to the model.
      */
     public function getDirectPermissions(): Collection
     {
