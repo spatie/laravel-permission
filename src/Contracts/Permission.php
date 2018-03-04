@@ -36,4 +36,14 @@ interface Permission
      * @return Permission
      */
     public static function findById(int $id, $guardName): self;
+
+    /**
+     * Find or Create a permission by its name and guard name.
+     *
+     * @param string $name
+     * @param string|null $guardName
+     *
+     * @return Permission
+     */
+    public static function findOrCreate(string $name, $guardName): self;
 }
