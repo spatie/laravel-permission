@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.9.2 - 2018-03-12
+- Now findOrCreate() exists for both Roles and Permissions
+- Internal code refactoring for future dev work
+
 ## 2.9.1 - 2018-02-23
 - Permissions now support passing integer id for sync, find, hasPermissionTo and hasDirectPermissionTo
 
