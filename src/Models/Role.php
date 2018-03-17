@@ -106,6 +106,27 @@ class Role extends Model implements RoleContract
     }
 
     /**
+     * Find or create role by its name (and optionally guardName).
+     *
+     * @param string $name
+     * @param string|null $guardName
+     *
+     * @return \Spatie\Permission\Contracts\Role
+     */
+    public static function findOrCreate(string $name, $guardName = null): RoleContract
+    {
+        $guardName = $guardName ?? Guard::getDefaultName(static::class);
+
+        $role = static::where('name', $name)->where('guard_name', $guardName)->first();
+
+        if (! $role) {
+            return static::create(['name' => $name, 'guard_name' => $guardName]);
+        }
+
+        return $role;
+    }
+
+    /**
      * Determine if the user may perform the given permission.
      *
      * @param string|Permission $permission
@@ -118,6 +139,10 @@ class Role extends Model implements RoleContract
     {
         if (is_string($permission)) {
             $permission = app(Permission::class)->findByName($permission, $this->getDefaultGuardName());
+        }
+
+        if (is_int($permission)) {
+            $permission = app(Permission::class)->findById($permission, $this->getDefaultGuardName());
         }
 
         if (! $this->getGuardNames()->contains($permission->guard_name)) {
