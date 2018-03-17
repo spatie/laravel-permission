@@ -724,14 +724,15 @@ Two notes about Database Seeding:
 	        Permission::create(['name' => 'publish articles']);
 	        Permission::create(['name' => 'unpublish articles']);
 
-	        // create roles and assign existing permissions
+	        // create roles and assign created permissions
+
 	        $role = Role::create(['name' => 'writer']);
 	        $role->givePermissionTo('edit articles');
 
-	        $role = Role::create(['name' => 'admin']);
+	        $role = Role::create(['name' => 'moderator']);
             $role->givePermissionTo(['publish articles', 'unpublish articles']);
 
-            // or to grant all permissions
+	        $role = Role::create(['name' => 'super-admin']);
             $role->givePermissionTo(Permission::all());
 	    }
 	}
