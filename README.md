@@ -729,10 +729,10 @@ Two notes about Database Seeding:
 	        $role = Role::create(['name' => 'writer']);
 	        $role->givePermissionTo('edit articles');
 
-	        $role = Role::create(['name' => 'moderator']);
+            $role = Role::create(['name' => 'moderator']);
             $role->givePermissionTo(['publish articles', 'unpublish articles']);
 
-	        $role = Role::create(['name' => 'super-admin']);
+            $role = Role::create(['name' => 'super-admin']);
             $role->givePermissionTo(Permission::all());
 	    }
 	}
