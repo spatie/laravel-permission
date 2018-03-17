@@ -730,6 +730,9 @@ Two notes about Database Seeding:
 
 	        $role = Role::create(['name' => 'admin']);
             $role->givePermissionTo(['publish articles', 'unpublish articles']);
+
+            // or to grant all permissions
+            $role->givePermissionTo(Permission::all());
 	    }
 	}
 
