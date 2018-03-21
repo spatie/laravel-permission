@@ -9,6 +9,9 @@ class GuardDoesNotMatch extends InvalidArgumentException
 {
     public static function create(string $givenGuard, Collection $expectedGuards)
     {
-        return new static("The given role or permission should use guard `{$expectedGuards->implode(', ')}` instead of `{$givenGuard}`.");
+        return new static(trans('permission::exceptions.guard_does_not_match-create', [
+            'expectedGuards' => $expectedGuards->implode(', '),
+            'givenGuard' => $givenGuard,
+        ]));
     }
 }

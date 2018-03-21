@@ -12,11 +12,13 @@ class UnauthorizedException extends HttpException
 
     public static function forRoles(array $roles): self
     {
-        $message = 'User does not have the right roles.';
+        $message = trans('permission::exceptions.unauthorized_exception-for_roles');
 
         if (config('permission.display_permission_in_exception')) {
             $permStr = implode(', ', $roles);
-            $message = 'User does not have the right roles. Necessary roles are '.$permStr;
+            $message .= ' ' . trans('permission::exceptions.unauthorized_exception-for_roles-display_permission', [
+                'permStr' => $permStr,
+            ]);
         }
 
         $exception = new static(403, $message, null, []);
@@ -27,11 +29,13 @@ class UnauthorizedException extends HttpException
 
     public static function forPermissions(array $permissions): self
     {
-        $message = 'User does not have the right permissions.';
+        $message = trans('permission::exceptions.unauthorized_exception-for_permissions');
 
         if (config('permission.display_permission_in_exception')) {
             $permStr = implode(', ', $permissions);
-            $message = 'User does not have the right permissions. Necessary permissions are '.$permStr;
+            $message .= ' ' . trans('permission::exceptions.unauthorized_exception-for_permissions-display_permission', [
+                'permStr' => $permStr,
+            ]);
         }
 
         $exception = new static(403, $message, null, []);
@@ -42,7 +46,7 @@ class UnauthorizedException extends HttpException
 
     public static function notLoggedIn(): self
     {
-        return new static(403, 'User is not logged in.', null, []);
+        return new static(403, trans('permission::exceptions.unauthorized_exception-not_logged_in'), null, []);
     }
 
     public function getRequiredRoles(): array

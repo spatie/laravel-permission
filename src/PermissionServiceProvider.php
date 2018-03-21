@@ -34,6 +34,8 @@ class PermissionServiceProvider extends ServiceProvider
 
         $this->registerModelBindings();
 
+        $this->loadTranslationsFrom(__DIR__.'/resources/lang', 'permission');
+
         $permissionLoader->registerPermissions();
     }
 

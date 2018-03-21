@@ -8,11 +8,16 @@ class PermissionDoesNotExist extends InvalidArgumentException
 {
     public static function create(string $permissionName, string $guardName = '')
     {
-        return new static("There is no permission named `{$permissionName}` for guard `{$guardName}`.");
+        return new static(trans('permission::exceptions.permission_does_not_exist-create', [
+            'permissionName' => $permissionName,
+            'guardName' => $guardName,
+        ]));
     }
 
     public static function withId(int $permissionId)
     {
-        return new static("There is no [permission] with id `{$permissionId}`.");
+        return new static(trans('permission::exceptions.permission_does_not_exist-with_id', [
+            'permissionId' => $permissionId,
+        ]));
     }
 }
