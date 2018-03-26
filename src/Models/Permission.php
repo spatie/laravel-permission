@@ -4,6 +4,7 @@ namespace Spatie\Permission\Models;
 
 use Spatie\Permission\Test\User;
 use Illuminate\Support\Collection;
+use Spatie\Permission\Test\User;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\PermissionRegistrar;
@@ -30,12 +31,12 @@ class Permission extends Model implements PermissionContract
 
     public static function create(array $attributes = [])
     {
-        $permission = static::getPermissions()->filter(function ($permission) use($attributes) {
+        $permission = static::getPermissions()->filter(function ($permission) use ($attributes) {
             return $permission->name === $attributes['name'];
         })->first();
 
         // TODO: Remove this exception and fall back to Laravel's default?
-        if (static::getPermissions()->where('name', $attributes['name'])->first()) {
+        if ($permission) {
             throw PermissionAlreadyExists::create($attributes['name']);
         }
 
