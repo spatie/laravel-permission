@@ -15,8 +15,8 @@ class UnauthorizedException extends HttpException
         $message = 'User does not have the right roles.';
 
         if (config('permission.display_permission_in_exception')) {
-            $permStr = implode(', ', $roles);
-            $message = 'User does not have the right roles. Necessary roles are '.$permStr;
+            $permissionString = implode(', ', $roles);
+            $message = 'User does not have the right roles. Necessary roles are '.$permissionString;
         }
 
         $exception = new static(403, $message, null, []);
@@ -30,8 +30,8 @@ class UnauthorizedException extends HttpException
         $message = 'User does not have the right permissions.';
 
         if (config('permission.display_permission_in_exception')) {
-            $permStr = implode(', ', $permissions);
-            $message = 'User does not have the right permissions. Necessary permissions are '.$permStr;
+            $permissionString = implode(', ', $permissions);
+            $message = 'User does not have the right permissions. Necessary permissions are '.$permissionString;
         }
 
         $exception = new static(403, $message, null, []);

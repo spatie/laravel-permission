@@ -6,8 +6,8 @@ use InvalidArgumentException;
 
 class PermissionAlreadyExists extends InvalidArgumentException
 {
-    public static function create(string $permissionName, string $guardName)
+    public static function create(string $permissionName)
     {
-        return new static("A `{$permissionName}` permission already exists for guard `{$guardName}`.");
+        return new static("A `{$permissionName}` permission already exists.");
     }
 }

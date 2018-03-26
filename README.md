@@ -604,7 +604,7 @@ You can use the same methods to assign permissions and roles to users as describ
 You can use all of the blade directives listed in [using blade directives](#using-blade-directives) by passing in the guard you wish to use as the second argument to the directive:
 
 ```php
-@role('super-admin', 'admin')
+@role('admin', 'admin')
     I am a super-admin!
 @else
     I am not a super-admin...
@@ -746,7 +746,7 @@ Two notes about Database Seeding:
             $role = Role::create(['name' => 'moderator']);
             $role->givePermissionTo(['publish articles', 'unpublish articles']);
 
-            $role = Role::create(['name' => 'super-admin']);
+            $role = Role::create(['name' => 'admin']);
             $role->givePermissionTo(Permission::all());
         }
     }

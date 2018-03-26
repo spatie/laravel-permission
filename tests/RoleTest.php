@@ -5,7 +5,6 @@ namespace Spatie\Permission\Test;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
-use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\RoleAlreadyExists;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
@@ -16,15 +15,11 @@ class RoleTest extends TestCase
         parent::setUp();
 
         Permission::create(['name' => 'other-permission']);
-
-        Permission::create(['name' => 'wrong-guard-permission', 'guard_name' => 'admin']);
     }
 
     /** @test */
     public function it_has_user_models_of_the_right_class()
     {
-        $this->testAdmin->assignRole($this->testAdminRole);
-
         $this->testUser->assignRole($this->testUserRole);
 
         $this->assertCount(1, $this->testUserRole->users);
@@ -55,18 +50,6 @@ class RoleTest extends TestCase
         $this->expectException(PermissionDoesNotExist::class);
 
         $this->testUserRole->givePermissionTo('create-evil-empire');
-    }
-
-    /** @test */
-    public function it_throws_an_exception_when_given_a_permission_that_belongs_to_another_guard()
-    {
-        $this->expectException(PermissionDoesNotExist::class);
-
-        $this->testUserRole->givePermissionTo('admin-permission');
-
-        $this->expectException(GuardDoesNotMatch::class);
-
-        $this->testUserRole->givePermissionTo($this->testAdminPermission);
     }
 
     /** @test */
@@ -107,20 +90,6 @@ class RoleTest extends TestCase
         $this->expectException(PermissionDoesNotExist::class);
 
         $this->testUserRole->syncPermissions('permission-does-not-exist');
-    }
-
-    /** @test */
-    public function it_throws_an_exception_when_syncing_permissions_that_belong_to_a_different_guard()
-    {
-        $this->testUserRole->givePermissionTo('edit-articles');
-
-        $this->expectException(PermissionDoesNotExist::class);
-
-        $this->testUserRole->syncPermissions('admin-permission');
-
-        $this->expectException(GuardDoesNotMatch::class);
-
-        $this->testUserRole->syncPermissions($this->testAdminPermission);
     }
 
     /** @test */
@@ -182,7 +151,7 @@ class RoleTest extends TestCase
     }
 
     /** @test */
-    public function it_creates_permission_object_with_findOrCreate_if_it_does_not_have_a_permission_object()
+    public function it_creates_permission_object_with_find_or_create_if_it_does_not_have_a_permission_object()
     {
         $permission = app(Permission::class)->findOrCreate('another-permission');
 
@@ -196,7 +165,7 @@ class RoleTest extends TestCase
     }
 
     /** @test */
-    public function it_creates_a_role_with_findOrCreate_if_the_named_role_does_not_exist()
+    public function it_creates_a_role_with_find_or_create_if_the_named_role_does_not_exist()
     {
         $this->expectException(RoleDoesNotExist::class);
 
@@ -207,29 +176,5 @@ class RoleTest extends TestCase
         $role2 = app(Role::class)->findOrCreate('yet-another-role');
 
         $this->assertInstanceOf(Role::class, $role2);
-    }
-
-    /** @test */
-    public function it_throws_an_exception_when_a_permission_of_the_wrong_guard_is_passed_in()
-    {
-        $this->expectException(GuardDoesNotMatch::class);
-
-        $permission = app(Permission::class)->findByName('wrong-guard-permission', 'admin');
-
-        $this->testUserRole->hasPermissionTo($permission);
-    }
-
-    /** @test */
-    public function it_belongs_to_a_guard()
-    {
-        $role = app(Role::class)->create(['name' => 'admin', 'guard_name' => 'admin']);
-
-        $this->assertEquals('admin', $role->guard_name);
-    }
-
-    /** @test */
-    public function it_belongs_to_the_default_guard_by_default()
-    {
-        $this->assertEquals($this->app['config']->get('auth.defaults.guard'), $this->testUserRole->guard_name);
     }
 }

@@ -4,7 +4,6 @@ namespace Spatie\Permission\Test;
 
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Contracts\Permission;
-use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class HasPermissionsTest extends TestCase
@@ -25,18 +24,6 @@ class HasPermissionsTest extends TestCase
         $this->expectException(PermissionDoesNotExist::class);
 
         $this->testUser->givePermissionTo('permission-does-not-exist');
-    }
-
-    /** @test */
-    public function it_throws_an_exception_when_assigning_a_permission_to_a_user_from_a_different_guard()
-    {
-        $this->expectException(GuardDoesNotMatch::class);
-
-        $this->testUser->givePermissionTo($this->testAdminPermission);
-
-        $this->expectException(PermissionDoesNotExist::class);
-
-        $this->testUser->givePermissionTo('admin-permission');
     }
 
     /** @test */
@@ -146,18 +133,6 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_trying_to_scope_a_permission_from_another_guard()
-    {
-        $this->expectException(PermissionDoesNotExist::class);
-
-        User::permission('testAdminPermission')->get();
-
-        $this->expectException(GuardDoesNotMatch::class);
-
-        User::permission($this->testAdminPermission)->get();
-    }
-
-    /** @test */
     public function it_doesnt_detach_permissions_when_soft_deleting()
     {
         $user = SoftDeletingUser::create(['email' => 'test@example.com']);
@@ -193,14 +168,6 @@ class HasPermissionsTest extends TestCase
         $this->expectException(PermissionDoesNotExist::class);
 
         $this->testUser->hasPermissionTo('does-not-exist');
-    }
-
-    /** @test */
-    public function it_throws_an_exception_when_the_permission_does_not_exist_for_this_guard()
-    {
-        $this->expectException(PermissionDoesNotExist::class);
-
-        $this->testUser->hasPermissionTo('admin-permission');
     }
 
     /** @test */

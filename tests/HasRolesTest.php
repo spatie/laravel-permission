@@ -4,7 +4,6 @@ namespace Spatie\Permission\Test;
 
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
-use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 
 class HasRolesTest extends TestCase
 {
@@ -87,22 +86,6 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_only_assign_roles_from_the_correct_guard()
-    {
-        $this->expectException(RoleDoesNotExist::class);
-
-        $this->testUser->assignRole('testAdminRole');
-    }
-
-    /** @test */
-    public function it_throws_an_exception_when_assigning_a_role_from_a_different_guard()
-    {
-        $this->expectException(GuardDoesNotMatch::class);
-
-        $this->testUser->assignRole($this->testAdminRole);
-    }
-
-    /** @test */
     public function it_can_sync_roles_from_a_string()
     {
         $this->testUser->assignRole('testRole');
@@ -158,18 +141,6 @@ class HasRolesTest extends TestCase
         $this->assertFalse($this->testUser->hasRole('testRole'));
 
         $this->assertFalse($this->testUser->hasRole('testRole2'));
-    }
-
-    /** @test */
-    public function it_throws_an_exception_when_syncing_a_role_from_another_guard()
-    {
-        $this->expectException(RoleDoesNotExist::class);
-
-        $this->testUser->syncRoles('testRole', 'testAdminRole');
-
-        $this->expectException(GuardDoesNotMatch::class);
-
-        $this->testUser->syncRoles('testRole', $this->testAdminRole);
     }
 
     /** @test */
@@ -250,18 +221,6 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_trying_to_scope_a_role_from_another_guard()
-    {
-        $this->expectException(RoleDoesNotExist::class);
-
-        User::role('testAdminRole')->get();
-
-        $this->expectException(GuardDoesNotMatch::class);
-
-        User::role($this->testAdminRole)->get();
-    }
-
-    /** @test */
     public function it_can_determine_that_a_user_has_one_of_the_given_roles()
     {
         $roleModel = app(Role::class);
@@ -315,22 +274,6 @@ class HasRolesTest extends TestCase
         $this->refreshTestUser();
 
         $this->assertTrue($this->testUser->hasAllRoles(['testRole', 'second role']));
-    }
-
-    /** @test */
-    public function it_can_determine_that_a_user_does_not_have_a_role_from_another_guard()
-    {
-        $this->assertFalse($this->testUser->hasRole('testAdminRole'));
-
-        $this->assertFalse($this->testUser->hasRole($this->testAdminRole));
-
-        $this->testUser->assignRole('testRole');
-
-        $this->refreshTestUser();
-
-        $this->assertTrue($this->testUser->hasAnyRole(['testRole', 'testAdminRole']));
-
-        $this->assertFalse($this->testUser->hasAnyRole('testAdminRole', $this->testAdminRole));
     }
 
     /** @test */

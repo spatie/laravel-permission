@@ -18,9 +18,9 @@ class MiddlewareTest extends TestCase
     {
         parent::setUp();
 
-        $this->roleMiddleware = new RoleMiddleware($this->app);
+        $this->roleMiddleware = new RoleMiddleware();
 
-        $this->permissionMiddleware = new PermissionMiddleware($this->app);
+        $this->permissionMiddleware = new PermissionMiddleware();
     }
 
     /** @test */

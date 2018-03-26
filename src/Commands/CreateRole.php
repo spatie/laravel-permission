@@ -8,8 +8,7 @@ use Spatie\Permission\Contracts\Role as RoleContract;
 class CreateRole extends Command
 {
     protected $signature = 'permission:create-role
-        {name : The name of the role}
-        {guard? : The name of the guard}';
+        {name : The name of the role}';
 
     protected $description = 'Create a role';
 
@@ -19,7 +18,6 @@ class CreateRole extends Command
 
         $role = $roleClass::create([
             'name' => $this->argument('name'),
-            'guard_name' => $this->argument('guard'),
         ]);
 
         $this->info("Role `{$role->name}` created");
