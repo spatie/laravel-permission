@@ -97,7 +97,7 @@ class Permission extends Model implements PermissionContract
     public static function findById(int $id): PermissionContract
     {
         $permission = static::getPermissions()->filter(function($permission) use ($id) {
-            return $permission->id === $id && $permission->guard_name;
+            return $permission->id === $id;
         })->first();
 
         if (! $permission) {
