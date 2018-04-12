@@ -30,9 +30,17 @@ class Permission extends Model implements PermissionContract
 
     public static function create(array $attributes = [])
     {
+        $permission = static::getPermissions()->filter(function ($permission) use($attributes) {
+            return $permission->name === $attributes['name'];
+        })->first();
+
         // TODO: Remove this exception and fall back to Laravel's default?
         if (static::getPermissions()->where('name', $attributes['name'])->first()) {
             throw PermissionAlreadyExists::create($attributes['name']);
+        }
+
+        if (isNotLumen() && app()::VERSION < '5.4') {
+            return parent::create($attributes);
         }
 
         return static::query()->create($attributes);
@@ -116,7 +124,9 @@ class Permission extends Model implements PermissionContract
      */
     public static function findOrCreate(string $name): PermissionContract
     {
-        $permission = static::getPermissions()->where('name', $name)->first();
+        $permission = static::getPermissions()->filter(function ($permission) use ($name) {
+            return $permission->name === $name;
+        })->first();
 
         if (! $permission) {
             return static::create(['name' => $name]);
