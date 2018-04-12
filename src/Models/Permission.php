@@ -34,7 +34,7 @@ class Permission extends Model implements PermissionContract
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? Guard::getDefaultName(static::class);
 
-        $permission = static::getPermissions()->filter(function ($permission) use($attributes) {
+        $permission = static::getPermissions()->filter(function ($permission) use ($attributes) {
             return $permission->name === $attributes['name'] && $permission->guard_name === $attributes['guard_name'];
         })->first();
 
