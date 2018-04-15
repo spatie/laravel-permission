@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Cache\Repository;
 use Spatie\Permission\Contracts\Permission;
-use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Access\Authorizable;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class PermissionRegistrar
@@ -28,11 +28,7 @@ class PermissionRegistrar
 
     public function registerPermissions(): bool
     {
-        $this->gate->before(function (Authenticatable $user, string $ability, $guard = null) {
-            if (\is_array($guard)) {
-                $guard = array_first($guard);
-            }
-
+        $this->gate->before(function (Authorizable $user, string $ability) {
             try {
                 if (method_exists($user, 'hasPermissionTo')) {
                     return $user->hasPermissionTo($ability, $guard) ?: null;
