@@ -28,6 +28,10 @@ class Permission extends Model implements PermissionContract
         parent::__construct($attributes);
 
         $this->setTable(config('permission.table_names.permissions'));
+
+        if ($connection = config('permission.db_connection')) {
+            $this->setConnection($connection);
+        }
     }
 
     public static function create(array $attributes = [])

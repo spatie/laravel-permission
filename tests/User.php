@@ -23,4 +23,14 @@ class User extends Model implements AuthorizableContract, AuthenticatableContrac
     public $timestamps = false;
 
     protected $table = 'users';
+
+    // for testing, override the connection lookup
+    public function getConnectionName()
+    {
+        if ($connection = config('permission.db_connection')) {
+            $this->connection = $connection;
+        }
+
+        return $this->connection;
+    }
 }

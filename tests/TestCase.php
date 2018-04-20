@@ -29,11 +29,14 @@ abstract class TestCase extends Orchestra
     /** @var \Spatie\Permission\Models\Permission */
     protected $testAdminPermission;
 
+    /** @var string $connection */
+    protected $connection = null;
+
     public function setUp()
     {
         parent::setUp();
 
-        $this->setUpDatabase($this->app);
+        $this->setUpDatabase($this->app, $this->connection);
 
         $this->testUser = User::first();
         $this->testUserRole = app(Role::class)->find(1);
@@ -84,23 +87,24 @@ abstract class TestCase extends Orchestra
      * Set up the database.
      *
      * @param \Illuminate\Foundation\Application $app
+     * @param string $connection
      */
-    protected function setUpDatabase($app)
+    protected function setUpDatabase($app, $connection = null)
     {
-        $app['db']->connection()->getSchemaBuilder()->create('users', function (Blueprint $table) {
+        $app['db']->connection($connection)->getSchemaBuilder()->create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
             $table->softDeletes();
         });
 
-        $app['db']->connection()->getSchemaBuilder()->create('admins', function (Blueprint $table) {
+        $app['db']->connection($connection)->getSchemaBuilder()->create('admins', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
         });
 
         include_once __DIR__.'/../database/migrations/create_permission_tables.php.stub';
 
-        (new \CreatePermissionTables())->up();
+        (new \CreatePermissionTables())->up($connection);
 
         User::create(['email' => 'test@user.com']);
         Admin::create(['email' => 'admin@user.com']);
