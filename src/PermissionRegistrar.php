@@ -28,7 +28,7 @@ class PermissionRegistrar
 
     public function registerPermissions(): bool
     {
-        $this->gate->before(function (Authenticatable $user, string $ability, $guard = null) {
+        $this->gate->before(function (Authorizable $user, string $ability, $guard = null) {
             if (\is_array($guard)) {
                 $guard = array_first($guard);
             }
