@@ -28,14 +28,10 @@ class PermissionRegistrar
 
     public function registerPermissions(): bool
     {
-        $this->gate->before(function (Authorizable $user, string $ability, $guard = null) {
-            if (\is_array($guard)) {
-                $guard = array_first($guard);
-            }
-
+        $this->gate->before(function (Authorizable $user, string $ability) {
             try {
                 if (method_exists($user, 'hasPermissionTo')) {
-                    return $user->hasPermissionTo($ability, $guard) ?: null;
+                    return $user->hasPermissionTo($ability) ?: null;
                 }
             } catch (PermissionDoesNotExist $e) {
             }
