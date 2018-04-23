@@ -72,6 +72,14 @@ return [
     ],
 
     /*
+     * Occasionally an app may use separate db connections for storing permission data
+     * for its models. You may specify which connection to use for role / permission
+     * tables as long as your models use the same name in their $connection property.
+     */
+
+    'db_connection' => null,
+
+    /*
      * By default all permissions will be cached for 24 hours unless a permission or
      * role is updated. Then the cache will be flushed immediately.
      */

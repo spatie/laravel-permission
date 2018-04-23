@@ -23,4 +23,14 @@ class Admin extends Model implements AuthorizableContract, AuthenticatableContra
     public $timestamps = false;
 
     protected $table = 'admins';
+
+    // for testing, override the connection lookup
+    public function getConnectionName()
+    {
+        if ($connection = config('permission.db_connection')) {
+            $this->connection = $connection;
+        }
+
+        return $this->connection;
+    }
 }
