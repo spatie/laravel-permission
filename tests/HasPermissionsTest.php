@@ -204,20 +204,6 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_approve_and_reject_via_the_gate_when_the_permission_is_not_valid_for_a_specific_guard()
-    {
-        $this->testAdmin->givePermissionTo($this->testAdminPermission);
-        $this->testUser->givePermissionTo('edit-articles');
-
-        $this->assertFalse($this->testUser->can('admin-permission', 'admin'));
-        $this->assertTrue($this->testUser->can('edit-articles', 'web'));
-
-        $this->assertTrue($this->testAdmin->can('admin-permission', 'admin'));
-        $this->assertTrue($this->testAdmin->can('admin-permission'));
-        $this->assertFalse($this->testAdmin->can('admin-permission', 'web'));
-    }
-
-    /** @test */
     public function it_can_work_with_a_user_that_does_not_have_any_permissions_at_all()
     {
         $user = new User();
