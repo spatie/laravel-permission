@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.12.1 - 2018-04-23
+- Reverted 2.12.0. REVERTS: "Add ability to pass guard name to gate methods like can()". Requires reworking of guard handling if we're going to add this feature. 
+
 ## 2.12.0 - 2018-04-22
 - Add ability to pass guard name to gate methods like can()
 
