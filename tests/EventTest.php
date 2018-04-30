@@ -5,19 +5,18 @@
 
 namespace Spatie\Permission\Test;
 
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Event;
-use Spatie\Permission\Events\PermissionRevoked;
-use Spatie\Permission\Events\PermissionSynched;
-use Spatie\Permission\Events\RoleAssigned;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Events\RoleRevoked;
 use Spatie\Permission\Events\RoleSynched;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
+use Spatie\Permission\Events\RoleAssigned;
+use Spatie\Permission\Events\PermissionRevoked;
+use Spatie\Permission\Events\PermissionSynched;
 use Spatie\Permission\Events\PermissionAssigned;
 
 class EventTest extends TestCase
 {
-
     public function setUp()
     {
         parent::setUp();

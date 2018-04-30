@@ -2,14 +2,14 @@
 
 namespace Spatie\Permission\Traits;
 
-use Spatie\Permission\Events\PermissionAssigned;
-use Spatie\Permission\Events\PermissionRevoked;
-use Spatie\Permission\Events\PermissionSynched;
 use Spatie\Permission\Guard;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Events\PermissionRevoked;
+use Spatie\Permission\Events\PermissionSynched;
+use Spatie\Permission\Events\PermissionAssigned;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
@@ -20,7 +20,7 @@ trait HasPermissions
     public static function bootHasPermissions()
     {
         static::deleting(function ($model) {
-            if (method_exists($model, 'isForceDeleting') && !$model->isForceDeleting()) {
+            if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
                 return;
             }
 
@@ -30,7 +30,7 @@ trait HasPermissions
 
 
     /**
-     * disable Permission Events Firing
+     * disable Permission Events Firing.
      *
      * @return $this
      */
@@ -42,7 +42,7 @@ trait HasPermissions
     }
 
     /**
-     * enable Permission Events Firing
+     * enable Permission Events Firing.
      * @return $this
      */
     public function enablePermissionEvents()
@@ -86,7 +86,7 @@ trait HasPermissions
             $query->whereHas('permissions', function ($query) use ($permissions) {
                 $query->where(function ($query) use ($permissions) {
                     foreach ($permissions as $permission) {
-                        $query->orWhere(config('permission.table_names.permissions') . '.id', $permission->id);
+                        $query->orWhere(config('permission.table_names.permissions').'.id', $permission->id);
                     }
                 });
             });
@@ -94,7 +94,7 @@ trait HasPermissions
                 $query->orWhereHas('roles', function ($query) use ($rolesWithPermissions) {
                     $query->where(function ($query) use ($rolesWithPermissions) {
                         foreach ($rolesWithPermissions as $role) {
-                            $query->orWhere(config('permission.table_names.roles') . '.id', $role->id);
+                            $query->orWhere(config('permission.table_names.roles').'.id', $role->id);
                         }
                     });
                 });
@@ -193,14 +193,14 @@ trait HasPermissions
     {
         if (is_string($permission)) {
             $permission = app(Permission::class)->findByName($permission, $this->getDefaultGuardName());
-            if (!$permission) {
+            if (! $permission) {
                 return false;
             }
         }
 
         if (is_int($permission)) {
             $permission = app(Permission::class)->findById($permission, $this->getDefaultGuardName());
-            if (!$permission) {
+            if (! $permission) {
                 return false;
             }
         }
@@ -266,7 +266,7 @@ trait HasPermissions
      */
     public function syncPermissions(...$permissions)
     {
-        $permission_event_was_enabled = !$this->disablePermissionEvents;
+        $permission_event_was_enabled = ! $this->disablePermissionEvents;
         if ($permission_event_was_enabled) {
             $old_permissions = collect($this->permissions()->get());
             $this->disablePermissionEvents();
@@ -277,7 +277,7 @@ trait HasPermissions
             $new_permissions = collect($this->permissions()->get());
             $this->enablePermissionEvents();
             $this->firePermissionEvent(new PermissionSynched($old_permissions->diff($new_permissions),
-                $new_permissions->diff($old_permissions), $new_permissions,$this));
+                $new_permissions->diff($old_permissions), $new_permissions, $this));
 
         }
         return $this;
@@ -331,7 +331,7 @@ trait HasPermissions
      */
     protected function ensureModelSharesGuard($roleOrPermission)
     {
-        if (!$this->getGuardNames()->contains($roleOrPermission->guard_name)) {
+        if (! $this->getGuardNames()->contains($roleOrPermission->guard_name)) {
             throw GuardDoesNotMatch::create($roleOrPermission->guard_name, $this->getGuardNames());
         }
     }
@@ -356,7 +356,7 @@ trait HasPermissions
 
     protected function firePermissionEvent($event)
     {
-        if (!config('permission.events_enabled') || $this->disablePermissionEvents) {
+        if (! config('permission.events_enabled') || $this->disablePermissionEvents) {
             return;
         }
 

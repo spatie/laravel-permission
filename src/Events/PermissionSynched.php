@@ -5,9 +5,9 @@
 
 namespace Spatie\Permission\Events;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Database\Eloquent\Model;
 
 class PermissionSynched
 {

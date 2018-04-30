@@ -5,13 +5,12 @@ namespace Spatie\Permission\Traits;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Role;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Spatie\Permission\Events\PermissionAssigned;
-use Spatie\Permission\Events\PermissionRevoked;
-use Spatie\Permission\Events\PermissionSynched;
-use Spatie\Permission\Events\RoleAssigned;
 use Spatie\Permission\Events\RoleRevoked;
 use Spatie\Permission\Events\RoleSynched;
+use Spatie\Permission\Events\RoleAssigned;
+use Spatie\Permission\Events\PermissionRevoked;
+use Spatie\Permission\Events\PermissionAssigned;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 trait HasRoles
 {
@@ -22,7 +21,7 @@ trait HasRoles
     public static function bootHasRoles()
     {
         static::deleting(function ($model) {
-            if (method_exists($model, 'isForceDeleting') && !$model->isForceDeleting()) {
+            if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
                 return;
             }
 
@@ -32,7 +31,7 @@ trait HasRoles
     }
 
     /**
-     * disable Permission Events Firing
+     * disable Role Events Firing.
      *
      * @return $this
      */
@@ -44,7 +43,7 @@ trait HasRoles
     }
 
     /**
-     * enable Permission Events Firing
+     * enable Role Events Firing.
      * @return $this
      */
     public function enableRoleEvents()
@@ -82,7 +81,7 @@ trait HasRoles
             $roles = $roles->all();
         }
 
-        if (!is_array($roles)) {
+        if (! is_array($roles)) {
             $roles = [$roles];
         }
 
@@ -97,7 +96,7 @@ trait HasRoles
         return $query->whereHas('roles', function ($query) use ($roles) {
             $query->where(function ($query) use ($roles) {
                 foreach ($roles as $role) {
-                    $query->orWhere(config('permission.table_names.roles') . '.id', $role->id);
+                    $query->orWhere(config('permission.table_names.roles').'.id', $role->id);
                 }
             });
         });
@@ -127,7 +126,7 @@ trait HasRoles
 
         if (is_a($this, \Spatie\Permission\Contracts\Permission::class, true)) {
             foreach ($roles as $role) {
-                $this->firePermissionEvent(new PermissionAssigned(collect(array($this)), $role));
+                $this->firePermissionEvent(new PermissionAssigned(collect([$this]), $role));
             }
 
         } else {
@@ -148,9 +147,9 @@ trait HasRoles
         $role = $this->getStoredRole($role);
         $this->roles()->detach($role);
         if (is_a($this, \Spatie\Permission\Contracts\Permission::class, true)) {
-            $this->firePermissionEvent(new PermissionRevoked(collect(array($this)), $role));
+            $this->firePermissionEvent(new PermissionRevoked(collect([$this]), $role));
         } else {
-            $this->fireRoleEvent(new RoleRevoked(collect(array($role)), $this));
+            $this->fireRoleEvent(new RoleRevoked(collect([$role]), $this));
         }
     }
 
@@ -164,14 +163,14 @@ trait HasRoles
     public function syncRoles(...$roles)
     {
 
-        $roles_event_was_enabled = !$this->disableRoleEvents;
-        $permission_event_was_enabled = !$this->disablePermissionEvents;
+        $roles_event_was_enabled = ! $this->disableRoleEvents;
+        $permission_event_was_enabled = ! $this->disablePermissionEvents;
 
 
         if ($permission_event_was_enabled && is_a($this, \Spatie\Permission\Contracts\Permission::class, true)) {
             $old_roles = collect($this->roles()->get());
             $this->disablePermissionEvents();
-        } elseif ($roles_event_was_enabled && !is_a($this, \Spatie\Permission\Contracts\Permission::class, true)) {
+        } elseif ($roles_event_was_enabled && ! is_a($this, \Spatie\Permission\Contracts\Permission::class, true)) {
             $old_roles = collect($this->roles()->get());
             $this->disableRoleEvents();
         }
@@ -185,7 +184,7 @@ trait HasRoles
             $new_roles = collect($this->roles()->get());
             $this->enablePermissionEvents();
             foreach ($old_roles as $role) {
-                if (!$new_roles->contains($role)) {
+                if (! $new_roles->contains($role)) {
 
                     $this->firePermissionEvent(new PermissionRevoked(collect([$this]), $role));
                 }
@@ -193,16 +192,17 @@ trait HasRoles
 
             foreach ($new_roles as $role) {
 
-                if (!$old_roles->contains($role)) {
+                if (! $old_roles->contains($role)) {
                     $this->firePermissionEvent(new PermissionAssigned(collect([$this]), $role));
                 }
             }
-        } elseif ($roles_event_was_enabled && !is_a($this, \Spatie\Permission\Contracts\Permission::class, true)) {
+        } elseif ($roles_event_was_enabled && ! is_a($this, \Spatie\Permission\Contracts\Permission::class, true)) {
             $new_roles = collect($this->roles()->get());
             $this->enableRoleEvents();
             $this->fireRoleEvent(new RoleSynched($old_roles->diff($new_roles), $new_roles->diff($old_roles), $new_roles,
                 $this));
         }
+
         return $this;
     }
 
@@ -321,7 +321,7 @@ trait HasRoles
             return explode('|', $pipeString);
         }
 
-        if (!in_array($quoteCharacter, ["'", '"'])) {
+        if (! in_array($quoteCharacter, ["'", '"'])) {
             return explode('|', $pipeString);
         }
 
@@ -330,7 +330,7 @@ trait HasRoles
 
     protected function fireRoleEvent($event)
     {
-        if (!config('permission.events_enabled') || $this->disableRoleEvents) {
+        if (! config('permission.events_enabled') || $this->disableRoleEvents) {
             return;
         }
 
