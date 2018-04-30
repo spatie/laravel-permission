@@ -28,7 +28,6 @@ trait HasPermissions
         });
     }
 
-
     /**
      * disable Permission Events Firing.
      *
@@ -278,8 +277,8 @@ trait HasPermissions
             $this->enablePermissionEvents();
             $this->firePermissionEvent(new PermissionSynched($old_permissions->diff($new_permissions),
                 $new_permissions->diff($old_permissions), $new_permissions, $this));
-
         }
+
         return $this;
     }
 

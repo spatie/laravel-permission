@@ -27,5 +27,4 @@ class PermissionAssigned
         $this->permissions = $permissions;
         $this->target = $target;
     }
-
 }

@@ -27,5 +27,4 @@ class PermissionRevoked
         $this->permissions = $permissions;
         $this->target = $target;
     }
-
 }

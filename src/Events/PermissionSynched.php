@@ -37,5 +37,4 @@ class PermissionSynched
         $this->permissions_assigned = $permissions_assigned;
         $this->target = $target;
     }
-
 }

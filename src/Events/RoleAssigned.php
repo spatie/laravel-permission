@@ -27,5 +27,4 @@ class RoleAssigned
         $this->roles = $roles;
         $this->target = $target;
     }
-
 }

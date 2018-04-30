@@ -27,7 +27,6 @@ trait HasRoles
 
             $model->roles()->detach();
         });
-
     }
 
     /**
@@ -123,12 +122,10 @@ trait HasRoles
 
         $this->roles()->saveMany($roles);
 
-
         if (is_a($this, \Spatie\Permission\Contracts\Permission::class, true)) {
             foreach ($roles as $role) {
                 $this->firePermissionEvent(new PermissionAssigned(collect([$this]), $role));
             }
-
         } else {
             $this->fireRoleEvent(new RoleAssigned(collect($roles), $this));
         }
@@ -162,10 +159,8 @@ trait HasRoles
      */
     public function syncRoles(...$roles)
     {
-
         $roles_event_was_enabled = ! $this->disableRoleEvents;
         $permission_event_was_enabled = ! $this->disablePermissionEvents;
-
 
         if ($permission_event_was_enabled && is_a($this, \Spatie\Permission\Contracts\Permission::class, true)) {
             $old_roles = collect($this->roles()->get());
@@ -185,13 +180,11 @@ trait HasRoles
             $this->enablePermissionEvents();
             foreach ($old_roles as $role) {
                 if (! $new_roles->contains($role)) {
-
                     $this->firePermissionEvent(new PermissionRevoked(collect([$this]), $role));
                 }
             }
 
             foreach ($new_roles as $role) {
-
                 if (! $old_roles->contains($role)) {
                     $this->firePermissionEvent(new PermissionAssigned(collect([$this]), $role));
                 }

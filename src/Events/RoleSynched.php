@@ -37,5 +37,4 @@ class RoleSynched
         $this->roles_assigned = $roles_assigned;
         $this->target = $target;
     }
-
 }

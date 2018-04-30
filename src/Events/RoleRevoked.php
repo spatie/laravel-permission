@@ -27,5 +27,4 @@ class RoleRevoked
         $this->roles = $roles;
         $this->target = $target;
     }
-
 }
