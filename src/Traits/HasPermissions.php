@@ -2,6 +2,9 @@
 
 namespace Spatie\Permission\Traits;
 
+use Spatie\Permission\Events\PermissionAssigned;
+use Spatie\Permission\Events\PermissionRevoked;
+use Spatie\Permission\Events\PermissionSynched;
 use Spatie\Permission\Guard;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
@@ -12,15 +15,41 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 trait HasPermissions
 {
+    protected $disablePermissionEvents = false;
+
     public static function bootHasPermissions()
     {
         static::deleting(function ($model) {
-            if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
+            if (method_exists($model, 'isForceDeleting') && !$model->isForceDeleting()) {
                 return;
             }
 
             $model->permissions()->detach();
         });
+    }
+
+
+    /**
+     * disable Permission Events Firing
+     *
+     * @return $this
+     */
+    public function disablePermissionEvents()
+    {
+        $this->disablePermissionEvents = true;
+
+        return $this;
+    }
+
+    /**
+     * enable Permission Events Firing
+     * @return $this
+     */
+    public function enablePermissionEvents()
+    {
+        $this->disablePermissionEvents = false;
+
+        return $this;
     }
 
     /**
@@ -57,7 +86,7 @@ trait HasPermissions
             $query->whereHas('permissions', function ($query) use ($permissions) {
                 $query->where(function ($query) use ($permissions) {
                     foreach ($permissions as $permission) {
-                        $query->orWhere(config('permission.table_names.permissions').'.id', $permission->id);
+                        $query->orWhere(config('permission.table_names.permissions') . '.id', $permission->id);
                     }
                 });
             });
@@ -65,7 +94,7 @@ trait HasPermissions
                 $query->orWhereHas('roles', function ($query) use ($rolesWithPermissions) {
                     $query->where(function ($query) use ($rolesWithPermissions) {
                         foreach ($rolesWithPermissions as $role) {
-                            $query->orWhere(config('permission.table_names.roles').'.id', $role->id);
+                            $query->orWhere(config('permission.table_names.roles') . '.id', $role->id);
                         }
                     });
                 });
@@ -164,14 +193,14 @@ trait HasPermissions
     {
         if (is_string($permission)) {
             $permission = app(Permission::class)->findByName($permission, $this->getDefaultGuardName());
-            if (! $permission) {
+            if (!$permission) {
                 return false;
             }
         }
 
         if (is_int($permission)) {
             $permission = app(Permission::class)->findById($permission, $this->getDefaultGuardName());
-            if (! $permission) {
+            if (!$permission) {
                 return false;
             }
         }
@@ -221,6 +250,7 @@ trait HasPermissions
             ->all();
 
         $this->permissions()->saveMany($permissions);
+        $this->firePermissionEvent(new PermissionAssigned(collect($permissions), $this));
 
         $this->forgetCachedPermissions();
 
@@ -236,9 +266,21 @@ trait HasPermissions
      */
     public function syncPermissions(...$permissions)
     {
+        $permission_event_was_enabled = !$this->disablePermissionEvents;
+        if ($permission_event_was_enabled) {
+            $old_permissions = collect($this->permissions()->get());
+            $this->disablePermissionEvents();
+        }
         $this->permissions()->detach();
+        $this->givePermissionTo($permissions);
+        if ($permission_event_was_enabled) {
+            $new_permissions = collect($this->permissions()->get());
+            $this->enablePermissionEvents();
+            $this->firePermissionEvent(new PermissionSynched($old_permissions->diff($new_permissions),
+                $new_permissions->diff($old_permissions), $new_permissions,$this));
 
-        return $this->givePermissionTo($permissions);
+        }
+        return $this;
     }
 
     /**
@@ -251,7 +293,7 @@ trait HasPermissions
     public function revokePermissionTo($permission)
     {
         $this->permissions()->detach($this->getStoredPermission($permission));
-
+        $this->firePermissionEvent(new PermissionRevoked(collect($permission), $this));
         $this->forgetCachedPermissions();
 
         return $this;
@@ -289,7 +331,7 @@ trait HasPermissions
      */
     protected function ensureModelSharesGuard($roleOrPermission)
     {
-        if (! $this->getGuardNames()->contains($roleOrPermission->guard_name)) {
+        if (!$this->getGuardNames()->contains($roleOrPermission->guard_name)) {
             throw GuardDoesNotMatch::create($roleOrPermission->guard_name, $this->getGuardNames());
         }
     }
@@ -310,5 +352,14 @@ trait HasPermissions
     public function forgetCachedPermissions()
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
+    }
+
+    protected function firePermissionEvent($event)
+    {
+        if (!config('permission.events_enabled') || $this->disablePermissionEvents) {
+            return;
+        }
+
+        event($event);
     }
 }
