@@ -24,6 +24,7 @@
   * [Using multiple guards](#using-multiple-guards)
   * [Using a middleware](#using-a-middleware)
   * [Using artisan commands](#using-artisan-commands)
+  * [Events](#events)
 * [Unit Testing](#unit-testing)
 * [Database Seeding](#database-seeding)
 * [Extending](#extending)
@@ -696,6 +697,49 @@ php artisan permission:create-role writer web
 ```bash
 php artisan permission:create-permission "edit articles" web
 ```
+
+## Events
+The package is shipped with some custom events, fired when assigning roles or permissions.
+For speeding up the performance this feature can be disabled from config file.
+This are the list of events fired.
+
+  * `Spatie\Permission\Events\PermissionAssigned` fired when calling
+   ```
+    $user->givePermissionTo($permission);
+    $role->givePermissionTo($permission);
+    $permission->assignRole($role);
+    $permission->syncRoles($roles);
+   ```
+The event provides a collection of permissions assigned (`$event->permissions`) and the target model to whom permissions are assigned  (`$event->target`)
+  * `Spatie\Permission\Events\PermissionRevoked` fired when calling
+   ```
+    $user->revokePermissionTo($permission);
+    $role->revokePermissionTo($permission);
+    $permission->removeRole($role);
+    $permission->syncRoles($roles);
+   ```
+The event provides a collection of permissions revoked (`$event->permissions`) and the target model to whom permissions are assigned  (`$event->target`)
+  * `Spatie\Permission\Events\PermissionSynched` fired when calling
+```
+ $role->syncPermissions($permissions);
+ $user->syncPermissions($permissions);
+```
+The event provides a collection of permissions revoked (`$event->permissions_revoked`),newly assigned  (`$event->permissions_added`), actually assigned (`$event->permissions_assigned`) and the target model to whom permissions are assigned (`$event->target`)
+  * `Spatie\Permission\Events\RoleAssigned` fired when calling
+   ```
+    $user->assignRole($role);   
+   ```
+The event provides a collection of roles assigned (`$event->roles`) and the target model to whom permissions are assigned  (`$event->target`)
+  * `Spatie\Permission\Events\RoleRevoked` fired when calling
+   ```
+    $user->removeRole($role);    
+   ```
+The event provides a collection of roles revoked (`$event->roles`) and the target model to whom permissions are assigned  (`$event->target`)
+  * `Spatie\Permission\Events\RoleSynched` fired when calling
+```
+ $user->syncRoles($roles);
+```
+The event provides a collection of roles revoked (`$event->permissions_revoked`),newly assigned  (`$event->permissions_added`), actually assigned (`$event->permissions_assigned`) and the target model to whom permissions are assigned (`$event->target`)
 
 ## Unit Testing
 
