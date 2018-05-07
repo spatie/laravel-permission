@@ -42,7 +42,7 @@ class PermissionRegistrar
 
     public function forgetCachedPermissions()
     {
-        $this->cache->clear();
+        $this->cache->flush();
     }
 
     public function getPermissions($params = null): Collection
