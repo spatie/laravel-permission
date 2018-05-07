@@ -42,13 +42,17 @@ class PermissionRegistrar
 
     public function forgetCachedPermissions()
     {
-        $this->cache->forget($this->cacheKey);
+        $this->cache->tags($this->cacheKey)->flush();
     }
 
-    public function getPermissions(): Collection
+    public function getPermissions($params = null): Collection
     {
-        return $this->cache->remember($this->cacheKey, config('permission.cache_expiration_time'), function () {
-            return app(Permission::class)->with('roles')->get();
+        return $this->cache->tags($this->cacheKey)->remember($this->cacheKey.($params ? '.'.implode('.', array_values($params)) : ''), config('permission.cache_expiration_time'), function () use ($params) {
+            if ($params) {
+                return app(Permission::class)->where($params)->with('roles')->get();
+            } else {
+                return app(Permission::class)->with('roles')->get();
+            }
         });
     }
 }
