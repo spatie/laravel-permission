@@ -106,7 +106,6 @@ class Permission extends Model implements PermissionContract
     public static function findById(int $id, $guardName = null): PermissionContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
-
         $permission = static::getPermissions(['id' => $id, 'guard_name' => $guardName])->first();
 
         if (! $permission) {
@@ -127,10 +126,7 @@ class Permission extends Model implements PermissionContract
     public static function findOrCreate(string $name, $guardName = null): PermissionContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
-
-        $permission = static::getPermissions()->filter(function ($permission) use ($name, $guardName) {
-            return $permission->name === $name && $permission->guard_name === $guardName;
-        })->first();
+        $permission = static::getPermissions(['name' => $name, 'guard_name' => $guardName])->first();
 
         if (! $permission) {
             return static::create(['name' => $name, 'guard_name' => $guardName]);
