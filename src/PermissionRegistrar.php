@@ -42,12 +42,12 @@ class PermissionRegistrar
 
     public function forgetCachedPermissions()
     {
-        $this->cache->tags('spatie')->flush();
+        $this->cache->tags($this->cacheKey)->flush();
     }
 
     public function getPermissions($params = null): Collection
     {
-        return $this->cache->tags('spatie')->remember($this->cacheKey.($params ? '.'.implode('.', array_values($params)) : ''), config('permission.cache_expiration_time'), function () use ($params) {
+        return $this->cache->tags($this->cacheKey)->remember($this->cacheKey.($params ? '.'.implode('.', array_values($params)) : ''), config('permission.cache_expiration_time'), function () use ($params) {
             if ($params) {
                 return app(Permission::class)->where($params)->with('roles')->get();
             } else {
