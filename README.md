@@ -215,12 +215,6 @@ You will also need to create another configuration file at `config/auth.php`. Ge
 curl -Ls https://raw.githubusercontent.com/laravel/lumen-framework/5.5/config/auth.php -o config/auth.php
 ```
 
-Now, run your migrations:
-
-```bash
-php artisan migrate
-```
-
 Then, in `bootstrap/app.php`, register the middlewares:
 
 ```php
@@ -236,6 +230,12 @@ As well as the configuration and the service provider:
 ```php
 $app->configure('permission');
 $app->register(Spatie\Permission\PermissionServiceProvider::class);
+```
+
+Now, run your migrations:
+
+```bash
+php artisan migrate
 ```
 
 ## Usage
