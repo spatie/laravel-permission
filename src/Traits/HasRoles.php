@@ -12,6 +12,8 @@ trait HasRoles
 {
     use HasPermissions;
 
+    private $roleClass;
+
     public static function bootHasRoles()
     {
         static::deleting(function ($model) {
@@ -21,6 +23,16 @@ trait HasRoles
 
             $model->roles()->detach();
         });
+    }
+
+    public function getRoleClass()
+    {
+        if(!isset($this->roleClass))
+        {
+            $this->roleClass = app(PermissionRegistrar::class)->getRoleClass();
+        }
+
+        return $this->roleClass;
     }
 
     /**
@@ -60,7 +72,7 @@ trait HasRoles
                 return $role;
             }
 
-            return app(PermissionRegistrar::class)->getRoleClass()->findByName($role, $this->getDefaultGuardName());
+            return $this->getRoleClass()->findByName($role, $this->getDefaultGuardName());
         }, $roles);
 
         return $query->whereHas('roles', function ($query) use ($roles) {
@@ -211,12 +223,14 @@ trait HasRoles
 
     protected function getStoredRole($role): Role
     {
+        $roleClass = $this->getRoleClass();
+
         if (is_numeric($role)) {
-            return app(PermissionRegistrar::class)->getRoleClass()->findById($role, $this->getDefaultGuardName());
+            return $roleClass->findById($role, $this->getDefaultGuardName());
         }
 
         if (is_string($role)) {
-            return app(PermissionRegistrar::class)->getRoleClass()->findByName($role, $this->getDefaultGuardName());
+            return $roleClass->findByName($role, $this->getDefaultGuardName());
         }
 
         return $role;
