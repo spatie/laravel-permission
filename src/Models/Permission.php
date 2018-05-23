@@ -30,7 +30,7 @@ class Permission extends Model implements PermissionContract
 
     public static function create(array $attributes = [])
     {
-        $permission = static::getPermissions()->filter(function($permission) use ($attributes) {
+        $permission = static::getPermissions()->filter(function ($permission) use ($attributes) {
             return $permission->name === $attributes['name'];
         })->first();
 
@@ -82,7 +82,7 @@ class Permission extends Model implements PermissionContract
      */
     public static function findByName(string $name): PermissionContract
     {
-        $permission = static::getPermissions()->filter(function($permission) use ($name) {
+        $permission = static::getPermissions()->filter(function ($permission) use ($name) {
             return $permission->name === $name;
         })->first();
 
@@ -104,7 +104,7 @@ class Permission extends Model implements PermissionContract
      */
     public static function findById(int $id): PermissionContract
     {
-        $permission = static::getPermissions()->filter(function($permission) use ($id) {
+        $permission = static::getPermissions()->filter(function ($permission) use ($id) {
             return $permission->id === $id;
         })->first();
 
@@ -124,7 +124,7 @@ class Permission extends Model implements PermissionContract
      */
     public static function findOrCreate(string $name): PermissionContract
     {
-        $permission = static::getPermissions()->filter(function($permission) use ($name) {
+        $permission = static::getPermissions()->filter(function ($permission) use ($name) {
             return $permission->name === $name;
         })->first();
 
