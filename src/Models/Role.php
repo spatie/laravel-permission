@@ -4,6 +4,7 @@ namespace Spatie\Permission\Models;
 
 use Spatie\Permission\Guard;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
@@ -138,11 +139,11 @@ class Role extends Model implements RoleContract
     public function hasPermissionTo($permission): bool
     {
         if (is_string($permission)) {
-            $permission = app(config('permission.models.permission'))->findByName($permission, $this->getDefaultGuardName());
+            $permission = app(PermissionRegistrar::class)->getPermissionClass()->findByName($permission, $this->getDefaultGuardName());
         }
 
         if (is_int($permission)) {
-            $permission = app(config('permission.models.permission'))->findById($permission, $this->getDefaultGuardName());
+            $permission = app(PermissionRegistrar::class)->getPermissionClass()->findById($permission, $this->getDefaultGuardName());
         }
 
         if (! $this->getGuardNames()->contains($permission->guard_name)) {

@@ -91,7 +91,7 @@ trait HasPermissions
                 return $permission;
             }
 
-            return app(config('permission.models.permission'))->findByName($permission, $this->getDefaultGuardName());
+            return app(PermissionRegistrar::class)->getPermissionClass()->findByName($permission, $this->getDefaultGuardName());
         }, $permissions);
     }
 
@@ -106,14 +106,14 @@ trait HasPermissions
     public function hasPermissionTo($permission, $guardName = null): bool
     {
         if (is_string($permission)) {
-            $permission = app(config('permission.models.permission'))->findByName(
+            $permission = app(PermissionRegistrar::class)->getPermissionClass()->findByName(
                 $permission,
                 $guardName ?? $this->getDefaultGuardName()
             );
         }
 
         if (is_int($permission)) {
-            $permission = app(config('permission.models.permission'))->findById($permission, $this->getDefaultGuardName());
+            $permission = app(PermissionRegistrar::class)->getPermissionClass()->findById($permission, $this->getDefaultGuardName());
         }
 
         return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
@@ -163,14 +163,14 @@ trait HasPermissions
     public function hasDirectPermission($permission): bool
     {
         if (is_string($permission)) {
-            $permission = app(config('permission.models.permission'))->findByName($permission, $this->getDefaultGuardName());
+            $permission = app(PermissionRegistrar::class)->getPermissionClass()->findByName($permission, $this->getDefaultGuardName());
             if (! $permission) {
                 return false;
             }
         }
 
         if (is_int($permission)) {
-            $permission = app(config('permission.models.permission'))->findById($permission, $this->getDefaultGuardName());
+            $permission = app(PermissionRegistrar::class)->getPermissionClass()->findById($permission, $this->getDefaultGuardName());
             if (! $permission) {
                 return false;
             }
@@ -265,15 +265,15 @@ trait HasPermissions
     protected function getStoredPermission($permissions)
     {
         if (is_numeric($permissions)) {
-            return app(config('permission.models.permission'))->findById($permissions, $this->getDefaultGuardName());
+            return app(PermissionRegistrar::class)->getPermissionClass()->findById($permissions, $this->getDefaultGuardName());
         }
 
         if (is_string($permissions)) {
-            return app(config('permission.models.permission'))->findByName($permissions, $this->getDefaultGuardName());
+            return app(PermissionRegistrar::class)->getPermissionClass()->findByName($permissions, $this->getDefaultGuardName());
         }
 
         if (is_array($permissions)) {
-            return app(config('permission.models.permission'))
+            return app(PermissionRegistrar::class)->getPermissionClass()
                 ->whereIn('name', $permissions)
                 ->whereIn('guard_name', $this->getGuardNames())
                 ->get();

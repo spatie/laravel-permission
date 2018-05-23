@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Role;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Spatie\Permission\PermissionRegistrar;
 
 trait HasRoles
 {
@@ -59,7 +60,7 @@ trait HasRoles
                 return $role;
             }
 
-            return app(config('permission.models.role'))->findByName($role, $this->getDefaultGuardName());
+            return app(PermissionRegistrar::class)->getRoleClass()->findByName($role, $this->getDefaultGuardName());
         }, $roles);
 
         return $query->whereHas('roles', function ($query) use ($roles) {
@@ -211,11 +212,11 @@ trait HasRoles
     protected function getStoredRole($role): Role
     {
         if (is_numeric($role)) {
-            return app(config('permission.models.role'))->findById($role, $this->getDefaultGuardName());
+            return app(PermissionRegistrar::class)->getRoleClass()->findById($role, $this->getDefaultGuardName());
         }
 
         if (is_string($role)) {
-            return app(config('permission.models.role'))->findByName($role, $this->getDefaultGuardName());
+            return app(PermissionRegistrar::class)->getRoleClass()->findByName($role, $this->getDefaultGuardName());
         }
 
         return $role;
