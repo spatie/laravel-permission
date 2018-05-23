@@ -4,7 +4,6 @@ namespace Spatie\Permission\Models;
 
 use Spatie\Permission\Test\User;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Permission\Test\User;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Exceptions\RoleAlreadyExists;
@@ -31,6 +30,10 @@ class Role extends Model implements RoleContract
     {
         if (static::where('name', $attributes['name'])->first()) {
             throw RoleAlreadyExists::create($attributes['name']);
+        }
+
+        if (isNotLumen() && app()::VERSION < '5.4') {
+            return parent::create($attributes);
         }
 
         return static::query()->create($attributes);
