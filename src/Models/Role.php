@@ -3,8 +3,8 @@
 namespace Spatie\Permission\Models;
 
 use Spatie\Permission\Test\User;
-use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Test\User;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Exceptions\RoleAlreadyExists;

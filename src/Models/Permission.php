@@ -3,8 +3,8 @@
 namespace Spatie\Permission\Models;
 
 use Spatie\Permission\Test\User;
-use Illuminate\Support\Collection;
 use Spatie\Permission\Test\User;
+use Illuminate\Support\Collection;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\PermissionRegistrar;
@@ -83,7 +83,7 @@ class Permission extends Model implements PermissionContract
      */
     public static function findByName(string $name): PermissionContract
     {
-        $permission = static::getPermissions()->filter(function($permission) use ($name) {
+        $permission = static::getPermissions()->filter(function ($permission) use ($name) {
             return $permission->name === $name;
         })->first();
 
@@ -105,7 +105,7 @@ class Permission extends Model implements PermissionContract
      */
     public static function findById(int $id): PermissionContract
     {
-        $permission = static::getPermissions()->filter(function($permission) use ($id) {
+        $permission = static::getPermissions()->filter(function ($permission) use ($id) {
             return $permission->id === $id;
         })->first();
 
