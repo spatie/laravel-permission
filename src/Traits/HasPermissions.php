@@ -27,8 +27,7 @@ trait HasPermissions
 
     public function getPermissionClass()
     {
-        if(!isset($this->permissionClass))
-        {
+        if (! isset($this->permissionClass)) {
             $this->permissionClass = app(PermissionRegistrar::class)->getPermissionClass();
         }
 

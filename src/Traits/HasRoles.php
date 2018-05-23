@@ -5,8 +5,8 @@ namespace Spatie\Permission\Traits;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Role;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Spatie\Permission\PermissionRegistrar;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 trait HasRoles
 {
@@ -27,8 +27,7 @@ trait HasRoles
 
     public function getRoleClass()
     {
-        if(!isset($this->roleClass))
-        {
+        if (! isset($this->roleClass)) {
             $this->roleClass = app(PermissionRegistrar::class)->getRoleClass();
         }
 
