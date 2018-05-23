@@ -55,8 +55,10 @@ class PermissionRegistrar
 
     public function getPermissions(): Collection
     {
-        return $this->cache->remember($this->cacheKey, config('permission.cache_expiration_time'), function () {
-            return $this->getPermissionClass()->with('roles')->get();
+        $permissionClass = $this->getPermissionClass();
+
+        return $this->cache->remember($this->cacheKey, config('permission.cache_expiration_time'), function () use ($permissionClass) {
+            return $permissionClass->with('roles')->get();
         });
     }
 
