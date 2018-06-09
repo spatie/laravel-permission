@@ -576,7 +576,7 @@ However, when using multiple guards they will act like namespaces for your permi
 
 ### Using permissions and roles with multiple guards
 
-By default the default guard (`config('auth.defaults.guard')`) will be used as the guard for new permissions and roles. When creating permissions and roles for specific guards you'll have to specify their `guard_name` on the model:
+By default the default guard (`config('auth.defaults.guard')`) will be used as the guard for new permissions and roles, more precisely the default guard is a guard which is **first** defined in `auth.guards` config array. When creating permissions and roles for specific guards you'll have to specify their `guard_name` on the model:
 
 ```php
 // Create a superadmin role for the admin users
