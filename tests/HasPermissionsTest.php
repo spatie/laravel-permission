@@ -262,6 +262,52 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    public function it_can_determine_that_the_user_has_all_of_the_permissions_directly()
+    {
+        $this->testUser->givePermissionTo('edit-articles', 'edit-news');
+
+        $this->refreshTestUser();
+
+        $this->assertTrue($this->testUser->hasAllPermissions('edit-articles', 'edit-news'));
+
+        $this->testUser->revokePermissionTo('edit-articles');
+
+        $this->refreshTestUser();
+
+        $this->assertFalse($this->testUser->hasAllPermissions('edit-articles', 'edit-news'));
+    }
+
+    /** @test */
+    public function it_can_determine_that_the_user_has_all_of_the_permissions_directly_using_an_array()
+    {
+        $this->assertFalse($this->testUser->hasAllPermissions(['edit-articles', 'edit-news']));
+
+        $this->testUser->revokePermissionTo('edit-articles');
+
+        $this->refreshTestUser();
+
+        $this->assertFalse($this->testUser->hasAllPermissions(['edit-news', 'edit-articles']));
+
+        $this->testUser->givePermissionTo('edit-news');
+
+        $this->refreshTestUser();
+
+        $this->testUser->revokePermissionTo($this->testUserPermission);
+
+        $this->assertFalse($this->testUser->hasAllPermissions(['edit-articles', 'edit-news']));
+    }
+
+    /** @test */
+    public function it_can_determine_that_the_user_has_all_of_the_permissions_via_role()
+    {
+        $this->testUserRole->givePermissionTo('edit-articles', 'edit-news');
+
+        $this->testUser->assignRole('testRole');
+
+        $this->assertTrue($this->testUser->hasAllPermissions('edit-articles', 'edit-news'));
+    }
+
+    /** @test */
     public function it_can_determine_that_user_has_direct_permission()
     {
         $this->testUser->givePermissionTo('edit-articles');
