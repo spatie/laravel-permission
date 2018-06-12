@@ -142,7 +142,7 @@ trait HasPermissions
     }
 
     /**
-     * Determine if the model has any of the given permissions.
+     * Determine if the model has all of the given permissions.
      *
      * @param array ...$permissions
      *
