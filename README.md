@@ -374,10 +374,16 @@ $user->hasPermissionTo(Permission::find(1)->id);
 $user->hasPermissionTo($somePermission->id);
 ```
 
-...or if a user has multiple permissions:
+...or if a user has any permissions:
 
 ```php
 $user->hasAnyPermission(['edit articles', 'publish articles', 'unpublish articles']);
+```
+
+...or if a user has all permissions:
+
+```php
+$user->hasAllPermissions(['edit articles', 'publish articles', 'unpublish articles']);
 ```
 
 You may also pass integers to lookup by permission id
