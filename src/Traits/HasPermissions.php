@@ -142,6 +142,28 @@ trait HasPermissions
     }
 
     /**
+     * Determine if the model has all of the given permissions.
+     *
+     * @param array ...$permissions
+     *
+     * @return bool
+     */
+    public function hasAllPermissions(...$permissions): bool
+    {
+        if (is_array($permissions[0])) {
+            $permissions = $permissions[0];
+        }
+
+        foreach ($permissions as $permission) {
+            if (! $this->hasPermissionTo($permission)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Determine if the model has, via roles, the given permission.
      *
      * @param \Spatie\Permission\Contracts\Permission $permission
