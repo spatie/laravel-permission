@@ -311,8 +311,8 @@ The `HasRoles` trait adds Eloquent relationships to your models, which can be ac
 // get a list of all permissions directly assigned to the user
 $permissions = $user->permissions;
 
-// get all permissions inherited by the user via roles
-$permissions = $user->getAllPermissions();
+// get all permissions inherited via the user's roles
+$permissions = $user->getPermissionsViaRoles();
 
 // get a collection of all defined roles
 $roles = $user->getRoleNames(); // Returns a collection
