@@ -537,7 +537,7 @@ Test for any role in a list:
     I have none of these roles...
 @endhasanyrole
 // or
-@hasanyrole('writer|admin')
+@hasanyrole(['writer' ,'admin'])
     I am either a writer or an admin or both!
 @else
     I have none of these roles...
