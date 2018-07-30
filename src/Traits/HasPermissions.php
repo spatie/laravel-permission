@@ -126,7 +126,10 @@ trait HasPermissions
         }
 
         if (is_int($permission)) {
-            $permission = $permissionClass->findById($permission, $this->getDefaultGuardName());
+            $permission = $permissionClass->findById(
+                $permission,
+                $guardName ?? $this->getDefaultGuardName()
+            );
         }
 
         return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
@@ -152,6 +155,28 @@ trait HasPermissions
         }
 
         return false;
+    }
+
+    /**
+     * Determine if the model has all of the given permissions.
+     *
+     * @param array ...$permissions
+     *
+     * @return bool
+     */
+    public function hasAllPermissions(...$permissions): bool
+    {
+        if (is_array($permissions[0])) {
+            $permissions = $permissions[0];
+        }
+
+        foreach ($permissions as $permission) {
+            if (! $this->hasPermissionTo($permission)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
