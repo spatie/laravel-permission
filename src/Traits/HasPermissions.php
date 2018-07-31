@@ -7,11 +7,16 @@ use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Events\PermissionRevoked;
+use Spatie\Permission\Events\PermissionSynched;
+use Spatie\Permission\Events\PermissionAssigned;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 trait HasPermissions
 {
+    protected $disablePermissionEvents = false;
+
     public static function bootHasPermissions()
     {
         static::deleting(function ($model) {
@@ -21,6 +26,29 @@ trait HasPermissions
 
             $model->permissions()->detach();
         });
+    }
+
+    /**
+     * disable Permission Events Firing.
+     *
+     * @return $this
+     */
+    public function disablePermissionEvents()
+    {
+        $this->disablePermissionEvents = true;
+
+        return $this;
+    }
+
+    /**
+     * enable Permission Events Firing.
+     * @return $this
+     */
+    public function enablePermissionEvents()
+    {
+        $this->disablePermissionEvents = false;
+
+        return $this;
     }
 
     /**
@@ -246,6 +274,7 @@ trait HasPermissions
             ->all();
 
         $this->permissions()->saveMany($permissions);
+        $this->firePermissionEvent(new PermissionAssigned(collect($permissions), $this));
 
         $this->forgetCachedPermissions();
 
@@ -261,9 +290,21 @@ trait HasPermissions
      */
     public function syncPermissions(...$permissions)
     {
+        $permission_event_was_enabled = ! $this->disablePermissionEvents;
+        if ($permission_event_was_enabled) {
+            $old_permissions = collect($this->permissions()->get());
+            $this->disablePermissionEvents();
+        }
         $this->permissions()->detach();
+        $this->givePermissionTo($permissions);
+        if ($permission_event_was_enabled) {
+            $new_permissions = collect($this->permissions()->get());
+            $this->enablePermissionEvents();
+            $this->firePermissionEvent(new PermissionSynched($old_permissions->diff($new_permissions),
+                $new_permissions->diff($old_permissions), $new_permissions, $this));
+        }
 
-        return $this->givePermissionTo($permissions);
+        return $this;
     }
 
     /**
@@ -276,7 +317,7 @@ trait HasPermissions
     public function revokePermissionTo($permission)
     {
         $this->permissions()->detach($this->getStoredPermission($permission));
-
+        $this->firePermissionEvent(new PermissionRevoked(collect($permission), $this));
         $this->forgetCachedPermissions();
 
         return $this;
@@ -335,5 +376,14 @@ trait HasPermissions
     public function forgetCachedPermissions()
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
+    }
+
+    protected function firePermissionEvent($event)
+    {
+        if (! config('permission.events_enabled') || $this->disablePermissionEvents) {
+            return;
+        }
+
+        event($event);
     }
 }
