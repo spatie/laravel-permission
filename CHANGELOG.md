@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.13.0 - 2018-08-02
+- Fix issue with null values passed to syncPermissions & syncRoles
+
 ## 2.12.2 - 2018-06-13
 - added hasAllPermissions method
 
