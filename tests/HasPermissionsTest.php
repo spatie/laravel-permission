@@ -387,4 +387,22 @@ class HasPermissionsTest extends TestCase
 
         $this->assertFalse($this->testUser->hasDirectPermission('edit-news'));
     }
+
+    /** @test */
+    public function sync_permission_ignores_null_inputs()
+    {
+        $this->testUser->givePermissionTo('edit-news');
+
+        $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-blog'])->pluck('id');
+
+        $ids->push(null);
+
+        $this->testUser->syncPermissions($ids);
+
+        $this->assertTrue($this->testUser->hasDirectPermission('edit-articles'));
+
+        $this->assertTrue($this->testUser->hasDirectPermission('edit-blog'));
+
+        $this->assertFalse($this->testUser->hasDirectPermission('edit-news'));
+    }
 }
