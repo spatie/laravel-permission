@@ -103,6 +103,18 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_ignores_null_roles_when_syncing()
+    {
+        $this->testUser->assignRole('testRole');
+
+        $this->testUser->syncRoles('testRole2', null);
+
+        $this->assertFalse($this->testUser->hasRole('testRole'));
+
+        $this->assertTrue($this->testUser->hasRole('testRole2'));
+    }
+
+    /** @test */
     public function it_can_sync_roles_from_a_string()
     {
         $this->testUser->assignRole('testRole');

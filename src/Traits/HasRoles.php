@@ -83,7 +83,14 @@ trait HasRoles
         $roles = collect($roles)
             ->flatten()
             ->map(function ($role) {
+                if (empty($role)) {
+                    return false;
+                }
+
                 return $this->getStoredRole($role);
+            })
+            ->filter(function ($role) {
+                return $role instanceof Role;
             })
             ->each(function ($role) {
                 $this->ensureModelSharesGuard($role);

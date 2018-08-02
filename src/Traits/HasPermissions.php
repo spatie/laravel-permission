@@ -240,6 +240,9 @@ trait HasPermissions
             ->map(function ($permission) {
                 return $this->getStoredPermission($permission);
             })
+            ->filter(function ($permission) {
+                return $permission instanceof Permission;
+            })
             ->each(function ($permission) {
                 $this->ensureModelSharesGuard($permission);
             })
