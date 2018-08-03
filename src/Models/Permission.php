@@ -33,10 +33,8 @@ class Permission extends Model implements PermissionContract
     public static function create(array $attributes = [])
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? Guard::getDefaultName(static::class);
-
-        $permission = static::getPermissions()->filter(function ($permission) use ($attributes) {
-            return $permission->name === $attributes['name'] && $permission->guard_name === $attributes['guard_name'];
-        })->first();
+        
+        $permission = static::findByNameOrId($attributes['name'], $attributes['guard_name']);
 
         if ($permission) {
             throw PermissionAlreadyExists::create($attributes['name'], $attributes['guard_name']);
@@ -88,9 +86,7 @@ class Permission extends Model implements PermissionContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $permission = static::getPermissions()->filter(function ($permission) use ($name, $guardName) {
-            return $permission->name === $name && $permission->guard_name === $guardName;
-        })->first();
+        $permission = static::findByNameOrId($name, $guardName);
 
         if (! $permission) {
             throw PermissionDoesNotExist::create($name, $guardName);
@@ -113,9 +109,7 @@ class Permission extends Model implements PermissionContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $permission = static::getPermissions()->filter(function ($permission) use ($id, $guardName) {
-            return $permission->id === $id && $permission->guard_name === $guardName;
-        })->first();
+        $permission = static::findByNameOrId($id, $guardName);
 
         if (! $permission) {
             throw PermissionDoesNotExist::withId($id, $guardName);
@@ -136,15 +130,46 @@ class Permission extends Model implements PermissionContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $permission = static::getPermissions()->filter(function ($permission) use ($name, $guardName) {
-            return $permission->name === $name && $permission->guard_name === $guardName;
-        })->first();
+        $permission = static::findByNameOrId($name, $guardName);
 
         if (! $permission) {
             return static::create(['name' => $name, 'guard_name' => $guardName]);
         }
 
         return $permission;
+    }
+
+    /**
+     *  Find a permission by its name or id (and optionally guardName).
+     *
+     * @param string|int $permission
+     * @param string|null $guardName
+     *
+     * @return null|\Spatie\Permission\Contracts\Permission
+     */
+    public static function findByNameOrId($permission, $guardName = null)
+    {
+        if (is_string($permission)) {
+            return static::filterPermissionsBy('name', $permission, $guardName)->first();
+        }
+
+        return static::filterPermissionsBy('id', $permission, $guardName)->first();
+    }
+    
+    /**
+     * Filters permissions by a given (key , value) and guardName
+     *
+     * @param string $key
+     * @param string|int $value
+     * @param string $guardName
+     * 
+     * @return \Illuminate\Support\Collection
+     */
+    protected static function filterPermissionsBy(string $key, $value, string $guardName)
+    {
+        return static::getPermissions()->filter(function ($permission) use ($key,$value, $guardName) {
+            return $permission->{$key} === $value && $permission->guard_name === $guardName;
+        });
     }
 
     /**
