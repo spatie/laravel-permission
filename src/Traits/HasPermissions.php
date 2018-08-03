@@ -105,7 +105,7 @@ trait HasPermissions
      */
     public function hasPermissionTo($permission, $guardName = null): bool
     {
-        if (!is_object($permission)) {
+        if (! is_object($permission)) {
             $permission = app(Permission::class)->findByNameOrId($permission, $guardName ?? $this->getDefaultGuardName());
         }
 
@@ -181,7 +181,7 @@ trait HasPermissions
      */
     public function hasDirectPermission($permission): bool
     {
-        if (!is_object($permission)) {
+        if (! is_object($permission)) {
             $permission = app(Permission::class)->findByNameOrId($permission, $guardName ?? $this->getDefaultGuardName());
         }
         

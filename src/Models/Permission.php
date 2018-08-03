@@ -33,7 +33,7 @@ class Permission extends Model implements PermissionContract
     public static function create(array $attributes = [])
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? Guard::getDefaultName(static::class);
-        
+
         $permission = static::findByNameOrId($attributes['name'], $attributes['guard_name']);
 
         if ($permission) {
@@ -157,7 +157,7 @@ class Permission extends Model implements PermissionContract
     }
     
     /**
-     * Filters permissions by a given (key , value) and guardName
+     * Filters permissions by a given (key , value) and guardName .
      *
      * @param string $key
      * @param string|int $value
