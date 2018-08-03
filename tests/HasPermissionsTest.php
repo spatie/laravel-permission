@@ -188,19 +188,15 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_the_permission_does_not_exist()
+    public function it_returns_false_when_the_permission_does_not_exist()
     {
-        $this->expectException(PermissionDoesNotExist::class);
-
-        $this->testUser->hasPermissionTo('does-not-exist');
+        $this->assertFalse($this->testUser->hasPermissionTo('does-not-exist'));
     }
 
     /** @test */
-    public function it_throws_an_exception_when_the_permission_does_not_exist_for_this_guard()
+    public function it_returns_false_when_the_permission_does_not_exist_for_this_guard()
     {
-        $this->expectException(PermissionDoesNotExist::class);
-
-        $this->testUser->hasPermissionTo('admin-permission');
+        $this->assertFalse($this->testUser->hasPermissionTo('admin-permission'));
     }
 
     /** @test */

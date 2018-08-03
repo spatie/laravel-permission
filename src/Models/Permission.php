@@ -162,7 +162,7 @@ class Permission extends Model implements PermissionContract
      * @param string $key
      * @param string|int $value
      * @param string $guardName
-     * 
+     *
      * @return \Illuminate\Support\Collection
      */
     protected static function filterPermissionsBy(string $key, $value, string $guardName)

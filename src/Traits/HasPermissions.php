@@ -105,20 +105,14 @@ trait HasPermissions
      */
     public function hasPermissionTo($permission, $guardName = null): bool
     {
-        if (is_string($permission)) {
-            $permission = app(Permission::class)->findByName(
-                $permission,
-                $guardName ?? $this->getDefaultGuardName()
-            );
+        if (!is_object($permission)) {
+            $permission = app(Permission::class)->findByNameOrId($permission, $guardName ?? $this->getDefaultGuardName());
         }
 
-        if (is_int($permission)) {
-            $permission = app(Permission::class)->findById(
-                $permission,
-                $guardName ?? $this->getDefaultGuardName()
-            );
+        if (! $permission) {
+            return false;
         }
-
+        
         return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
     }
 
@@ -187,18 +181,12 @@ trait HasPermissions
      */
     public function hasDirectPermission($permission): bool
     {
-        if (is_string($permission)) {
-            $permission = app(Permission::class)->findByName($permission, $this->getDefaultGuardName());
-            if (! $permission) {
-                return false;
-            }
+        if (!is_object($permission)) {
+            $permission = app(Permission::class)->findByNameOrId($permission, $guardName ?? $this->getDefaultGuardName());
         }
-
-        if (is_int($permission)) {
-            $permission = app(Permission::class)->findById($permission, $this->getDefaultGuardName());
-            if (! $permission) {
-                return false;
-            }
+        
+        if (! $permission) {
+            return false;
         }
 
         return $this->permissions->contains('id', $permission->id);
