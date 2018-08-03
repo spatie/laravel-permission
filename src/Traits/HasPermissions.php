@@ -112,7 +112,7 @@ trait HasPermissions
         if (! $permission) {
             return false;
         }
-        
+
         return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
     }
 
@@ -184,7 +184,7 @@ trait HasPermissions
         if (! is_object($permission)) {
             $permission = app(Permission::class)->findByNameOrId($permission, $guardName ?? $this->getDefaultGuardName());
         }
-        
+
         if (! $permission) {
             return false;
         }

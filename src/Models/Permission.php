@@ -155,7 +155,7 @@ class Permission extends Model implements PermissionContract
 
         return static::filterPermissionsBy('id', $permission, $guardName)->first();
     }
-    
+
     /**
      * Filters permissions by a given (key , value) and guardName .
      *
