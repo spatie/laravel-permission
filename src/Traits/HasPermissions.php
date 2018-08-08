@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Traits;
 
+use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Guard;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
@@ -98,7 +99,7 @@ trait HasPermissions
     /**
      * Determine if the model may perform the given permission.
      *
-     * @param string|\Spatie\Permission\Contracts\Permission $permission
+     * @param string|int|\Spatie\Permission\Contracts\Permission $permission
      * @param string|null $guardName
      *
      * @return bool
@@ -117,6 +118,11 @@ trait HasPermissions
                 $permission,
                 $guardName ?? $this->getDefaultGuardName()
             );
+        }
+
+        if (!$permission instanceof Permission)
+        {
+            throw new PermissionDoesNotExist;
         }
 
         return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
@@ -181,7 +187,7 @@ trait HasPermissions
     /**
      * Determine if the model has the given permission.
      *
-     * @param string|\Spatie\Permission\Contracts\Permission $permission
+     * @param string|int|\Spatie\Permission\Contracts\Permission $permission
      *
      * @return bool
      */
@@ -199,6 +205,11 @@ trait HasPermissions
             if (! $permission) {
                 return false;
             }
+        }
+
+        if (!$permission instanceof Permission)
+        {
+            return false;
         }
 
         return $this->permissions->contains('id', $permission->id);
