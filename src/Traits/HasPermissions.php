@@ -2,7 +2,6 @@
 
 namespace Spatie\Permission\Traits;
 
-use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Guard;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
@@ -10,6 +9,7 @@ use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 trait HasPermissions
 {
@@ -120,8 +120,7 @@ trait HasPermissions
             );
         }
 
-        if (!$permission instanceof Permission)
-        {
+        if (! $permission instanceof Permission) {
             throw new PermissionDoesNotExist;
         }
 
@@ -207,8 +206,7 @@ trait HasPermissions
             }
         }
 
-        if (!$permission instanceof Permission)
-        {
+        if (! $permission instanceof Permission) {
             return false;
         }
 
