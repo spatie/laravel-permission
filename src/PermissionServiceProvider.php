@@ -26,7 +26,8 @@ class PermissionServiceProvider extends ServiceProvider
         }
 
         if ($this->app->runningInConsole()) {
-            $this->commands([
+            $this->commands([[
+                Commands\AssignRole::class,
                 Commands\CreateRole::class,
                 Commands\CreatePermission::class,
             ]);
