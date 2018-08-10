@@ -30,6 +30,7 @@ class PermissionServiceProvider extends ServiceProvider
                 Commands\AssignRole::class,
                 Commands\CreateRole::class,
                 Commands\CreatePermission::class,
+                Commands\GivePermissionUser::class,
             ]);
         }
 
