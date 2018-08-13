@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.14.0 - 2018-08-13
+- Allow using another key name than `model_id` by defining new `columns` array with `model_morph_key` key in config file. This improves UUID compatibility as discussed in #777.
+
 ## 2.13.0 - 2018-08-02
 - Fix issue with null values passed to syncPermissions & syncRoles
 
