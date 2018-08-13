@@ -182,7 +182,7 @@ return [
 
     'column_names' => [
 
-        /**
+        /*
          * Change this if you want to name the related model primary key other than 
          * `model_id`.
          *
