@@ -191,7 +191,7 @@ return [
          * that case, name this `model_uuid`.
          */
         'model_morph_type' => 'model_type',
-        'model_morph_key' => 'model_uuid',
+        'model_morph_key' => 'model_id',
     ],
 
     /*
