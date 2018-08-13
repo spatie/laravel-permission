@@ -88,9 +88,8 @@ If you're using UUIDs or GUIDs for your `User` models you can update the `create
 
 ```php
 $table->uuid(config('permission.column_names.model_morph_key'));
-$table->string(config('permission.column_names.model_morph_type'));
-$table->index([config('permission.column_names.model_morph_key'), 
-               config('permission.column_names.model_morph_type'), ]);
+$table->string('model_type');
+$table->index([config('permission.column_names.model_morph_key'), 'model_type', ]);
 ```
 
 For consistency, you can also update the package configuration file to use the `model_uuid` column name instead of the default `model_id` column.
