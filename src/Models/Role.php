@@ -65,7 +65,7 @@ class Role extends Model implements RoleContract
             'model',
             config('permission.table_names.model_has_roles'),
             'role_id',
-            'model_id'
+            config('permission.column_names.model_morph_key')
         );
     }
 

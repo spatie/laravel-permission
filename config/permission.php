@@ -71,6 +71,18 @@ return [
         'role_has_permissions' => 'role_has_permissions',
     ],
 
+    'column_names' => [
+
+        /*
+         * Change this if you want to name the related model primary key other than
+         * `model_id`.
+         *
+         * For example, this would be nice if your primary keys are all UUIDs. In
+         * that case, name this `model_uuid`.
+         */
+        'model_morph_key' => 'model_id',
+    ],
+
     /*
      * By default all permissions will be cached for 24 hours unless a permission or
      * role is updated. Then the cache will be flushed immediately.

@@ -192,13 +192,13 @@ class HasRolesTest extends TestCase
         $user->assignRole('testRole');
         $user->givePermissionTo('edit-articles');
 
-        $this->assertDatabaseHas('model_has_permissions', ['model_id' => $user->id]);
-        $this->assertDatabaseHas('model_has_roles', ['model_id' => $user->id]);
+        $this->assertDatabaseHas('model_has_permissions', [config('permission.column_names.model_morph_key') => $user->id]);
+        $this->assertDatabaseHas('model_has_roles', [config('permission.column_names.model_morph_key') => $user->id]);
 
         $user->delete();
 
-        $this->assertDatabaseMissing('model_has_permissions', ['model_id' => $user->id]);
-        $this->assertDatabaseMissing('model_has_roles', ['model_id' => $user->id]);
+        $this->assertDatabaseMissing('model_has_permissions', [config('permission.column_names.model_morph_key') => $user->id]);
+        $this->assertDatabaseMissing('model_has_roles', [config('permission.column_names.model_morph_key') => $user->id]);
     }
 
     /** @test */

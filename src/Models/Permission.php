@@ -70,7 +70,7 @@ class Permission extends Model implements PermissionContract
             'model',
             config('permission.table_names.model_has_permissions'),
             'permission_id',
-            'model_id'
+            config('permission.column_names.model_morph_key')
         );
     }
 
