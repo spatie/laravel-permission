@@ -95,9 +95,10 @@ trait HasRoles
             ->each(function ($role) {
                 $this->ensureModelSharesGuard($role);
             })
+            ->map->id
             ->all();
 
-        $this->roles()->saveMany($roles);
+        $this->roles()->sync($roles, false);
 
         $this->forgetCachedPermissions();
 

@@ -79,6 +79,26 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_does_not_remove_already_associated_roles_when_assigning_new_roles()
+    {
+        $this->testUser->assignRole($this->testUserRole->id);
+
+        $this->testUser->assignRole('testRole2');
+
+        $this->assertTrue($this->testUser->fresh()->hasRole('testRole'));
+    }
+
+    /** @test */
+    public function it_does_not_throw_an_exception_when_assigning_a_role_that_is_already_assigned()
+    {
+        $this->testUser->assignRole($this->testUserRole->id);
+
+        $this->testUser->assignRole($this->testUserRole->id);
+
+        $this->assertTrue($this->testUser->fresh()->hasRole('testRole'));
+    }
+
+    /** @test */
     public function it_throws_an_exception_when_assigning_a_role_that_does_not_exist()
     {
         $this->expectException(RoleDoesNotExist::class);
