@@ -246,9 +246,10 @@ trait HasPermissions
             ->each(function ($permission) {
                 $this->ensureModelSharesGuard($permission);
             })
+            ->map->id
             ->all();
 
-        $this->permissions()->saveMany($permissions);
+        $this->permissions()->sync($permissions, false);
 
         $this->forgetCachedPermissions();
 
