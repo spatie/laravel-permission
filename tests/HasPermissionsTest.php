@@ -401,4 +401,24 @@ class HasPermissionsTest extends TestCase
 
         $this->assertFalse($this->testUser->hasDirectPermission('edit-news'));
     }
+
+    /** @test */
+    public function it_does_not_remove_already_associated_permissions_when_assigning_new_permissions()
+    {
+        $this->testUser->givePermissionTo('edit-news');
+
+        $this->testUser->givePermissionTo('edit-articles');
+
+        $this->assertTrue($this->testUser->fresh()->hasDirectPermission('edit-news'));
+    }
+
+    /** @test */
+    public function it_does_not_throw_an_exception_when_assigning_a_permission_that_is_already_assigned()
+    {
+        $this->testUser->givePermissionTo('edit-news');
+
+        $this->testUser->givePermissionTo('edit-news');
+
+        $this->assertTrue($this->testUser->fresh()->hasDirectPermission('edit-news'));
+    }
 }

@@ -87,6 +87,8 @@ abstract class TestCase extends Orchestra
      */
     protected function setUpDatabase($app)
     {
+        $this->app['config']->set('permission.column_names.model_morph_key', 'model_test_id');
+
         $app['db']->connection()->getSchemaBuilder()->create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
