@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 trait HasPermissions
 {
+    private $permissionClass;
+
     public static function bootHasPermissions()
     {
         static::deleting(function ($model) {
@@ -21,6 +23,15 @@ trait HasPermissions
 
             $model->permissions()->detach();
         });
+    }
+
+    public function getPermissionClass()
+    {
+        if (! isset($this->permissionClass)) {
+            $this->permissionClass = app(PermissionRegistrar::class)->getPermissionClass();
+        }
+
+        return $this->permissionClass;
     }
 
     /**
@@ -91,7 +102,7 @@ trait HasPermissions
                 return $permission;
             }
 
-            return app(Permission::class)->findByName($permission, $this->getDefaultGuardName());
+            return $this->getPermissionClass()->findByName($permission, $this->getDefaultGuardName());
         }, $permissions);
     }
 
@@ -105,15 +116,17 @@ trait HasPermissions
      */
     public function hasPermissionTo($permission, $guardName = null): bool
     {
+        $permissionClass = $this->getPermissionClass();
+
         if (is_string($permission)) {
-            $permission = app(Permission::class)->findByName(
+            $permission = $permissionClass->findByName(
                 $permission,
                 $guardName ?? $this->getDefaultGuardName()
             );
         }
 
         if (is_int($permission)) {
-            $permission = app(Permission::class)->findById(
+            $permission = $permissionClass->findById(
                 $permission,
                 $guardName ?? $this->getDefaultGuardName()
             );
@@ -187,15 +200,17 @@ trait HasPermissions
      */
     public function hasDirectPermission($permission): bool
     {
+        $permissionClass = $this->getPermissionClass();
+
         if (is_string($permission)) {
-            $permission = app(Permission::class)->findByName($permission, $this->getDefaultGuardName());
+            $permission = $permissionClass->findByName($permission, $this->getDefaultGuardName());
             if (! $permission) {
                 return false;
             }
         }
 
         if (is_int($permission)) {
-            $permission = app(Permission::class)->findById($permission, $this->getDefaultGuardName());
+            $permission = $permissionClass->findById($permission, $this->getDefaultGuardName());
             if (! $permission) {
                 return false;
             }
@@ -293,16 +308,18 @@ trait HasPermissions
      */
     protected function getStoredPermission($permissions)
     {
+        $permissionClass = $this->getPermissionClass();
+
         if (is_numeric($permissions)) {
-            return app(Permission::class)->findById($permissions, $this->getDefaultGuardName());
+            return $permissionClass->findById($permissions, $this->getDefaultGuardName());
         }
 
         if (is_string($permissions)) {
-            return app(Permission::class)->findByName($permissions, $this->getDefaultGuardName());
+            return $permissionClass->findByName($permissions, $this->getDefaultGuardName());
         }
 
         if (is_array($permissions)) {
-            return app(Permission::class)
+            return $permissionClass
                 ->whereIn('name', $permissions)
                 ->whereIn('guard_name', $this->getGuardNames())
                 ->get();

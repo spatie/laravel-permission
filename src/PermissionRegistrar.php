@@ -20,10 +20,18 @@ class PermissionRegistrar
     /** @var string */
     protected $cacheKey = 'spatie.permission.cache';
 
+    /** @var string */
+    protected $permissionClass;
+
+    /** @var string */
+    protected $roleClass;
+
     public function __construct(Gate $gate, Repository $cache)
     {
         $this->gate = $gate;
         $this->cache = $cache;
+        $this->permissionClass = config('permission.models.permission');
+        $this->roleClass = config('permission.models.role');
     }
 
     public function registerPermissions(): bool
@@ -47,8 +55,20 @@ class PermissionRegistrar
 
     public function getPermissions(): Collection
     {
-        return $this->cache->remember($this->cacheKey, config('permission.cache_expiration_time'), function () {
-            return app(Permission::class)->with('roles')->get();
+        $permissionClass = $this->getPermissionClass();
+
+        return $this->cache->remember($this->cacheKey, config('permission.cache_expiration_time'), function () use ($permissionClass) {
+            return $permissionClass->with('roles')->get();
         });
+    }
+
+    public function getPermissionClass()
+    {
+        return app($this->permissionClass);
+    }
+
+    public function getRoleClass()
+    {
+        return app($this->roleClass);
     }
 }
