@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.16.0 - 2018-08-20
+- Replace static Permission::class and Role::class with dynamic value (allows custom models more easily)
+- Added type checking in hasPermissionTo and hasDirectPermission
+
 ## 2.15.0 - 2018-08-15
 - Make assigning the same role or permission twice not throw an exception
 
