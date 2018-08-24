@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 1.17.0 - 2018-08-24
+- added support for Laravel 5.7
+
 ## 1.16.0 - 2018-02-07
 - added support for Laravel 5.6
 
