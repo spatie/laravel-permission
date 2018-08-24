@@ -874,6 +874,8 @@ Special thanks to [Alex Vanderbist](https://github.com/AlexVanderbist) who great
 
 ## Resources
 
+- [Laravel Nova package by @vyuldashev for managing Roles and Permissions](https://github.com/vyuldashev/nova-permission)
+
 - [How to create a UI for managing the permissions and roles](http://www.qcode.in/easy-roles-and-permissions-in-laravel-5-4/)
 
 ## Alternatives
