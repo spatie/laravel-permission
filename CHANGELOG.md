@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.17.0 - 2018-08-24
+- Laravel 5.7 compatibility
+
 ## 2.16.0 - 2018-08-20
 - Replace static Permission::class and Role::class with dynamic value (allows custom models more easily)
 - Added type checking in hasPermissionTo and hasDirectPermission
