@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.17.1 - 2018-08-28
+- Require laravel/framework instead of illuminate/* starting from ~5.4.0 
+- Removed old dependency for illuminate/database@~5.3.0 (Laravel 5.3 is not supported)
+
 ## 2.17.0 - 2018-08-24
 - Laravel 5.7 compatibility
 
