@@ -18,14 +18,14 @@ class AssignRole extends Command
     /**
      * User model.
      *
-     * @var User $user
+     * @var User
      */
     protected $user;
 
     /**
      * Create a new command instance.
      *
-     * @param User
+     * @param User $user
      * @return void
      */
     public function __construct(User $user)
