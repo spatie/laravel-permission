@@ -715,6 +715,16 @@ php artisan permission:create-role writer web
 php artisan permission:create-permission "edit articles" web
 ```
 
+You can also give permission or assign a role to users. User ID first and then follow the same pattern as it shown above:
+
+```bash
+php artisan permission:give-user 1 "edit articles" web
+```
+
+```bash
+php artisan permission:assign-user 1 writer web
+```
+
 ## Unit Testing
 
 In your application's tests, if you are not seeding roles and permissions as part of your test `setUp()` then you may run into a chicken/egg situation where roles and permissions aren't registered with the gate (because your tests create them after that gate registration is done). Working around this is simple: In your tests simply add a `setUp()` instruction to re-register the permissions, like this:
