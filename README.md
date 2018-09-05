@@ -714,7 +714,7 @@ php artisan permission:give-user 1 "edit articles" web
 ```
 
 ```bash
-php artisan permission:assign 1 writer web
+php artisan permission:assign-user 1 writer web
 ```
 
 ## Unit Testing
