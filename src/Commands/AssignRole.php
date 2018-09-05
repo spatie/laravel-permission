@@ -25,7 +25,7 @@ class AssignRole extends Command
     /**
      * Create a new command instance.
      *
-     * @param  User  $user
+     * @param User
      * @return void
      */
     public function __construct(User $user)
