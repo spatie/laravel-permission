@@ -49,4 +49,26 @@ class CommandTest extends TestCase
             ->where('guard_name', 'api')
             ->get());
     }
+
+    /** @test */
+    public function it_can_give_a_role_to_a_specific_user()
+    {
+        Artisan::call('permission:assign-user', [
+            'user' => $this->testUser->id,
+            'name' => 'Moderator',
+        ]);
+
+        $this->assertTrue($this->testUser->hasRole('Moderator'));
+    }
+
+    /** @test */
+    public function it_can_give_a_permission_to_a_specific_user()
+    {
+        Artisan::call('permission:give-user', [
+            'user' => $this->testUser->id,
+            'name' => 'edit articles',
+        ]);
+
+        $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
+    }
 }
