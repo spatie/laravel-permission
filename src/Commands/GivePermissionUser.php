@@ -18,7 +18,7 @@ class GivePermissionUser extends Command
     /**
      * User model.
      *
-     * @var User $user
+     * @var User
      */
     protected $user;
 
@@ -39,7 +39,7 @@ class GivePermissionUser extends Command
     {
         $permissionClass = app(PermissionContract::class);
 
-        $user       = $this->user->find($this->argument('user'));
+        $user = $this->user->find($this->argument('user'));
         $permission = $permissionClass::findByName($this->argument('name'), $this->argument('guard'));
 
         $user->givePermissionTo($permission->name);
