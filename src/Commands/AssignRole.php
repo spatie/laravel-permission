@@ -8,7 +8,7 @@ use Spatie\Permission\Contracts\Role as RoleContract;
 
 class AssignRole extends Command
 {
-    protected $signature = 'permission:assign
+    protected $signature = 'permission:assign-user
         {user : User ID}
         {name : The name of the role}
         {guard? : The name of the guard}';
