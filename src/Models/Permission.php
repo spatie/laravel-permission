@@ -68,7 +68,7 @@ class Permission extends Model implements PermissionContract
             'model',
             config('permission.table_names.model_has_permissions'),
             'permission_id',
-            'model_id'
+            config('permission.column_names.model_morph_key')
         );
     }
 
@@ -129,7 +129,7 @@ class Permission extends Model implements PermissionContract
         $permission = static::getPermissions(['name' => $name, 'guard_name' => $guardName])->first();
 
         if (! $permission) {
-            return static::create(['name' => $name, 'guard_name' => $guardName]);
+            return static::query()->create(['name' => $name, 'guard_name' => $guardName]);
         }
 
         return $permission;

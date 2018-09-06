@@ -79,6 +79,26 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_does_not_remove_already_associated_roles_when_assigning_new_roles()
+    {
+        $this->testUser->assignRole($this->testUserRole->id);
+
+        $this->testUser->assignRole('testRole2');
+
+        $this->assertTrue($this->testUser->fresh()->hasRole('testRole'));
+    }
+
+    /** @test */
+    public function it_does_not_throw_an_exception_when_assigning_a_role_that_is_already_assigned()
+    {
+        $this->testUser->assignRole($this->testUserRole->id);
+
+        $this->testUser->assignRole($this->testUserRole->id);
+
+        $this->assertTrue($this->testUser->fresh()->hasRole('testRole'));
+    }
+
+    /** @test */
     public function it_throws_an_exception_when_assigning_a_role_that_does_not_exist()
     {
         $this->expectException(RoleDoesNotExist::class);
@@ -100,6 +120,18 @@ class HasRolesTest extends TestCase
         $this->expectException(GuardDoesNotMatch::class);
 
         $this->testUser->assignRole($this->testAdminRole);
+    }
+
+    /** @test */
+    public function it_ignores_null_roles_when_syncing()
+    {
+        $this->testUser->assignRole('testRole');
+
+        $this->testUser->syncRoles('testRole2', null);
+
+        $this->assertFalse($this->testUser->hasRole('testRole'));
+
+        $this->assertTrue($this->testUser->hasRole('testRole2'));
     }
 
     /** @test */
@@ -180,13 +212,13 @@ class HasRolesTest extends TestCase
         $user->assignRole('testRole');
         $user->givePermissionTo('edit-articles');
 
-        $this->assertDatabaseHas('model_has_permissions', ['model_id' => $user->id]);
-        $this->assertDatabaseHas('model_has_roles', ['model_id' => $user->id]);
+        $this->assertDatabaseHas('model_has_permissions', [config('permission.column_names.model_morph_key') => $user->id]);
+        $this->assertDatabaseHas('model_has_roles', [config('permission.column_names.model_morph_key') => $user->id]);
 
         $user->delete();
 
-        $this->assertDatabaseMissing('model_has_permissions', ['model_id' => $user->id]);
-        $this->assertDatabaseMissing('model_has_roles', ['model_id' => $user->id]);
+        $this->assertDatabaseMissing('model_has_permissions', [config('permission.column_names.model_morph_key') => $user->id]);
+        $this->assertDatabaseMissing('model_has_roles', [config('permission.column_names.model_morph_key') => $user->id]);
     }
 
     /** @test */
