@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.18.0 - 2018-09-06
+- Expanded CLI `permission:create-role` command to create optionally create-and-link permissions in one command. Also now no longer throws an error if the role already exists.
+
 ## 2.17.1 - 2018-08-28
 - Require laravel/framework instead of illuminate/* starting from ~5.4.0 
 - Removed old dependency for illuminate/database@~5.3.0 (Laravel 5.3 is not supported)
@@ -172,6 +175,8 @@ The 403 response is backward compatible
 - renamed config file from `laravel-permission` to `permission`.
 
 
+## 1.17.0 - 2018-08-24
+- added support for Laravel 5.7
 
 ## 1.16.0 - 2018-02-07
 - added support for Laravel 5.6
