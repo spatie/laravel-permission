@@ -34,7 +34,7 @@ class CreateRole extends Command
 
         $models = [];
 
-        foreach($permissions as $permission) {
+        foreach ($permissions as $permission) {
             $models[] = $permissionClass::findOrCreate(trim($permission), $this->argument('guard'));
         }
 
