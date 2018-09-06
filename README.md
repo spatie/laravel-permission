@@ -324,7 +324,7 @@ $permissions = $user->getDirectPermissions();
 $permissions = $user->getPermissionsViaRoles();
 $permissions = $user->getAllPermissions();
 
-// get a collection of all defined roles
+// get the names of the user's roles
 $roles = $user->getRoleNames(); // Returns a collection
 ```
 
@@ -705,7 +705,7 @@ php artisan permission:create-role writer
 php artisan permission:create-permission "edit articles"
 ```
 
-When creating permissions and roles for specific guards you can specify the guard names as a second argument:
+When creating permissions/roles for specific guards you can specify the guard names as a second argument:
 
 ```bash
 php artisan permission:create-role writer web
@@ -714,6 +714,13 @@ php artisan permission:create-role writer web
 ```bash
 php artisan permission:create-permission "edit articles" web
 ```
+
+When creating roles you can also create and link permissions at the same time:
+
+```bash
+php artisan permission:create-role writer web "create articles|edit articles"
+```
+
 
 ## Unit Testing
 
