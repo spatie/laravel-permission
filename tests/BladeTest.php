@@ -114,6 +114,23 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    public function the_unlessrole_directive_will_evaluate_true_when_the_logged_in_user_does_not_have_the_role()
+    {
+        auth()->setUser($this->getWriter());
+
+        $this->assertEquals('does not have role', $this->renderView('unlessrole', ['role' => 'another']));
+    }
+
+    /** @test */
+    public function the_unlessrole_directive_will_evaluate_true_when_the_logged_in_user_does_not_have_the_role_for_the_given_guard()
+    {
+        auth('admin')->setUser($this->getSuperAdmin());
+
+        $this->assertEquals('does not have role', $this->renderView('guardunlessrole', ['role' => 'another', 'guard' => 'admin']));
+        $this->assertEquals('does not have role', $this->renderView('guardunlessrole', ['role' => 'super-admin', 'guard' => 'web']));
+    }
+
+    /** @test */
     public function the_hasanyrole_directive_will_evaluate_false_when_the_logged_in_user_does_not_have_any_of_the_required_roles()
     {
         $roles = ['writer', 'intern'];
