@@ -243,10 +243,30 @@ class HasRolesTest extends TestCase
         $user2->assignRole('testRole2');
 
         $scopedUsers1 = User::role([$this->testUserRole])->get();
+
         $scopedUsers2 = User::role(['testRole', 'testRole2'])->get();
 
         $this->assertEquals($scopedUsers1->count(), 1);
         $this->assertEquals($scopedUsers2->count(), 2);
+    }
+
+    /** @test */
+    public function it_can_scope_users_using_an_array_of_ids_and_names()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+
+        $user1->assignRole($this->testUserRole);
+
+        $user2->assignRole('testRole2');
+
+        $roleName = $this->testUserRole->name;
+
+        $otherRoleId = app(Role::class)->find(2)->id;
+
+        $scopedUsers = User::role([$roleName, $otherRoleId])->get();
+
+        $this->assertEquals($scopedUsers->count(), 2);
     }
 
     /** @test */
