@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.19.0 - 2018-09-10
+- Add ability to pass in IDs or mixed values to `role` scope
+- Add `@unlessrole`/`@endunlessrole` Blade directives
+
 ## 2.18.0 - 2018-09-06
 - Expanded CLI `permission:create-role` command to create optionally create-and-link permissions in one command. Also now no longer throws an error if the role already exists.
 
