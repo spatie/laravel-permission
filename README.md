@@ -569,6 +569,16 @@ Test for all roles:
 @endhasallroles
 ```
 
+Alternatively, `@unlessrole` gives the reverse for checking a singular role, like this:
+
+```php
+@unlessrole('does not have this role')
+    I do not have the role
+@else
+    I do have the role
+@endunlessrole
+```
+
 #### Blade and Permissions
 This package doesn't add any permission-specific Blade directives. Instead, use Laravel's native `@can` directive to check if a user has a certain permission.
 
