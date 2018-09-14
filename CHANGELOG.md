@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.19.1 - 2018-09-14
+- Spark-related fix to accommodate missing guard[providers] config
+
 ## 2.19.0 - 2018-09-10
 - Add ability to pass in IDs or mixed values to `role` scope
 - Add `@unlessrole`/`@endunlessrole` Blade directives
