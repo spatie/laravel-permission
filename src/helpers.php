@@ -9,7 +9,6 @@ function getModelForGuard(string $guard)
 {
     return collect(config('auth.guards'))
         ->map(function ($guard) {
-
             if (! isset($guard['provider'])) {
                 return;
             }
