@@ -65,6 +65,11 @@ class PermissionServiceProvider extends ServiceProvider
 
                 return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasRole({$role})): ?>";
             });
+            $bladeCompiler->directive('elserole', function ($arguments) {
+                list($role, $guard) = explode(',', $arguments.',');
+
+                return "<?php elseif(auth({$guard})->check() && auth({$guard})->user()->hasRole({$role})): ?>";
+            });
             $bladeCompiler->directive('endrole', function () {
                 return '<?php endif; ?>';
             });

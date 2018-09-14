@@ -461,4 +461,17 @@ class HasPermissionsTest extends TestCase
 
         $this->assertTrue($this->testUser->fresh()->hasDirectPermission('edit-news'));
     }
+
+    /** @test */
+    public function it_can_sync_permissions_to_a_model_that_is_not_persisted()
+    {
+        $user = new User(['email' => 'test@user.com']);
+        $user->syncPermissions('edit-articles');
+        $user->save();
+
+        $this->assertTrue($user->hasPermissionTo('edit-articles'));
+
+        $user->syncPermissions('edit-articles');
+        $this->assertTrue($user->fresh()->hasPermissionTo('edit-articles'));
+    }
 }
