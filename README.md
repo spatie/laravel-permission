@@ -623,6 +623,10 @@ $user->hasPermissionTo('publish articles', 'admin');
 
 > **Note**: When determining whether a role/permission is valid on a given model, it chooses the guard in this order: first the `$guard_name` property of the model; then the guard in the config (through a provider); then the first-defined guard in the `auth.guards` config array; then the `auth.defaults.guard` config.
 
+> **Note**: When using other than the default `web` guard, you will need to declare which `guard_name` you wish each model to use by setting the `$guard_name` property in your model. One per model is simplest. 
+
+> **Note**: If your app uses only a single guard, but is not `web` then change the order of your listed guards in your `config/app.php` to list your primary guard as the default and as the first in the list of defined guards.
+
 ### Assigning permissions and roles to guard users
 
 You can use the same methods to assign permissions and roles to users as described above in [using permissions via roles](#using-permissions-via-roles). Just make sure the `guard_name` on the permission or role matches the guard of the user, otherwise a `GuardDoesNotMatch` exception will be thrown.
