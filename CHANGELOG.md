@@ -2,6 +2,17 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.19.2 - 2018-09-19
+- add `@elserole` directive:
+ Usage: 
+```php
+@role('roleA')
+ // user hasRole 'roleA'
+@elserole('roleB')
+ // user hasRole 'roleB' but not 'roleA'
+@endrole
+```
+
 ## 2.19.1 - 2018-09-14
 - Spark-related fix to accommodate missing guard[providers] config
 
