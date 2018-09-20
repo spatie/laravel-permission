@@ -4,7 +4,8 @@ All notable changes to `laravel-permission` will be documented in this file
 
 
 ## 2.20.0 - 2018-09-19
-- It will sync roles/permissions to models that are not persisted, by registering a `saved` callback. It would previously throw an Integrity constraint violation QueryException on the pivot table insertion.
+- It will sync roles/permissions to models that are not persisted, by registering a `saved` callback. 
+(It would previously throw an Integrity constraint violation QueryException on the pivot table insertion.)
 
 ## 2.19.2 - 2018-09-19
 - add `@elserole` directive:
