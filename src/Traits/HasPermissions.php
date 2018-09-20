@@ -273,7 +273,18 @@ trait HasPermissions
             ->map->id
             ->all();
 
-        $this->permissions()->sync($permissions, false);
+        $model = $this->getModel();
+
+        if ($model->exists) {
+            $this->permissions()->sync($permissions, false);
+        } else {
+            $class = \get_class($model);
+
+            $class::saved(
+                function ($model) use ($permissions) {
+                    $model->permissions()->sync($permissions, false);
+                });
+        }
 
         $this->forgetCachedPermissions();
 

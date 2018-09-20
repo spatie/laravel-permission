@@ -112,7 +112,18 @@ trait HasRoles
             ->map->id
             ->all();
 
-        $this->roles()->sync($roles, false);
+        $model = $this->getModel();
+
+        if ($model->exists) {
+            $this->roles()->sync($roles, false);
+        } else {
+            $class = \get_class($model);
+
+            $class::saved(
+                function ($model) use ($roles) {
+                    $model->roles()->sync($roles, false);
+                });
+        }
 
         $this->forgetCachedPermissions();
 

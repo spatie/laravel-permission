@@ -193,6 +193,16 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_will_sync_roles_to_a_model_that_is_not_persisted()
+    {
+        $user = new User(['email' => 'test@user.com']);
+        $user->syncRoles([$this->testUserRole]);
+        $user->save();
+
+        $this->assertTrue($user->hasRole($this->testUserRole));
+    }
+
+    /** @test */
     public function it_throws_an_exception_when_syncing_a_role_from_another_guard()
     {
         $this->expectException(RoleDoesNotExist::class);
