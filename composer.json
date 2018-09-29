@@ -20,7 +20,10 @@
     ],
     "require": {
         "php" : ">=7.0",
-        "laravel/framework": "~5.4.0|~5.5.0|~5.6.0|~5.7.0"
+        "illuminate/auth": "~5.3.0|~5.4.0|~5.5.0|~5.6.0|~5.7.0",
+        "illuminate/container": "~5.3.0|~5.4.0|~5.5.0|~5.6.0|~5.7.0",
+        "illuminate/contracts": "~5.3.0|~5.4.0|~5.5.0|~5.6.0|~5.7.0",
+        "illuminate/database": "~5.4.0|~5.5.0|~5.6.0|~5.7.0"
     },
     "require-dev": {
         "orchestra/testbench": "~3.4.2|~3.5.0|~3.6.0|~3.7.0",
