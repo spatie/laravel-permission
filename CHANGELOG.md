@@ -3,6 +3,9 @@
 All notable changes to `laravel-permission` will be documented in this file
 
 
+## 2.21.0 - 2018-09-29
+- Revert changes from 2.17.1 in order to support Lumen 5.7
+
 ## 2.20.0 - 2018-09-19
 - It will sync roles/permissions to models that are not persisted, by registering a `saved` callback. 
 (It would previously throw an Integrity constraint violation QueryException on the pivot table insertion.)
