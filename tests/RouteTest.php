@@ -43,7 +43,7 @@ class RouteTest extends TestCase
         $this->assertEquals(
             [
                 'role:superadmin|admin',
-                'permission:create user|edit user'
+                'permission:create user|edit user',
             ],
             $this->getLastRouteMiddlewareFromRouter($router)
         );
