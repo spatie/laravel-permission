@@ -35,7 +35,7 @@ class PermissionServiceProvider extends ServiceProvider
 
         $this->registerModelBindings();
 
-        if (app()->version() > '5.4') {
+        if (app()->version() >= '5.5') {
             $this->registerMacroHelpers();
         }
 
