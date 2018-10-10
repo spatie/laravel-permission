@@ -35,7 +35,9 @@ class PermissionServiceProvider extends ServiceProvider
 
         $this->registerModelBindings();
 
-        $this->registerMacroHelpers();
+        if (app()->version() > '5.4') {
+            $this->registerMacroHelpers();
+        }
 
         $permissionLoader->registerPermissions();
     }
@@ -49,9 +51,7 @@ class PermissionServiceProvider extends ServiceProvider
             );
         }
 
-        if (app()->version() > '5.4') {
-            $this->registerBladeExtensions();
-        }
+        $this->registerBladeExtensions();
     }
 
     protected function registerModelBindings()
