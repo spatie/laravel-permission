@@ -645,7 +645,7 @@ You can use all of the blade directives listed in [using blade directives](#usin
 
 ## Using a middleware
 
-This package comes with `RoleMiddleware`, `PermissionMiddleware` nad `RoleOrPermissionMiddleware` middleware. You can add them inside your `app/Http/Kernel.php` file.
+This package comes with `RoleMiddleware`, `PermissionMiddleware` and `RoleOrPermissionMiddleware` middleware. You can add them inside your `app/Http/Kernel.php` file.
 
 ```php
 protected $routeMiddleware = [
