@@ -23,7 +23,7 @@ class MiddlewareTest extends TestCase
         $this->roleMiddleware = new RoleMiddleware($this->app);
 
         $this->permissionMiddleware = new PermissionMiddleware($this->app);
-        
+
         $this->roleOrPermissionMiddleware = new RoleOrPermissionMiddleware($this->app);
     }
 
