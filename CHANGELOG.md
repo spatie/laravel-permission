@@ -3,6 +3,10 @@
 All notable changes to `laravel-permission` will be documented in this file
 
 
+## 2.22.0 - 2018-10-11
+- Added `Route::role()` and `Route::permission()` middleware helper functions
+- Added new `role_or_permission` middleware to allow specifying "or" combinations
+
 ## 2.21.0 - 2018-09-29
 - Revert changes from 2.17.1 in order to support Lumen 5.7
 
