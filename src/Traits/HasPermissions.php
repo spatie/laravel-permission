@@ -245,7 +245,9 @@ trait HasPermissions
     public function getAllPermissions(): Collection
     {
         return $this->permissions
-            ->merge($this->getPermissionsViaRoles())
+            ->when($this->roles, function ($collection) {
+                return $collection->merge($this->getPermissionsViaRoles());
+            })
             ->sort()
             ->values();
     }
