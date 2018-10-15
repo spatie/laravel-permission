@@ -3,6 +3,12 @@
 All notable changes to `laravel-permission` will be documented in this file
 
 
+## 2.23.0 - 2018-10-15
+- Avoid unnecessary queries of user roles when fetching all permissions
+
+## 2.22.1 - 2018-10-15
+- Fix Lumen issue with Route helper added in 2.22.0
+
 ## 2.22.0 - 2018-10-11
 - Added `Route::role()` and `Route::permission()` middleware helper functions
 - Added new `role_or_permission` middleware to allow specifying "or" combinations
