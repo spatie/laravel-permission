@@ -7,17 +7,13 @@ php:
   - 7.3
   - nightly
 
-env:
-  matrix:
-    - COMPOSER_FLAGS="--prefer-lowest"
-    - COMPOSER_FLAGS=""
 matrix:
   allow_failures:
   - php: nightly
-  exclude:
-  - php: 7.2
+  include:
+  - php: 7.0
     env: COMPOSER_FLAGS="--prefer-lowest"
-  - php: 7.3
+  - php: 7.1
     env: COMPOSER_FLAGS="--prefer-lowest"
 
 before_script:
