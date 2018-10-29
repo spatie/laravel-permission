@@ -17,6 +17,8 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_can_assign_and_remove_a_role()
     {
+        $this->assertFalse($this->testUser->hasRole('testRole'));
+
         $this->testUser->assignRole('testRole');
 
         $this->assertTrue($this->testUser->hasRole('testRole'));

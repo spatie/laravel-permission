@@ -116,6 +116,7 @@ trait HasRoles
 
         if ($model->exists) {
             $this->roles()->sync($roles, false);
+            $model->load('roles');
         } else {
             $class = \get_class($model);
 
