@@ -14,6 +14,7 @@ class CommandTest extends TestCase
         Artisan::call('permission:create-role', ['name' => 'new-role']);
 
         $this->assertCount(1, Role::where('name', 'new-role')->get());
+        $this->assertCount(0, Role::where('name', 'new-role')->first()->permissions);
     }
 
     /** @test */

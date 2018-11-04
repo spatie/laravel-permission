@@ -30,14 +30,18 @@ class CreateRole extends Command
     {
         $permissionClass = app(PermissionContract::class);
 
-        $permissions = explode('|', $string);
+        if ($string) {
+            $permissions = explode('|', $string);
 
-        $models = [];
+            $models = [];
 
-        foreach ($permissions as $permission) {
-            $models[] = $permissionClass::findOrCreate(trim($permission), $this->argument('guard'));
+            foreach ($permissions as $permission) {
+                $models[] = $permissionClass::findOrCreate(trim($permission), $this->argument('guard'));
+            }
+
+            return collect($models);
+        } else {
+            return null;
         }
-
-        return collect($models);
     }
 }
