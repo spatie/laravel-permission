@@ -28,20 +28,20 @@ class CreateRole extends Command
 
     protected function makePermissions($string = null)
     {
+        if (null === string) {
+            return;
+        }
+
         $permissionClass = app(PermissionContract::class);
 
-        if ($string) {
-            $permissions = explode('|', $string);
+        $permissions = explode('|', $string);
 
-            $models = [];
+        $models = [];
 
-            foreach ($permissions as $permission) {
-                $models[] = $permissionClass::findOrCreate(trim($permission), $this->argument('guard'));
-            }
-
-            return collect($models);
-        } else {
-            return null;
+        foreach ($permissions as $permission) {
+            $models[] = $permissionClass::findOrCreate(trim($permission), $this->argument('guard'));
         }
+
+        return collect($models);
     }
 }
