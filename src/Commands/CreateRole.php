@@ -28,7 +28,7 @@ class CreateRole extends Command
 
     protected function makePermissions($string = null)
     {
-        if (null === string) {
+        if (empty($string)) {
             return;
         }
 
