@@ -2,9 +2,13 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.25.0 - 2018-11-07
+- A model's `roles` and `permissions` relations (respectively) are now automatically reloaded after an Assign/Remove role or Grant/Revoke of permissions. This means there's no longer a need to call `->fresh()` on the model if the only reason is to reload the role/permission relations. (That said, you may want to call it for other reasons.)
+- Added support for passing id to HasRole()
+
 ## 2.24.0 - 2018-11-06
 - Fix operator used on RoleOrPermissionMiddleware, and avoid throwing PermissionDoesNotExist if invalid permission passed
-- Auto-refresh model roles after using AssignRole
+- Auto-reload model role relation after using AssignRole
 - Avoid empty permission creation when using the CreateRole command
 
 ## 2.23.0 - 2018-10-15
