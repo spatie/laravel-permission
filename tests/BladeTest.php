@@ -214,8 +214,6 @@ class BladeTest extends TestCase
 
         $user->assignRole('writer');
 
-        $this->refreshTestUser();
-
         auth()->setUser($user);
 
         $this->assertEquals('does have all of the given roles', $this->renderView('hasAllRoles', compact('roles')));
@@ -232,8 +230,6 @@ class BladeTest extends TestCase
 
         $admin->assignRole('moderator');
 
-        $this->refreshTestAdmin();
-
         auth('admin')->setUser($admin);
 
         $this->assertEquals('does have all of the given roles', $this->renderView('guardHasAllRoles', compact('roles', 'guard')));
@@ -248,8 +244,6 @@ class BladeTest extends TestCase
 
         $admin->assignRole('moderator');
 
-        $this->refreshTestAdmin();
-
         auth('admin')->setUser($admin);
 
         $this->assertEquals('does have all of the given roles', $this->renderView('guardHasAllRolesPipe', compact('guard')));
@@ -263,8 +257,6 @@ class BladeTest extends TestCase
 
         $user->assignRole('writer');
 
-        $this->refreshTestUser();
-
         auth()->setUser($user);
 
         $this->assertEquals('does not have all of the given roles', $this->renderView('guardHasAllRolesPipe', compact('guard')));
@@ -274,8 +266,6 @@ class BladeTest extends TestCase
     {
         $this->testUser->assignRole('writer');
 
-        $this->refreshTestUser();
-
         return $this->testUser;
     }
 
@@ -283,16 +273,12 @@ class BladeTest extends TestCase
     {
         $this->testUser->assignRole('member');
 
-        $this->refreshTestUser();
-
         return $this->testUser;
     }
 
     protected function getSuperAdmin()
     {
         $this->testAdmin->assignRole('super-admin');
-
-        $this->refreshTestAdmin();
 
         return $this->testAdmin;
     }
