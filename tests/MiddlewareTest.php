@@ -180,7 +180,6 @@ class MiddlewareTest extends TestCase
         );
 
         $this->testUser->removeRole('testRole');
-        $this->refreshTestUser();
 
         $this->assertEquals(
             $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles'),

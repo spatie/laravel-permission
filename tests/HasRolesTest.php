@@ -25,8 +25,6 @@ class HasRolesTest extends TestCase
 
         $this->testUser->removeRole('testRole');
 
-        $this->refreshTestUser();
-
         $this->assertFalse($this->testUser->hasRole('testRole'));
     }
 
@@ -38,8 +36,6 @@ class HasRolesTest extends TestCase
         $this->assertTrue($this->testUserPermission->hasRole('testRole'));
 
         $this->testUserPermission->removeRole('testRole');
-
-        $this->refreshTestUserPermission();
 
         $this->assertFalse($this->testUserPermission->hasRole('testRole'));
     }
@@ -336,8 +332,6 @@ class HasRolesTest extends TestCase
 
         $this->testUser->assignRole($this->testUserRole);
 
-        $this->refreshTestUser();
-
         $this->assertTrue($this->testUser->hasRole($roleModel->all()));
 
         $this->assertTrue($this->testUser->hasAnyRole($roleModel->all()));
@@ -370,13 +364,9 @@ class HasRolesTest extends TestCase
 
         $this->testUser->assignRole($this->testUserRole);
 
-        $this->refreshTestUser();
-
         $this->assertFalse($this->testUser->hasAllRoles(['testRole', 'second role']));
 
         $this->testUser->assignRole('second role');
-
-        $this->refreshTestUser();
 
         $this->assertTrue($this->testUser->hasAllRoles(['testRole', 'second role']));
     }
@@ -389,8 +379,6 @@ class HasRolesTest extends TestCase
         $this->assertFalse($this->testUser->hasRole($this->testAdminRole));
 
         $this->testUser->assignRole('testRole');
-
-        $this->refreshTestUser();
 
         $this->assertTrue($this->testUser->hasAnyRole(['testRole', 'testAdminRole']));
 

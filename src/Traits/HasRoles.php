@@ -139,6 +139,8 @@ trait HasRoles
     public function removeRole($role)
     {
         $this->roles()->detach($this->getStoredRole($role));
+
+        $this->load('roles');
     }
 
     /**
