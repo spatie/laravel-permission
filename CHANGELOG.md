@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.24.0 - 2018-11-06
+- Fix operator used on RoleOrPermissionMiddleware, and avoid throwing PermissionDoesNotExist if invalid permission passed
+- Auto-refresh model roles after using AssignRole
+- Avoid empty permission creation when using the CreateRole command
 
 ## 2.23.0 - 2018-10-15
 - Avoid unnecessary queries of user roles when fetching all permissions
