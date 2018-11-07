@@ -174,6 +174,10 @@ trait HasRoles
             return $this->roles->contains('name', $roles);
         }
 
+        if (is_int($roles)) {
+            return $this->roles->contains('id', $roles);
+        }
+
         if ($roles instanceof Role) {
             return $this->roles->contains('id', $roles->id);
         }
