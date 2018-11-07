@@ -5,7 +5,6 @@ namespace Spatie\Permission\Middlewares;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Exceptions\UnauthorizedException;
-use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class RoleOrPermissionMiddleware
 {
@@ -19,11 +18,8 @@ class RoleOrPermissionMiddleware
             ? $roleOrPermission
             : explode('|', $roleOrPermission);
 
-        try {
-            if (! Auth::user()->hasAnyRole($rolesOrPermissions) || ! Auth::user()->hasAnyPermission($rolesOrPermissions)) {
-                throw UnauthorizedException::forRolesOrPermissions($rolesOrPermissions);
-            }
-        } catch (PermissionDoesNotExist $exception) {
+        if (! Auth::user()->hasAnyRole($rolesOrPermissions) && ! Auth::user()->hasAnyPermission($rolesOrPermissions)) {
+            throw UnauthorizedException::forRolesOrPermissions($rolesOrPermissions);
         }
 
         return $next($request);

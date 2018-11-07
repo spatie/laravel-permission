@@ -141,6 +141,23 @@ trait HasPermissions
     }
 
     /**
+     * An alias to hasPermissionTo(), but avoids throwing an exception.
+     *
+     * @param string|int|\Spatie\Permission\Contracts\Permission $permission
+     * @param string|null $guardName
+     *
+     * @return bool
+     */
+    public function checkPermissionTo($permission, $guardName = null): bool
+    {
+        try {
+            return $this->hasPermissionTo($permission, $guardName);
+        } catch (PermissionDoesNotExist $e) {
+            return false;
+        }
+    }
+
+    /**
      * Determine if the model has any of the given permissions.
      *
      * @param array ...$permissions
@@ -154,7 +171,7 @@ trait HasPermissions
         }
 
         foreach ($permissions as $permission) {
-            if ($this->hasPermissionTo($permission)) {
+            if ($this->checkPermissionTo($permission)) {
                 return true;
             }
         }

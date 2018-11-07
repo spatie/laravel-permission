@@ -175,11 +175,12 @@ class MiddlewareTest extends TestCase
         $this->testUser->givePermissionTo('edit-articles');
 
         $this->assertEquals(
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles'),
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-news|edit-articles'),
             200
         );
 
         $this->testUser->removeRole('testRole');
+        $this->refreshTestUser();
 
         $this->assertEquals(
             $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles'),
@@ -202,6 +203,11 @@ class MiddlewareTest extends TestCase
 
         $this->assertEquals(
             $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles'),
+            403
+        );
+
+        $this->assertEquals(
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'missingRole|missingPermission'),
             403
         );
     }
