@@ -5,7 +5,6 @@ namespace Spatie\Permission\Middlewares;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Exceptions\UnauthorizedException;
-use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class RoleOrPermissionMiddleware
 {
