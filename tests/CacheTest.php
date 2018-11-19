@@ -14,6 +14,7 @@ class CacheTest extends TestCase
     protected $cache_run_count = 2;
     protected $cache_reload_count = 0;
     protected $cache_untagged_count = 0;
+    protected $cache_relations_count = 1;
 
     protected $registrar;
 
@@ -28,7 +29,6 @@ class CacheTest extends TestCase
         DB::connection()->enableQueryLog();
 
         $cacheStore = $this->registrar->getCacheStore();
-        $taggable = $cacheStore instanceof \Illuminate\Cache\TaggableStore;
 
         switch (true) {
             case $cacheStore instanceof \Illuminate\Cache\DatabaseStore:
@@ -154,7 +154,7 @@ class CacheTest extends TestCase
 
         $this->resetQueryCount();
         $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
-        $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count + 1); // + 1 for getting the User's relations
+        $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count + $this->cache_relations_count);
 
         $this->resetQueryCount();
         $this->assertTrue($this->testUser->hasPermissionTo('edit-news'));
@@ -163,6 +163,23 @@ class CacheTest extends TestCase
         $this->resetQueryCount();
         $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
         $this->assertQueryCount($this->cache_init_count);
+    }
+
+    /** @test */
+    public function get_all_permissions_should_use_the_cache()
+    {
+        $this->testUserRole->givePermissionTo($expected = ['edit-articles', 'edit-news']);
+        $this->testUser->assignRole('testRole');
+
+        $this->resetQueryCount();
+        $this->registrar->getPermissions();
+        $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
+
+        $this->resetQueryCount();
+        $actual = $this->testUser->getAllPermissions()->pluck('name');
+        $this->assertEquals($actual, collect($expected));
+
+        $this->assertQueryCount(3);
     }
 
     protected function assertQueryCount(int $expected)
