@@ -3,6 +3,7 @@
 namespace Spatie\Permission\Test;
 
 use Spatie\Permission\Contracts\Role;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Contracts\Permission;
@@ -100,6 +101,10 @@ abstract class TestCase extends Orchestra
             $table->string('email');
         });
 
+        if ($this->app->make(PermissionRegistrar::class)->getCacheStore() instanceof \Illuminate\Cache\DatabaseStore) {
+            $this->createCacheTable();
+        }
+
         include_once __DIR__.'/../database/migrations/create_permission_tables.php.stub';
 
         (new \CreatePermissionTables())->up();
@@ -121,5 +126,14 @@ abstract class TestCase extends Orchestra
     protected function reloadPermissions()
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
+    }
+
+    public function createCacheTable()
+    {
+        Schema::create('cache', function ($table) {
+            $table->string('key')->unique();
+            $table->text('value');
+            $table->integer('expiration');
+        });
     }
 }

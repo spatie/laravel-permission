@@ -9,7 +9,11 @@ use Spatie\Permission\Contracts\Permission;
 
 class CacheTest extends TestCase
 {
-    const QUERIES_PER_CACHE_PROVISION = 2;
+    protected $cache_init_count = 0;
+    protected $cache_load_count = 0;
+    protected $cache_run_count = 2;
+    protected $cache_reload_count = 0;
+    protected $cache_untagged_count = 0;
 
     protected $registrar;
 
@@ -22,18 +26,44 @@ class CacheTest extends TestCase
         $this->registrar->forgetCachedPermissions();
 
         DB::connection()->enableQueryLog();
+
+        $cacheStore = $this->registrar->getCacheStore();
+        $taggable = $cacheStore instanceof \Illuminate\Cache\TaggableStore;
+
+        switch (true) {
+            case $cacheStore instanceof \Illuminate\Cache\DatabaseStore:
+                $this->cache_init_count = 1;
+                $this->cache_load_count = 1;
+                $this->cache_reload_count = 1;
+                $this->cache_untagged_count = -1;
+                break;
+            case $cacheStore instanceof \Illuminate\Cache\FileStore:
+                $this->cache_untagged_count = -2;
+                break;
+            case $cacheStore instanceof \Illuminate\Cache\RedisStore:
+                $this->cache_untagged_count = 0;
+                break;
+            case $cacheStore instanceof \Illuminate\Cache\MemcachedStore:
+                $this->cache_untagged_count = 0;
+                break;
+            case $cacheStore instanceof \Illuminate\Cache\ArrayStore:
+                $this->cache_untagged_count = 0;
+            default:
+        }
     }
 
     /** @test */
     public function it_can_cache_the_permissions()
     {
-        $this->registrar->getPermissions();
-
-        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
+        $this->resetQueryCount();
 
         $this->registrar->getPermissions();
 
-        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
+        $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
+
+        $this->registrar->getPermissions();
+
+        $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count + $this->cache_reload_count);
     }
 
     /** @test */
@@ -45,7 +75,7 @@ class CacheTest extends TestCase
 
         $this->registrar->getPermissions();
 
-        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
+        $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
     }
 
     /** @test */
@@ -60,7 +90,7 @@ class CacheTest extends TestCase
 
         $this->registrar->getPermissions();
 
-        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
+        $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
     }
 
     /** @test */
@@ -72,7 +102,7 @@ class CacheTest extends TestCase
 
         $this->registrar->getPermissions();
 
-        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
+        $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
     }
 
     /** @test */
@@ -87,7 +117,7 @@ class CacheTest extends TestCase
 
         $this->registrar->getPermissions();
 
-        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
+        $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
     }
 
     /** @test */
@@ -101,7 +131,7 @@ class CacheTest extends TestCase
 
         $this->registrar->getPermissions();
 
-        $this->assertQueryCount(0);
+        $this->assertQueryCount($this->cache_init_count);
     }
 
     /** @test */
@@ -113,7 +143,7 @@ class CacheTest extends TestCase
 
         $this->registrar->getPermissions();
 
-        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
+        $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
     }
 
     /** @test */
@@ -123,20 +153,16 @@ class CacheTest extends TestCase
         $this->testUser->assignRole('testRole');
 
         $this->resetQueryCount();
-
         $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
+        $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count + 1); // + 1 for getting the User's relations
 
-        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION + 1); // + 1 for getting the User's relations
         $this->resetQueryCount();
-
         $this->assertTrue($this->testUser->hasPermissionTo('edit-news'));
+        $this->assertQueryCount($this->cache_run_count + $this->cache_untagged_count);
 
-        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
         $this->resetQueryCount();
-
         $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
-
-        $this->assertQueryCount(0);
+        $this->assertQueryCount($this->cache_init_count);
     }
 
     protected function assertQueryCount(int $expected)
