@@ -892,15 +892,11 @@ $permission->syncRoles(params);
 HOWEVER, if you manipulate permission/role data directly in the database instead of calling the supplied methods, then you will not see the changes reflected in the application unless you manually reset the cache.
 
 ### Manual cache reset
-To manually reset the cache for this package, you can run the following in your app
+To manually reset the cache for this package, you can run the following in your app code:
 ```php
 $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
 ```
 
-Or you may use the following Artisan command:
-```bash
-php artisan cache:forget spatie.permission.cache
-```
 
 ### Cache Identifier
 
