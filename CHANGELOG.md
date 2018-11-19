@@ -5,6 +5,22 @@ All notable changes to `laravel-permission` will be documented in this file
 ## 2.26.0 - 2018-11-19
 - Substantial speed increase by caching the associations between models and permissions
 
+### NOTES: ###
+The following changes are not "breaking", but worth making the updates to your app for consistency.
+
+1. Config file: The `config/permission.php` file changed to move cache-related settings into a sub-array. **You should review the changes and merge the updates into your own config file.** Specifically the `expiration_time` value has moved into a sub-array entry, and the old top-level entry is no longer used.
+See the master config file here: 
+https://github.com/spatie/laravel-permission/blob/master/config/permission.php
+
+2. Cache Resets: If your `app` or `tests` are clearing the cache by specifying the cache key, **it is better to use the built-in forgetCachedPermissions() method** so that it properly handles tagged cache entries. Here is the recommended change:
+```diff
+- app()['cache']->forget('spatie.permission.cache');
++ $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+```
+
+3. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
+
+
 ## 2.25.0 - 2018-11-07
 - A model's `roles` and `permissions` relations (respectively) are now automatically reloaded after an Assign/Remove role or Grant/Revoke of permissions. This means there's no longer a need to call `->fresh()` on the model if the only reason is to reload the role/permission relations. (That said, you may want to call it for other reasons.)
 - Added support for passing id to HasRole()
