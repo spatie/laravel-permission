@@ -48,8 +48,7 @@ class PermissionRegistrar
         $this->permissionClass = config('permission.models.permission');
         $this->roleClass = config('permission.models.role');
 
-        self::$cacheExpirationTime = config('permission.cache.expiration_time',
-            config('permission.cache_expiration_time'));
+        self::$cacheExpirationTime = config('permission.cache.expiration_time', config('permission.cache_expiration_time'));
         self::$cacheKey = config('permission.cache.key');
         self::$cacheModelKey = config('permission.cache.model_key');
         self::$cacheIsTaggable = ($cache->getStore() instanceof \Illuminate\Cache\TaggableStore);
@@ -146,5 +145,15 @@ class PermissionRegistrar
     public function getRoleClass(): Role
     {
         return app($this->roleClass);
+    }
+
+    /**
+     * Get the instance of the Cache Store.
+     *
+     * @return \Illuminate\Contracts\Cache\Store
+     */
+    public function getCacheStore(): \Illuminate\Contracts\Cache\Store
+    {
+        return $this->cache->getStore();
     }
 }
