@@ -47,7 +47,7 @@ $role->givePermissionTo('edit articles');
 
 If you're using multiple guards we've got you covered as well. Every guard will have its own set of permissions and roles that can be assigned to the guard's users. Read about it in the [using multiple guards](#using-multiple-guards) section of the readme.
 
-Because all permissions will be registered on [Laravel's gate](https://laravel.com/docs/5.5/authorization), you can test if a user has a permission with Laravel's default `can` function:
+Because all permissions will be registered on [Laravel's gate](https://laravel.com/docs/5.5/authorization), you can check if a user has a permission with Laravel's default `can` function:
 
 ```php
 $user->can('edit articles');
@@ -392,7 +392,7 @@ Or revoke & add new permissions in one go:
 $user->syncPermissions(['edit articles', 'delete articles']);
 ```
 
-You can test if a user has a permission:
+You can check if a user has a permission:
 
 ```php
 $user->hasPermissionTo('edit articles');
@@ -406,7 +406,7 @@ $user->hasPermissionTo(Permission::find(1)->id);
 $user->hasPermissionTo($somePermission->id);
 ```
 
-You can test if a user has Any of an array of permissions:
+You can check if a user has Any of an array of permissions:
 
 ```php
 $user->hasAnyPermission(['edit articles', 'publish articles', 'unpublish articles']);
@@ -425,7 +425,7 @@ $user->hasAnyPermission(['edit articles', 1, 5]);
 ```
 
 Saved permissions will be registered with the `Illuminate\Auth\Access\Gate` class for the default guard. So you can
-test if a user has a permission with Laravel's default `can` function:
+check if a user has a permission with Laravel's default `can` function:
 
 ```php
 $user->can('edit articles');
@@ -544,7 +544,7 @@ This package also adds Blade directives to verify whether the currently logged i
 Optionally you can pass in the `guard` that the check will be performed on as a second argument.
 
 #### Blade and Roles
-Test for a specific role:
+Check for a specific role:
 ```php
 @role('writer')
     I am a writer!
@@ -561,7 +561,7 @@ is the same as
 @endhasrole
 ```
 
-Test for any role in a list:
+Check for any role in a list:
 ```php
 @hasanyrole($collectionOfRoles)
     I have one or more of these roles!
@@ -575,7 +575,7 @@ Test for any role in a list:
     I have none of these roles...
 @endhasanyrole
 ```
-Test for all roles:
+Check for all roles:
 
 ```php
 @hasallroles($collectionOfRoles)
@@ -811,9 +811,9 @@ In your application's tests, if you are not seeding roles and permissions as par
 
 Two notes about Database Seeding:
 
-1. It is best to flush the `spatie.permission.cache` before seeding, to avoid cache conflict errors. This can be done from an Artisan command (see Troubleshooting: Cache section, later) or directly in a seeder class (see example below).
+1. You may discover that it is best to flush this package's cache before seeding, to avoid cache conflict errors. This can be done from an Artisan command (see Troubleshooting: Cache section, later) or directly in a seeder class (see example below).
 
-2. Here's a sample seeder, which clears the cache, creates permissions and then assigns permissions to roles:
+2. Here's a sample seeder, which first clears the cache, creates permissions and then assigns permissions to roles (the order of these steps is intentional):
 
     ```php
     use Illuminate\Database\Seeder;
@@ -825,7 +825,7 @@ Two notes about Database Seeding:
         public function run()
         {
             // Reset cached roles and permissions
-            app()['cache']->forget('spatie.permission.cache');
+            $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
 
             // create permissions
             Permission::create(['name' => 'edit articles']);
@@ -835,17 +835,19 @@ Two notes about Database Seeding:
 
             // create roles and assign created permissions
 
+            // this can be done as separate statements
             $role = Role::create(['name' => 'writer']);
             $role->givePermissionTo('edit articles');
 
-            $role = Role::create(['name' => 'moderator']);
-            $role->givePermissionTo(['publish articles', 'unpublish articles']);
+            // or may be done by chaining
+            $role = Role::create(['name' => 'moderator'])
+                ->givePermissionTo(['publish articles', 'unpublish articles']);
 
             $role = Role::create(['name' => 'super-admin']);
             $role->givePermissionTo(Permission::all());
         }
     }
-	```
+    ```
 
 ## Extending
 
@@ -871,7 +873,9 @@ php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvid
 
 Role and Permission data are cached to speed up performance.
 
-When you use the supplied methods for manipulating roles and permissions, the cache is automatically reset for you:
+While we recommend not changing the cache "key" name, if you wish to alter the expiration time you may do so in the `config/permission.php` file, in the `cache` array. Note that as of v2.26.0 the `cache` entry here is now an array, and `expiration_time` is a sub-array entry.
+
+When you use the built-in functions for manipulating roles and permissions, the cache is automatically reset for you, and relations are automatically reloaded for the current model record:
 
 ```php
 $user->assignRole('writer');
@@ -888,7 +892,12 @@ $permission->syncRoles(params);
 HOWEVER, if you manipulate permission/role data directly in the database instead of calling the supplied methods, then you will not see the changes reflected in the application unless you manually reset the cache.
 
 ### Manual cache reset
-To manually reset the cache for this package, run:
+To manually reset the cache for this package, you can run the following in your app
+```php
+$this->app->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+```
+
+Or you may use the following Artisan command:
 ```bash
 php artisan cache:forget spatie.permission.cache
 ```
@@ -896,9 +905,9 @@ php artisan cache:forget spatie.permission.cache
 ### Cache Identifier
 
 TIP: If you are leveraging a caching service such as `redis` or `memcached` and there are other sites 
-running on your server, you could run into cache clashes. It is prudent to set your own cache `prefix` 
-in `/config/cache.php` to something unique for each application. This will prevent other applications 
-from accidentally using/changing your cached data.
+running on your server, you could run into cache clashes between apps. It is prudent to set your own 
+cache `prefix` in Laravel's `/config/cache.php` to something unique for each application. 
+This will prevent other applications from accidentally using/changing your cached data.
 
 
 ## Need a UI?
