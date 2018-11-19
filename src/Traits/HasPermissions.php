@@ -363,6 +363,16 @@ trait HasPermissions
      */
     public function getAllPermissions(): Collection
     {
+        $functionGetAllPermissions = function () {
+            $permissions = $this->permissions;
+
+            if ($this->roles) {
+                $permissions = $permissions->merge($this->getPermissionsViaRoles());
+            }
+
+            return $permissions->sort()->values();
+        };
+
         $registrar = app(PermissionRegistrar::class);
         if ($registrar::$cacheIsTaggable) {
             return $registrar->getCacheStore()
@@ -370,25 +380,11 @@ trait HasPermissions
                 ->remember(
                     $this->getCacheKey(),
                     $registrar::$cacheExpirationTime,
-                    function () {
-                        $permissions = $this->permissions;
-
-                        if ($this->roles) {
-                            $permissions = $permissions->merge($this->getPermissionsViaRoles());
-                        }
-
-                        return $permissions->sort()->values();
-                    }
+                    $functionGetAllPermissions
                 );
         }
 
-        $permissions = $this->permissions;
-
-        if ($this->roles) {
-            $permissions = $permissions->merge($this->getPermissionsViaRoles());
-        }
-
-        return $permissions->sort()->values();
+        return $functionGetAllPermissions();
     }
 
     /**
