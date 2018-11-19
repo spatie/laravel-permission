@@ -122,15 +122,16 @@ trait HasPermissions
             throw new PermissionDoesNotExist;
         }
 
-        if (! PermissionRegistrar::$cacheIsTaggable) {
+        $registrar = app(PermissionRegistrar::class);
+        if (! $registrar::$cacheIsTaggable) {
             return $this->hasUncachedPermissionTo($permission, $guardName);
         }
 
-        return cache()
+        return $registrar->getCacheStore()
             ->tags($this->getCacheTags($permission))
             ->remember(
                 $this->getCacheKey($permission),
-                PermissionRegistrar::$cacheExpirationTime,
+                $registrar::$cacheExpirationTime,
                 function () use ($permission, $guardName) {
                     return $this->hasUncachedPermissionTo($permission, $guardName);
                 }
@@ -362,11 +363,13 @@ trait HasPermissions
      */
     public function getAllPermissions(): Collection
     {
-        if (PermissionRegistrar::$cacheIsTaggable) {
-            return cache()->tags($this->getCacheTags())
+        $registrar = app(PermissionRegistrar::class);
+        if ($registrar::$cacheIsTaggable) {
+            return $registrar->getCacheStore()
+                ->tags($this->getCacheTags())
                 ->remember(
                     $this->getCacheKey(),
-                    PermissionRegistrar::$cacheExpirationTime,
+                    $registrar::$cacheExpirationTime,
                     function () {
                         $permissions = $this->permissions;
 
