@@ -809,11 +809,7 @@ In your application's tests, if you are not seeding roles and permissions as par
 
 ## Database Seeding
 
-Two notes about Database Seeding:
-
-1. You may discover that it is best to flush this package's cache before seeding, to avoid cache conflict errors. This can be done from an Artisan command (see Troubleshooting: Cache section, later) or directly in a seeder class (see example below).
-
-2. Here's a sample seeder, which first clears the cache, creates permissions and then assigns permissions to roles (the order of these steps is intentional):
+You may discover that it is best to flush this package's cache before seeding, to avoid cache conflict errors. This can be done directly in a seeder class. Here is a sample seeder, which first clears the cache, creates permissions and then assigns permissions to roles (the order of these steps is intentional):
 
     ```php
     use Illuminate\Database\Seeder;
