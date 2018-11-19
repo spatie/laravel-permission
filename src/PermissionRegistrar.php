@@ -3,6 +3,7 @@
 namespace Spatie\Permission;
 
 use Illuminate\Support\Collection;
+use Spatie\Permission\Contracts\Role;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Cache\Repository;
 use Spatie\Permission\Contracts\Permission;
@@ -18,22 +19,49 @@ class PermissionRegistrar
     protected $cache;
 
     /** @var string */
-    protected $cacheKey = 'spatie.permission.cache';
-
-    /** @var string */
     protected $permissionClass;
 
     /** @var string */
     protected $roleClass;
 
+    /** @var int */
+    public static $cacheExpirationTime;
+
+    /** @var string */
+    public static $cacheKey;
+
+    /** @var string */
+    public static $cacheModelKey;
+
+    /** @var bool */
+    public static $cacheIsTaggable = false;
+
+    /**
+     * PermissionRegistrar constructor.
+     *
+     * @param \Illuminate\Contracts\Auth\Access\Gate $gate
+     * @param \Illuminate\Contracts\Cache\Repository $cache
+     */
     public function __construct(Gate $gate, Repository $cache)
     {
         $this->gate = $gate;
-        $this->cache = $cache;
         $this->permissionClass = config('permission.models.permission');
         $this->roleClass = config('permission.models.role');
+
+        self::$cacheExpirationTime = config('permission.cache.expiration_time',
+            config('permission.cache_expiration_time'));
+        self::$cacheKey = config('permission.cache.key');
+        self::$cacheModelKey = config('permission.cache.model_key');
+        self::$cacheIsTaggable = ($cache->getStore() instanceof \Illuminate\Cache\TaggableStore);
+
+        $this->cache = self::$cacheIsTaggable ? $cache->tags(self::$cacheKey) : $cache;
     }
 
+    /**
+     * Register the permission check method on the gate.
+     *
+     * @return bool
+     */
     public function registerPermissions(): bool
     {
         $this->gate->before(function (Authorizable $user, string $ability) {
@@ -48,26 +76,74 @@ class PermissionRegistrar
         return true;
     }
 
+    /**
+     * Flush the cache.
+     */
     public function forgetCachedPermissions()
     {
-        $this->cache->forget($this->cacheKey);
+        self::$cacheIsTaggable ? $this->cache->flush() : $this->cache->forget(self::$cacheKey);
     }
 
-    public function getPermissions(): Collection
+    /**
+     * Get the permissions based on the passed params.
+     *
+     * @param array $params
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getPermissions(array $params = []): Collection
     {
-        $permissionClass = $this->getPermissionClass();
+        $permissions = $this->cache->remember($this->getKey($params), self::$cacheExpirationTime,
+            function () use ($params) {
+                return $this->getPermissionClass()
+                    ->when(($params && self::$cacheIsTaggable), function ($query) use ($params) {
+                        return $query->where($params);
+                    })
+                    ->with('roles')
+                    ->get();
+            });
 
-        return $this->cache->remember($this->cacheKey, config('permission.cache_expiration_time'), function () use ($permissionClass) {
-            return $permissionClass->with('roles')->get();
-        });
+        if (! self::$cacheIsTaggable) {
+            foreach ($params as $attr => $value) {
+                $permissions = $permissions->where($attr, $value);
+            }
+        }
+
+        return $permissions;
     }
 
-    public function getPermissionClass()
+    /**
+     * Get the key for caching.
+     *
+     * @param $params
+     *
+     * @return string
+     */
+    public function getKey(array $params): string
+    {
+        if ($params && self::$cacheIsTaggable) {
+            return self::$cacheKey.'.'.implode('.', array_values($params));
+        }
+
+        return self::$cacheKey;
+    }
+
+    /**
+     * Get an instance of the permission class.
+     *
+     * @return \Spatie\Permission\Contracts\Permission
+     */
+    public function getPermissionClass(): Permission
     {
         return app($this->permissionClass);
     }
 
-    public function getRoleClass()
+    /**
+     * Get an instance of the role class.
+     *
+     * @return \Spatie\Permission\Contracts\Role
+     */
+    public function getRoleClass(): Role
     {
         return app($this->roleClass);
     }

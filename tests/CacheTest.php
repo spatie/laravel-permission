@@ -131,7 +131,8 @@ class CacheTest extends TestCase
 
         $this->assertTrue($this->testUser->hasPermissionTo('edit-news'));
 
-        $this->assertQueryCount(0);
+        $this->assertQueryCount(self::QUERIES_PER_CACHE_PROVISION);
+        $this->resetQueryCount();
 
         $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
 

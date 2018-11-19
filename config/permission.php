@@ -84,17 +84,37 @@ return [
     ],
 
     /*
-     * By default all permissions will be cached for 24 hours unless a permission or
-     * role is updated. Then the cache will be flushed immediately.
-     */
-
-    'cache_expiration_time' => 60 * 24,
-
-    /*
      * When set to true, the required permission/role names are added to the exception
      * message. This could be considered an information leak in some contexts, so
      * the default setting is false here for optimum safety.
      */
 
     'display_permission_in_exception' => false,
+
+    'cache' => [
+
+        /*
+         * By default all permissions will be cached for 24 hours unless a permission or
+         * role is updated. Then the cache will be flushed immediately.
+         */
+
+        'expiration_time' => 60 * 24,
+
+        /*
+         * The key to use when tagging and prefixing entries in the cache.
+         */
+
+        'key' => 'spatie.permission.cache',
+
+        /*
+         * When checking for a permission against a model by passing a Permission
+         * instance to the check, this key determines what attribute on the
+         * Permissions model is used to cache against.
+         *
+         * Ideally, this should match your preferred way of checking permissions, eg:
+         * `$user->can('view-posts')` would be 'name'.
+         */
+
+        'model_key' => 'name',
+    ],
 ];
