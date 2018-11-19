@@ -87,6 +87,8 @@ abstract class TestCase extends Orchestra
      */
     protected function setUpDatabase($app)
     {
+        $this->app['config']->set('permission.column_names.model_morph_key', 'model_test_id');
+
         $app['db']->connection()->getSchemaBuilder()->create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
@@ -119,29 +121,5 @@ abstract class TestCase extends Orchestra
     protected function reloadPermissions()
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
-    }
-
-    /**
-     * Refresh the testUser.
-     */
-    public function refreshTestUser()
-    {
-        $this->testUser = $this->testUser->fresh();
-    }
-
-    /**
-     * Refresh the testAdmin.
-     */
-    public function refreshTestAdmin()
-    {
-        $this->testAdmin = $this->testAdmin->fresh();
-    }
-
-    /**
-     * Refresh the testUserPermission.
-     */
-    public function refreshTestUserPermission()
-    {
-        $this->testUserPermission = $this->testUserPermission->fresh();
     }
 }

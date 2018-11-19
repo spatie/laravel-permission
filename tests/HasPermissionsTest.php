@@ -14,8 +14,6 @@ class HasPermissionsTest extends TestCase
     {
         $this->testUser->givePermissionTo($this->testUserPermission);
 
-        $this->refreshTestUser();
-
         $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission));
     }
 
@@ -44,13 +42,9 @@ class HasPermissionsTest extends TestCase
     {
         $this->testUser->givePermissionTo($this->testUserPermission);
 
-        $this->refreshTestUser();
-
         $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission));
 
         $this->testUser->revokePermissionTo($this->testUserPermission);
-
-        $this->refreshTestUser();
 
         $this->assertFalse($this->testUser->hasPermissionTo($this->testUserPermission));
     }
@@ -146,6 +140,42 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    public function it_throws_an_exception_when_calling_hasPermissionTo_with_an_invalid_type()
+    {
+        $user = User::create(['email' => 'user1@test.com']);
+
+        $this->expectException(PermissionDoesNotExist::class);
+
+        $user->hasPermissionTo(new \stdClass());
+    }
+
+    /** @test */
+    public function it_throws_an_exception_when_calling_hasPermissionTo_with_null()
+    {
+        $user = User::create(['email' => 'user1@test.com']);
+
+        $this->expectException(PermissionDoesNotExist::class);
+
+        $user->hasPermissionTo(null);
+    }
+
+    /** @test */
+    public function it_throws_an_exception_when_calling_hasDirectPermission_with_an_invalid_type()
+    {
+        $user = User::create(['email' => 'user1@test.com']);
+
+        $this->assertFalse($user->hasDirectPermission(new \stdClass()));
+    }
+
+    /** @test */
+    public function it_throws_an_exception_when_calling_hasDirectPermission_with_null()
+    {
+        $user = User::create(['email' => 'user1@test.com']);
+
+        $this->assertFalse($user->hasDirectPermission(null));
+    }
+
+    /** @test */
     public function it_throws_an_exception_when_trying_to_scope_a_permission_from_another_guard()
     {
         $this->expectException(PermissionDoesNotExist::class);
@@ -218,13 +248,9 @@ class HasPermissionsTest extends TestCase
 
         $this->testUser->givePermissionTo('edit-articles');
 
-        $this->refreshTestUser();
-
         $this->assertTrue($this->testUser->hasAnyPermission('edit-news', 'edit-articles'));
 
         $this->testUser->givePermissionTo('edit-news');
-
-        $this->refreshTestUser();
 
         $this->testUser->revokePermissionTo($this->testUserPermission);
 
@@ -238,13 +264,9 @@ class HasPermissionsTest extends TestCase
 
         $this->testUser->givePermissionTo('edit-articles');
 
-        $this->refreshTestUser();
-
         $this->assertTrue($this->testUser->hasAnyPermission(['edit-news', 'edit-articles']));
 
         $this->testUser->givePermissionTo('edit-news');
-
-        $this->refreshTestUser();
 
         $this->testUser->revokePermissionTo($this->testUserPermission);
 
@@ -262,11 +284,47 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    public function it_can_determine_that_the_user_has_all_of_the_permissions_directly()
+    {
+        $this->testUser->givePermissionTo('edit-articles', 'edit-news');
+
+        $this->assertTrue($this->testUser->hasAllPermissions('edit-articles', 'edit-news'));
+
+        $this->testUser->revokePermissionTo('edit-articles');
+
+        $this->assertFalse($this->testUser->hasAllPermissions('edit-articles', 'edit-news'));
+    }
+
+    /** @test */
+    public function it_can_determine_that_the_user_has_all_of_the_permissions_directly_using_an_array()
+    {
+        $this->assertFalse($this->testUser->hasAllPermissions(['edit-articles', 'edit-news']));
+
+        $this->testUser->revokePermissionTo('edit-articles');
+
+        $this->assertFalse($this->testUser->hasAllPermissions(['edit-news', 'edit-articles']));
+
+        $this->testUser->givePermissionTo('edit-news');
+
+        $this->testUser->revokePermissionTo($this->testUserPermission);
+
+        $this->assertFalse($this->testUser->hasAllPermissions(['edit-articles', 'edit-news']));
+    }
+
+    /** @test */
+    public function it_can_determine_that_the_user_has_all_of_the_permissions_via_role()
+    {
+        $this->testUserRole->givePermissionTo('edit-articles', 'edit-news');
+
+        $this->testUser->assignRole('testRole');
+
+        $this->assertTrue($this->testUser->hasAllPermissions('edit-articles', 'edit-news'));
+    }
+
+    /** @test */
     public function it_can_determine_that_user_has_direct_permission()
     {
         $this->testUser->givePermissionTo('edit-articles');
-        $this->refreshTestUser();
-
         $this->assertTrue($this->testUser->hasDirectPermission('edit-articles'));
         $this->assertEquals(
             collect(['edit-articles']),
@@ -274,12 +332,10 @@ class HasPermissionsTest extends TestCase
         );
 
         $this->testUser->revokePermissionTo('edit-articles');
-        $this->refreshTestUser();
         $this->assertFalse($this->testUser->hasDirectPermission('edit-articles'));
 
         $this->testUser->assignRole('testRole');
         $this->testUserRole->givePermissionTo('edit-articles');
-        $this->refreshTestUser();
         $this->assertFalse($this->testUser->hasDirectPermission('edit-articles'));
     }
 
@@ -340,5 +396,57 @@ class HasPermissionsTest extends TestCase
         $this->assertTrue($this->testUser->hasDirectPermission('edit-blog'));
 
         $this->assertFalse($this->testUser->hasDirectPermission('edit-news'));
+    }
+
+    /** @test */
+    public function sync_permission_ignores_null_inputs()
+    {
+        $this->testUser->givePermissionTo('edit-news');
+
+        $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-blog'])->pluck('id');
+
+        $ids->push(null);
+
+        $this->testUser->syncPermissions($ids);
+
+        $this->assertTrue($this->testUser->hasDirectPermission('edit-articles'));
+
+        $this->assertTrue($this->testUser->hasDirectPermission('edit-blog'));
+
+        $this->assertFalse($this->testUser->hasDirectPermission('edit-news'));
+    }
+
+    /** @test */
+    public function it_does_not_remove_already_associated_permissions_when_assigning_new_permissions()
+    {
+        $this->testUser->givePermissionTo('edit-news');
+
+        $this->testUser->givePermissionTo('edit-articles');
+
+        $this->assertTrue($this->testUser->fresh()->hasDirectPermission('edit-news'));
+    }
+
+    /** @test */
+    public function it_does_not_throw_an_exception_when_assigning_a_permission_that_is_already_assigned()
+    {
+        $this->testUser->givePermissionTo('edit-news');
+
+        $this->testUser->givePermissionTo('edit-news');
+
+        $this->assertTrue($this->testUser->fresh()->hasDirectPermission('edit-news'));
+    }
+
+    /** @test */
+    public function it_can_sync_permissions_to_a_model_that_is_not_persisted()
+    {
+        $user = new User(['email' => 'test@user.com']);
+        $user->syncPermissions('edit-articles');
+        $user->save();
+
+        $this->assertTrue($user->hasPermissionTo('edit-articles'));
+
+        $user->syncPermissions('edit-articles');
+        $this->assertTrue($user->hasPermissionTo('edit-articles'));
+        $this->assertTrue($user->fresh()->hasPermissionTo('edit-articles'));
     }
 }

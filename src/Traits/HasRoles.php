@@ -5,11 +5,14 @@ namespace Spatie\Permission\Traits;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Role;
 use Illuminate\Database\Eloquent\Builder;
+use Spatie\Permission\PermissionRegistrar;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 trait HasRoles
 {
     use HasPermissions;
+
+    private $roleClass;
 
     public static function bootHasRoles()
     {
@@ -22,6 +25,15 @@ trait HasRoles
         });
     }
 
+    public function getRoleClass()
+    {
+        if (! isset($this->roleClass)) {
+            $this->roleClass = app(PermissionRegistrar::class)->getRoleClass();
+        }
+
+        return $this->roleClass;
+    }
+
     /**
      * A model may have multiple roles.
      */
@@ -31,7 +43,7 @@ trait HasRoles
             config('permission.models.role'),
             'model',
             config('permission.table_names.model_has_roles'),
-            'model_id',
+            config('permission.column_names.model_morph_key'),
             'role_id'
         );
     }
@@ -59,7 +71,9 @@ trait HasRoles
                 return $role;
             }
 
-            return app(Role::class)->findByName($role, $this->getDefaultGuardName());
+            $method = is_numeric($role) ? 'findById' : 'findByName';
+
+            return $this->getRoleClass()->{$method}($role, $this->getDefaultGuardName());
         }, $roles);
 
         return $query->whereHas('roles', function ($query) use ($roles) {
@@ -83,14 +97,34 @@ trait HasRoles
         $roles = collect($roles)
             ->flatten()
             ->map(function ($role) {
+                if (empty($role)) {
+                    return false;
+                }
+
                 return $this->getStoredRole($role);
+            })
+            ->filter(function ($role) {
+                return $role instanceof Role;
             })
             ->each(function ($role) {
                 $this->ensureModelSharesGuard($role);
             })
+            ->map->id
             ->all();
 
-        $this->roles()->saveMany($roles);
+        $model = $this->getModel();
+
+        if ($model->exists) {
+            $this->roles()->sync($roles, false);
+            $model->load('roles');
+        } else {
+            $class = \get_class($model);
+
+            $class::saved(
+                function ($model) use ($roles) {
+                    $model->roles()->sync($roles, false);
+                });
+        }
 
         $this->forgetCachedPermissions();
 
@@ -105,6 +139,8 @@ trait HasRoles
     public function removeRole($role)
     {
         $this->roles()->detach($this->getStoredRole($role));
+
+        $this->load('roles');
     }
 
     /**
@@ -124,7 +160,7 @@ trait HasRoles
     /**
      * Determine if the model has (one of) the given role(s).
      *
-     * @param string|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
+     * @param string|int|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
      *
      * @return bool
      */
@@ -136,6 +172,10 @@ trait HasRoles
 
         if (is_string($roles)) {
             return $this->roles->contains('name', $roles);
+        }
+
+        if (is_int($roles)) {
+            return $this->roles->contains('id', $roles);
         }
 
         if ($roles instanceof Role) {
@@ -210,12 +250,14 @@ trait HasRoles
 
     protected function getStoredRole($role): Role
     {
+        $roleClass = $this->getRoleClass();
+
         if (is_numeric($role)) {
-            return app(Role::class)->findById($role, $this->getDefaultGuardName());
+            return $roleClass->findById($role, $this->getDefaultGuardName());
         }
 
         if (is_string($role)) {
-            return app(Role::class)->findByName($role, $this->getDefaultGuardName());
+            return $roleClass->findByName($role, $this->getDefaultGuardName());
         }
 
         return $role;

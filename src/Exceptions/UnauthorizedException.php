@@ -40,6 +40,21 @@ class UnauthorizedException extends HttpException
         return $exception;
     }
 
+    public static function forRolesOrPermissions(array $rolesOrPermissions): self
+    {
+        $message = 'User does not have any of the necessary access rights.';
+
+        if (config('permission.display_permission_in_exception') && config('permission.display_role_in_exception')) {
+            $permStr = implode(', ', $rolesOrPermissions);
+            $message = 'User does not have the right permissions. Necessary permissions are '.$permStr;
+        }
+
+        $exception = new static(403, $message, null, []);
+        $exception->requiredPermissions = $rolesOrPermissions;
+
+        return $exception;
+    }
+
     public static function notLoggedIn(): self
     {
         return new static(403, 'User is not logged in.', null, []);

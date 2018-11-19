@@ -71,6 +71,18 @@ return [
         'role_has_permissions' => 'role_has_permissions',
     ],
 
+    'column_names' => [
+
+        /*
+         * Change this if you want to name the related model primary key other than
+         * `model_id`.
+         *
+         * For example, this would be nice if your primary keys are all UUIDs. In
+         * that case, name this `model_uuid`.
+         */
+        'model_morph_key' => 'model_id',
+    ],
+
     /*
      * When set to true, the required permission/role names are added to the exception
      * message. This could be considered an information leak in some contexts, so

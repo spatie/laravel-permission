@@ -2,8 +2,8 @@
 
 namespace Spatie\Permission\Test;
 
-use Artisan;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Artisan;
 use Spatie\Permission\Models\Permission;
 
 class CommandTest extends TestCase
@@ -14,6 +14,7 @@ class CommandTest extends TestCase
         Artisan::call('permission:create-role', ['name' => 'new-role']);
 
         $this->assertCount(1, Role::where('name', 'new-role')->get());
+        $this->assertCount(0, Role::where('name', 'new-role')->first()->permissions);
     }
 
     /** @test */
@@ -48,5 +49,19 @@ class CommandTest extends TestCase
         $this->assertCount(1, Permission::where('name', 'new-permission')
             ->where('guard_name', 'api')
             ->get());
+    }
+
+    /** @test */
+    public function it_can_create_a_role_and_permissions_at_same_time()
+    {
+        Artisan::call('permission:create-role', [
+            'name' => 'new-role',
+            'permissions' => 'first permission | second permission',
+        ]);
+
+        $role = Role::where('name', 'new-role')->first();
+
+        $this->assertTrue($role->hasPermissionTo('first permission'));
+        $this->assertTrue($role->hasPermissionTo('second permission'));
     }
 }

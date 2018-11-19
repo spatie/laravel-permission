@@ -2,6 +2,76 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.25.0 - 2018-11-07
+- A model's `roles` and `permissions` relations (respectively) are now automatically reloaded after an Assign/Remove role or Grant/Revoke of permissions. This means there's no longer a need to call `->fresh()` on the model if the only reason is to reload the role/permission relations. (That said, you may want to call it for other reasons.)
+- Added support for passing id to HasRole()
+
+## 2.24.0 - 2018-11-06
+- Fix operator used on RoleOrPermissionMiddleware, and avoid throwing PermissionDoesNotExist if invalid permission passed
+- Auto-reload model role relation after using AssignRole
+- Avoid empty permission creation when using the CreateRole command
+
+## 2.23.0 - 2018-10-15
+- Avoid unnecessary queries of user roles when fetching all permissions
+
+## 2.22.1 - 2018-10-15
+- Fix Lumen issue with Route helper added in 2.22.0
+
+## 2.22.0 - 2018-10-11
+- Added `Route::role()` and `Route::permission()` middleware helper functions
+- Added new `role_or_permission` middleware to allow specifying "or" combinations
+
+## 2.21.0 - 2018-09-29
+- Revert changes from 2.17.1 in order to support Lumen 5.7
+
+## 2.20.0 - 2018-09-19
+- It will sync roles/permissions to models that are not persisted, by registering a `saved` callback. 
+(It would previously throw an Integrity constraint violation QueryException on the pivot table insertion.)
+
+## 2.19.2 - 2018-09-19
+- add `@elserole` directive:
+ Usage: 
+```php
+@role('roleA')
+ // user hasRole 'roleA'
+@elserole('roleB')
+ // user hasRole 'roleB' but not 'roleA'
+@endrole
+```
+
+## 2.19.1 - 2018-09-14
+- Spark-related fix to accommodate missing guard[providers] config
+
+## 2.19.0 - 2018-09-10
+- Add ability to pass in IDs or mixed values to `role` scope
+- Add `@unlessrole`/`@endunlessrole` Blade directives
+
+## 2.18.0 - 2018-09-06
+- Expanded CLI `permission:create-role` command to create optionally create-and-link permissions in one command. Also now no longer throws an error if the role already exists.
+
+## 2.17.1 - 2018-08-28
+- Require laravel/framework instead of illuminate/* starting from ~5.4.0 
+- Removed old dependency for illuminate/database@~5.3.0 (Laravel 5.3 is not supported)
+
+## 2.17.0 - 2018-08-24
+- Laravel 5.7 compatibility
+
+## 2.16.0 - 2018-08-20
+- Replace static Permission::class and Role::class with dynamic value (allows custom models more easily)
+- Added type checking in hasPermissionTo and hasDirectPermission
+
+## 2.15.0 - 2018-08-15
+- Make assigning the same role or permission twice not throw an exception
+
+## 2.14.0 - 2018-08-13
+- Allow using another key name than `model_id` by defining new `columns` array with `model_morph_key` key in config file. This improves UUID compatibility as discussed in #777.
+
+## 2.13.0 - 2018-08-02
+- Fix issue with null values passed to syncPermissions & syncRoles
+
+## 2.12.2 - 2018-06-13
+- added hasAllPermissions method
+
 ## 2.12.1 - 2018-04-23
 - Reverted 2.12.0. REVERTS: "Add ability to pass guard name to gate methods like can()". Requires reworking of guard handling if we're going to add this feature. 
 
@@ -149,6 +219,8 @@ The 403 response is backward compatible
 - renamed config file from `laravel-permission` to `permission`.
 
 
+## 1.17.0 - 2018-08-24
+- added support for Laravel 5.7
 
 ## 1.16.0 - 2018-02-07
 - added support for Laravel 5.6

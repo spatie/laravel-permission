@@ -8,11 +8,13 @@ use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Middlewares\RoleMiddleware;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
+use Spatie\Permission\Middlewares\RoleOrPermissionMiddleware;
 
 class MiddlewareTest extends TestCase
 {
     protected $roleMiddleware;
     protected $permissionMiddleware;
+    protected $roleOrPermissionMiddleware;
 
     public function setUp()
     {
@@ -21,6 +23,8 @@ class MiddlewareTest extends TestCase
         $this->roleMiddleware = new RoleMiddleware($this->app);
 
         $this->permissionMiddleware = new PermissionMiddleware($this->app);
+
+        $this->roleOrPermissionMiddleware = new RoleOrPermissionMiddleware($this->app);
     }
 
     /** @test */
@@ -160,6 +164,51 @@ class MiddlewareTest extends TestCase
             $this->runMiddleware(
                 $this->permissionMiddleware, 'edit-articles|edit-news'
             ), 403);
+    }
+
+    /** @test */
+    public function a_user_can_access_a_route_protected_by_permission_or_role_middleware_if_has_this_permission_or_role()
+    {
+        Auth::login($this->testUser);
+
+        $this->testUser->assignRole('testRole');
+        $this->testUser->givePermissionTo('edit-articles');
+
+        $this->assertEquals(
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-news|edit-articles'),
+            200
+        );
+
+        $this->testUser->removeRole('testRole');
+
+        $this->assertEquals(
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles'),
+            200
+        );
+
+        $this->testUser->revokePermissionTo('edit-articles');
+        $this->testUser->assignRole('testRole');
+
+        $this->assertEquals(
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles'),
+            200
+        );
+    }
+
+    /** @test */
+    public function a_user_can_not_access_a_route_protected_by_permission_or_role_middleware_if_have_not_this_permission_and_role()
+    {
+        Auth::login($this->testUser);
+
+        $this->assertEquals(
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles'),
+            403
+        );
+
+        $this->assertEquals(
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'missingRole|missingPermission'),
+            403
+        );
     }
 
     /** @test */
