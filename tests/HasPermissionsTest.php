@@ -340,7 +340,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_list_all_the_permissions_via_his_roles()
+    public function it_can_list_all_the_permissions_via_roles_of_user()
     {
         $roleModel = app(Role::class);
         $roleModel->findByName('testRole2')->givePermissionTo('edit-news');
