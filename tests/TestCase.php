@@ -79,6 +79,8 @@ abstract class TestCase extends Orchestra
 
         // Use test User model for users provider
         $app['config']->set('auth.providers.users.model', User::class);
+
+        $app['config']->set('cache.prefix', 'spatie_tests---');
     }
 
     /**
@@ -88,7 +90,7 @@ abstract class TestCase extends Orchestra
      */
     protected function setUpDatabase($app)
     {
-        $this->app['config']->set('permission.column_names.model_morph_key', 'model_test_id');
+        $app['config']->set('permission.column_names.model_morph_key', 'model_test_id');
 
         $app['db']->connection()->getSchemaBuilder()->create('users', function (Blueprint $table) {
             $table->increments('id');
@@ -101,7 +103,7 @@ abstract class TestCase extends Orchestra
             $table->string('email');
         });
 
-        if ($this->app->make(PermissionRegistrar::class)->getCacheStore() instanceof \Illuminate\Cache\DatabaseStore) {
+        if ($app[PermissionRegistrar::class]->getCacheStore() instanceof \Illuminate\Cache\DatabaseStore) {
             $this->createCacheTable();
         }
 
