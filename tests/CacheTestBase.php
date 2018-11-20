@@ -24,7 +24,7 @@ class CacheTestBase extends TestCase
 
         $this->registrar = app(PermissionRegistrar::class);
 
-        if (!empty($this->cache_driver)) {
+        if (! empty($this->cache_driver)) {
             $this->registrar->setCacheDriver($this->cache_driver);
         }
 
