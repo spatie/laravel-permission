@@ -73,7 +73,7 @@ trait HasRoles
 
             $method = is_numeric($role) ? 'findById' : 'findByName';
 
-            return $this->getRoleClass()->{$method}($role, $this->getDefaultGuardName());
+            return $this->getRoleClass()->{$method}($role);
         }, $roles);
 
         return $query->whereHas('roles', function ($query) use ($roles) {
@@ -105,9 +105,6 @@ trait HasRoles
             })
             ->filter(function ($role) {
                 return $role instanceof Role;
-            })
-            ->each(function ($role) {
-                $this->ensureModelSharesGuard($role);
             })
             ->map->id
             ->all();
@@ -253,11 +250,11 @@ trait HasRoles
         $roleClass = $this->getRoleClass();
 
         if (is_numeric($role)) {
-            return $roleClass->findById($role, $this->getDefaultGuardName());
+            return $roleClass->findById($role);
         }
 
         if (is_string($role)) {
-            return $roleClass->findByName($role, $this->getDefaultGuardName());
+            return $roleClass->findByName($role);
         }
 
         return $role;
