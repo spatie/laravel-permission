@@ -4,6 +4,7 @@ namespace Spatie\Permission\Test;
 
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Contracts\Role;
+use Illuminate\Support\Facades\Artisan;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Contracts\Permission;
 
@@ -180,6 +181,26 @@ class CacheTest extends TestCase
         $this->assertEquals($actual, collect($expected));
 
         $this->assertQueryCount(3);
+    }
+
+    /** @test */
+    public function it_can_reset_the_cache_with_artisan_command()
+    {
+        Artisan::call('permission:create-permission', ['name' => 'new-permission']);
+        $this->assertCount(1, \Spatie\Permission\Models\Permission::where('name', 'new-permission')->get());
+
+        $this->resetQueryCount();
+        // retrieve permissions, and assert that the cache had to be loaded
+        $this->registrar->getPermissions();
+        $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
+
+        // reset the cache
+        Artisan::call('permission:cache-reset');
+
+        $this->resetQueryCount();
+        $this->registrar->getPermissions();
+        // assert that the cache had to be reloaded
+        $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
     }
 
     protected function assertQueryCount(int $expected)
