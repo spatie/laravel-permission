@@ -8,7 +8,7 @@ use Spatie\Permission\Exceptions\UnauthorizedException;
 class CascadePermissionMiddleware
 {
     /**
-     * Do a cascading permissions check by recreating the permission namespace tier-by-tier
+     * Do a cascading permissions check by recreating the permission namespace tier-by-tier.
      *
      * example:
      * admin.auth.users.modify.create
@@ -37,13 +37,13 @@ class CascadePermissionMiddleware
         foreach ($permissions as $permission) {
 
             //split on the '.'
-            $parts   = explode('.', $permission);
+            $parts = explode('.', $permission);
             $ability = '';
 
             foreach ($parts as $part) {
 
                 //reassemble
-                $ability .= $ability ? '.' . $part : $part;
+                $ability .= $ability ? '.'.$part : $part;
 
                 if (app('auth')->user()->can($ability)) {
                     //exit on first match
