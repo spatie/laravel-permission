@@ -2,12 +2,10 @@
 
 namespace Spatie\Permission\Traits;
 
-use Spatie\Permission\Guard;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Contracts\Permission;
-use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
@@ -103,7 +101,7 @@ trait HasPermissions
                 return $permission;
             }
 
-            return $this->getPermissionClass()->findByName($permission, $this->getDefaultGuardName());
+            return $this->getPermissionClass()->findByName($permission);
         }, $permissions);
     }
 
@@ -111,12 +109,11 @@ trait HasPermissions
      * Determine if the model may perform the given permission.
      *
      * @param string|int|\Spatie\Permission\Contracts\Permission $permission
-     * @param string|null $guardName
      *
      * @return bool
      * @throws \Exception
      */
-    public function hasPermissionTo($permission, $guardName = null): bool
+    public function hasPermissionTo($permission): bool
     {
         if (! is_string($permission) && ! is_int($permission) && ! $permission instanceof Permission) {
             throw new PermissionDoesNotExist;
@@ -124,7 +121,7 @@ trait HasPermissions
 
         $registrar = app(PermissionRegistrar::class);
         if (! $registrar::$cacheIsTaggable) {
-            return $this->hasUncachedPermissionTo($permission, $guardName);
+            return $this->hasUncachedPermissionTo($permission);
         }
 
         return $registrar->getCacheStore()
@@ -132,8 +129,8 @@ trait HasPermissions
             ->remember(
                 $this->getCacheKey($permission),
                 $registrar::$cacheExpirationTime,
-                function () use ($permission, $guardName) {
-                    return $this->hasUncachedPermissionTo($permission, $guardName);
+                function () use ($permission) {
+                    return $this->hasUncachedPermissionTo($permission);
                 }
             );
     }
@@ -142,26 +139,19 @@ trait HasPermissions
      * Check the uncached permissions for the model.
      *
      * @param string|int|Permission $permission
-     * @param string|null $guardName
      *
      * @return bool
      */
-    public function hasUncachedPermissionTo($permission, $guardName = null): bool
+    public function hasUncachedPermissionTo($permission): bool
     {
         $permissionClass = $this->getPermissionClass();
 
         if (is_string($permission)) {
-            $permission = $permissionClass->findByName(
-                $permission,
-                $guardName ?? $this->getDefaultGuardName()
-            );
+            $permission = $permissionClass->findByName($permission);
         }
 
         if (is_int($permission)) {
-            $permission = $permissionClass->findById(
-                $permission,
-                $guardName ?? $this->getDefaultGuardName()
-            );
+            $permission = $permissionClass->findById($permission);
         }
 
         if (! $permission instanceof Permission) {
@@ -175,16 +165,15 @@ trait HasPermissions
      * An alias to hasPermissionTo(), but avoids throwing an exception.
      *
      * @param string|int|\Spatie\Permission\Contracts\Permission $permission
-     * @param string|null $guardName
      *
      * @return bool
      *
      * @throws \Exception
      */
-    public function checkPermissionTo($permission, $guardName = null): bool
+    public function checkPermissionTo($permission): bool
     {
         try {
-            return $this->hasPermissionTo($permission, $guardName);
+            return $this->hasPermissionTo($permission);
         } catch (PermissionDoesNotExist $e) {
             return false;
         }
@@ -325,14 +314,14 @@ trait HasPermissions
         $permissionClass = $this->getPermissionClass();
 
         if (is_string($permission)) {
-            $permission = $permissionClass->findByName($permission, $this->getDefaultGuardName());
+            $permission = $permissionClass->findByName($permission);
             if (! $permission) {
                 return false;
             }
         }
 
         if (is_int($permission)) {
-            $permission = $permissionClass->findById($permission, $this->getDefaultGuardName());
+            $permission = $permissionClass->findById($permission);
             if (! $permission) {
                 return false;
             }
@@ -404,9 +393,6 @@ trait HasPermissions
             ->filter(function ($permission) {
                 return $permission instanceof Permission;
             })
-            ->each(function ($permission) {
-                $this->ensureModelSharesGuard($permission);
-            })
             ->map->id
             ->all();
 
@@ -472,43 +458,20 @@ trait HasPermissions
         $permissionClass = $this->getPermissionClass();
 
         if (is_numeric($permissions)) {
-            return $permissionClass->findById($permissions, $this->getDefaultGuardName());
+            return $permissionClass->findById($permissions);
         }
 
         if (is_string($permissions)) {
-            return $permissionClass->findByName($permissions, $this->getDefaultGuardName());
+            return $permissionClass->findByName($permissions);
         }
 
         if (is_array($permissions)) {
             return $permissionClass
                 ->whereIn('name', $permissions)
-                ->whereIn('guard_name', $this->getGuardNames())
                 ->get();
         }
 
         return $permissions;
-    }
-
-    /**
-     * @param \Spatie\Permission\Contracts\Permission|\Spatie\Permission\Contracts\Role $roleOrPermission
-     *
-     * @throws \Spatie\Permission\Exceptions\GuardDoesNotMatch
-     */
-    protected function ensureModelSharesGuard($roleOrPermission)
-    {
-        if (! $this->getGuardNames()->contains($roleOrPermission->guard_name)) {
-            throw GuardDoesNotMatch::create($roleOrPermission->guard_name, $this->getGuardNames());
-        }
-    }
-
-    protected function getGuardNames(): Collection
-    {
-        return Guard::getNames($this);
-    }
-
-    protected function getDefaultGuardName(): string
-    {
-        return Guard::getDefaultName($this);
     }
 
     /**

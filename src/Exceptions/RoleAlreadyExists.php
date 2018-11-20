@@ -6,8 +6,8 @@ use InvalidArgumentException;
 
 class RoleAlreadyExists extends InvalidArgumentException
 {
-    public static function create(string $roleName, string $guardName)
+    public static function create(string $roleName)
     {
-        return new static("A role `{$roleName}` already exists for guard `{$guardName}`.");
+        return new static("A role `{$roleName}` already exists.");
     }
 }
