@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+
+## 2.26.2 - 2018-11-20
+- Added the ability to reset the permissions cache via an Artisan command:
+`php artisan permission:cache-reset`
+
 ## 2.26.1 - 2018-11-19
 - minor update to de-duplicate code overhead
 - numerous internal updates to cache tests infrastructure
