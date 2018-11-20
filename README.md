@@ -235,6 +235,7 @@ composer require spatie/laravel-permission
 Copy the required files:
 
 ```bash
+mkdir -p config
 cp vendor/spatie/laravel-permission/config/permission.php config/permission.php
 cp vendor/spatie/laravel-permission/database/migrations/create_permission_tables.php.stub database/migrations/2018_01_01_000000_create_permission_tables.php
 ```
@@ -242,7 +243,7 @@ cp vendor/spatie/laravel-permission/database/migrations/create_permission_tables
 You will also need to create another configuration file at `config/auth.php`. Get it on the Laravel repository or just run the following command:
 
 ```bash
-curl -Ls https://raw.githubusercontent.com/laravel/lumen-framework/5.5/config/auth.php -o config/auth.php
+curl -Ls https://raw.githubusercontent.com/laravel/lumen-framework/5.7/config/auth.php -o config/auth.php
 ```
 
 Then, in `bootstrap/app.php`, register the middlewares:
