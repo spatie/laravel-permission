@@ -894,6 +894,11 @@ To manually reset the cache for this package, you can run the following in your 
 $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
 ```
 
+Or you can use an Artisan command:
+```bash
+php artisan permission:cache-reset
+```
+
 
 ### Cache Identifier
 
