@@ -8,7 +8,7 @@ use Spatie\Permission\Exceptions\UnauthorizedException;
 class CascadePermissionMiddleware
 {
     /**
-     * Do a cascading permissions check by recreating the permission namespace tier-by-tier
+     * Do a cascading permissions check by recreating the permission namespace tier-by-tier.
      *
      * example:
      * admin.auth.users.modify.create
