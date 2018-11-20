@@ -3,6 +3,7 @@
 namespace Spatie\Permission\Test;
 
 use Spatie\Permission\Contracts\Role;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Contracts\Permission;
@@ -78,6 +79,8 @@ abstract class TestCase extends Orchestra
 
         // Use test User model for users provider
         $app['config']->set('auth.providers.users.model', User::class);
+
+        $app['config']->set('cache.prefix', 'spatie_tests---');
     }
 
     /**
@@ -87,7 +90,7 @@ abstract class TestCase extends Orchestra
      */
     protected function setUpDatabase($app)
     {
-        $this->app['config']->set('permission.column_names.model_morph_key', 'model_test_id');
+        $app['config']->set('permission.column_names.model_morph_key', 'model_test_id');
 
         $app['db']->connection()->getSchemaBuilder()->create('users', function (Blueprint $table) {
             $table->increments('id');
@@ -99,6 +102,10 @@ abstract class TestCase extends Orchestra
             $table->increments('id');
             $table->string('email');
         });
+
+        if ($app[PermissionRegistrar::class]->getCacheStore() instanceof \Illuminate\Cache\DatabaseStore) {
+            $this->createCacheTable();
+        }
 
         include_once __DIR__.'/../database/migrations/create_permission_tables.php.stub';
 
@@ -121,5 +128,14 @@ abstract class TestCase extends Orchestra
     protected function reloadPermissions()
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
+    }
+
+    public function createCacheTable()
+    {
+        Schema::create('cache', function ($table) {
+            $table->string('key')->unique();
+            $table->text('value');
+            $table->integer('expiration');
+        });
     }
 }
