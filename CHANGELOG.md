@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.26.1 - 2018-11-19
+- minor update to de-duplicate code overhead
+- numerous internal updates to cache tests infrastructure
+
 ## 2.26.0 - 2018-11-19
 - Substantial speed increase by caching the associations between models and permissions
 
