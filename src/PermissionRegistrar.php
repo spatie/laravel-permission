@@ -3,9 +3,9 @@
 namespace Spatie\Permission;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Spatie\Permission\Contracts\Role;
 use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Contracts\Cache\Repository;
 use Spatie\Permission\Contracts\Permission;
 use Illuminate\Contracts\Auth\Access\Authorizable;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
@@ -40,20 +40,45 @@ class PermissionRegistrar
      * PermissionRegistrar constructor.
      *
      * @param \Illuminate\Contracts\Auth\Access\Gate $gate
-     * @param \Illuminate\Contracts\Cache\Repository $cache
      */
-    public function __construct(Gate $gate, Repository $cache)
+    public function __construct(Gate $gate)
     {
         $this->gate = $gate;
         $this->permissionClass = config('permission.models.permission');
         $this->roleClass = config('permission.models.role');
 
+        $this->initializeCache();
+    }
+
+    protected function initializeCache()
+    {
         self::$cacheExpirationTime = config('permission.cache.expiration_time', config('permission.cache_expiration_time'));
         self::$cacheKey = config('permission.cache.key');
         self::$cacheModelKey = config('permission.cache.model_key');
+
+        $cache = $this->getCacheStoreFromConfig();
+
         self::$cacheIsTaggable = ($cache->getStore() instanceof \Illuminate\Cache\TaggableStore);
 
         $this->cache = self::$cacheIsTaggable ? $cache->tags(self::$cacheKey) : $cache;
+    }
+
+    protected function getCacheStoreFromConfig(): \Illuminate\Contracts\Cache\Repository
+    {
+        // the 'default' fallback here is from the permission.php config file, where 'default' means to use config(cache.default)
+        $cacheDriver = config('permission.cache.store', 'default');
+
+        // when 'default' is specified, no action is required since we already have the default instance
+        if ($cacheDriver === 'default') {
+            return Cache::store();
+        }
+
+        // if an undefined cache store is specified, fallback to 'array' which is Laravel's closest equiv to 'none'
+        if (! \array_key_exists($cacheDriver, config('cache.stores'))) {
+            $cacheDriver = 'array';
+        }
+
+        return Cache::store($cacheDriver);
     }
 
     /**
@@ -95,7 +120,7 @@ class PermissionRegistrar
         $permissions = $this->cache->remember($this->getKey($params), self::$cacheExpirationTime,
             function () use ($params) {
                 return $this->getPermissionClass()
-                    ->when(($params && self::$cacheIsTaggable), function ($query) use ($params) {
+                    ->when($params && self::$cacheIsTaggable, function ($query) use ($params) {
                         return $query->where($params);
                     })
                     ->with('roles')
