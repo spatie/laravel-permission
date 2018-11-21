@@ -2,6 +2,8 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.27.0 - 2018-11-21
+- Add ability to specify a cache driver for roles/permissions caching
 
 ## 2.26.2 - 2018-11-20
 - Added the ability to reset the permissions cache via an Artisan command:
