@@ -53,11 +53,10 @@ class Role extends Model implements RoleContract
     /**
      * A role belongs to some users/role having models.
      */
-    public function users(): MorphToMany
+    public function users(): BelongsToMany
     {
         return $this->morphedByMany(
-            // TODO: decide on the right model here!!!
-            \Spatie\Permission\Test\User::class, // TEMP! - getModelForGuard($this->attributes['guard_name']),
+            getProviderModelForGuard(),
             'model',
             config('permission.table_names.model_has_roles'),
             'role_id',

@@ -57,11 +57,10 @@ class Permission extends Model implements PermissionContract
     /**
      * A permission belongs to some users/permission things.
      */
-    public function users(): MorphToMany
+    public function users(): BelongsToMany
     {
         return $this->morphedByMany(
-        // TODO: decide on the right model here!!!
-            \Spatie\Permission\Test\User::class, // TEMP! - getModelForGuard($this->attributes['guard_name']),
+            getProviderModelForGuard(),
             'model',
             config('permission.table_names.model_has_permissions'),
             'permission_id',
