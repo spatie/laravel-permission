@@ -130,7 +130,7 @@ trait HasPermissions
         return $registrar->getCacheStore()
             ->tags($this->getCacheTags($permission))
             ->remember(
-                $this->getCacheKey($permission),
+                $this->getPermissionCacheKey($permission),
                 $registrar::$cacheExpirationTime,
                 function () use ($permission, $guardName) {
                     return $this->hasUncachedPermissionTo($permission, $guardName);
@@ -197,7 +197,7 @@ trait HasPermissions
      *
      * @return string
      */
-    protected function getCacheKey($permission = null)
+    protected function getPermissionCacheKey($permission = null)
     {
         $key = PermissionRegistrar::$cacheKey.'.'.$this->getClassCacheString();
 
@@ -378,7 +378,7 @@ trait HasPermissions
             return $registrar->getCacheStore()
                 ->tags($this->getCacheTags())
                 ->remember(
-                    $this->getCacheKey(),
+                    $this->getPermissionCacheKey(),
                     $registrar::$cacheExpirationTime,
                     $functionGetAllPermissions
                 );
