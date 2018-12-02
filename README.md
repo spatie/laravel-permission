@@ -934,6 +934,10 @@ The package doesn't come with any screens out of the box, you should build that 
 composer test
 ```
 
+### Upgrading
+If you're upgrading from v1 to v2, @fabricecw prepared [a gist which may make your data migration easier](https://gist.github.com/fabricecw/58ee93dd4f99e78724d8acbb851658a4).
+You will also need to remove your old `laravel-permission.php` config file and publish the new one `permission.php`, and edit accordingly.
+
 ### Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
