@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.28.1 - 2018-12-07
+- Remove use of Cache facade, for Lumen compatibility
+
 ## 2.28.0 - 2018-11-30
 - Rename `getCacheKey` method in HasPermissions trait to `getPermissionCacheKey` for clearer specificity. 
 
