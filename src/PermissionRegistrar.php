@@ -2,8 +2,8 @@
 
 namespace Spatie\Permission;
 
+use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
 use Spatie\Permission\Contracts\Role;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Spatie\Permission\Contracts\Permission;
@@ -17,6 +17,9 @@ class PermissionRegistrar
 
     /** @var \Illuminate\Contracts\Cache\Repository */
     protected $cache;
+
+    /** @var \Illuminate\Cache\CacheManager */
+    protected $cacheManager;
 
     /** @var string */
     protected $permissionClass;
@@ -40,13 +43,15 @@ class PermissionRegistrar
      * PermissionRegistrar constructor.
      *
      * @param \Illuminate\Contracts\Auth\Access\Gate $gate
+     * @param \Illuminate\Cache\CacheManager $cacheManager
      */
-    public function __construct(Gate $gate)
+    public function __construct(Gate $gate, CacheManager $cacheManager)
     {
         $this->gate = $gate;
         $this->permissionClass = config('permission.models.permission');
         $this->roleClass = config('permission.models.role');
 
+        $this->cacheManager = $cacheManager;
         $this->initializeCache();
     }
 
@@ -70,7 +75,7 @@ class PermissionRegistrar
 
         // when 'default' is specified, no action is required since we already have the default instance
         if ($cacheDriver === 'default') {
-            return Cache::store();
+            return $this->cacheManager->store();
         }
 
         // if an undefined cache store is specified, fallback to 'array' which is Laravel's closest equiv to 'none'
@@ -78,7 +83,7 @@ class PermissionRegistrar
             $cacheDriver = 'array';
         }
 
-        return Cache::store($cacheDriver);
+        return $this->cacheManager->store($cacheDriver);
     }
 
     /**
