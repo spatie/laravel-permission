@@ -449,4 +449,34 @@ class HasPermissionsTest extends TestCase
         $this->assertTrue($user->hasPermissionTo('edit-articles'));
         $this->assertTrue($user->fresh()->hasPermissionTo('edit-articles'));
     }
+
+    /** @test */
+    public function calling_givePermissionTo_before_saving_object_doesnt_interfere_with_other_objects()
+    {
+        $user = new User(['email' => 'test@user.com']);
+        $user->givePermissionTo('edit-news');
+        $user->save();
+
+        $user2 = new User(['email' => 'test2@user.com']);
+        $user2->givePermissionTo('edit-articles');
+        $user2->save();
+
+        $this->assertTrue($user2->fresh()->hasPermissionTo('edit-articles'));
+        $this->assertFalse($user2->fresh()->hasPermissionTo('edit-news'));
+    }
+
+    /** @test */
+    public function calling_syncPermissions_before_saving_object_doesnt_interfere_with_other_objects()
+    {
+        $user = new User(['email' => 'test@user.com']);
+        $user->syncPermissions('edit-news');
+        $user->save();
+
+        $user2 = new User(['email' => 'test2@user.com']);
+        $user2->syncPermissions('edit-articles');
+        $user2->save();
+
+        $this->assertTrue($user2->fresh()->hasPermissionTo('edit-articles'));
+        $this->assertFalse($user2->fresh()->hasPermissionTo('edit-news'));
+    }
 }
