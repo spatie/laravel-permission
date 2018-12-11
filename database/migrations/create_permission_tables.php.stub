@@ -77,9 +77,14 @@ class CreatePermissionTables extends Migration
                 ->onDelete('cascade');
 
             $table->primary(['permission_id', 'role_id']);
-
+            
             $cacheConfig = config('permission.cache');
-            app('cache')->store($cacheConfig['store'])->forget($cacheConfig['key']);
+            $cacheStore = $cacheConfig['store'];
+            if ($cacheStore == 'default')
+            {
+                $cacheStore = config('cache.default');
+            }
+            app('cache')->store($cacheStore)->forget($cacheConfig['key']);
         });
     }
 
