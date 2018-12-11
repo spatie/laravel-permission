@@ -78,7 +78,8 @@ class CreatePermissionTables extends Migration
 
             $table->primary(['permission_id', 'role_id']);
 
-            app('cache')->forget(config('permission.cache.key'));
+            $cacheConfig = config('permission.cache');
+            app('cache')->store($cacheConfig['store'])->forget($cacheConfig['key']);
         });
     }
 
