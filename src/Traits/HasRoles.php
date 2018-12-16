@@ -121,8 +121,14 @@ trait HasRoles
             $class = \get_class($model);
 
             $class::saved(
-                function ($model) use ($roles) {
-                    $model->roles()->sync($roles, false);
+                function ($object) use ($roles, $model) {
+                    static $modelLastFiredOn;
+                    if ($modelLastFiredOn !== null && $modelLastFiredOn === $model) {
+                        return;
+                    }
+                    $object->roles()->sync($roles, false);
+                    $object->load('roles');
+                    $modelLastFiredOn = $object;
                 });
         }
 

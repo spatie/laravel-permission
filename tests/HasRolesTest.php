@@ -201,6 +201,36 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function calling_syncRoles_before_saving_object_doesnt_interfere_with_other_objects()
+    {
+        $user = new User(['email' => 'test@user.com']);
+        $user->syncRoles('testRole');
+        $user->save();
+
+        $user2 = new User(['email' => 'admin@user.com']);
+        $user2->syncRoles('testRole2');
+        $user2->save();
+
+        $this->assertTrue($user2->fresh()->hasRole('testRole2'));
+        $this->assertFalse($user2->fresh()->hasRole('testRole'));
+    }
+
+    /** @test */
+    public function calling_assignRole_before_saving_object_doesnt_interfere_with_other_objects()
+    {
+        $user = new User(['email' => 'test@user.com']);
+        $user->assignRole('testRole');
+        $user->save();
+
+        $admin_user = new User(['email' => 'admin@user.com']);
+        $admin_user->assignRole('testRole2');
+        $admin_user->save();
+
+        $this->assertTrue($admin_user->fresh()->hasRole('testRole2'));
+        $this->assertFalse($admin_user->fresh()->hasRole('testRole'));
+    }
+
+    /** @test */
     public function it_throws_an_exception_when_syncing_a_role_from_another_guard()
     {
         $this->expectException(RoleDoesNotExist::class);

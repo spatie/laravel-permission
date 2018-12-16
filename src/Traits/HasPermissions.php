@@ -419,9 +419,14 @@ trait HasPermissions
             $class = \get_class($model);
 
             $class::saved(
-                function ($model) use ($permissions) {
-                    $model->permissions()->sync($permissions, false);
-                    $model->load('permissions');
+                function ($object) use ($permissions, $model) {
+                    static $modelLastFiredOn;
+                    if ($modelLastFiredOn !== null && $modelLastFiredOn === $model) {
+                        return;
+                    }
+                    $object->permissions()->sync($permissions, false);
+                    $object->load('permissions');
+                    $modelLastFiredOn = $object;
                 });
         }
 
