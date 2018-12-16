@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.29.0 - 2018-12-15
+- Fix bound `saved` event from firing on all subsequent models when calling assignRole or givePermissionTo on unsaved models. However, it is preferable to save the model first, and then add roles/permissions after saving. See #971.
+
 ## 2.28.2 - 2018-12-10
 - Use config settings for cache reset in migration stub
 
