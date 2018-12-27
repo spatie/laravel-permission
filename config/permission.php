@@ -80,6 +80,7 @@ return [
          * For example, this would be nice if your primary keys are all UUIDs. In
          * that case, name this `model_uuid`.
          */
+
         'model_morph_key' => 'model_id',
     ],
 
@@ -122,6 +123,7 @@ return [
          * role caching using any of the `store` drivers listed in the cache.php config
          * file. Using 'default' here means to use the `default` set in cache.php.
          */
+
         'store' => 'default',
     ],
 ];
