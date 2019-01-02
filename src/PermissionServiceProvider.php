@@ -68,6 +68,14 @@ class PermissionServiceProvider extends ServiceProvider
     protected function registerBladeExtensions()
     {
         $this->app->afterResolving('blade.compiler', function (BladeCompiler $bladeCompiler) {
+            
+            $bladeCompiler->directive('hasanypermission', function ($permissions) {
+                return "<?php if(Auth::user()->hasAnyPermission({$permissions})): ?>";
+            });
+            $bladeCompiler->directive('endhasanypermission', function () {
+                return '<?php endif; ?>';
+            });
+            
             $bladeCompiler->directive('role', function ($arguments) {
                 list($role, $guard) = explode(',', $arguments.',');
 
