@@ -6,9 +6,9 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class UnauthorizedException extends HttpException
 {
-    private $requiredRoles = [];
+    public $requiredRoles = [];
 
-    private $requiredPermissions = [];
+    public $requiredPermissions = [];
 
     public static function forRoles(array $roles): self
     {
