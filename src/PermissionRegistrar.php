@@ -91,13 +91,18 @@ class PermissionRegistrar
      *
      * @return bool
      */
-    public function registerPermissions()
+    public function registerPermissions(): bool
     {
-        $this->getPermissions()->map(function ($permission) {
-            $this->gate->define($permission->name, function ($user) use ($permission) {
-                return $user->hasPermissionTo($permission);
-            });
+        $this->gate->before(function (Authorizable $user, string $ability) {
+            try {
+                if (method_exists($user, 'hasPermissionTo')) {
+                    return $user->hasPermissionTo($ability) ?: null;
+                }
+            } catch (PermissionDoesNotExist $e) {
+            }
         });
+
+        return true;
     }
 
     /**
