@@ -80,7 +80,7 @@ In Laravel 5.5 the service provider will automatically get registered. In older 
 ];
 ```
 
-You can publish [the migration](https://github.com/spatie/laravel-permission/blob/master/database/migrations/create_permission_tables.php.stub) with:
+You can publish [the migration](https://github.com/spatie/laravel-permission/blob/master/database/migrations/2015_09_14_000001_create_permission_tables.php.stub) with:
 
 ```bash
 php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="migrations"
@@ -244,7 +244,7 @@ Copy the required files:
 ```bash
 mkdir -p config
 cp vendor/spatie/laravel-permission/config/permission.php config/permission.php
-cp vendor/spatie/laravel-permission/database/migrations/create_permission_tables.php.stub database/migrations/2018_01_01_000000_create_permission_tables.php
+cp vendor/spatie/laravel-permission/database/migrations/2015_09_14_000001_create_permission_tables.php.stub database/migrations/2018_01_01_000000_create_permission_tables.php
 ```
 
 You will also need to create another configuration file at `config/auth.php`. Get it on the Laravel repository or just run the following command:
