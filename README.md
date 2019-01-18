@@ -899,7 +899,7 @@ HOWEVER, if you manipulate permission/role data directly in the database instead
 ### Manual cache reset
 To manually reset the cache for this package, you can run the following in your app code:
 ```php
-$this->app->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+app()->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
 ```
 
 Or you can use an Artisan command:
