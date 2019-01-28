@@ -2,6 +2,18 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.30.0 - 2019-01-28
+- Change cache config time to DateInterval instead of integer
+
+This is in preparation for compatibility with Laravel 5.8's cache TTL change to seconds instead of minutes.
+
+NOTE: If you leave your existing `config/permission.php` file alone, then with Laravel 5.8 the `60 * 24` will change from being treated as 24 hours to just 24 minutes. Depending on your app, this may or may not make a significant difference.  Updating your config file to a specific DateInterval will add specificity and insulate you from the TTL change in Laravel 5.8.
+
+Refs:
+
+https://laravel-news.com/cache-ttl-change-coming-to-laravel-5-8
+https://github.com/laravel/framework/commit/fd6eb89b62ec09df1ffbee164831a827e83fa61d
+
 ## 2.29.0 - 2018-12-15
 - Fix bound `saved` event from firing on all subsequent models when calling assignRole or givePermissionTo on unsaved models. However, it is preferable to save the model first, and then add roles/permissions after saving. See #971.
 
