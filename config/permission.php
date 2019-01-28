@@ -95,11 +95,11 @@ return [
     'cache' => [
 
         /*
-         * By default all permissions will be cached for 24 hours unless a permission or
-         * role is updated. Then the cache will be flushed immediately.
+         * By default all permissions are cached for 24 hours to speed up performance.
+         * When permissions or roles are updated the cache is flushed automatically.
          */
 
-        'expiration_time' => 60 * 24,
+        'expiration_time' => \DateInterval::createFromDateString('24 hours'),
 
         /*
          * The key to use when tagging and prefixing entries in the cache.
