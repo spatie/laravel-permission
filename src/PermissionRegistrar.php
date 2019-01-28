@@ -27,7 +27,7 @@ class PermissionRegistrar
     /** @var string */
     protected $roleClass;
 
-    /** @var int */
+    /** @var DateInterval|int */
     public static $cacheExpirationTime;
 
     /** @var string */
@@ -58,6 +58,14 @@ class PermissionRegistrar
     protected function initializeCache()
     {
         self::$cacheExpirationTime = config('permission.cache.expiration_time', config('permission.cache_expiration_time'));
+
+        if (app()->version() <= '5.5') {
+            if (self::$cacheExpirationTime instanceof \DateInterval) {
+                $interval = self::$cacheExpirationTime;
+                self::$cacheExpirationTime = $interval->m * 30 * 60 * 24 + $interval->d * 60 * 24 + $interval->h * 60 + $interval->i;
+            }
+        }
+
         self::$cacheKey = config('permission.cache.key');
         self::$cacheModelKey = config('permission.cache.model_key');
 
