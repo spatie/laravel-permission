@@ -56,7 +56,7 @@ trait HasRoles
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeRole(Builder $query, $roles): Builder
+    public function scopeRole(Builder $query, $roles, $guard = null): Builder
     {
         if ($roles instanceof Collection) {
             $roles = $roles->all();
@@ -66,14 +66,15 @@ trait HasRoles
             $roles = [$roles];
         }
 
-        $roles = array_map(function ($role) {
+        $roles = array_map(function ($role) use ($guard) {
             if ($role instanceof Role) {
                 return $role;
             }
 
             $method = is_numeric($role) ? 'findById' : 'findByName';
+            $guard = $guard ?: $this->getDefaultGuardName();
 
-            return $this->getRoleClass()->{$method}($role, $this->getDefaultGuardName());
+            return $this->getRoleClass()->{$method}($role, $guard);
         }, $roles);
 
         return $query->whereHas('roles', function ($query) use ($roles) {
