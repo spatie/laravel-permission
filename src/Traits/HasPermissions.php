@@ -2,7 +2,6 @@
 
 namespace Spatie\Permission\Traits;
 
-use Illuminate\Support\Arr;
 use Spatie\Permission\Guard;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
@@ -97,7 +96,7 @@ trait HasPermissions
             $permissions = $permissions->all();
         }
 
-        $permissions = Arr::wrap($permissions);
+        $permissions = is_array($permissions) ? $permissions : [$permissions];
 
         return array_map(function ($permission) {
             if ($permission instanceof Permission) {
