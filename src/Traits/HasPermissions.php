@@ -96,7 +96,7 @@ trait HasPermissions
             $permissions = $permissions->all();
         }
 
-        $permissions = array_wrap($permissions);
+        $permissions = is_array($permissions) ? $permissions : [$permissions];
 
         return array_map(function ($permission) {
             if ($permission instanceof Permission) {
@@ -427,7 +427,8 @@ trait HasPermissions
                     $object->permissions()->sync($permissions, false);
                     $object->load('permissions');
                     $modelLastFiredOn = $object;
-                });
+                }
+            );
         }
 
         $this->forgetCachedPermissions();
