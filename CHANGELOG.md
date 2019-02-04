@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.31.0 - 2019-02-03
+- Add custom guard query to role scope
+- Remove use of array_wrap helper function due to future deprecation
+
 ## 2.30.0 - 2019-01-28
 - Change cache config time to DateInterval instead of integer
 
