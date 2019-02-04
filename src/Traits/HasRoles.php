@@ -53,6 +53,7 @@ trait HasRoles
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param string|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
+     * @param string $guard
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
