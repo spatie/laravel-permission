@@ -64,4 +64,26 @@ class CommandTest extends TestCase
         $this->assertTrue($role->hasPermissionTo('first permission'));
         $this->assertTrue($role->hasPermissionTo('second permission'));
     }
+
+
+    /** @test */
+    public function it_can_create_a_role_without_duplication()
+    {
+        Artisan::call('permission:create-role', ['name' => 'new-role']);
+        Artisan::call('permission:create-role', ['name' => 'new-role']);
+
+        $this->assertCount(1, Role::where('name', 'new-role')->get());
+        $this->assertCount(0, Role::where('name', 'new-role')->first()->permissions);
+    }
+
+    /** @test */
+    public function it_can_create_a_permission_without_duplication()
+    {
+        Artisan::call('permission:create-permission', ['name' => 'new-permission']);
+        Artisan::call('permission:create-permission', ['name' => 'new-permission']);
+
+        $this->assertCount(1, Permission::where('name', 'new-permission')->get());
+    }
+
+
 }
