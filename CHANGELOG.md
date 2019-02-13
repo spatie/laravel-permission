@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.32.0 - 2019-02-13
+- Fix duplicate permissions being created through artisan command
+
 ## 2.31.0 - 2019-02-03
 - Add custom guard query to role scope
 - Remove use of array_wrap helper function due to future deprecation
