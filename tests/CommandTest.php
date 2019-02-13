@@ -65,7 +65,6 @@ class CommandTest extends TestCase
         $this->assertTrue($role->hasPermissionTo('second permission'));
     }
 
-
     /** @test */
     public function it_can_create_a_role_without_duplication()
     {
@@ -84,6 +83,4 @@ class CommandTest extends TestCase
 
         $this->assertCount(1, Permission::where('name', 'new-permission')->get());
     }
-
-
 }
