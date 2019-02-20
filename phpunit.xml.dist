@@ -10,7 +10,7 @@
          processIsolation="false"
          stopOnFailure="false">
     <testsuites>
-        <testsuite name="League Test Suite">
+        <testsuite name="Permissions Test Suite">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
