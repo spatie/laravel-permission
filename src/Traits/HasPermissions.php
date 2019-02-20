@@ -114,7 +114,7 @@ trait HasPermissions
      * @param string|null $guardName
      *
      * @return bool
-     * @throws \Exception
+     * @throws PermissionDoesNotExist
      */
     public function hasPermissionTo($permission, $guardName = null): bool
     {
@@ -145,6 +145,8 @@ trait HasPermissions
      * @param string|null $guardName
      *
      * @return bool
+     *
+     * @throws PermissionDoesNotExist
      */
     public function hasUncachedPermissionTo($permission, $guardName = null): bool
     {
@@ -178,8 +180,6 @@ trait HasPermissions
      * @param string|null $guardName
      *
      * @return bool
-     *
-     * @throws \Exception
      */
     public function checkPermissionTo($permission, $guardName = null): bool
     {
