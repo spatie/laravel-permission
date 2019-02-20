@@ -52,6 +52,7 @@ abstract class TestCase extends Orchestra
 
         parent::tearDown();
     }
+
     /**
      * @param \Illuminate\Foundation\Application $app
      *
