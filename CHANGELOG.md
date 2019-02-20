@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.33.0 - 2019-02-20
+- Laravel 5.8 compatibility
+
 ## 2.32.0 - 2019-02-13
 - Fix duplicate permissions being created through artisan command
 
