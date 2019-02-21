@@ -31,4 +31,3 @@ class PermissionMiddleware
         throw UnauthorizedException::forPermissions($permissions);
     }
 }
-

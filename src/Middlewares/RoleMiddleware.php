@@ -13,7 +13,7 @@ class RoleMiddleware
         if (is_null($guard)) {
             $guard = (require config_path('auth.php'))['defaults']['guard'];
         }
-        
+
         if (Auth::guard($guard)->guest()) {
             throw UnauthorizedException::notLoggedIn();
         }

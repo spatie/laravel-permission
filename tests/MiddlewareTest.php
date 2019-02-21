@@ -395,7 +395,7 @@ class MiddlewareTest extends TestCase
         $this->assertEquals(
             $this->runMiddleware(
                 $this->roleMiddleware, 'testAdminRole', 'admin'
-            ), 200);            
+            ), 200);
     }
 
     /** @test */
@@ -416,7 +416,7 @@ class MiddlewareTest extends TestCase
         $this->assertEquals(
             $this->runMiddleware(
                 $this->permissionMiddleware, 'admin-permission', 'admin'
-            ), 200);            
+            ), 200);
     }
 
     /** @test */
@@ -438,7 +438,7 @@ class MiddlewareTest extends TestCase
         $this->assertEquals(
             $this->runMiddleware(
                 $this->roleOrPermissionMiddleware, 'testAdminRole|admin-permission', 'admin'
-            ), 200);            
+            ), 200);
     }
 
     protected function runMiddleware($middleware, ...$parameters)
