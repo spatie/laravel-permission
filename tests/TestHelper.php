@@ -14,12 +14,12 @@ class TestHelper
      *
      * @return int
      */
-    public function testMiddleware($middleware, $parameter)
+    public function testMiddleware($middleware, ...$parameters)
     {
         try {
             return $middleware->handle(new Request(), function () {
                 return (new Response())->setContent('<html></html>');
-            }, $parameter)->status();
+            }, ...$parameters)->status();
         } catch (HttpException $e) {
             return $e->getStatusCode();
         }

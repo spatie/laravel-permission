@@ -5,6 +5,7 @@ namespace Spatie\Permission\Test;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Auth\Middleware\Authenticate;
 use Spatie\Permission\Middlewares\RoleMiddleware;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
@@ -25,6 +26,8 @@ class MiddlewareTest extends TestCase
         $this->permissionMiddleware = new PermissionMiddleware($this->app);
 
         $this->roleOrPermissionMiddleware = new RoleOrPermissionMiddleware($this->app);
+
+        $this->authenticateMiddleware = new Authenticate($this->app['auth']);
     }
 
     /** @test */
@@ -247,12 +250,203 @@ class MiddlewareTest extends TestCase
         $this->assertEquals(['some-permission'], $requiredPermissions);
     }
 
-    protected function runMiddleware($middleware, $parameter)
+    /** @test */
+    public function a_guest_cannot_access_a_route_protected_by_the_role_middleware_from_a_specific_guard()
+    {
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->roleMiddleware, 'testAdminRole', 'admin'
+            ), 403);
+    }
+
+    /** @test */
+    public function a_guest_cannot_access_a_route_protected_by_the_permission_middleware_from_a_specific_guard()
+    {
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->permissionMiddleware, 'admin-permission', 'admin'
+            ), 403);
+    }
+
+    /** @test */
+    public function a_guest_can_not_access_a_route_protected_by_permission_or_role_middleware_from_a_specific_guard()
+    {
+        $this->assertEquals(
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testAdminRole|admin-permission', 'admin'),
+            403
+        );
+    }
+
+    /** @test */
+    public function an_admin_user_can_access_a_route_protected_by_role_middleware_from_a_specific_guard()
+    {
+        $this->testAdmin->assignRole('testAdminRole');
+
+        Auth::guard('admin')->login($this->testAdmin);
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->roleMiddleware, 'testAdminRole', 'admin'
+            ), 200);
+    }
+
+    /** @test */
+    public function an_admin_user_cannot_access_a_route_protected_by_role_middleware_from_a_specific_guard_if_they_do_not_provide_the_guard_name()
+    {
+        $this->testAdmin->assignRole('testAdminRole');
+
+        Auth::guard('admin')->login($this->testAdmin);
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->roleMiddleware, 'testAdminRole'
+            ), 403);
+    }
+
+    /** @test */
+    public function an_admin_user_can_access_a_route_protected_by_permission_middleware_from_a_specific_guard()
+    {
+        $this->testAdmin->givePermissionTo('admin-permission');
+
+        Auth::guard('admin')->login($this->testAdmin);
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->permissionMiddleware, 'admin-permission', 'admin'
+            ), 200);
+    }
+
+    /** @test */
+    public function an_admin_user_cannot_access_a_route_protected_by_permission_middleware_from_a_specific_guard_if_they_do_not_provide_the_guard_name()
+    {
+        $this->testAdmin->givePermissionTo('admin-permission');
+
+        Auth::guard('admin')->login($this->testAdmin);
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->permissionMiddleware, 'admin-permission'
+            ), 403);
+    }
+
+    /** @test */
+    public function an_admin_user_can_access_a_route_protected_by_role_or_permission_middleware_from_a_specific_guard()
+    {
+        Auth::guard('admin')->login($this->testAdmin);
+
+        $this->testAdmin->assignRole('testAdminRole');
+        $this->testAdmin->givePermissionTo('admin-permission');
+
+        $this->assertEquals(
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testAdminRole|admin-permission', 'admin'),
+            200
+        );
+    }
+
+    /** @test */
+    public function an_admin_user_cannot_access_a_route_protected_by_role_or_permission_middleware_from_a_specific_guard_if_they_do_not_provide_the_guard_name()
+    {
+        Auth::guard('admin')->login($this->testAdmin);
+
+        $this->testAdmin->assignRole('testAdminRole');
+        $this->testAdmin->givePermissionTo('admin-permission');
+
+        $this->assertEquals(
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testAdminRole|admin-permission'),
+            403
+        );
+    }
+
+    /** @test */
+    public function logging_in_both_users_and_calling_the_authenticate_middleware_with_a_guard_results_in_a_change_at_runtime_of_the_default_guard_config_value()
+    {
+        Auth::login($this->testUser);
+
+        $this->runMiddleware(
+            $this->authenticateMiddleware
+        );
+
+        $this->assertEquals('web', config('auth.defaults.guard'));
+
+        Auth::guard('admin')->login($this->testAdmin);
+
+        $this->runMiddleware(
+            $this->authenticateMiddleware, 'admin'
+        );
+
+        $this->assertEquals('admin', config('auth.defaults.guard'));
+    }
+
+    /** @test */
+    public function ensure_that_the_role_middleware_is_not_affected_by_a_change_at_runtime_of_the_default_guard_config_value()
+    {
+        Auth::login($this->testUser);
+
+        $this->testAdmin->assignRole('testAdminRole');
+        Auth::guard('admin')->login($this->testAdmin);
+
+        config(['auth.defaults.guard' => 'admin']);
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->roleMiddleware, 'testAdminRole'
+            ), 403);
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->roleMiddleware, 'testAdminRole', 'admin'
+            ), 200);            
+    }
+
+    /** @test */
+    public function ensure_that_the_permission_middleware_is_not_affected_by_a_change_at_runtime_of_the_default_guard_config_value()
+    {
+        Auth::login($this->testUser);
+
+        $this->testAdmin->givePermissionTo('admin-permission');
+        Auth::guard('admin')->login($this->testAdmin);
+
+        config(['auth.defaults.guard' => 'admin']);
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->permissionMiddleware, 'admin-permission'
+            ), 403);
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->permissionMiddleware, 'admin-permission', 'admin'
+            ), 200);            
+    }
+
+    /** @test */
+    public function ensure_that_the_role_or_permission_middleware_is_not_affected_by_a_change_at_runtime_of_the_default_guard_config_value()
+    {
+        Auth::login($this->testUser);
+
+        $this->testAdmin->assignRole('testAdminRole');
+        $this->testAdmin->givePermissionTo('admin-permission');
+        Auth::guard('admin')->login($this->testAdmin);
+
+        config(['auth.defaults.guard' => 'admin']);
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->roleOrPermissionMiddleware, 'testAdminRole|admin-permission'
+            ), 403);
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->roleOrPermissionMiddleware, 'testAdminRole|admin-permission', 'admin'
+            ), 200);            
+    }
+
+    protected function runMiddleware($middleware, ...$parameters)
     {
         try {
             return $middleware->handle(new Request(), function () {
                 return (new Response())->setContent('<html></html>');
-            }, $parameter)->status();
+            }, ...$parameters)->status();
         } catch (UnauthorizedException $e) {
             return $e->getStatusCode();
         }

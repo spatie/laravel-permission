@@ -3,13 +3,18 @@
 namespace Spatie\Permission\Middlewares;
 
 use Closure;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 
 class PermissionMiddleware
 {
-    public function handle($request, Closure $next, $permission)
+    public function handle($request, Closure $next, $permission, $guard = null)
     {
-        if (app('auth')->guest()) {
+        if (is_null($guard)) {
+            $guard = (require config_path('auth.php'))['defaults']['guard'];
+        }
+
+        if (Auth::guard($guard)->guest()) {
             throw UnauthorizedException::notLoggedIn();
         }
 
@@ -18,7 +23,7 @@ class PermissionMiddleware
             : explode('|', $permission);
 
         foreach ($permissions as $permission) {
-            if (app('auth')->user()->can($permission)) {
+            if (Auth::guard($guard)->user()->can($permission, $guard)) {
                 return $next($request);
             }
         }
@@ -26,3 +31,4 @@ class PermissionMiddleware
         throw UnauthorizedException::forPermissions($permissions);
     }
 }
+
