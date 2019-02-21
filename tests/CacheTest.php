@@ -150,7 +150,7 @@ class CacheTest extends TestCase
     /** @test */
     public function has_permission_to_should_use_the_cache()
     {
-        $this->testUserRole->givePermissionTo(['edit-articles', 'edit-news']);
+        $this->testUserRole->givePermissionTo(['edit-articles', 'edit-news', 'Edit News']);
         $this->testUser->assignRole('testRole');
 
         $this->resetQueryCount();
@@ -159,11 +159,15 @@ class CacheTest extends TestCase
 
         $this->resetQueryCount();
         $this->assertTrue($this->testUser->hasPermissionTo('edit-news'));
-        $this->assertQueryCount($this->cache_run_count + $this->cache_untagged_count);
+        $this->assertQueryCount(0);
 
         $this->resetQueryCount();
         $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
-        $this->assertQueryCount($this->cache_init_count);
+        $this->assertQueryCount(0);
+
+        $this->resetQueryCount();
+        $this->assertTrue($this->testUser->hasPermissionTo('Edit News'));
+        $this->assertQueryCount(0);
     }
 
     /** @test */

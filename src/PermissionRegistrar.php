@@ -27,6 +27,9 @@ class PermissionRegistrar
     /** @var string */
     protected $roleClass;
 
+    /** @var \Illuminate\Support\Collection */
+    protected $permissions;
+
     /** @var DateInterval|int */
     public static $cacheExpirationTime;
 
@@ -118,6 +121,7 @@ class PermissionRegistrar
      */
     public function forgetCachedPermissions()
     {
+        $this->permissions = null;
         self::$cacheIsTaggable ? $this->cache->flush() : $this->cache->forget(self::$cacheKey);
     }
 
@@ -130,39 +134,21 @@ class PermissionRegistrar
      */
     public function getPermissions(array $params = []): Collection
     {
-        $permissions = $this->cache->remember($this->getKey($params), self::$cacheExpirationTime,
-            function () use ($params) {
+        if ($this->permissions === null) {
+            $this->permissions = $this->cache->remember(self::$cacheKey, self::$cacheExpirationTime, function () {
                 return $this->getPermissionClass()
-                    ->when($params && self::$cacheIsTaggable, function ($query) use ($params) {
-                        return $query->where($params);
-                    })
                     ->with('roles')
                     ->get();
             });
+        }
 
-        if (! self::$cacheIsTaggable) {
-            foreach ($params as $attr => $value) {
-                $permissions = $permissions->where($attr, $value);
-            }
+        $permissions = clone $this->permissions;
+
+        foreach ($params as $attr => $value) {
+            $permissions = $permissions->where($attr, $value);
         }
 
         return $permissions;
-    }
-
-    /**
-     * Get the key for caching.
-     *
-     * @param $params
-     *
-     * @return string
-     */
-    public function getKey(array $params): string
-    {
-        if ($params && self::$cacheIsTaggable) {
-            return self::$cacheKey.'.'.implode('.', array_values($params));
-        }
-
-        return self::$cacheKey;
     }
 
     /**
