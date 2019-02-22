@@ -22,7 +22,7 @@ class RoleOrPermissionMiddleware
             ? $roleOrPermission
             : explode('|', $roleOrPermission);
 
-        if (! Auth::guard($guard)->user()->hasAnyRole($rolesOrPermissions, $guard) && ! Auth::guard($guard)->user()->hasAnyPermission($rolesOrPermissions, $guard)) {
+        if (! Auth::guard($guard)->user()->hasAnyRole($rolesOrPermissions) && ! Auth::guard($guard)->user()->hasAnyPermission($rolesOrPermissions)) {
             throw UnauthorizedException::forRolesOrPermissions($rolesOrPermissions);
         }
 

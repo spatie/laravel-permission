@@ -23,7 +23,7 @@ class PermissionMiddleware
             : explode('|', $permission);
 
         foreach ($permissions as $permission) {
-            if (Auth::guard($guard)->user()->can($permission, $guard)) {
+            if (Auth::guard($guard)->user()->can($permission)) {
                 return $next($request);
             }
         }

@@ -22,7 +22,7 @@ class RoleMiddleware
             ? $role
             : explode('|', $role);
 
-        if (! Auth::guard($guard)->user()->hasAnyRole($roles, $guard)) {
+        if (! Auth::guard($guard)->user()->hasAnyRole($roles)) {
             throw UnauthorizedException::forRoles($roles);
         }
 
