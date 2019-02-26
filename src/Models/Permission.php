@@ -54,7 +54,9 @@ class Permission extends Model implements PermissionContract
     {
         return $this->belongsToMany(
             config('permission.models.role'),
-            config('permission.table_names.role_has_permissions')
+            config('permission.table_names.role_has_permissions'),
+            'permission_id',
+            'role_id'
         );
     }
 
