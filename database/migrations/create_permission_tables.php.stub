@@ -20,6 +20,7 @@ class CreatePermissionTables extends Migration
             $table->increments('id');
             $table->string('name');
             $table->string('guard_name');
+            $table->unique(['name', 'guard_name'],'p_n_g_unique');
             $table->timestamps();
         });
 
@@ -27,6 +28,7 @@ class CreatePermissionTables extends Migration
             $table->increments('id');
             $table->string('name');
             $table->string('guard_name');
+            $table->unique(['name', 'guard_name'],'r_n_g_unique');
             $table->timestamps();
         });
 
