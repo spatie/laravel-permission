@@ -5,7 +5,7 @@ namespace Spatie\Permission;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Cache\Repository;
 use Spatie\Permission\Contracts\Permission;
-use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Access\Authorizable;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class PermissionRegistrar
@@ -37,7 +37,7 @@ class PermissionRegistrar
      */
     public function registerPermissions()
     {
-        $this->gate->before(function (Authenticatable $user, $ability) {
+        $this->gate->before(function (Authorizable $user, $ability) {
             try {
                 if (method_exists($user, 'hasPermissionTo')) {
                     return $user->hasPermissionTo($ability) ?: null;
