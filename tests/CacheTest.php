@@ -12,8 +12,7 @@ class CacheTest extends TestCase
 {
     protected $cache_init_count = 0;
     protected $cache_load_count = 0;
-    protected $cache_run_count = 2;
-    protected $cache_reload_count = 0;
+    protected $cache_run_count = 2; // roles lookup, permissions lookup
     protected $cache_relations_count = 1;
 
     protected $registrar;
@@ -34,8 +33,7 @@ class CacheTest extends TestCase
             case $cacheStore instanceof \Illuminate\Cache\DatabaseStore:
                 $this->cache_init_count = 1;
                 $this->cache_load_count = 1;
-                $this->cache_reload_count = 1;
-                break;
+            default:
         }
     }
 
@@ -47,10 +45,6 @@ class CacheTest extends TestCase
         $this->registrar->getPermissions();
 
         $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
-
-        $this->registrar->getPermissions();
-
-        $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count + $this->cache_reload_count);
     }
 
     /** @test */
@@ -118,7 +112,8 @@ class CacheTest extends TestCase
 
         $this->registrar->getPermissions();
 
-        $this->assertQueryCount($this->cache_init_count);
+        // should all be in memory, so no init/load required
+        $this->assertQueryCount(0);
     }
 
     /** @test */
