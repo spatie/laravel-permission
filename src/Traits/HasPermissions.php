@@ -122,20 +122,7 @@ trait HasPermissions
             throw new PermissionDoesNotExist;
         }
 
-        $registrar = app(PermissionRegistrar::class);
-        if (! $registrar::$cacheIsTaggable) {
-            return $this->hasUncachedPermissionTo($permission, $guardName);
-        }
-
-        return $registrar->getCacheStore()
-            ->tags($this->getCacheTags($permission))
-            ->remember(
-                $this->getPermissionCacheKey($permission),
-                $registrar::$cacheExpirationTime,
-                function () use ($permission, $guardName) {
-                    return $this->hasUncachedPermissionTo($permission, $guardName);
-                }
-            );
+        return $this->hasUncachedPermissionTo($permission, $guardName);
     }
 
     /**
@@ -206,27 +193,6 @@ trait HasPermissions
         }
 
         return md5($key);
-    }
-
-    /**
-     * Construct the tags for the cache entry.
-     *
-     * @param null|string|int|\Spatie\Permission\Contracts\Permission $permission
-     *
-     * @return array
-     */
-    protected function getCacheTags($permission = null)
-    {
-        $tags = [
-            PermissionRegistrar::$cacheKey,
-            $this->getClassCacheString(),
-        ];
-
-        if ($permission !== null) {
-            $tags[] = $this->getPermissionCacheString($permission);
-        }
-
-        return $tags;
     }
 
     /**
@@ -363,28 +329,13 @@ trait HasPermissions
      */
     public function getAllPermissions(): Collection
     {
-        $functionGetAllPermissions = function () {
-            $permissions = $this->permissions;
+        $permissions = $this->permissions;
 
-            if ($this->roles) {
-                $permissions = $permissions->merge($this->getPermissionsViaRoles());
-            }
-
-            return $permissions->sort()->values();
-        };
-
-        $registrar = app(PermissionRegistrar::class);
-        if ($registrar::$cacheIsTaggable) {
-            return $registrar->getCacheStore()
-                ->tags($this->getCacheTags())
-                ->remember(
-                    $this->getPermissionCacheKey(),
-                    $registrar::$cacheExpirationTime,
-                    $functionGetAllPermissions
-                );
+        if ($this->roles) {
+            $permissions = $permissions->merge($this->getPermissionsViaRoles());
         }
 
-        return $functionGetAllPermissions();
+        return $permissions->sort()->values();
     }
 
     /**

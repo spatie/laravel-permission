@@ -39,9 +39,6 @@ class PermissionRegistrar
     /** @var string */
     public static $cacheModelKey;
 
-    /** @var bool */
-    public static $cacheIsTaggable = false;
-
     /**
      * PermissionRegistrar constructor.
      *
@@ -72,11 +69,7 @@ class PermissionRegistrar
         self::$cacheKey = config('permission.cache.key');
         self::$cacheModelKey = config('permission.cache.model_key');
 
-        $cache = $this->getCacheStoreFromConfig();
-
-        self::$cacheIsTaggable = ($cache->getStore() instanceof \Illuminate\Cache\TaggableStore);
-
-        $this->cache = self::$cacheIsTaggable ? $cache->tags(self::$cacheKey) : $cache;
+        $this->cache = $this->getCacheStoreFromConfig();
     }
 
     protected function getCacheStoreFromConfig(): \Illuminate\Contracts\Cache\Repository
@@ -122,7 +115,7 @@ class PermissionRegistrar
     public function forgetCachedPermissions()
     {
         $this->permissions = null;
-        self::$cacheIsTaggable ? $this->cache->flush() : $this->cache->forget(self::$cacheKey);
+        $this->cache->forget(self::$cacheKey);
     }
 
     /**
