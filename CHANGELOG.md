@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 1.18.0 - 2019-03-01
+- added support for Laravel 5.8
+- Switched gate registration to use correct Authorizable contract (instead Authenticatable)
+
 ## 1.17.0 - 2018-08-24
 - added support for Laravel 5.7
 
