@@ -399,6 +399,10 @@ trait HasPermissions
         $permissions = collect($permissions)
             ->flatten()
             ->map(function ($permission) {
+                if (empty($permission)) {
+                    return false;
+                }
+
                 return $this->getStoredPermission($permission);
             })
             ->filter(function ($permission) {
