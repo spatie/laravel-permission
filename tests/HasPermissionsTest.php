@@ -479,4 +479,14 @@ class HasPermissionsTest extends TestCase
         $this->assertTrue($user2->fresh()->hasPermissionTo('edit-articles'));
         $this->assertFalse($user2->fresh()->hasPermissionTo('edit-news'));
     }
+
+    /** @test */
+    public function it_can_retrieve_permission_names()
+    {
+        $this->testUser->givePermissionTo('edit-news', 'edit-articles');
+        $this->assertEquals(
+            collect(['edit-news', 'edit-articles']),
+            $this->testUser->getPermissionNames()
+        );
+    }
 }

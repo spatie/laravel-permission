@@ -472,6 +472,11 @@ trait HasPermissions
         return $this;
     }
 
+    public function getPermissionNames(): Collection
+    {
+        return $this->permissions->pluck('name');
+    }
+
     /**
      * @param string|array|\Spatie\Permission\Contracts\Permission|\Illuminate\Support\Collection $permissions
      *
