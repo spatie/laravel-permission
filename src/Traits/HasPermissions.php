@@ -178,50 +178,6 @@ trait HasPermissions
     }
 
     /**
-     * Construct the key for the cache entry.
-     *
-     * @param null|string|int|\Spatie\Permission\Contracts\Permission $permission
-     *
-     * @return string
-     */
-    protected function getPermissionCacheKey($permission = null)
-    {
-        $key = PermissionRegistrar::$cacheKey.'.'.$this->getClassCacheString();
-
-        if ($permission !== null) {
-            $key .= $this->getPermissionCacheString($permission);
-        }
-
-        return md5($key);
-    }
-
-    /**
-     * Get the key to cache the model by.
-     *
-     * @return string
-     */
-    private function getClassCacheString()
-    {
-        return str_replace('\\', '.', get_class($this)).'.'.$this->getKey();
-    }
-
-    /**
-     * Get the key to cache the permission by.
-     *
-     * @param string|int|\Spatie\Permission\Contracts\Permission $permission
-     *
-     * @return mixed
-     */
-    protected function getPermissionCacheString($permission)
-    {
-        if ($permission instanceof Permission) {
-            $permission = $permission[PermissionRegistrar::$cacheModelKey];
-        }
-
-        return str_replace('\\', '.', Permission::class).'.'.$permission;
-    }
-
-    /**
      * Determine if the model has any of the given permissions.
      *
      * @param array ...$permissions
