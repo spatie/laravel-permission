@@ -118,25 +118,6 @@ trait HasPermissions
      */
     public function hasPermissionTo($permission, $guardName = null): bool
     {
-        if (! is_string($permission) && ! is_int($permission) && ! $permission instanceof Permission) {
-            throw new PermissionDoesNotExist;
-        }
-
-        return $this->hasUncachedPermissionTo($permission, $guardName);
-    }
-
-    /**
-     * Check the uncached permissions for the model.
-     *
-     * @param string|int|Permission $permission
-     * @param string|null $guardName
-     *
-     * @return bool
-     *
-     * @throws PermissionDoesNotExist
-     */
-    public function hasUncachedPermissionTo($permission, $guardName = null): bool
-    {
         $permissionClass = $this->getPermissionClass();
 
         if (is_string($permission)) {
@@ -158,6 +139,15 @@ trait HasPermissions
         }
 
         return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
+    }
+
+    /**
+     * @deprecated since 2.35.0
+     * @alias of hasPermissionTo()
+     */
+    public function hasUncachedPermissionTo($permission, $guardName = null): bool
+    {
+        return $this->hasPermissionTo($permission, $guardName);
     }
 
     /**
