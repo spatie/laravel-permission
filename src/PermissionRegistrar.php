@@ -143,9 +143,9 @@ class PermissionRegistrar
                     return false;
                 }
             }
+
             return true;
         })]);
-
     }
 
     /**
