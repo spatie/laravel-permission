@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.36.0 - 2019-03-04
+- improve performance by reducing another iteration in processing query results and returning earlier
+
 ## 2.35.0 - 2019-03-01
 - overhaul internal caching strategy for better performance and fix cache miss when permission names contained spaces
 - deprecated hasUncachedPermissionTo() (use hasPermissionTo() instead)
