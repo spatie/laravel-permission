@@ -5,16 +5,16 @@ namespace Spatie\Permission\Test;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Contracts\Role;
 use Illuminate\Support\Facades\Artisan;
-use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class CacheTest extends TestCase
 {
     protected $cache_init_count = 0;
     protected $cache_load_count = 0;
-    protected $cache_run_count = 2; // roles lookup, permissions lookup
-    protected $cache_relations_count = 1;
+    protected $cache_run_count = 1; // permissions lookup
+    protected $cache_relations_count = 2; // roles lookup
 
     protected $registrar;
 
@@ -141,15 +141,15 @@ class CacheTest extends TestCase
 
         $this->resetQueryCount();
         $this->assertTrue($this->testUser->hasPermissionTo('edit-news'));
-        $this->assertQueryCount(0);
+        $this->assertQueryCount(1); // first lookup of this name
 
         $this->resetQueryCount();
         $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
-        $this->assertQueryCount(0);
+        $this->assertQueryCount(0); // re-lookup of same name
 
         $this->resetQueryCount();
         $this->assertTrue($this->testUser->hasPermissionTo('Edit News'));
-        $this->assertQueryCount(0);
+        $this->assertQueryCount(1); // first lookup for this name
     }
 
     /** @test */
