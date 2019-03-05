@@ -137,15 +137,11 @@ class PermissionRegistrar
 
         $permissions = clone $this->permissions;
 
-        return collect([$permissions->first(function ($item) use ($params) {
-            foreach ($params as $key => $value) {
-                if ($item[$key] !== $value) {
-                    return false;
-                }
-            }
+        foreach ($params as $attr => $value) {
+            $permissions = $permissions->where($attr, $value);
+        }
 
-            return true;
-        })]);
+        return $permissions;
     }
 
     /**
