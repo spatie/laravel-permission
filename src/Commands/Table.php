@@ -4,8 +4,8 @@ namespace Spatie\Permission\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class Table extends Command
 {
@@ -18,7 +18,7 @@ class Table extends Command
     {
         $guard = $this->argument('guard');
 
-        if($guard){
+        if ($guard) {
             $guards = Collection::make([$guard]);
         } else {
             $guards = Permission::pluck('guard_name')->merge(Role::pluck('guard_name'))->unique();
