@@ -83,4 +83,31 @@ class CommandTest extends TestCase
 
         $this->assertCount(1, Permission::where('name', 'new-permission')->get());
     }
+
+    /** @test */
+    public function it_can_show_a_permission_table()
+    {
+        Artisan::call('permission:table');
+
+        $output = Artisan::output();
+
+        $this->assertStringContainsString('Guard: web', $output);
+        $this->assertStringContainsString('Guard: admin', $output);
+
+        // |               | testRole | testRole2 |
+        $this->assertRegExp('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|/', $output);
+
+        // | edit-articles |  ·       |  ·        |
+        $this->assertRegExp('/\|\s+edit-articles\s+\|\s+·\s+\|\s+·\s+\|/', $output);
+
+        Role::findByName('testRole')->givePermissionTo('edit-articles');
+        $this->reloadPermissions();
+
+        Artisan::call('permission:table');
+
+        $output = Artisan::output();
+
+        // | edit-articles |  ·       |  ·        |
+        $this->assertRegExp('/\|\s+edit-articles\s+\|\s+✔\s+\|\s+·\s+\|/', $output);
+    }
 }
