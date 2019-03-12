@@ -7,9 +7,9 @@ use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
-class Table extends Command
+class Show extends Command
 {
-    protected $signature = 'permission:table
+    protected $signature = 'permission:show
             {guard? : The name of the guard}';
 
     protected $description = 'Show a table of roles and permissions per guard';

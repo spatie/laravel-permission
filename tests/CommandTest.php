@@ -85,9 +85,9 @@ class CommandTest extends TestCase
     }
 
     /** @test */
-    public function it_can_show_a_permission_table()
+    public function it_can_show_permission_tables()
     {
-        Artisan::call('permission:table');
+        Artisan::call('permission:show');
 
         $output = Artisan::output();
 
@@ -103,7 +103,7 @@ class CommandTest extends TestCase
         Role::findByName('testRole')->givePermissionTo('edit-articles');
         $this->reloadPermissions();
 
-        Artisan::call('permission:table');
+        Artisan::call('permission:show');
 
         $output = Artisan::output();
 
@@ -112,9 +112,9 @@ class CommandTest extends TestCase
     }
 
     /** @test */
-    public function it_shows_one_table()
+    public function it_can_show_permissions_for_guard()
     {
-        Artisan::call('permission:table', ['guard' => 'web']);
+        Artisan::call('permission:show', ['guard' => 'web']);
 
         $output = Artisan::output();
 

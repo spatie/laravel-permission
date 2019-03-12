@@ -33,7 +33,7 @@ class PermissionServiceProvider extends ServiceProvider
                 Commands\CacheReset::class,
                 Commands\CreateRole::class,
                 Commands\CreatePermission::class,
-                Commands\Table::class,
+                Commands\Show::class,
             ]);
         }
 
