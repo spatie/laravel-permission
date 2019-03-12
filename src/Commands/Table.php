@@ -27,13 +27,11 @@ class Table extends Command
         foreach ($guards as $guard) {
             $this->info("Guard: $guard");
 
-            $permissions = Permission::whereGuardName($guard)->orderBy('name')->pluck('name');
-
             $roles = Role::whereGuardName($guard)->orderBy('name')->get()->mapWithKeys(function (Role $role) {
                 return [$role->name => $role->permissions->pluck('name')];
             });
 
-            $header = $roles->keys()->prepend('');
+            $permissions = Permission::whereGuardName($guard)->orderBy('name')->pluck('name');
 
             $body = $permissions->map(function ($permission) use ($roles) {
                 return $roles->map(function (Collection $role_permissions) use ($permission) {
@@ -41,7 +39,10 @@ class Table extends Command
                 })->prepend($permission);
             });
 
-            $this->table($header->toArray(), $body->toArray());
+            $this->table(
+                $roles->keys()->prepend('')->toArray(),
+                $body->toArray()
+            );
         }
     }
 }
