@@ -110,4 +110,15 @@ class CommandTest extends TestCase
         // | edit-articles |  ·       |  ·        |
         $this->assertRegExp('/\|\s+edit-articles\s+\|\s+✔\s+\|\s+·\s+\|/', $output);
     }
+
+    /** @test */
+    public function it_shows_one_table()
+    {
+        Artisan::call('permission:table', ['guard' => 'web']);
+
+        $output = Artisan::output();
+
+        $this->assertStringContainsString('Guard: web', $output);
+        $this->assertStringNotContainsString('Guard: admin', $output);
+    }
 }
