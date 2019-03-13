@@ -91,8 +91,8 @@ class CommandTest extends TestCase
 
         $output = Artisan::output();
 
-        $this->assertStringContainsString('Guard: web', $output);
-        $this->assertStringContainsString('Guard: admin', $output);
+        $this->assertTrue(strpos($output, 'Guard: web') !== false);
+        $this->assertTrue(strpos($output, 'Guard: admin') !== false);
 
         // |               | testRole | testRole2 |
         $this->assertRegExp('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|/', $output);
@@ -118,7 +118,7 @@ class CommandTest extends TestCase
 
         $output = Artisan::output();
 
-        $this->assertStringContainsString('Guard: web', $output);
-        $this->assertStringNotContainsString('Guard: admin', $output);
+        $this->assertTrue(strpos($output, 'Guard: web') !== false);
+        $this->assertTrue(strpos($output, 'Guard: admin') === false);
     }
 }
