@@ -42,7 +42,6 @@ class HasRolesTest extends TestCase
         $this->assertFalse($roles->hasRole('testRole'));
 
         $this->assertTrue($roles->hasRole('testRole2'));
-
     }
 
     /** @test */
