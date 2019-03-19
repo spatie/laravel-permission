@@ -35,7 +35,7 @@ class HasRolesTest extends TestCase
 
         $this->testUser->assignRole('testRole2');
 
-        $this->assertTrue($this->testUser->hasRole(['testRole','testRole2']));
+        $this->assertTrue($this->testUser->hasRole(['testRole', 'testRole2']));
 
         $roles = $this->testUser->removeRole('testRole');
 
