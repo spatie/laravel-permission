@@ -4,7 +4,7 @@ php:
   - 7.1
   - 7.2
   - 7.3
-  - nightly
+  - 7.4snapshot
 
 matrix:
   include:
@@ -13,7 +13,7 @@ matrix:
   - php: 7.1
     env: COMPOSER_FLAGS="--prefer-lowest"
   allow_failures:
-  - php: nightly
+  - php: 7.4snapshot
 
 before_script:
   - travis_retry composer self-update
