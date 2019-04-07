@@ -23,6 +23,7 @@
   * [Using Blade directives](#using-blade-directives)
   * [Defining a Super-Admin](#defining-a-super-admin)
   * [Best Practices -- roles vs permissions](#best-practices----roles-vs-permissions)
+  * [Best Practices -- Using Policies](#best-practices----using-policies)
   * [Using multiple guards](#using-multiple-guards)
   * [Using a middleware](#using-a-middleware)
   * [Using artisan commands](#using-artisan-commands)
@@ -640,6 +641,10 @@ See this wiki article on [Defining a Super-Admin Gate rule](https://github.com/s
 It is generally best to code your app around `permissions` only. That way you can always use the native Laravel `@can` and `can()` directives everywhere in your app.
 
 Roles can still be used to group permissions for easy assignment, and you can still use the role-based helper methods if truly necessary. But most app-related logic can usually be best controlled using the `can` methods, which allows Laravel's Gate layer to do all the heavy lifting.
+
+## Best Practices -- Using Policies
+
+The best way to incorporate access control for access to app features is with Model Policies. This way your application logic can be combined with your permission rules, keeping your implementation simpler. You can find an example of implementing a model policy with this Laravel Permissions package in this demo app: https://github.com/drbyte/spatie-permissions-demo/blob/master/app/Policies/PostPolicy.php
 
 
 ## Using multiple guards
