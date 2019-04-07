@@ -10,12 +10,14 @@ use Spatie\Permission\Models\Permission;
 class Show extends Command
 {
     protected $signature = 'permission:show
-            {guard? : The name of the guard}';
+            {guard? : The name of the guard}
+            {style? : The display style (default|borderless|compact|box)}';
 
     protected $description = 'Show a table of roles and permissions per guard';
 
     public function handle()
     {
+        $style = $this->argument('style') ?? 'default';
         $guard = $this->argument('guard');
 
         if ($guard) {
@@ -41,7 +43,8 @@ class Show extends Command
 
             $this->table(
                 $roles->keys()->prepend('')->toArray(),
-                $body->toArray()
+                $body->toArray(),
+                $style
             );
         }
     }
