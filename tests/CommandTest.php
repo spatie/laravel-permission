@@ -83,4 +83,42 @@ class CommandTest extends TestCase
 
         $this->assertCount(1, Permission::where('name', 'new-permission')->get());
     }
+
+    /** @test */
+    public function it_can_show_permission_tables()
+    {
+        Artisan::call('permission:show');
+
+        $output = Artisan::output();
+
+        $this->assertTrue(strpos($output, 'Guard: web') !== false);
+        $this->assertTrue(strpos($output, 'Guard: admin') !== false);
+
+        // |               | testRole | testRole2 |
+        $this->assertRegExp('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|/', $output);
+
+        // | edit-articles |  ·       |  ·        |
+        $this->assertRegExp('/\|\s+edit-articles\s+\|\s+·\s+\|\s+·\s+\|/', $output);
+
+        Role::findByName('testRole')->givePermissionTo('edit-articles');
+        $this->reloadPermissions();
+
+        Artisan::call('permission:show');
+
+        $output = Artisan::output();
+
+        // | edit-articles |  ·       |  ·        |
+        $this->assertRegExp('/\|\s+edit-articles\s+\|\s+✔\s+\|\s+·\s+\|/', $output);
+    }
+
+    /** @test */
+    public function it_can_show_permissions_for_guard()
+    {
+        Artisan::call('permission:show', ['guard' => 'web']);
+
+        $output = Artisan::output();
+
+        $this->assertTrue(strpos($output, 'Guard: web') !== false);
+        $this->assertTrue(strpos($output, 'Guard: admin') === false);
+    }
 }
