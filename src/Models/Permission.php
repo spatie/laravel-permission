@@ -19,7 +19,7 @@ class Permission extends Model implements PermissionContract
     use HasRoles;
     use RefreshesPermissionCache;
 
-    public $guarded = ['id'];
+    protected $guarded = ['id'];
 
     public function __construct(array $attributes = [])
     {
