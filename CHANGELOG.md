@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 2.37.0 - 2019-04-09
+- Added `permission:show` CLI command to display a table of roles/permissions
+- `removeRole` now returns the model, consistent with other methods
+- model `$guarded` properties updated to `protected`
+- README updates
+
 ## 2.36.1 - 2019-03-05
 - reverts the changes made in 2.36.0 due to some reported breaks.
 
