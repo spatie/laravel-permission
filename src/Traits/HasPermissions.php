@@ -383,6 +383,10 @@ trait HasPermissions
     {
         $permissionClass = $this->getPermissionClass();
 
+        if (is_a($permissions, $permissionClass)) {
+            return $permissions;
+        }
+
         if (is_numeric($permissions)) {
             return $permissionClass->findById($permissions, $this->getDefaultGuardName());
         }
