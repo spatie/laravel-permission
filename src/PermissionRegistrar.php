@@ -115,6 +115,7 @@ class PermissionRegistrar
     public function forgetCachedPermissions()
     {
         $this->permissions = null;
+
         return $this->cache->forget(self::$cacheKey);
     }
 
