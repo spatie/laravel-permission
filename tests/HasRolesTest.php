@@ -17,15 +17,31 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_can_assign_and_remove_a_role()
     {
+        $this->assertFalse($this->testUser->hasRole('testRole'));
+
         $this->testUser->assignRole('testRole');
 
         $this->assertTrue($this->testUser->hasRole('testRole'));
 
         $this->testUser->removeRole('testRole');
 
-        $this->refreshTestUser();
-
         $this->assertFalse($this->testUser->hasRole('testRole'));
+    }
+
+    /** @test */
+    public function it_removes_a_role_and_returns_roles()
+    {
+        $this->testUser->assignRole('testRole');
+
+        $this->testUser->assignRole('testRole2');
+
+        $this->assertTrue($this->testUser->hasRole(['testRole', 'testRole2']));
+
+        $roles = $this->testUser->removeRole('testRole');
+
+        $this->assertFalse($roles->hasRole('testRole'));
+
+        $this->assertTrue($roles->hasRole('testRole2'));
     }
 
     /** @test */
@@ -36,8 +52,6 @@ class HasRolesTest extends TestCase
         $this->assertTrue($this->testUserPermission->hasRole('testRole'));
 
         $this->testUserPermission->removeRole('testRole');
-
-        $this->refreshTestUserPermission();
 
         $this->assertFalse($this->testUserPermission->hasRole('testRole'));
     }
@@ -203,6 +217,36 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function calling_syncRoles_before_saving_object_doesnt_interfere_with_other_objects()
+    {
+        $user = new User(['email' => 'test@user.com']);
+        $user->syncRoles('testRole');
+        $user->save();
+
+        $user2 = new User(['email' => 'admin@user.com']);
+        $user2->syncRoles('testRole2');
+        $user2->save();
+
+        $this->assertTrue($user2->fresh()->hasRole('testRole2'));
+        $this->assertFalse($user2->fresh()->hasRole('testRole'));
+    }
+
+    /** @test */
+    public function calling_assignRole_before_saving_object_doesnt_interfere_with_other_objects()
+    {
+        $user = new User(['email' => 'test@user.com']);
+        $user->assignRole('testRole');
+        $user->save();
+
+        $admin_user = new User(['email' => 'admin@user.com']);
+        $admin_user->assignRole('testRole2');
+        $admin_user->save();
+
+        $this->assertTrue($admin_user->fresh()->hasRole('testRole2'));
+        $this->assertFalse($admin_user->fresh()->hasRole('testRole'));
+    }
+
+    /** @test */
     public function it_throws_an_exception_when_syncing_a_role_from_another_guard()
     {
         $this->expectException(RoleDoesNotExist::class);
@@ -312,6 +356,32 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_scope_against_a_specific_guard()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1->assignRole('testRole');
+        $user2->assignRole('testRole2');
+
+        $scopedUsers1 = User::role('testRole', 'web')->get();
+
+        $this->assertEquals($scopedUsers1->count(), 1);
+
+        $user3 = Admin::create(['email' => 'user1@test.com']);
+        $user4 = Admin::create(['email' => 'user1@test.com']);
+        $user5 = Admin::create(['email' => 'user2@test.com']);
+        $testAdminRole2 = app(Role::class)->create(['name' => 'testAdminRole2', 'guard_name' => 'admin']);
+        $user3->assignRole($this->testAdminRole);
+        $user4->assignRole($this->testAdminRole);
+        $user5->assignRole($testAdminRole2);
+        $scopedUsers2 = Admin::role('testAdminRole', 'admin')->get();
+        $scopedUsers3 = Admin::role('testAdminRole2', 'admin')->get();
+
+        $this->assertEquals($scopedUsers2->count(), 2);
+        $this->assertEquals($scopedUsers3->count(), 1);
+    }
+
+    /** @test */
     public function it_throws_an_exception_when_trying_to_scope_a_role_from_another_guard()
     {
         $this->expectException(RoleDoesNotExist::class);
@@ -333,8 +403,6 @@ class HasRolesTest extends TestCase
         $this->assertFalse($this->testUser->hasRole($roleModel->all()));
 
         $this->testUser->assignRole($this->testUserRole);
-
-        $this->refreshTestUser();
 
         $this->assertTrue($this->testUser->hasRole($roleModel->all()));
 
@@ -368,13 +436,9 @@ class HasRolesTest extends TestCase
 
         $this->testUser->assignRole($this->testUserRole);
 
-        $this->refreshTestUser();
-
         $this->assertFalse($this->testUser->hasAllRoles(['testRole', 'second role']));
 
         $this->testUser->assignRole('second role');
-
-        $this->refreshTestUser();
 
         $this->assertTrue($this->testUser->hasAllRoles(['testRole', 'second role']));
     }
@@ -387,8 +451,6 @@ class HasRolesTest extends TestCase
         $this->assertFalse($this->testUser->hasRole($this->testAdminRole));
 
         $this->testUser->assignRole('testRole');
-
-        $this->refreshTestUser();
 
         $this->assertTrue($this->testUser->hasAnyRole(['testRole', 'testAdminRole']));
 

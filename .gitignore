@@ -2,3 +2,4 @@ build
 composer.lock
 vendor
 tests/temp
+.idea

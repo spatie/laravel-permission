@@ -28,6 +28,10 @@ class CreateRole extends Command
 
     protected function makePermissions($string = null)
     {
+        if (empty($string)) {
+            return;
+        }
+
         $permissionClass = app(PermissionContract::class);
 
         $permissions = explode('|', $string);

@@ -10,7 +10,7 @@
          processIsolation="false"
          stopOnFailure="false">
     <testsuites>
-        <testsuite name="League Test Suite">
+        <testsuite name="Permissions Test Suite">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
@@ -19,4 +19,7 @@
             <directory suffix=".php">src/</directory>
         </whitelist>
     </filter>
+    <php>
+        <env name="CACHE_DRIVER" value="array"/>
+    </php>
 </phpunit>

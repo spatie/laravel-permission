@@ -96,7 +96,7 @@ trait HasPermissions
             $permissions = $permissions->all();
         }
 
-        $permissions = array_wrap($permissions);
+        $permissions = is_array($permissions) ? $permissions : [$permissions];
 
         return array_map(function ($permission) {
             if ($permission instanceof Permission) {
@@ -114,6 +114,7 @@ trait HasPermissions
      * @param string|null $guardName
      *
      * @return bool
+     * @throws PermissionDoesNotExist
      */
     public function hasPermissionTo($permission, $guardName = null): bool
     {
@@ -141,11 +142,38 @@ trait HasPermissions
     }
 
     /**
+     * @deprecated since 2.35.0
+     * @alias of hasPermissionTo()
+     */
+    public function hasUncachedPermissionTo($permission, $guardName = null): bool
+    {
+        return $this->hasPermissionTo($permission, $guardName);
+    }
+
+    /**
+     * An alias to hasPermissionTo(), but avoids throwing an exception.
+     *
+     * @param string|int|\Spatie\Permission\Contracts\Permission $permission
+     * @param string|null $guardName
+     *
+     * @return bool
+     */
+    public function checkPermissionTo($permission, $guardName = null): bool
+    {
+        try {
+            return $this->hasPermissionTo($permission, $guardName);
+        } catch (PermissionDoesNotExist $e) {
+            return false;
+        }
+    }
+
+    /**
      * Determine if the model has any of the given permissions.
      *
      * @param array ...$permissions
      *
      * @return bool
+     * @throws \Exception
      */
     public function hasAnyPermission(...$permissions): bool
     {
@@ -154,7 +182,7 @@ trait HasPermissions
         }
 
         foreach ($permissions as $permission) {
-            if ($this->hasPermissionTo($permission)) {
+            if ($this->checkPermissionTo($permission)) {
                 return true;
             }
         }
@@ -168,6 +196,7 @@ trait HasPermissions
      * @param array ...$permissions
      *
      * @return bool
+     * @throws \Exception
      */
     public function hasAllPermissions(...$permissions): bool
     {
@@ -241,13 +270,18 @@ trait HasPermissions
 
     /**
      * Return all the permissions the model has, both directly and via roles.
+     *
+     * @throws \Exception
      */
     public function getAllPermissions(): Collection
     {
-        return $this->permissions
-            ->merge($this->getPermissionsViaRoles())
-            ->sort()
-            ->values();
+        $permissions = $this->permissions;
+
+        if ($this->roles) {
+            $permissions = $permissions->merge($this->getPermissionsViaRoles());
+        }
+
+        return $permissions->sort()->values();
     }
 
     /**
@@ -262,6 +296,10 @@ trait HasPermissions
         $permissions = collect($permissions)
             ->flatten()
             ->map(function ($permission) {
+                if (empty($permission)) {
+                    return false;
+                }
+
                 return $this->getStoredPermission($permission);
             })
             ->filter(function ($permission) {
@@ -277,13 +315,21 @@ trait HasPermissions
 
         if ($model->exists) {
             $this->permissions()->sync($permissions, false);
+            $model->load('permissions');
         } else {
             $class = \get_class($model);
 
             $class::saved(
-                function ($model) use ($permissions) {
-                    $model->permissions()->sync($permissions, false);
-                });
+                function ($object) use ($permissions, $model) {
+                    static $modelLastFiredOn;
+                    if ($modelLastFiredOn !== null && $modelLastFiredOn === $model) {
+                        return;
+                    }
+                    $object->permissions()->sync($permissions, false);
+                    $object->load('permissions');
+                    $modelLastFiredOn = $object;
+                }
+            );
         }
 
         $this->forgetCachedPermissions();
@@ -318,7 +364,14 @@ trait HasPermissions
 
         $this->forgetCachedPermissions();
 
+        $this->load('permissions');
+
         return $this;
+    }
+
+    public function getPermissionNames(): Collection
+    {
+        return $this->permissions->pluck('name');
     }
 
     /**

@@ -1,18 +1,19 @@
 language: php
 
 php:
-  - 7.0
   - 7.1
   - 7.2
+  - 7.3
+  - 7.4snapshot
 
-env:
-  matrix:
-    - COMPOSER_FLAGS="--prefer-lowest"
-    - COMPOSER_FLAGS=""
 matrix:
-  exclude:
-  - php: 7.2
+  include:
+  - php: 7.0
     env: COMPOSER_FLAGS="--prefer-lowest"
+  - php: 7.1
+    env: COMPOSER_FLAGS="--prefer-lowest"
+  allow_failures:
+  - php: 7.4snapshot
 
 before_script:
   - travis_retry composer self-update
