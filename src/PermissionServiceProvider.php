@@ -26,10 +26,6 @@ class PermissionServiceProvider extends ServiceProvider
             if (app()->version() >= '5.5') {
                 $this->registerMacroHelpers();
             }
-
-            if (app()->version() >= '5.5') {
-                $this->registerMacroHelpers();
-            }
         }
 
         if ($this->app->runningInConsole()) {
