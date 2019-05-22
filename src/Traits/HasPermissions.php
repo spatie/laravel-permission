@@ -231,6 +231,7 @@ trait HasPermissions
      * @param string|int|\Spatie\Permission\Contracts\Permission $permission
      *
      * @return bool
+     * @throws PermissionDoesNotExist
      */
     public function hasDirectPermission($permission): bool
     {
