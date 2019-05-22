@@ -15,7 +15,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Role extends Model implements RoleContract
 {
-    use HasPermissions;
+    use HasPermissions {
+        permissions as traitPermissions;
+    }
     use RefreshesPermissionCache;
 
     protected $guarded = ['id'];
@@ -46,15 +48,21 @@ class Role extends Model implements RoleContract
 
     /**
      * A role may be given various permissions.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany|\Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     public function permissions(): BelongsToMany
     {
-        return $this->belongsToMany(
-            config('permission.models.permission'),
-            config('permission.table_names.role_has_permissions'),
-            'role_id',
-            'permission_id'
-        );
+        if (config('permission.table_names.role_has_permissions')) {
+            return $this->belongsToMany(
+                config('permission.models.permission'),
+                config('permission.table_names.role_has_permissions'),
+                'role_id',
+                'permission_id'
+            );
+        }
+
+        return $this->traitPermissions();
     }
 
     /**

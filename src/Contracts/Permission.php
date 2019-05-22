@@ -9,7 +9,7 @@ interface Permission
     /**
      * A permission can be applied to roles.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany|\Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     public function roles(): BelongsToMany;
 

@@ -49,14 +49,26 @@ class Permission extends Model implements PermissionContract
 
     /**
      * A permission can be applied to roles.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany|\Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(
+        if (config('permission.table_names.role_has_permissions')) {
+            return $this->belongsToMany(
+                config('permission.models.role'),
+                config('permission.table_names.role_has_permissions'),
+                'permission_id',
+                'role_id'
+            );
+        }
+
+        return $this->morphedByMany(
             config('permission.models.role'),
-            config('permission.table_names.role_has_permissions'),
+            'model',
+            config('permission.table_names.model_has_permissions'),
             'permission_id',
-            'role_id'
+            config('permission.column_names.model_morph_key')
         );
     }
 
