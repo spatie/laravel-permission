@@ -1,6 +1,6 @@
 <?php
 
-if (!function_exists('getModelForGuard')) {
+if (! function_exists('getModelForGuard')) {
     /**
      * @param string $guard
      *
@@ -10,7 +10,7 @@ if (!function_exists('getModelForGuard')) {
     {
         return collect(config('auth.guards'))
             ->map(function ($guard) {
-                if (!isset($guard['provider'])) {
+                if (! isset($guard['provider'])) {
                     return;
                 }
 
@@ -19,14 +19,14 @@ if (!function_exists('getModelForGuard')) {
     }
 }
 
-if (!function_exists('isNotLumen')) {
+if (! function_exists('isNotLumen')) {
     /**
-     * check if application is lumen
+     * check if application is lumen.
      *
      * @return bool
      */
     function isNotLumen(): bool
     {
-        return !preg_match('/lumen/i', app()->version());
+        return ! preg_match('/lumen/i', app()->version());
     }
 }
