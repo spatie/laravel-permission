@@ -150,6 +150,8 @@ trait HasRoles
 
         $this->load('roles');
 
+        $this->forgetCachedPermissions();
+
         return $this;
     }
 
