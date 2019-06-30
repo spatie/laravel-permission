@@ -183,7 +183,7 @@ class CacheTest extends TestCase
         $actual = $this->testUser->getAllPermissions()->pluck('name');
         $this->assertEquals($actual, collect($expected));
 
-        $this->assertQueryCount(3);
+        $this->assertQueryCount(method_exists($this->testUser, 'loadMissing') ? 2 : 3);
     }
 
     /** @test */
