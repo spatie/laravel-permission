@@ -506,48 +506,9 @@ All these responses are collections of `Spatie\Permission\Models\Permission` obj
 If we follow the previous example, the first response will be a collection with the `delete article` permission and 
 the second will be a collection with the `edit article` permission and the third will contain both.
 
-### Using in Controllers with Laravel's authorize method
+### NOTE about using permission names in policies
 
-Laravel's `Controller` base class has an `authorize` method that will check a user's authorization and return a HTTP 403 if the user is not authorized. This is a convenient way to keep your controller methods short, and it can work nicely with this package.
-
-However, when used with this package you need to be aware of the order in which the authorizations methods are attempted.
-
-With the code below, if the user has the permission `show`, then they will be authorized and the `PostPolicy` `show` method will not be executed.
-
-If the user does **not** have the permission `show`, then the `PostPolicy` `show` method will be executed, and in this example the user will be authorized if they own the post.
-
-```php
-class AuthServiceProvider extends ServiceProvider
-{
-    protected $policies = [
-        \App\Post::class => \App\Policies\Post::class,
-    ];
-}
-
-class PostController extends Controller
-{
-    public function show(Post $post)
-    {
-        $this->authorize('show', $post);
-
-        return view('post.show',compact($post));
-    }
-}
-
-class PostPolicy
-{
-    use HandlesAuthorization;
-
-    public function show(User $user, $post)
-    {
-        if ($user->id === $post->user_id) {
-            return true;
-        }
-
-        return false;
-    }
-}
-```
+When calling `authorize()` for a policy method, if you have a permission named the same as one of those policy methods, your permission "name" will take precedence and not fire the policy. For this reason it may be wise to avoid naming your permissions the same as the methods in your policy. While you can define your own method names, you can read more about the defaults Laravel offers in Laravel's documentation at https://laravel.com/docs/5.8/authorization#writing-policies
 
 ### Using Blade directives
 This package also adds Blade directives to verify whether the currently logged in user has all or any of a given list of roles. 
