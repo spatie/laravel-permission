@@ -158,7 +158,7 @@ class PermissionRegistrar
     public function setPermissionClass($permissionClass)
     {
         $this->permissionClass = $permissionClass;
-        
+
         return $this;
     }
 
