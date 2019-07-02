@@ -171,13 +171,6 @@ class PermissionRegistrar
     {
         return app($this->roleClass);
     }
-    
-    public function setRoleClass($roleClass)
-    {
-        $this->roleClass = $roleClass;
-        
-        return $this;
-    }
 
     /**
      * Get the instance of the Cache Store.
