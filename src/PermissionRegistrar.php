@@ -154,7 +154,7 @@ class PermissionRegistrar
     {
         return app($this->permissionClass);
     }
-    
+
     public function setPermissionClass($permissionClass)
     {
         $this->permissionClass = $permissionClass;
