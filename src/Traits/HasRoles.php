@@ -259,6 +259,11 @@ trait HasRoles
     {
         return $this->roles->pluck('name');
     }
+//     Return all the roles of auth user
+    public function getRoles(): Collection
+    {
+        return $this->roles;
+    }
 
     protected function getStoredRole($role): Role
     {
