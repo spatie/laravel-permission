@@ -155,6 +155,13 @@ class PermissionRegistrar
         return app($this->permissionClass);
     }
 
+    public function setPermissionClass($permissionClass)
+    {
+        $this->permissionClass = $permissionClass;
+
+        return $this;
+    }
+
     /**
      * Get an instance of the role class.
      *
