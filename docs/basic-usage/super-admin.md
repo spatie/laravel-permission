@@ -3,7 +3,7 @@ title: Defining a Super-Admin
 weight: 5
 ---
 
-We strongly recommend that a Super-Admin be handled by setting a global `Gate::before` rule which checks for the desired role. 
+We strongly recommend that a Super-Admin be handled by setting a global `Gate::before` or `Gate::after` rule which checks for the desired role. 
 
 Then you can implement the best-practice of primarily using permission-based controls throughout your app, without always having to check for "is this a super-admin" everywhere.
 
