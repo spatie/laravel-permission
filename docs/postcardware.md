@@ -7,4 +7,4 @@ You're free to use this package, but if it makes it to your production environme
 
 Our address is: Spatie, Samberstraat 69D, 2060 Antwerp, Belgium.
 
-The best postcards will get published on the [open source section](https://spatie.be/en/opensource/postcards) on our website.
+All postcards will get published on the [open source section](https://spatie.be/en/opensource/postcards) on our website.
