@@ -198,8 +198,12 @@ trait HasPermissions
      * @return bool
      * @throws \Exception
      */
-    public function hasAllPermissions($permissions = []): bool
+    public function hasAllPermissions(...$permissions): bool
     {
+        if (is_array($permissions[0])) {
+            $permissions = $permissions[0];
+        }
+        
         foreach ($permissions as $permission) {
             if (! $this->hasPermissionTo($permission)) {
                 return false;
