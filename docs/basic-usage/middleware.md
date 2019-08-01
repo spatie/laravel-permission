@@ -29,7 +29,7 @@ Route::group(['middleware' => ['role:super-admin','permission:publish articles']
     //
 });
 
-Route::group(['middleware' => ['role_or_permission:super-admin']], function () {
+Route::group(['middleware' => ['role_or_permission:super-admin|edit articles']], function () {
     //
 });
 
