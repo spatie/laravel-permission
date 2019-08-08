@@ -12,6 +12,7 @@ weight: 5
 
 
 **role**
+
 - has parameter = YES
 - Prefix: `<?php if(auth()->check() && auth()->user()->hasRole(`
 - Suffix: `)); ?>`
@@ -19,6 +20,7 @@ weight: 5
 --
 
 **endrole**
+
 - has parameter = NO
 - Prefix: blank
 - Suffix: blank
@@ -26,6 +28,7 @@ weight: 5
 --
 
 **hasrole**
+
 - has parameter = YES
 - Prefix: `<?php if(auth()->check() && auth()->user()->hasRole(`
 - Suffix: `)); ?>`
@@ -33,6 +36,7 @@ weight: 5
 --
 
 **endhasrole**
+
 - has parameter = NO
 - Prefix: blank
 - Suffix: blank
@@ -40,6 +44,7 @@ weight: 5
 --
 
 **hasanyrole**
+
 - has parameter = YES
 - Prefix: `<?php if(auth()->check() && auth()->user()->hasAnyRole(`
 - Suffix: `)); ?>`
@@ -47,6 +52,7 @@ weight: 5
 --
 
 **endhasanyrole**
+
 - has parameter = NO
 - Prefix: blank
 - Suffix: blank
@@ -54,6 +60,7 @@ weight: 5
 --
 
 **hasallroles**
+
 - has parameter = YES
 - Prefix: `<?php if(auth()->check() && auth()->user()->hasAllRoles(`
 - Suffix: `)); ?>`
@@ -61,6 +68,7 @@ weight: 5
 --
 
 **endhasallroles**
+
 - has parameter = NO
 - Prefix: blank
 - Suffix: blank
