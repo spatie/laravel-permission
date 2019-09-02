@@ -1,11 +1,14 @@
 {
     "name": "spatie/laravel-permission",
-    "description": "Permission handling for Laravel 5.4 to 5.8",
+    "description": "Permission handling for Laravel 5.8 and up",
     "keywords": [
         "spatie",
         "laravel",
-        "permission", "roles", "permissions", "rbac",
+        "permission",
+        "permissions",
+        "roles",
         "acl",
+        "rbac",
         "security"
     ],
     "homepage": "https://github.com/spatie/laravel-permission",
@@ -19,15 +22,15 @@
         }
     ],
     "require": {
-        "php" : ">=7.0",
-        "illuminate/auth": "~5.3.0|~5.4.0|~5.5.0|~5.6.0|~5.7.0|~5.8.0",
-        "illuminate/container": "~5.3.0|~5.4.0|~5.5.0|~5.6.0|~5.7.0|~5.8.0",
-        "illuminate/contracts": "~5.3.0|~5.4.0|~5.5.0|~5.6.0|~5.7.0|~5.8.0",
-        "illuminate/database": "~5.4.0|~5.5.0|~5.6.0|~5.7.0|~5.8.0"
+        "php" : "^7.2",
+        "illuminate/auth": "^5.8|^6.0",
+        "illuminate/container": "^5.8|^6.0",
+        "illuminate/contracts": "^5.8|^6.0",
+        "illuminate/database": "^5.8|^6.0"
     },
     "require-dev": {
-        "orchestra/testbench": "~3.4.2|~3.5.0|~3.6.0|~3.7.0",
-        "phpunit/phpunit": "^5.7|6.2|^7.0",
+        "orchestra/testbench": "^3.8",
+        "phpunit/phpunit": "^8.0",
         "predis/predis": "^1.1"
     },
     "autoload": {
@@ -43,17 +46,19 @@
             "Spatie\\Permission\\Test\\": "tests"
         }
     },
-    "scripts": {
-        "test": "phpunit"
-    },
-    "config": {
-        "sort-packages": true
-    },
     "extra": {
         "laravel": {
             "providers": [
                 "Spatie\\Permission\\PermissionServiceProvider"
             ]
         }
-    }
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

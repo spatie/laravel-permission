@@ -5,7 +5,7 @@ weight: 4
 
 Role and Permission data are cached to speed up performance.
 
-While we recommend not changing the cache "key" name, if you wish to alter the expiration time you may do so in the `config/permission.php` file, in the `cache` array. Note that as of v2.26.0 the `cache` entry here is now an array, and `expiration_time` is a sub-array entry.
+While we recommend not changing the cache "key" name, if you wish to alter the expiration time you may do so in the `config/permission.php` file, in the `cache` array.
 
 When you use the built-in functions for manipulating roles and permissions, the cache is automatically reset for you, and relations are automatically reloaded for the current model record:
 

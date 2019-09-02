@@ -18,7 +18,7 @@ class CacheTest extends TestCase
 
     protected $registrar;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

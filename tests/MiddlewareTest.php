@@ -16,7 +16,7 @@ class MiddlewareTest extends TestCase
     protected $permissionMiddleware;
     protected $roleOrPermissionMiddleware;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

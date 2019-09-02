@@ -3,7 +3,29 @@ title: Using Blade directives
 weight: 4
 ---
 
-This package also adds Blade directives to verify whether the currently logged in user has all or any of a given list of roles. 
+#### Blade and Permissions
+This package doesn't add any **permission**-specific Blade directives. 
+Instead, use Laravel's native `@can` directive to check if a user has a certain permission.
+
+```php
+@can('edit articles')
+  //
+@endcan
+```
+or
+```php
+@if(auth()->user()->can('edit articles') && $some_other_condition)
+  //
+@endif
+```
+
+You can use `@can`, `@cannot`, `@canany`, and `@guest` to test for permission-related access.
+
+
+### Roles 
+As discussed in the Best Practices section of the docs, it is strongly recommended to always use permission directives, instead of role directives.
+
+However, in case you need to test for Roles, this package also adds Blade directives to verify whether the currently logged in user has all or any of a given list of roles. 
 
 Optionally you can pass in the `guard` that the check will be performed on as a second argument.
 
@@ -65,17 +87,3 @@ Alternatively, `@unlessrole` gives the reverse for checking a singular role, lik
 @endunlessrole
 ```
 
-#### Blade and Permissions
-This package doesn't add any permission-specific Blade directives. Instead, use Laravel's native `@can` directive to check if a user has a certain permission.
-
-```php
-@can('edit articles')
-  //
-@endcan
-```
-or
-```php
-@if(auth()->user()->can('edit articles') && $some_other_condition)
-  //
-@endif
-```
