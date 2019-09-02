@@ -30,9 +30,7 @@ $user->assignRole('writer');
 $role->givePermissionTo('edit articles');
 ```
 
-If you're using multiple guards we've got you covered as well. Every guard will have its own set of permissions and roles that can be assigned to the guard's users. Read about it in the [using multiple guards](#using-multiple-guards) section of the readme.
-
-Because all permissions will be registered on [Laravel's gate](https://laravel.com/docs/5.5/authorization), you can check if a user has a permission with Laravel's default `can` function:
+Because all permissions will be registered on [Laravel's gate](https://laravel.com/docs/authorization), you can check if a user has a permission with Laravel's default `can` function:
 
 ```php
 $user->can('edit articles');
@@ -98,6 +96,8 @@ Special thanks to [Alex Vanderbist](https://github.com/AlexVanderbist) who great
 
 - [Povilas Korop](https://twitter.com/@povilaskorop) did an excellent job listing the alternatives [in an article on Laravel News](https://laravel-news.com/two-best-roles-permissions-packages). In that same article, he compares laravel-permission to [Joseph Silber](https://github.com/JosephSilber)'s [Bouncer]((https://github.com/JosephSilber/bouncer)), which in our book is also an excellent package.
 - [ultraware/roles](https://github.com/ultraware/roles) takes a slightly different approach to its features.
+- [santigarcor/laratrust](https://github.com/santigarcor/laratrust) implements team support
+- [zizaco/entrust](https://github.com/zizaco/entrust) offers some wildcard pattern matching
 
 ## Support us
 
