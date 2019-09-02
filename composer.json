@@ -1,10 +1,10 @@
 {
     "name": "spatie/laravel-permission",
-    "description": "Permission handling for Laravel 5.4 and up",
+    "description": "Permission handling for Laravel 5.4 to 5.8",
     "keywords": [
         "spatie",
         "laravel",
-        "permission",
+        "permission", "roles", "permissions", "rbac",
         "acl",
         "security"
     ],
