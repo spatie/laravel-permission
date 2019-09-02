@@ -38,9 +38,9 @@ Because all permissions will be registered on [Laravel's gate](https://laravel.c
 $user->can('edit articles');
 ```
 
-## Documentation
+## Documentation, Installation, and Usage Instructions
 
-You can find installation instructions and detailed instructions on how to use this package at [the dedicated documentation site](https://docs.spatie.be/laravel-permission/v2/introduction/).
+See the [documentation site](https://docs.spatie.be/laravel-permission/v2/introduction/) for detailed installation and usage instructions.
 
 ## Need a UI?
 
