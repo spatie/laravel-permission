@@ -4,7 +4,7 @@ weight: 4
 ---
 
 ### Upgrading from v2 to v3
-There are no special requirements for upgrading from v2 to v3, other than changing `^2.xx` (xx can vary) to `^3.0` in your `composer.json` and running `composer updat`. Of course, your app must meet the minimum requirements as well.
+There are no special requirements for upgrading from v2 to v3, other than changing `^2.xx` (xx can vary) to `^3.0` in your `composer.json` and running `composer update`. Of course, your app must meet the minimum requirements as well.
 
 ### Upgrading from v1 to v2
 If you're upgrading from v1 to v2, there's no built-in automatic migration/conversion of your data. 
