@@ -13,11 +13,6 @@ class Admin extends Model implements AuthorizableContract, AuthenticatableContra
 {
     use HasRoles, Authorizable, Authenticatable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = ['email'];
 
     public $timestamps = false;
