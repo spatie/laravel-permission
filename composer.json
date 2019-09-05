@@ -29,7 +29,7 @@
         "illuminate/database": "^5.8|^6.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^3.8",
+        "orchestra/testbench": "^3.8|^4.0",
         "phpunit/phpunit": "^8.0",
         "predis/predis": "^1.1"
     },
