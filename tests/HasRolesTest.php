@@ -394,6 +394,14 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_throws_an_exception_when_trying_to_scope_a_non_existing_role()
+    {
+        $this->expectException(RoleDoesNotExist::class);
+
+        User::role('role not defined')->get();
+    }
+
+    /** @test */
     public function it_can_determine_that_a_user_has_one_of_the_given_roles()
     {
         $roleModel = app(Role::class);

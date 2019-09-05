@@ -176,6 +176,14 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    public function it_throws_an_exception_when_trying_to_scope_a_non_existing_permission()
+    {
+        $this->expectException(PermissionDoesNotExist::class);
+
+        User::permission('not defined permission')->get();
+    }
+
+    /** @test */
     public function it_throws_an_exception_when_trying_to_scope_a_permission_from_another_guard()
     {
         $this->expectException(PermissionDoesNotExist::class);
