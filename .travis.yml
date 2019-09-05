@@ -12,10 +12,10 @@ php:
 matrix:
   include:
   - php: 7.2
-  - php: 7.2
     env: COMPOSER_FLAGS="--prefer-lowest"
   allow_failures:
   - php: 7.4snapshot
+  - php: nightly
 
 before_script:
   - travis_retry composer self-update
