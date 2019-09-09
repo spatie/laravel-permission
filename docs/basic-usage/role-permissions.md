@@ -36,7 +36,7 @@ $user->hasRole('writer');
 You can also determine if a user has any of a given list of roles:
 
 ```php
-$user->hasAnyRole(Role::all());
+$user->hasAnyRole('writer', 'reader');
 ```
 
 You can also determine if a user has all of a given list of roles:
