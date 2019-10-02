@@ -177,7 +177,7 @@ trait HasRoles
      *
      * @return bool
      */
-    public function hasRole($roles,  $guardName = null): bool
+    public function hasRole($roles, $guardName = null): bool
     {
         if (is_string($roles) && false !== strpos($roles, '|')) {
             $roles = $this->convertPipeToArray($roles);

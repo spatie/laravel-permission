@@ -497,6 +497,5 @@ class HasRolesTest extends TestCase
 
         $this->assertTrue($this->testUser->hasRole(['testRole', 'testRole2'], 'web'));
         $this->assertFalse($this->testUser->hasRole(['testRole', 'testRole2'], 'api'));
-
     }
 }
