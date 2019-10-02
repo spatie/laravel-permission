@@ -487,4 +487,16 @@ class HasRolesTest extends TestCase
 
         $this->assertTrue($user->hasRole('testRole'));
     }
+
+    /** @test */
+    public function it_accept_roles_guard()
+    {
+        $this->testUser->assignRole('testRole');
+
+        $this->testUser->assignRole('testRole2');
+
+        $this->assertTrue($this->testUser->hasRole(['testRole', 'testRole2'], 'web'));
+        $this->assertFalse($this->testUser->hasRole(['testRole', 'testRole2'], 'api'));
+
+    }
 }

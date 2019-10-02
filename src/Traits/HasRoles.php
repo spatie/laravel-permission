@@ -173,30 +173,35 @@ trait HasRoles
      * Determine if the model has (one of) the given role(s).
      *
      * @param string|int|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
+     * @param string|null $guardName
      *
      * @return bool
      */
-    public function hasRole($roles): bool
+    public function hasRole($roles,  $guardName = null): bool
     {
         if (is_string($roles) && false !== strpos($roles, '|')) {
             $roles = $this->convertPipeToArray($roles);
         }
 
+        $_roles = is_null($guardName)
+            ? $this->roles
+            : $this->roles->where('guard_name', $guardName);
+
         if (is_string($roles)) {
-            return $this->roles->contains('name', $roles);
+            return $_roles->contains('name', $roles);
         }
 
         if (is_int($roles)) {
-            return $this->roles->contains('id', $roles);
+            return $_roles->contains('id', $roles);
         }
 
         if ($roles instanceof Role) {
-            return $this->roles->contains('id', $roles->id);
+            return $_roles->contains('id', $roles->id);
         }
 
         if (is_array($roles)) {
             foreach ($roles as $role) {
-                if ($this->hasRole($role)) {
+                if ($this->hasRole($role, $guardName)) {
                     return true;
                 }
             }
@@ -204,7 +209,7 @@ trait HasRoles
             return false;
         }
 
-        return $roles->intersect($this->roles)->isNotEmpty();
+        return $roles->intersect($_roles)->isNotEmpty();
     }
 
     /**
