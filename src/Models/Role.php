@@ -54,7 +54,7 @@ class Role extends Model implements RoleContract
             config('permission.table_names.role_has_permissions'),
             'role_id',
             'permission_id'
-        );
+        )->withTimestamps();
     }
 
     /**

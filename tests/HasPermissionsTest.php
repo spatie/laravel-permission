@@ -499,9 +499,16 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_saves_timestamps_on_pivot_table_when_a_permission_is_related_to_a_model()
+    public function it_saves_timestamps_on_pivot_table_when_a_permission_is_given_to_a_model()
     {
         $this->testUser->givePermissionTo('edit-news');
         $this->assertNotNull($this->testUser->permissions->first()->pivot->created_at);
+    }
+
+    /** @test */
+    public function it_saves_timestamps_on_pivot_table_when_a_permission_is_assigned_to_a_role()
+    {
+        $this->testUserRole->givePermissionTo('edit-news');
+        $this->assertNotNull($this->testUserRole->permissions->first()->pivot->created_at);
     }
 }

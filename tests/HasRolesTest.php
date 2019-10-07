@@ -487,4 +487,18 @@ class HasRolesTest extends TestCase
 
         $this->assertTrue($user->hasRole('testRole'));
     }
+
+    /** @test */
+    public function it_saves_timestamps_on_pivot_table_when_a_role_is_assigned_to_a_model()
+    {
+        $this->testUser->assignRole('testRole');
+        $this->assertNotNull($this->testUser->roles->first()->pivot->created_at);
+    }
+
+    /** @test */
+    public function it_saves_timestamps_on_pivot_table_when_a_role_is_assigned_to_a_permission()
+    {
+        $this->testUserPermission->assignRole('testRole');
+        $this->assertNotNull($this->testUserPermission->roles->first()->pivot->created_at);
+    }
 }

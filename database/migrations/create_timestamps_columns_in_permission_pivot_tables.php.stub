@@ -18,6 +18,14 @@ class CreateTimestampsColumnsInPermissionPivotTables extends Migration
         Schema::table($tableNames['model_has_permissions'], function (Blueprint $table) {
             $table->timestamps();
         });
+
+        Schema::table($tableNames['model_has_roles'], function (Blueprint $table) {
+            $table->timestamps();
+        });
+
+        Schema::table($tableNames['role_has_permissions'], function (Blueprint $table) {
+            $table->timestamps();
+        });
     }
 
     /**
@@ -30,6 +38,14 @@ class CreateTimestampsColumnsInPermissionPivotTables extends Migration
         $tableNames = config('permission.table_names');
 
         Schema::table($tableNames['model_has_permissions'], function (Blueprint $table) {
+            $table->dropTimestamps();
+        });
+
+        Schema::table($tableNames['model_has_roles'], function (Blueprint $table) {
+            $table->dropTimestamps();
+        });
+
+        Schema::table($tableNames['role_has_permissions'], function (Blueprint $table) {
             $table->dropTimestamps();
         });
     }
