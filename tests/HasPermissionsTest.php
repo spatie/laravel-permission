@@ -497,4 +497,11 @@ class HasPermissionsTest extends TestCase
             $this->testUser->getPermissionNames()
         );
     }
+
+    /** @test */
+    public function it_saves_timestamps_on_pivot_table_when_a_permission_is_related_to_a_model()
+    {
+        $this->testUser->givePermissionTo('edit-news');
+        $this->assertNotNull($this->testUser->permissions->first()->pivot->created_at);
+    }
 }
