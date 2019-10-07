@@ -20,7 +20,8 @@ class PermissionServiceProvider extends ServiceProvider
             ], 'config');
 
             $this->publishes([
-                __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->getMigrationFileName($filesystem),
+                __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->getMigrationFileName($filesystem, 'create_permission_tables.php'),
+                __DIR__.'/../database/migrations/create_timestamps_columns_in_permission_pivot_tables.php.stub' => $this->getMigrationFileName($filesystem, 'create_timestamps_columns_in_permission_pivot_tables.php'),
             ], 'migrations');
 
             $this->registerMacroHelpers();
@@ -150,16 +151,18 @@ class PermissionServiceProvider extends ServiceProvider
      * Returns existing migration file if found, else uses the current timestamp.
      *
      * @param Filesystem $filesystem
+     * @param $migrationFileName
      * @return string
      */
-    protected function getMigrationFileName(Filesystem $filesystem): string
+    protected function getMigrationFileName(Filesystem $filesystem, $migrationFileName): string
     {
         $timestamp = date('Y_m_d_His');
 
         return Collection::make($this->app->databasePath().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR)
-            ->flatMap(function ($path) use ($filesystem) {
-                return $filesystem->glob($path.'*_create_permission_tables.php');
-            })->push($this->app->databasePath()."/migrations/{$timestamp}_create_permission_tables.php")
+            ->flatMap(function ($path) use ($filesystem, $migrationFileName) {
+                return $filesystem->glob($path.'*_'.$migrationFileName);
+            })
+            ->push($this->app->databasePath()."/migrations/{$timestamp}_{$migrationFileName}")
             ->first();
     }
 }
