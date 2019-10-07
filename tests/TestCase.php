@@ -111,7 +111,7 @@ abstract class TestCase extends Orchestra
         }
 
         include_once __DIR__.'/../database/migrations/create_permission_tables.php.stub';
-        include_once __DIR__ . '/../database/migrations/create_timestamps_columns_in_permission_pivot_tables.php.stub';
+        include_once __DIR__.'/../database/migrations/create_timestamps_columns_in_permission_pivot_tables.php.stub';
 
         (new \CreatePermissionTables())->up();
         (new \CreateTimestampsColumnsInPermissionPivotTables())->up();
