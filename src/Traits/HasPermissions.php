@@ -440,14 +440,14 @@ trait HasPermissions
     }
 
     /**
-     * Check if there are all the direct permissions
+     * Check if there are all the direct permissions.
      * @param array $permissions
      * @return bool
      */
     public function hasAllDirectPermissions(array $permissions) : bool
     {
         foreach ($permissions as $permission) {
-            if(! $this->hasDirectPermission($permission)) {
+            if (! $this->hasDirectPermission($permission)) {
                 return false;
             }
         }
@@ -456,14 +456,14 @@ trait HasPermissions
     }
 
     /**
-     * Check if there are any the direct permissions
+     * Check if there are any the direct permissions.
      * @param array $permissions
      * @return bool
      */
     public function hasAnyDirectPermission(array $permissions) : bool
     {
         foreach ($permissions as $permission) {
-            if($this->hasDirectPermission($permission)) {
+            if ($this->hasDirectPermission($permission)) {
                 return true;
             }
         }
