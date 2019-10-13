@@ -90,6 +90,20 @@ but `false` for `$user->hasDirectPermission('edit articles')`.
 
 This method is useful if one builds a form for setting permissions for roles and users in an application and wants to restrict or change inherited permissions of roles of the user, i.e. allowing to change only direct permissions of the user.
 
+You can check if the user has direct permissions without passing by the role's permissions:
+
+```php
+// Check if the user has all direct permissions
+$user->hasAllDirectPermissions(['edit articles', 'delete articles']);
+
+// Check if the user has any permission directly
+$user->hasAnyDirectPermission(['create articles', 'delete articles']);
+```
+By following the previous example, when we call `$user->hasAllDirectPermissions(['edit articles', 'delete articles'])` 
+it returns `true`, because the user has all these direct permissions. When we call
+`$user->hasAnyDirectPermission('edit articles')`, it returns `true` because the user has one of the provided permissions.
+
+
 You can list all of these permissions:
 
 ```php
@@ -105,8 +119,15 @@ $user->getAllPermissions();
 
 All these responses are collections of `Spatie\Permission\Models\Permission` objects.
 
+
+
 If we follow the previous example, the first response will be a collection with the `delete article` permission and 
 the second will be a collection with the `edit article` permission and the third will contain both.
+
+If we follow the previous example, the first response will be a collection with the `delete article` permission and 
+the second will be a collection with the `edit article` permission and the third will contain both.
+
+
 
 ### NOTE about using permission names in policies
 
