@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 3.2.0 - 2019-10-16
+- Implementation of optional guard check for hasRoles and hasAllRoles - See #1236
+
+## 3.1.0 - 2019-10-16
+- Use bigIncrements/bigInteger in migration - See #1224
+
 ## 3.0.0 - 2019-09-02
 - Update dependencies to allow for Laravel 6.0
 - Drop support for Laravel 5.7 and older, and PHP 7.1 and older. (They can use v2 of this package until they upgrade.)
