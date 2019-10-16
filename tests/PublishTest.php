@@ -53,6 +53,7 @@ class PublishTest extends TestCase
         foreach ($filesystem->listContents() as $file) {
             if (Str::endsWith($file['path'], '_create_permission_tables.php')) {
                 $this->assertTrue(true);
+
                 return;
             }
         }
