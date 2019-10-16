@@ -28,5 +28,7 @@ class PublishMigration extends Command
             '--provider' => PermissionServiceProvider::class,
             '--tag' => 'migrations',
         ]);
+
+        $this->info(Artisan::output());
     }
 }

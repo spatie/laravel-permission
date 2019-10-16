@@ -27,5 +27,7 @@ class Publish extends Command
         Artisan::call('vendor:publish', [
             '--provider' => PermissionServiceProvider::class,
         ]);
+
+        $this->info(Artisan::output());
     }
 }

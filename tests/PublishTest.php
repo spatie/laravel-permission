@@ -14,7 +14,7 @@ class PublishTest extends TestCase
         $this->clearConfigFile();
         $this->clearMigrationFile();
 
-        $this->artisan('permission:publish');
+        $this->artisan('permission:publish')->expectsOutput('Publishing complete.');
 
         $this->assertConfigFileExists();
         $this->assertMigrationFileExists();
@@ -25,7 +25,7 @@ class PublishTest extends TestCase
     {
         $this->clearConfigFile();
 
-        $this->artisan('permission:config');
+        $this->artisan('permission:config')->expectsOutput('Publishing complete.');
 
         $this->assertConfigFileExists();
     }
@@ -35,7 +35,7 @@ class PublishTest extends TestCase
     {
         $this->clearMigrationFile();
 
-        $this->artisan('permission:migration');
+        $this->artisan('permission:migration')->expectsOutput('Publishing complete.');
 
         $this->assertMigrationFileExists();
     }

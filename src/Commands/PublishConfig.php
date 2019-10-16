@@ -28,5 +28,7 @@ class PublishConfig extends Command
             '--provider' => PermissionServiceProvider::class,
             '--tag' => 'config',
         ]);
+
+        $this->info(Artisan::output());
     }
 }
