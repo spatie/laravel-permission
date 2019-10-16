@@ -3,7 +3,13 @@ title: Extending
 weight: 3
 ---
 
+## Extending User Models
+Laravel's authorization features are available in Models which implement the `Illuminate\Foundation\Auth\Access\Authorizable` trait. In a fresh Laravel app this is done in `\App\User` by extending `Illuminate\Foundation\Auth\User` out-of-the-box.
 
+If you are creating your own, or additional, User models and wish Authorization features to be available on it, including Roles and Permissions with this package, you need to implement `Illuminate\Foundation\Auth\Access\Authorizable` in one of those ways as well.
+
+
+## Extending Role and Permission Models
 If you are extending or replacing the role/permission models, you will need to specify your new models in the configuration. 
 First be sure that you've published the configuration file (see the Installation instructions), and edit it to update the `models.role` and `models.permission` values to point to your new models.
 
