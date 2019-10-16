@@ -25,8 +25,8 @@ class PublishConfig extends Command
     public function handle()
     {
         Artisan::call('vendor:publish', [
-            "--provider" => PermissionServiceProvider::class,
-            "--tag" => 'config',
+            '--provider' => PermissionServiceProvider::class,
+            '--tag' => 'config',
         ]);
     }
 }

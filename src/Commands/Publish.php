@@ -25,7 +25,7 @@ class Publish extends Command
     public function handle()
     {
         Artisan::call('vendor:publish', [
-            "--provider" => PermissionServiceProvider::class,
+            '--provider' => PermissionServiceProvider::class,
         ]);
     }
 }

@@ -25,8 +25,8 @@ class PublishMigration extends Command
     public function handle()
     {
         Artisan::call('vendor:publish', [
-            "--provider" => PermissionServiceProvider::class,
-            "--tag" => 'migrations',
+            '--provider' => PermissionServiceProvider::class,
+            '--tag' => 'migrations',
         ]);
     }
 }
