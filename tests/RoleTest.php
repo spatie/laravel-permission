@@ -232,4 +232,22 @@ class RoleTest extends TestCase
     {
         $this->assertEquals($this->app['config']->get('auth.defaults.guard'), $this->testUserRole->guard_name);
     }
+
+    /** @test */
+    public function it_uses_separate_morph_table_by_default()
+    {
+        $permissions = app(Role::class)->permissions();
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $permissions);
+    }
+
+    /** @test */
+    public function it_uses_unified_morph_table_if_config_not_set()
+    {
+        $this->app['config']->set('permission.table_names.role_has_permissions', null);
+
+        $permissions = app(Role::class)->permissions();
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\MorphToMany::class, $permissions);
+    }
 }

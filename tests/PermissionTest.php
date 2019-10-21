@@ -49,4 +49,22 @@ class PermissionTest extends TestCase
 
         $this->assertEquals($this->testUserPermission->id, $permission_by_id->id);
     }
+
+    /** @test */
+    public function it_uses_separate_morph_table_by_default()
+    {
+        $roles = app(Permission::class)->roles();
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $roles);
+    }
+
+    /** @test */
+    public function it_uses_unified_morph_table_if_config_not_set()
+    {
+        $this->app['config']->set('permission.table_names.role_has_permissions', null);
+
+        $roles = app(Permission::class)->roles();
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\MorphToMany::class, $roles);
+    }
 }
