@@ -13,7 +13,7 @@ class Admin extends Model implements AuthorizableContract, AuthenticatableContra
 {
     use HasRoles, Authorizable, Authenticatable;
 
-    protected $fillable = ['email'];
+    protected $guarded = [];
 
     public $timestamps = false;
 

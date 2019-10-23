@@ -15,9 +15,45 @@ class RoleTest extends TestCase
     {
         parent::setUp();
 
-        Permission::create(['name' => 'other-permission']);
+        Permission::create(['name' => 'other-permission', 'company' => $this->company]);
 
-        Permission::create(['name' => 'wrong-guard-permission', 'guard_name' => 'admin']);
+        Permission::create(['name' => 'wrong-guard-permission', 'guard_name' => 'admin', 'company' => $this->company]);
+    }
+
+    /** @test */
+    public function 可以刪除自己company的permission1()
+    {
+        $company = Permission::create(['name' => 'p', 'company' => $this->company]);
+        $companyX = Permission::create(['name' => 'p', 'company' => 'x']);
+
+        $companyUser = User::create(['email' => 'testx@user.com', 'company' => $this->company]);
+        $companyUserX = User::create(['email' => 'testx@user.com', 'company' => 'x']);
+
+        $companyUser->syncPermissions($company, $companyX);
+        $this->assertFalse($companyUser->hasPermissionTo($companyX));
+        $this->assertTrue($companyUser->hasPermissionTo($company));
+
+        $companyUserX->syncPermissions($company, $companyX);
+        $this->assertFalse($companyUserX->hasPermissionTo($company));
+        $this->assertTrue($companyUserX->hasPermissionTo($companyX));
+    }
+
+    /** @test */
+    public function 可以刪除自己company的permission()
+    {
+        $company = app(Role::class)->create(['name' => 'p1', 'company' => $this->company]);
+        $companyX = app(Role::class)->create(['name' => 'p2', 'company' => 'x']);
+
+        $companyUser = User::create(['email' => 'testx@user.com', 'company' => $this->company]);
+        $companyUserX = User::create(['email' => 'testx@user.com', 'company' => 'x']);
+
+        $companyUser->syncRoles($company, $companyX);
+        $this->assertFalse($companyUser->hasRole($companyX));
+        $this->assertTrue($companyUser->hasRole($company));
+
+        $companyUserX->syncRoles($company, $companyX);
+        $this->assertFalse($companyUserX->hasRole($company));
+        $this->assertTrue($companyUserX->hasRole($companyX));
     }
 
     /** @test */
@@ -37,8 +73,8 @@ class RoleTest extends TestCase
     {
         $this->expectException(RoleAlreadyExists::class);
 
-        app(Role::class)->create(['name' => 'test-role']);
-        app(Role::class)->create(['name' => 'test-role']);
+        app(Role::class)->create(['name' => 'test-role', 'company' => $this->company]);
+        app(Role::class)->create(['name' => 'test-role', 'company' => $this->company]);
     }
 
     /** @test */
@@ -176,7 +212,7 @@ class RoleTest extends TestCase
     /** @test */
     public function it_returns_false_if_it_does_not_have_a_permission_object()
     {
-        $permission = app(Permission::class)->findByName('other-permission');
+        $permission = app(Permission::class)->findByName('other-permission', $this->company);
 
         $this->assertFalse($this->testUserRole->hasPermissionTo($permission));
     }
@@ -184,7 +220,7 @@ class RoleTest extends TestCase
     /** @test */
     public function it_creates_permission_object_with_findOrCreate_if_it_does_not_have_a_permission_object()
     {
-        $permission = app(Permission::class)->findOrCreate('another-permission');
+        $permission = app(Permission::class)->findOrCreate('another-permission', $this->company);
 
         $this->assertFalse($this->testUserRole->hasPermissionTo($permission));
 
@@ -200,11 +236,11 @@ class RoleTest extends TestCase
     {
         $this->expectException(RoleDoesNotExist::class);
 
-        $role1 = app(Role::class)->findByName('non-existing-role');
+        $role1 = app(Role::class)->findByName('non-existing-role', $this->company);
 
         $this->assertNull($role1);
 
-        $role2 = app(Role::class)->findOrCreate('yet-another-role');
+        $role2 = app(Role::class)->findOrCreate('yet-another-role', $this->company);
 
         $this->assertInstanceOf(Role::class, $role2);
     }
@@ -214,7 +250,7 @@ class RoleTest extends TestCase
     {
         $this->expectException(GuardDoesNotMatch::class);
 
-        $permission = app(Permission::class)->findByName('wrong-guard-permission', 'admin');
+        $permission = app(Permission::class)->findByName('wrong-guard-permission', $this->company, 'admin');
 
         $this->testUserRole->hasPermissionTo($permission);
     }
@@ -222,7 +258,7 @@ class RoleTest extends TestCase
     /** @test */
     public function it_belongs_to_a_guard()
     {
-        $role = app(Role::class)->create(['name' => 'admin', 'guard_name' => 'admin']);
+        $role = app(Role::class)->create(['name' => 'admin', 'guard_name' => 'admin', 'company' => $this->company]);
 
         $this->assertEquals('admin', $role->guard_name);
     }

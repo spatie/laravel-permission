@@ -21,7 +21,7 @@ trait HasRoles
                 return;
             }
 
-            $model->roles()->detach();
+            $model->roles()->where('company', $model->company)->detach();
         });
     }
 
@@ -75,7 +75,7 @@ trait HasRoles
             $method = is_numeric($role) ? 'findById' : 'findByName';
             $guard = $guard ?: $this->getDefaultGuardName();
 
-            return $this->getRoleClass()->{$method}($role, $guard);
+            return $this->getRoleClass()->{$method}($role, null, $guard);
         }, $roles);
 
         return $query->whereHas('roles', function ($query) use ($roles) {
@@ -106,7 +106,8 @@ trait HasRoles
                 return $this->getStoredRole($role);
             })
             ->filter(function ($role) {
-                return $role instanceof Role;
+                return $role instanceof Role &&
+                       $role->company == $this->getCompany();
             })
             ->each(function ($role) {
                 $this->ensureModelSharesGuard($role);
@@ -131,7 +132,8 @@ trait HasRoles
                     $object->roles()->sync($roles, false);
                     $object->load('roles');
                     $modelLastFiredOn = $object;
-                });
+                }
+            );
         }
 
         $this->forgetCachedPermissions();
@@ -146,7 +148,7 @@ trait HasRoles
      */
     public function removeRole($role)
     {
-        $this->roles()->detach($this->getStoredRole($role));
+        $this->roles()->where('company', $this->getCompany())->detach($this->getStoredRole($role));
 
         $this->load('roles');
 
@@ -164,7 +166,7 @@ trait HasRoles
      */
     public function syncRoles(...$roles)
     {
-        $this->roles()->detach();
+        $this->roles()->where('company', $this->getCompany())->detach();
 
         return $this->assignRole($roles);
     }
@@ -182,20 +184,22 @@ trait HasRoles
             $roles = $this->convertPipeToArray($roles);
         }
 
+        $query = $this->roles->where('company', $this->getCompany());
+
         if (is_string($roles)) {
             return $guard
-                ? $this->roles->where('guard_name', $guard)->contains('name', $roles)
-                : $this->roles->contains('name', $roles);
+                ? $query->where('guard_name', $guard)->contains('name', $roles)
+                : $query->contains('name', $roles);
         }
 
         if (is_int($roles)) {
             return $guard
-                ? $this->roles->where('guard_name', $guard)->contains('id', $roles)
-                : $this->roles->contains('id', $roles);
+                ? $query->where('guard_name', $guard)->contains('id', $roles)
+                : $query->contains('id', $roles);
         }
 
         if ($roles instanceof Role) {
-            return $this->roles->contains('id', $roles->id);
+            return $query->contains('id', $roles->id);
         }
 
         if (is_array($roles)) {
@@ -204,11 +208,12 @@ trait HasRoles
                     return true;
                 }
             }
-
             return false;
         }
 
-        return $roles->intersect($guard ? $this->roles->where('guard_name', $guard) : $this->roles)->isNotEmpty();
+        return $roles->intersect(
+            $guard ? $query->where('guard_name', $guard) : $query
+        )->isNotEmpty();
     }
 
     /**
@@ -235,15 +240,15 @@ trait HasRoles
         if (is_string($roles) && false !== strpos($roles, '|')) {
             $roles = $this->convertPipeToArray($roles);
         }
-
+        $query = $this->roles->where('company', $this->getCompany());
         if (is_string($roles)) {
             return $guard
-                ? $this->roles->where('guard_name', $guard)->contains('name', $roles)
-                : $this->roles->contains('name', $roles);
+                ? $query->where('guard_name', $guard)->contains('name', $roles)
+                : $query->contains('name', $roles);
         }
 
         if ($roles instanceof Role) {
-            return $this->roles->contains('id', $roles->id);
+            return $query->contains('id', $roles->id);
         }
 
         $roles = collect()->make($roles)->map(function ($role) {
@@ -252,8 +257,9 @@ trait HasRoles
 
         return $roles->intersect(
             $guard
-                ? $this->roles->where('guard_name', $guard)->pluck('name')
-                : $this->getRoleNames()) == $roles;
+                ? $query->where('guard_name', $guard)->pluck('name')
+                : $this->getRoleNames()
+        ) == $roles;
     }
 
     /**
@@ -274,11 +280,11 @@ trait HasRoles
         $roleClass = $this->getRoleClass();
 
         if (is_numeric($role)) {
-            return $roleClass->findById($role, $this->getDefaultGuardName());
+            return $roleClass->findById($role, $this->getCompany(), $this->getDefaultGuardName());
         }
 
         if (is_string($role)) {
-            return $roleClass->findByName($role, $this->getDefaultGuardName());
+            return $roleClass->findByName($role, $this->getCompany(), $this->getDefaultGuardName());
         }
 
         return $role;

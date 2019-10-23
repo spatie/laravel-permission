@@ -11,7 +11,7 @@ class CommandTest extends TestCase
     /** @test */
     public function it_can_create_a_role()
     {
-        Artisan::call('permission:create-role', ['name' => 'new-role']);
+        Artisan::call('permission:create-role', ['name' => 'new-role', 'company' => $this->company]);
 
         $this->assertCount(1, Role::where('name', 'new-role')->get());
         $this->assertCount(0, Role::where('name', 'new-role')->first()->permissions);
@@ -22,20 +22,22 @@ class CommandTest extends TestCase
     {
         Artisan::call('permission:create-role', [
             'name' => 'new-role',
+            'company' => $this->company,
             'guard' => 'api',
         ]);
 
         $this->assertCount(1, Role::where('name', 'new-role')
             ->where('guard_name', 'api')
+            ->where('company', $this->company)
             ->get());
     }
 
     /** @test */
     public function it_can_create_a_permission()
     {
-        Artisan::call('permission:create-permission', ['name' => 'new-permission']);
+        Artisan::call('permission:create-permission', ['name' => 'new-permission', 'company' => $this->company]);
 
-        $this->assertCount(1, Permission::where('name', 'new-permission')->get());
+        $this->assertCount(1, Permission::where('name', 'new-permission')->where('company', $this->company)->get());
     }
 
     /** @test */
@@ -44,10 +46,12 @@ class CommandTest extends TestCase
         Artisan::call('permission:create-permission', [
             'name' => 'new-permission',
             'guard' => 'api',
+            'company' => $this->company
         ]);
 
         $this->assertCount(1, Permission::where('name', 'new-permission')
             ->where('guard_name', 'api')
+            ->where('company', $this->company)
             ->get());
     }
 
@@ -56,10 +60,11 @@ class CommandTest extends TestCase
     {
         Artisan::call('permission:create-role', [
             'name' => 'new-role',
+            'company' => $this->company,
             'permissions' => 'first permission | second permission',
         ]);
 
-        $role = Role::where('name', 'new-role')->first();
+        $role = Role::where('name', 'new-role')->where('company', $this->company)->first();
 
         $this->assertTrue($role->hasPermissionTo('first permission'));
         $this->assertTrue($role->hasPermissionTo('second permission'));
@@ -68,26 +73,26 @@ class CommandTest extends TestCase
     /** @test */
     public function it_can_create_a_role_without_duplication()
     {
-        Artisan::call('permission:create-role', ['name' => 'new-role']);
-        Artisan::call('permission:create-role', ['name' => 'new-role']);
+        Artisan::call('permission:create-role', ['name' => 'new-role', 'company' => $this->company]);
+        Artisan::call('permission:create-role', ['name' => 'new-role', 'company' => $this->company]);
 
-        $this->assertCount(1, Role::where('name', 'new-role')->get());
-        $this->assertCount(0, Role::where('name', 'new-role')->first()->permissions);
+        $this->assertCount(1, Role::where('name', 'new-role')->where('company', $this->company)->get());
+        $this->assertCount(0, Role::where('name', 'new-role')->where('company', $this->company)->first()->permissions);
     }
 
     /** @test */
     public function it_can_create_a_permission_without_duplication()
     {
-        Artisan::call('permission:create-permission', ['name' => 'new-permission']);
-        Artisan::call('permission:create-permission', ['name' => 'new-permission']);
+        Artisan::call('permission:create-permission', ['name' => 'new-permission', 'company' => $this->company]);
+        Artisan::call('permission:create-permission', ['name' => 'new-permission', 'company' => $this->company]);
 
-        $this->assertCount(1, Permission::where('name', 'new-permission')->get());
+        $this->assertCount(1, Permission::where('name', 'new-permission')->where('company', $this->company)->get());
     }
 
     /** @test */
     public function it_can_show_permission_tables()
     {
-        Artisan::call('permission:show');
+        Artisan::call('permission:show', ['company' => $this->company]);
 
         $output = Artisan::output();
 
@@ -100,10 +105,10 @@ class CommandTest extends TestCase
         // | edit-articles |  ·       |  ·        |
         $this->assertRegExp('/\|\s+edit-articles\s+\|\s+·\s+\|\s+·\s+\|/', $output);
 
-        Role::findByName('testRole')->givePermissionTo('edit-articles');
+        Role::findByName('testRole', $this->company)->givePermissionTo('edit-articles');
         $this->reloadPermissions();
 
-        Artisan::call('permission:show');
+        Artisan::call('permission:show', ['company' => $this->company]);
 
         $output = Artisan::output();
 
@@ -114,7 +119,7 @@ class CommandTest extends TestCase
     /** @test */
     public function it_can_show_permissions_for_guard()
     {
-        Artisan::call('permission:show', ['guard' => 'web']);
+        Artisan::call('permission:show', ['guard' => 'web','company' => $this->company]);
 
         $output = Artisan::output();
 

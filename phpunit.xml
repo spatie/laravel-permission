@@ -9,7 +9,8 @@
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
          processIsolation="false"
-         stopOnFailure="false">
+         cacheResult="false"
+         stopOnFailure="true">
     <testsuites>
         <testsuite name="Permissions Test Suite">
             <directory>tests</directory>

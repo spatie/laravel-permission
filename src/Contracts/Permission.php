@@ -23,7 +23,7 @@ interface Permission
      *
      * @return Permission
      */
-    public static function findByName(string $name, $guardName): self;
+    public static function findByName(string $name, string $company, $guardName): self;
 
     /**
      * Find a permission by its id.
@@ -35,7 +35,7 @@ interface Permission
      *
      * @return Permission
      */
-    public static function findById(int $id, $guardName): self;
+    public static function findById(int $id, string $company, $guardName): self;
 
     /**
      * Find or Create a permission by its name and guard name.
@@ -45,5 +45,5 @@ interface Permission
      *
      * @return Permission
      */
-    public static function findOrCreate(string $name, $guardName): self;
+    public static function findOrCreate(string $name, string $company, $guardName): self;
 }

@@ -9,11 +9,22 @@ use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 class HasRolesTest extends TestCase
 {
     /** @test */
+    public function 只能分配給自己company的role()
+    {
+        $roleValid = app(Role::class)->findOrCreate('testRoleInWebGuard', $this->company, 'web');
+        $roleInvalid = app(Role::class)->findOrCreate('testRoleInWebGuard', 'ffff', 'web');
+
+        $this->testUser->assignRole($roleValid);
+        $this->assertFalse($this->testUser->hasRole($roleInvalid));
+        $this->assertTrue($this->testUser->hasRole($roleValid));
+    }
+
+    /** @test */
     public function it_can_determine_that_the_user_does_not_have_a_role()
     {
         $this->assertFalse($this->testUser->hasRole('testRole'));
 
-        $role = app(Role::class)->findOrCreate('testRoleInWebGuard', 'web');
+        $role = app(Role::class)->findOrCreate('testRoleInWebGuard', $this->company, 'web');
 
         $this->assertFalse($this->testUser->hasRole($role));
 
@@ -229,7 +240,7 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_will_sync_roles_to_a_model_that_is_not_persisted()
     {
-        $user = new User(['email' => 'test@user.com']);
+        $user = new User(['email' => 'test@user.com', 'company' => $this->company]);
         $user->syncRoles([$this->testUserRole]);
         $user->save();
 
@@ -239,11 +250,11 @@ class HasRolesTest extends TestCase
     /** @test */
     public function calling_syncRoles_before_saving_object_doesnt_interfere_with_other_objects()
     {
-        $user = new User(['email' => 'test@user.com']);
+        $user = new User(['email' => 'test@user.com', 'company' => $this->company]);
         $user->syncRoles('testRole');
         $user->save();
 
-        $user2 = new User(['email' => 'admin@user.com']);
+        $user2 = new User(['email' => 'admin@user.com', 'company' => $this->company]);
         $user2->syncRoles('testRole2');
         $user2->save();
 
@@ -254,11 +265,11 @@ class HasRolesTest extends TestCase
     /** @test */
     public function calling_assignRole_before_saving_object_doesnt_interfere_with_other_objects()
     {
-        $user = new User(['email' => 'test@user.com']);
+        $user = new User(['email' => 'test@user.com', 'company' => $this->company]);
         $user->assignRole('testRole');
         $user->save();
 
-        $admin_user = new User(['email' => 'admin@user.com']);
+        $admin_user = new User(['email' => 'admin@user.com', 'company' => $this->company]);
         $admin_user->assignRole('testRole2');
         $admin_user->save();
 
@@ -281,7 +292,7 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_deletes_pivot_table_entries_when_deleting_models()
     {
-        $user = User::create(['email' => 'user@test.com']);
+        $user = User::create(['email' => 'user@test.com', 'company' => $this->company]);
 
         $user->assignRole('testRole');
         $user->givePermissionTo('edit-articles');
@@ -298,8 +309,8 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_can_scope_users_using_a_string()
     {
-        $user1 = User::create(['email' => 'user1@test.com']);
-        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1 = User::create(['email' => 'user1@test.com', 'company' => $this->company]);
+        $user2 = User::create(['email' => 'user2@test.com', 'company' => $this->company]);
         $user1->assignRole('testRole');
         $user2->assignRole('testRole2');
 
@@ -311,8 +322,8 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_can_scope_users_using_an_array()
     {
-        $user1 = User::create(['email' => 'user1@test.com']);
-        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1 = User::create(['email' => 'user1@test.com', 'company' => $this->company]);
+        $user2 = User::create(['email' => 'user2@test.com', 'company' => $this->company]);
         $user1->assignRole($this->testUserRole);
         $user2->assignRole('testRole2');
 
@@ -327,8 +338,8 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_can_scope_users_using_an_array_of_ids_and_names()
     {
-        $user1 = User::create(['email' => 'user1@test.com']);
-        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1 = User::create(['email' => 'user1@test.com', 'company' => $this->company]);
+        $user2 = User::create(['email' => 'user2@test.com', 'company' => $this->company]);
 
         $user1->assignRole($this->testUserRole);
 
@@ -346,8 +357,8 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_can_scope_users_using_a_collection()
     {
-        $user1 = User::create(['email' => 'user1@test.com']);
-        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1 = User::create(['email' => 'user1@test.com', 'company' => $this->company]);
+        $user2 = User::create(['email' => 'user2@test.com', 'company' => $this->company]);
         $user1->assignRole($this->testUserRole);
         $user2->assignRole('testRole2');
 
@@ -361,8 +372,8 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_can_scope_users_using_an_object()
     {
-        $user1 = User::create(['email' => 'user1@test.com']);
-        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1 = User::create(['email' => 'user1@test.com', 'company' => $this->company]);
+        $user2 = User::create(['email' => 'user2@test.com', 'company' => $this->company]);
         $user1->assignRole($this->testUserRole);
         $user2->assignRole('testRole2');
 
@@ -378,8 +389,8 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_can_scope_against_a_specific_guard()
     {
-        $user1 = User::create(['email' => 'user1@test.com']);
-        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1 = User::create(['email' => 'user1@test.com', 'company' => $this->company]);
+        $user2 = User::create(['email' => 'user2@test.com', 'company' => $this->company]);
         $user1->assignRole('testRole');
         $user2->assignRole('testRole2');
 
@@ -387,10 +398,14 @@ class HasRolesTest extends TestCase
 
         $this->assertEquals($scopedUsers1->count(), 1);
 
-        $user3 = Admin::create(['email' => 'user1@test.com']);
-        $user4 = Admin::create(['email' => 'user1@test.com']);
-        $user5 = Admin::create(['email' => 'user2@test.com']);
-        $testAdminRole2 = app(Role::class)->create(['name' => 'testAdminRole2', 'guard_name' => 'admin']);
+        $user3 = Admin::create(['email' => 'user1@test.com', 'company' => $this->company]);
+        $user4 = Admin::create(['email' => 'user1@test.com', 'company' => $this->company]);
+        $user5 = Admin::create(['email' => 'user2@test.com', 'company' => $this->company]);
+        $testAdminRole2 = app(Role::class)->create([
+            'name' => 'testAdminRole2',
+            'company' => $this->company,
+            'guard_name' => 'admin'
+        ]);
         $user3->assignRole($this->testAdminRole);
         $user4->assignRole($this->testAdminRole);
         $user5->assignRole($testAdminRole2);
@@ -426,7 +441,7 @@ class HasRolesTest extends TestCase
     {
         $roleModel = app(Role::class);
 
-        $roleModel->create(['name' => 'second role']);
+        $roleModel->create(['name' => 'second role', 'company' => $this->company]);
 
         $this->assertFalse($this->testUser->hasRole($roleModel->all()));
 
@@ -460,7 +475,7 @@ class HasRolesTest extends TestCase
 
         $this->assertFalse($this->testUser->hasAllRoles($roleModel->all()));
 
-        $roleModel->create(['name' => 'second role']);
+        $roleModel->create(['name' => 'second role', 'company' => $this->company]);
 
         $this->testUser->assignRole($this->testUserRole);
 
@@ -506,7 +521,7 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_does_not_detach_roles_when_soft_deleting()
     {
-        $user = SoftDeletingUser::create(['email' => 'test@example.com']);
+        $user = SoftDeletingUser::create(['email' => 'test@example.com', 'company' => $this->company]);
         $user->assignRole('testRole');
         $user->delete();
 

@@ -10,6 +10,7 @@ use Spatie\Permission\Models\Permission;
 class Show extends Command
 {
     protected $signature = 'permission:show
+            {company : The code of the company}
             {guard? : The name of the guard}
             {style? : The display style (default|borderless|compact|box)}';
 
@@ -19,11 +20,14 @@ class Show extends Command
     {
         $style = $this->argument('style') ?? 'default';
         $guard = $this->argument('guard');
+        $company = $this->argument('company');
 
         if ($guard) {
             $guards = Collection::make([$guard]);
         } else {
-            $guards = Permission::pluck('guard_name')->merge(Role::pluck('guard_name'))->unique();
+            $guards = Permission::where('company', $company)->pluck('guard_name')->merge(
+                Role::where('company', $company)->pluck('guard_name')
+            )->unique();
         }
 
         foreach ($guards as $guard) {

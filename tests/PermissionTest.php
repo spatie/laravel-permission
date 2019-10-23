@@ -12,14 +12,14 @@ class PermissionTest extends TestCase
     {
         $this->expectException(PermissionAlreadyExists::class);
 
-        app(Permission::class)->create(['name' => 'test-permission']);
-        app(Permission::class)->create(['name' => 'test-permission']);
+        app(Permission::class)->create(['name' => 'test-permission', 'company' => $this->company]);
+        app(Permission::class)->create(['name' => 'test-permission', 'company' => $this->company]);
     }
 
     /** @test */
     public function it_belongs_to_a_guard()
     {
-        $permission = app(Permission::class)->create(['name' => 'can-edit', 'guard_name' => 'admin']);
+        $permission = app(Permission::class)->create(['name' => 'can-edit', 'guard_name' => 'admin', 'company' => $this->company]);
 
         $this->assertEquals('admin', $permission->guard_name);
     }
@@ -45,7 +45,7 @@ class PermissionTest extends TestCase
     /** @test */
     public function it_is_retrievable_by_id()
     {
-        $permission_by_id = app(Permission::class)->findById($this->testUserPermission->id);
+        $permission_by_id = app(Permission::class)->findById($this->testUserPermission->id, $this->company);
 
         $this->assertEquals($this->testUserPermission->id, $permission_by_id->id);
     }

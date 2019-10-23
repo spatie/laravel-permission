@@ -13,6 +13,7 @@ use Spatie\Permission\PermissionServiceProvider;
 
 abstract class TestCase extends Orchestra
 {
+    protected $company = 'asiaweinet';
     /** @var \Spatie\Permission\Test\User */
     protected $testUser;
 
@@ -39,6 +40,7 @@ abstract class TestCase extends Orchestra
         $this->setUpDatabase($this->app);
 
         $this->testUser = User::first();
+
         $this->testUserRole = app(Role::class)->find(1);
         $this->testUserPermission = app(Permission::class)->find(1);
 
@@ -97,11 +99,13 @@ abstract class TestCase extends Orchestra
         $app['db']->connection()->getSchemaBuilder()->create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
+            $table->string('company');
             $table->softDeletes();
         });
 
         $app['db']->connection()->getSchemaBuilder()->create('admins', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('company');
             $table->string('email');
         });
 
@@ -114,16 +118,16 @@ abstract class TestCase extends Orchestra
 
         (new \CreatePermissionTables())->up();
 
-        User::create(['email' => 'test@user.com']);
-        Admin::create(['email' => 'admin@user.com']);
-        $app[Role::class]->create(['name' => 'testRole']);
-        $app[Role::class]->create(['name' => 'testRole2']);
-        $app[Role::class]->create(['name' => 'testAdminRole', 'guard_name' => 'admin']);
-        $app[Permission::class]->create(['name' => 'edit-articles']);
-        $app[Permission::class]->create(['name' => 'edit-news']);
-        $app[Permission::class]->create(['name' => 'edit-blog']);
-        $app[Permission::class]->create(['name' => 'admin-permission', 'guard_name' => 'admin']);
-        $app[Permission::class]->create(['name' => 'Edit News']);
+        User::create(['email' => 'test@user.com', 'company' => $this->company]);
+        Admin::create(['email' => 'admin@user.com',  'company' => $this->company]);
+        $app[Role::class]->create(['name' => 'testRole', 'company' => $this->company]);
+        $app[Role::class]->create(['name' => 'testRole2', 'company' => $this->company]);
+        $app[Role::class]->create(['name' => 'testAdminRole', 'guard_name' => 'admin', 'company' => $this->company]);
+        $app[Permission::class]->create(['name' => 'edit-articles', 'company' => $this->company]);
+        $app[Permission::class]->create(['name' => 'edit-news', 'company' => $this->company]);
+        $app[Permission::class]->create(['name' => 'edit-blog', 'company' => $this->company]);
+        $app[Permission::class]->create(['name' => 'admin-permission', 'guard_name' => 'admin','company' => $this->company]);
+        $app[Permission::class]->create(['name' => 'Edit News','company' => $this->company]);
     }
 
     /**

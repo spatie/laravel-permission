@@ -33,7 +33,10 @@ class Role extends Model implements RoleContract
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? Guard::getDefaultName(static::class);
 
-        if (static::where('name', $attributes['name'])->where('guard_name', $attributes['guard_name'])->first()) {
+        if (static::where('name', $attributes['name'])
+                 ->where('company', $attributes['company'])
+                 ->where('guard_name', $attributes['guard_name'])
+                 ->first()) {
             throw RoleAlreadyExists::create($attributes['name'], $attributes['guard_name']);
         }
 
@@ -81,11 +84,17 @@ class Role extends Model implements RoleContract
      *
      * @throws \Spatie\Permission\Exceptions\RoleDoesNotExist
      */
-    public static function findByName(string $name, $guardName = null): RoleContract
+    public static function findByName(string $name, $company = null, $guardName = null): RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $role = static::where('name', $name)->where('guard_name', $guardName)->first();
+        $role = static::where('name', $name)->where('guard_name', $guardName);
+
+        if ($company) {
+            $role = $role->where('company', $company);
+        }
+
+        $role = $role->first();
 
         if (! $role) {
             throw RoleDoesNotExist::named($name);
@@ -94,11 +103,17 @@ class Role extends Model implements RoleContract
         return $role;
     }
 
-    public static function findById(int $id, $guardName = null): RoleContract
+    public static function findById(int $id, $company = null, $guardName = null): RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $role = static::where('id', $id)->where('guard_name', $guardName)->first();
+        $role = static::where('id', $id)->where('guard_name', $guardName);
+
+        if ($company) {
+            $role = $role->where('company', $company);
+        }
+
+        $role = $role->first();
 
         if (! $role) {
             throw RoleDoesNotExist::withId($id);
@@ -115,14 +130,21 @@ class Role extends Model implements RoleContract
      *
      * @return \Spatie\Permission\Contracts\Role
      */
-    public static function findOrCreate(string $name, $guardName = null): RoleContract
+    public static function findOrCreate(string $name, $company, $guardName = null): RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $role = static::where('name', $name)->where('guard_name', $guardName)->first();
+        $role = static::where('name', $name)
+                      ->where('company', $company)
+                      ->where('guard_name', $guardName)
+                      ->first();
 
         if (! $role) {
-            return static::query()->create(['name' => $name, 'guard_name' => $guardName]);
+            return static::query()->create([
+                'name'       => $name,
+                'company'    => $company,
+                'guard_name' => $guardName
+            ]);
         }
 
         return $role;
@@ -142,11 +164,11 @@ class Role extends Model implements RoleContract
         $permissionClass = $this->getPermissionClass();
 
         if (is_string($permission)) {
-            $permission = $permissionClass->findByName($permission, $this->getDefaultGuardName());
+            $permission = $permissionClass->findByName($permission, $this->getCompany(), $this->getDefaultGuardName());
         }
 
         if (is_int($permission)) {
-            $permission = $permissionClass->findById($permission, $this->getDefaultGuardName());
+            $permission = $permissionClass->findById($permission, $this->getCompany(), $this->getDefaultGuardName());
         }
 
         if (! $this->getGuardNames()->contains($permission->guard_name)) {

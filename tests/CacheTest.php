@@ -34,6 +34,7 @@ class CacheTest extends TestCase
             case $cacheStore instanceof \Illuminate\Cache\DatabaseStore:
                 $this->cache_init_count = 1;
                 $this->cache_load_count = 1;
+                // no break
             default:
         }
     }
@@ -51,7 +52,7 @@ class CacheTest extends TestCase
     /** @test */
     public function it_flushes_the_cache_when_creating_a_permission()
     {
-        app(Permission::class)->create(['name' => 'new']);
+        app(Permission::class)->create(['name' => 'new', 'company' => $this->company]);
 
         $this->resetQueryCount();
 
@@ -63,7 +64,7 @@ class CacheTest extends TestCase
     /** @test */
     public function it_flushes_the_cache_when_updating_a_permission()
     {
-        $permission = app(Permission::class)->create(['name' => 'new']);
+        $permission = app(Permission::class)->create(['name' => 'new', 'company' => $this->company]);
 
         $permission->name = 'other name';
         $permission->save();
@@ -78,7 +79,7 @@ class CacheTest extends TestCase
     /** @test */
     public function it_flushes_the_cache_when_creating_a_role()
     {
-        app(Role::class)->create(['name' => 'new']);
+        app(Role::class)->create(['name' => 'new', 'company' => $this->company]);
 
         $this->resetQueryCount();
 
@@ -90,7 +91,7 @@ class CacheTest extends TestCase
     /** @test */
     public function it_flushes_the_cache_when_updating_a_role()
     {
-        $role = app(Role::class)->create(['name' => 'new']);
+        $role = app(Role::class)->create(['name' => 'new', 'company' => $this->company]);
 
         $role->name = 'other name';
         $role->save();
@@ -123,7 +124,7 @@ class CacheTest extends TestCase
     {
         $this->registrar->getPermissions();
 
-        User::create(['email' => 'new']);
+        User::create(['email' => 'new', 'company' => $this->company]);
 
         $this->resetQueryCount();
 
@@ -205,7 +206,10 @@ class CacheTest extends TestCase
     /** @test */
     public function it_can_reset_the_cache_with_artisan_command()
     {
-        Artisan::call('permission:create-permission', ['name' => 'new-permission']);
+        Artisan::call('permission:create-permission', [
+            'name' => 'new-permission',
+            'company' => $this->company
+        ]);
         $this->assertCount(1, \Spatie\Permission\Models\Permission::where('name', 'new-permission')->get());
 
         $this->resetQueryCount();

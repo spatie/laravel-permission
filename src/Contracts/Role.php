@@ -23,7 +23,7 @@ interface Role
      *
      * @throws \Spatie\Permission\Exceptions\RoleDoesNotExist
      */
-    public static function findByName(string $name, $guardName): self;
+    public static function findByName(string $name, string $company, $guardName): self;
 
     /**
      * Find a role by its id and guard name.
@@ -35,7 +35,7 @@ interface Role
      *
      * @throws \Spatie\Permission\Exceptions\RoleDoesNotExist
      */
-    public static function findById(int $id, $guardName): self;
+    public static function findById(int $id, string $company, $guardName): self;
 
     /**
      * Find or create a role by its name and guard name.
@@ -45,7 +45,7 @@ interface Role
      *
      * @return \Spatie\Permission\Contracts\Role
      */
-    public static function findOrCreate(string $name, $guardName): self;
+    public static function findOrCreate(string $name, string $company, $guardName): self;
 
     /**
      * Determine if the user may perform the given permission.

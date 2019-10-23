@@ -22,7 +22,7 @@ trait HasPermissions
                 return;
             }
 
-            $model->permissions()->detach();
+            $model->permissions()->where('company', $model->company)->detach();
         });
     }
 
@@ -103,7 +103,15 @@ trait HasPermissions
                 return $permission;
             }
 
-            return $this->getPermissionClass()->findByName($permission, $this->getDefaultGuardName());
+            $permi = $this->getPermissionClass()
+                        ->where('name', $permission)
+                        ->where('guard_name', $this->getDefaultGuardName())
+                        ->first();
+
+            if (! $permi) {
+                throw PermissionDoesNotExist::create($permission, $this->getDefaultGuardName());
+            }
+            return $permi;
         }, $permissions);
     }
 
@@ -123,6 +131,7 @@ trait HasPermissions
         if (is_string($permission)) {
             $permission = $permissionClass->findByName(
                 $permission,
+                $this->getCompany(),
                 $guardName ?? $this->getDefaultGuardName()
             );
         }
@@ -130,15 +139,18 @@ trait HasPermissions
         if (is_int($permission)) {
             $permission = $permissionClass->findById(
                 $permission,
+                $this->getCompany(),
                 $guardName ?? $this->getDefaultGuardName()
             );
         }
+
 
         if (! $permission instanceof Permission) {
             throw new PermissionDoesNotExist;
         }
 
-        return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
+        return $this->hasDirectPermission($permission) ||
+               $this->hasPermissionViaRole($permission);
     }
 
     /**
@@ -181,7 +193,7 @@ trait HasPermissions
             $permissions = $permissions[0];
         }
 
-        foreach ($permissions as $permission) {
+        foreach ($permissions as $key => $permission) {
             if ($this->checkPermissionTo($permission)) {
                 return true;
             }
@@ -238,14 +250,14 @@ trait HasPermissions
         $permissionClass = $this->getPermissionClass();
 
         if (is_string($permission)) {
-            $permission = $permissionClass->findByName($permission, $this->getDefaultGuardName());
+            $permission = $permissionClass->findByName($permission, $this->getCompany(), $this->getDefaultGuardName());
             if (! $permission) {
                 return false;
             }
         }
 
         if (is_int($permission)) {
-            $permission = $permissionClass->findById($permission, $this->getDefaultGuardName());
+            $permission = $permissionClass->findById($permission, $this->getCompany(), $this->getDefaultGuardName());
             if (! $permission) {
                 return false;
             }
@@ -307,11 +319,12 @@ trait HasPermissions
                 if (empty($permission)) {
                     return false;
                 }
-
                 return $this->getStoredPermission($permission);
             })
             ->filter(function ($permission) {
-                return $permission instanceof Permission;
+                return $permission instanceof Permission &&
+                        // 避免儲存不是自己 company 的權限
+                       $permission->company == $this->getCompany();
             })
             ->each(function ($permission) {
                 $this->ensureModelSharesGuard($permission);
@@ -323,6 +336,7 @@ trait HasPermissions
 
         if ($model->exists) {
             $this->permissions()->sync($permissions, false);
+
             $model->load('permissions');
         } else {
             $class = \get_class($model);
@@ -354,7 +368,9 @@ trait HasPermissions
      */
     public function syncPermissions(...$permissions)
     {
-        $this->permissions()->detach();
+        $this->permissions()
+             ->where('company', $this->getCompany())
+             ->detach();
 
         return $this->givePermissionTo($permissions);
     }
@@ -368,7 +384,9 @@ trait HasPermissions
      */
     public function revokePermissionTo($permission)
     {
-        $this->permissions()->detach($this->getStoredPermission($permission));
+        $this->permissions()
+             ->where('company', $this->getCompany())
+             ->detach($this->getStoredPermission($permission));
 
         $this->forgetCachedPermissions();
 
@@ -392,17 +410,18 @@ trait HasPermissions
         $permissionClass = $this->getPermissionClass();
 
         if (is_numeric($permissions)) {
-            return $permissionClass->findById($permissions, $this->getDefaultGuardName());
+            return $permissionClass->findById($permissions, $this->getCompany(), $this->getDefaultGuardName());
         }
 
         if (is_string($permissions)) {
-            return $permissionClass->findByName($permissions, $this->getDefaultGuardName());
+            return $permissionClass->findByName($permissions, $this->getCompany(), $this->getDefaultGuardName());
         }
 
         if (is_array($permissions)) {
             return $permissionClass
                 ->whereIn('name', $permissions)
-                ->whereIn('guard_name', $this->getGuardNames())
+                ->where('company', $this->getCompany())
+                ->where('guard_name', $this->getGuardNames())
                 ->get();
         }
 
@@ -429,6 +448,11 @@ trait HasPermissions
     protected function getDefaultGuardName(): string
     {
         return Guard::getDefaultName($this);
+    }
+
+    protected function getCompany()
+    {
+        return $this->attributes['company'] ?? 0;
     }
 
     /**
