@@ -1,5 +1,5 @@
 {
-    "name": "spatie/laravel-permission",
+    "name": "asiaweinet/laravel-permission",
     "description": "Permission handling for Laravel 5.8 and up",
     "keywords": [
         "spatie",
@@ -14,49 +14,58 @@
     "homepage": "https://github.com/spatie/laravel-permission",
     "license": "MIT",
     "authors": [
-        {
-            "name": "Freek Van der Herten",
-            "email": "freek@spatie.be",
-            "homepage": "https://spatie.be",
-            "role": "Developer"
-        }
-    ],
-    "require": {
-        "php" : "^7.2",
+    {
+        "name": "Freek Van der Herten",
+        "email": "freek@spatie.be",
+        "homepage": "https://spatie.be",
+        "role": "Developer"
+    }],
+    "require":
+    {
+        "php": "^7.2",
         "illuminate/auth": "^5.8|^6.0",
         "illuminate/container": "^5.8|^6.0",
         "illuminate/contracts": "^5.8|^6.0",
         "illuminate/database": "^5.8|^6.0"
     },
-    "require-dev": {
+    "require-dev":
+    {
         "orchestra/testbench": "^3.8|^4.0",
         "phpunit/phpunit": "^8.0",
         "predis/predis": "^1.1"
     },
-    "autoload": {
-        "psr-4": {
+    "autoload":
+    {
+        "psr-4":
+        {
             "Spatie\\Permission\\": "src"
         },
         "files": [
             "src/helpers.php"
         ]
     },
-    "autoload-dev": {
-        "psr-4": {
+    "autoload-dev":
+    {
+        "psr-4":
+        {
             "Spatie\\Permission\\Test\\": "tests"
         }
     },
-    "extra": {
-        "laravel": {
+    "extra":
+    {
+        "laravel":
+        {
             "providers": [
                 "Spatie\\Permission\\PermissionServiceProvider"
             ]
         }
     },
-    "scripts": {
+    "scripts":
+    {
         "test": "phpunit"
     },
-    "config": {
+    "config":
+    {
         "sort-packages": true
     },
     "minimum-stability": "dev",
