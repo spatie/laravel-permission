@@ -246,7 +246,7 @@ trait HasPermissions
         }
 
         if (! $permission instanceof Permission) {
-            return false;
+            throw new PermissionDoesNotExist;
         }
 
         return $this->permissions->contains('id', $permission->id);
