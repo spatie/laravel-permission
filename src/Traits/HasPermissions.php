@@ -2,14 +2,14 @@
 
 namespace Spatie\Permission\Traits;
 
-use Spatie\Permission\Guard;
-use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
-use Spatie\Permission\PermissionRegistrar;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
+use Spatie\Permission\Guard;
+use Spatie\Permission\PermissionRegistrar;
 
 trait HasPermissions
 {
