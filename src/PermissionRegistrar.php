@@ -8,7 +8,6 @@ use Spatie\Permission\Contracts\Role;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Spatie\Permission\Contracts\Permission;
 use Illuminate\Contracts\Auth\Access\Authorizable;
-use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class PermissionRegistrar
 {
@@ -91,11 +90,8 @@ class PermissionRegistrar
     public function registerPermissions(): bool
     {
         $this->gate->before(function (Authorizable $user, string $ability) {
-            try {
-                if (method_exists($user, 'hasPermissionTo')) {
-                    return $user->hasPermissionTo($ability) ?: null;
-                }
-            } catch (PermissionDoesNotExist $e) {
+            if (method_exists($user, 'checkPermissionTo')) {
+                return $user->checkPermissionTo($ability) ?: null;
             }
         });
 
