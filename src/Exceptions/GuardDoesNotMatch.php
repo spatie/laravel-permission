@@ -2,8 +2,8 @@
 
 namespace Spatie\Permission\Exceptions;
 
-use InvalidArgumentException;
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
 
 class GuardDoesNotMatch extends InvalidArgumentException
 {
