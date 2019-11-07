@@ -2,13 +2,13 @@
 
 namespace Spatie\Permission\Test;
 
-use Illuminate\Support\Facades\Cache;
-use Spatie\Permission\Contracts\Role;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
-use Spatie\Permission\PermissionRegistrar;
-use Spatie\Permission\Contracts\Permission;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase as Orchestra;
+use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Contracts\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\PermissionServiceProvider;
 
 abstract class TestCase extends Orchestra
