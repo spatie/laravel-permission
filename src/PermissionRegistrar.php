@@ -3,11 +3,11 @@
 namespace Spatie\Permission;
 
 use Illuminate\Cache\CacheManager;
-use Illuminate\Support\Collection;
-use Spatie\Permission\Contracts\Role;
-use Illuminate\Contracts\Auth\Access\Gate;
-use Spatie\Permission\Contracts\Permission;
 use Illuminate\Contracts\Auth\Access\Authorizable;
+use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Support\Collection;
+use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Contracts\Role;
 
 class PermissionRegistrar
 {
