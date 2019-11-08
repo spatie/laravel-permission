@@ -164,7 +164,9 @@ class HasPermissionsTest extends TestCase
     {
         $user = User::create(['email' => 'user1@test.com']);
 
-        $this->assertFalse($user->hasDirectPermission(new \stdClass()));
+        $this->expectException(PermissionDoesNotExist::class);
+
+        $user->hasDirectPermission(new \stdClass());
     }
 
     /** @test */
@@ -172,7 +174,9 @@ class HasPermissionsTest extends TestCase
     {
         $user = User::create(['email' => 'user1@test.com']);
 
-        $this->assertFalse($user->hasDirectPermission(null));
+        $this->expectException(PermissionDoesNotExist::class);
+
+        $user->hasDirectPermission(null);
     }
 
     /** @test */
