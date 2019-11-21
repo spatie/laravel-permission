@@ -48,3 +48,6 @@ Now, run your migrations:
 ```bash
 php artisan migrate
 ```
+
+Remember that Laravel's authorization layer requires that your `User` model implement the `Illuminate\Contracts\Auth\Access\Authorizable` contract. In Lumen you will then also need to use the `Laravel\Lumen\Auth\Authorizable` trait.
+
