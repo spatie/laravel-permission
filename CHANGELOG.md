@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 3.3.0 - 2019-11-22
+- Remove duplicate and unreachable code
+- Remove checks for older Laravel versions
+
 ## 3.2.0 - 2019-10-16
 - Implementation of optional guard check for hasRoles and hasAllRoles - See #1236
 
