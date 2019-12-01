@@ -29,7 +29,7 @@ php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvid
 If you're using UUIDs or GUIDs for your `User` models you can update the `create_permission_tables.php` migration and replace `$table->unsignedBigInteger($columnNames['model_morph_key'])` with `$table->uuid($columnNames['model_morph_key'])`.
 For consistency, you can also update the package configuration file to use the `model_uuid` column name instead of the default `model_id` column.
 
-You can publish the config file with:
+Then, publish the config file with:
 
 ```bash
 php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="config"
@@ -166,7 +166,13 @@ return [
 ];
 ```
 
-After the config & migration have been published you can create the role- and permission-tables by running the migrations:
+Then, apply the configuration:
+
+```bash
+php artisan config:cache
+```
+
+After the config and migration have been published and configured, you can create the role- and permission-tables by running the migrations:
 
 ```bash
 php artisan migrate
