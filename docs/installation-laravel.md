@@ -166,12 +166,6 @@ return [
 ];
 ```
 
-Then, apply the configuration:
-
-```bash
-php artisan config:cache
-```
-
 After the config and migration have been published and configured, you can create the role- and permission-tables by running the migrations:
 
 ```bash
