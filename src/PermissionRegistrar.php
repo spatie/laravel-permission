@@ -2,8 +2,10 @@
 
 namespace Spatie\Permission;
 
+use Beauty\Modules\Api\Controllers\ApiController;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Contracts\Role;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Spatie\Permission\Contracts\Permission;
@@ -118,12 +120,20 @@ class PermissionRegistrar
     public function getPermissions(array $params = []): Collection
     {
         if ($this->permissions === null) {
-            $this->permissions = $this->cache->remember(self::$cacheKey, self::$cacheExpirationTime, function () {
-                return $this->getPermissionClass()
-                    ->with('roles')
-                    ->get();
-            });
+            $base = resolve(ApiController::class);
+            $oProfile = $base->__getProfile(Auth::user());
+            $this->permissions = $this->getPermissionClass()->with(['roles' => function ($query) use ($oProfile) {
+                $query->where('profileID', $oProfile->profileID);
+            }])->get();
         }
+
+//        if ($this->permissions === null) {
+//            $this->permissions = $this->cache->remember(self::$cacheKey, self::$cacheExpirationTime, function () {
+//                return $this->getPermissionClass()
+//                    ->with('roles')
+//                    ->get();
+//            });
+//        }
 
         $permissions = clone $this->permissions;
 
