@@ -26,3 +26,5 @@ class User extends Authenticatable
 ```
 
 Additionally, your `User` model/object MUST NOT have a `role` or `roles` property (or field in the database), nor a `roles()` method on it. Those will interfere with the properties and methods added by the `HasRoles` trait provided by this package, thus causing unexpected outcomes when this package's methods are used to inspect roles and permissions.
+
+Similarly, your `User` model/object MUST NOT have a `permission` or `permissions` property (or field in the database), nor a `permissions()` method on it. Those will interfere with the properties and methods added by the `HasPermissions` trait provided by this package (which is invoked via the `HasRoles` trait).
