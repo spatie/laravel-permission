@@ -12,6 +12,10 @@ trait HasRoles
 {
     use HasPermissions;
 
+    /**
+     * The role class.
+     * @var \Spatie\Permission\Contracts\Role
+     */
     private $roleClass;
 
     public static function bootHasRoles()
@@ -25,6 +29,10 @@ trait HasRoles
         });
     }
 
+    /**
+     * Return the role class.
+     * @return \Spatie\Permission\Contracts\Role
+     */
     public function getRoleClass()
     {
         if (! isset($this->roleClass)) {
@@ -36,6 +44,7 @@ trait HasRoles
 
     /**
      * A model may have multiple roles.
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     public function roles(): MorphToMany
     {
@@ -258,17 +267,26 @@ trait HasRoles
 
     /**
      * Return all permissions directly coupled to the model.
+     * @return \Illuminate\Support\Collection
      */
     public function getDirectPermissions(): Collection
     {
         return $this->permissions;
     }
 
+    /**
+     * Return all role names.
+     * @return \Illuminate\Support\Collection
+     */
     public function getRoleNames(): Collection
     {
         return $this->roles->pluck('name');
     }
 
+    /**
+     * Return specific role.
+     * @return \Spatie\Permission\Contracts\Role
+     */
     protected function getStoredRole($role): Role
     {
         $roleClass = $this->getRoleClass();

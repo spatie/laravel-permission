@@ -13,6 +13,10 @@ use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 trait HasPermissions
 {
+    /**
+     * The permission class.
+     * @var Spatie\Permission\Contracts\Permission
+     */
     private $permissionClass;
 
     public static function bootHasPermissions()
@@ -26,6 +30,10 @@ trait HasPermissions
         });
     }
 
+    /**
+     * Return the permission class.
+     * @return \Spatie\Permission\Contracts\Permission
+     */
     public function getPermissionClass()
     {
         if (! isset($this->permissionClass)) {
@@ -37,6 +45,7 @@ trait HasPermissions
 
     /**
      * A model may have multiple direct permissions.
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     public function permissions(): MorphToMany
     {
@@ -254,6 +263,7 @@ trait HasPermissions
 
     /**
      * Return all the permissions the model has via roles.
+     * @return \Illuminate\Support\Collection
      */
     public function getPermissionsViaRoles(): Collection
     {
@@ -267,6 +277,7 @@ trait HasPermissions
      * Return all the permissions the model has, both directly and via roles.
      *
      * @throws \Exception
+     * @return \Illuminate\Support\Collection
      */
     public function getAllPermissions(): Collection
     {
@@ -364,6 +375,10 @@ trait HasPermissions
         return $this;
     }
 
+    /**
+     * Return all permission names.
+     * @return \Illuminate\Support\Collection
+     */
     public function getPermissionNames(): Collection
     {
         return $this->permissions->pluck('name');
