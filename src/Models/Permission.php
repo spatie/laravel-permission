@@ -45,6 +45,7 @@ class Permission extends Model implements PermissionContract
 
     /**
      * A permission can be applied to roles.
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function roles(): BelongsToMany
     {
@@ -58,6 +59,7 @@ class Permission extends Model implements PermissionContract
 
     /**
      * A permission belongs to some users of the model associated with its guard.
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     public function users(): MorphToMany
     {
@@ -135,6 +137,8 @@ class Permission extends Model implements PermissionContract
 
     /**
      * Get the current cached permissions.
+     * @param array $params
+     * @return \Illuminate\Support\Collection
      */
     protected static function getPermissions(array $params = []): Collection
     {

@@ -42,6 +42,7 @@ class Role extends Model implements RoleContract
 
     /**
      * A role may be given various permissions.
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function permissions(): BelongsToMany
     {
@@ -55,6 +56,7 @@ class Role extends Model implements RoleContract
 
     /**
      * A role belongs to some users of the model associated with its guard.
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     public function users(): MorphToMany
     {
