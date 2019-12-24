@@ -24,3 +24,11 @@ Because all permissions will be registered on [Laravel's gate](https://laravel.c
 ```php
 $user->can('edit articles');
 ```
+
+and Blade directives:
+
+```blade
+@can('edit articles')
+...
+@endcan
+```
