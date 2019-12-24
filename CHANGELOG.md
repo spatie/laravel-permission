@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 3.3.1 - 2019-12-24
+- Expose Artisan commands to app layer, not just to console
+
 ## 3.3.0 - 2019-11-22
 - Remove duplicate and unreachable code
 - Remove checks for older Laravel versions
