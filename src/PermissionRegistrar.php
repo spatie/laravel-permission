@@ -11,9 +11,6 @@ use Illuminate\Contracts\Auth\Access\Authorizable;
 
 class PermissionRegistrar
 {
-    /** @var \Illuminate\Contracts\Auth\Access\Gate */
-    protected $gate;
-
     /** @var \Illuminate\Contracts\Cache\Repository */
     protected $cache;
 
@@ -41,12 +38,10 @@ class PermissionRegistrar
     /**
      * PermissionRegistrar constructor.
      *
-     * @param \Illuminate\Contracts\Auth\Access\Gate $gate
      * @param \Illuminate\Cache\CacheManager $cacheManager
      */
-    public function __construct(Gate $gate, CacheManager $cacheManager)
+    public function __construct(CacheManager $cacheManager)
     {
-        $this->gate = $gate;
         $this->permissionClass = config('permission.models.permission');
         $this->roleClass = config('permission.models.role');
 
@@ -84,12 +79,13 @@ class PermissionRegistrar
 
     /**
      * Register the permission check method on the gate.
+     * We resolve the Gate fresh here, for benefit of long-running instances.
      *
      * @return bool
      */
     public function registerPermissions(): bool
     {
-        $this->gate->before(function (Authorizable $user, string $ability) {
+        resolve(Gate::class)->before(function (Authorizable $user, string $ability) {
             if (method_exists($user, 'checkPermissionTo')) {
                 return $user->checkPermissionTo($ability) ?: null;
             }
