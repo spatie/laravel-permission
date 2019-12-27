@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 3.4.0 - 2019-12-27
+- Make compatible with Swoole - ie: for long-running Laravel instances
+
 ## 3.3.1 - 2019-12-24
 - Expose Artisan commands to app layer, not just to console
 
