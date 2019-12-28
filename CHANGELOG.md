@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 3.4.1 - 2019-12-28
+- Fix 3.4.0 for Lumen
+
 ## 3.4.0 - 2019-12-27
 - Make compatible with Swoole - ie: for long-running Laravel instances
 
