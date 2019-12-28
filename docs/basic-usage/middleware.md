@@ -53,6 +53,21 @@ Route::group(['middleware' => ['role_or_permission:super-admin|edit articles']],
     //
 });
 ```
+Alternatively, you can choose your specific guard with a `@`  character:
+
+```php
+Route::group(['middleware' => ['role:super-admin|writer@admin']], function () {
+    //
+});
+
+Route::group(['middleware' => ['permission:publish articles|edit articles@user']], function () {
+    //
+});
+
+Route::group(['middleware' => ['role_or_permission:super-admin|edit articles@admin']], function () {
+    //
+});
+```
 
 You can protect your controllers similarly, by setting desired middleware in the constructor:
 

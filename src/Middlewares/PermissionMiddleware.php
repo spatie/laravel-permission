@@ -9,16 +9,22 @@ class PermissionMiddleware
 {
     public function handle($request, Closure $next, $permission)
     {
-        if (app('auth')->guest()) {
+        if (is_string($permission)) {     // sample : 'create-admin|update-admin@admin' , here admin is guard name and create-admin , update-admin are permission. | Notice: guard is optional.
+            $parsed = explode('@', $permission);
+            $guard = isset($parsed[1])
+                ? $parsed[1]
+                : null;
+            $permissions = explode('|', $parsed[0]);
+        } elseif (is_array($permission)) {
+            $guard = isset($permission['guard']) ? $permission['guard'] : null;
+            $permissions = $permission['permission'];
+        }
+        if (auth($guard)->guest()) {
             throw UnauthorizedException::notLoggedIn();
         }
 
-        $permissions = is_array($permission)
-            ? $permission
-            : explode('|', $permission);
-
         foreach ($permissions as $permission) {
-            if (app('auth')->user()->can($permission)) {
+            if (auth($guard)->user()->can($permission)) {
                 return $next($request);
             }
         }

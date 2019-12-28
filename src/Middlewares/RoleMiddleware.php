@@ -10,15 +10,22 @@ class RoleMiddleware
 {
     public function handle($request, Closure $next, $role)
     {
-        if (Auth::guest()) {
+        if (is_string($role)) {  // sample : 'support|super-admin@admin' , here admin is guard name and support , super-admin are role .   | Notice: guard is optional.
+            $parsed = explode('@', $role);
+            $guard = isset($parsed[1])
+                ? $parsed[1]
+                : null;
+            $roles = explode('|', $parsed[0]);
+        } elseif (is_array($role)) {
+            $guard = isset($role['guard']) ?
+                $role['guard'] : null;
+            $roles = $role['role'];
+        }
+        if (auth($guard)->guest()) {
             throw UnauthorizedException::notLoggedIn();
         }
 
-        $roles = is_array($role)
-            ? $role
-            : explode('|', $role);
-
-        if (! Auth::user()->hasAnyRole($roles)) {
+        if (!auth($guard)->user()->hasAnyRole($roles)) {
             throw UnauthorizedException::forRoles($roles);
         }
 
