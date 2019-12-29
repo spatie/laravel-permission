@@ -4,19 +4,29 @@ cache:
    directories:
      - $HOME/.composer/cache/files
 
-php:
-  - 7.2
-  - 7.3
-  - 7.4
-
 matrix:
   include:
-  - php: 7.2
-    env: COMPOSER_FLAGS="--prefer-lowest"
+    - php: 7.2
+      env: FRAMEWORK_VERSION=laravel/framework:5.8.* COMPOSER_FLAGS="--prefer-lowest"
+    - php: 7.2
+      env: FRAMEWORK_VERSION=laravel/framework:6.*
+    - php: 7.3
+      env: FRAMEWORK_VERSION=laravel/framework:6.*
+    - php: 7.4
+      env: FRAMEWORK_VERSION=laravel/framework:6.*
+    - php: 7.2
+      env: FRAMEWORK_VERSION=laravel/lumen-framework:5.8.* COMPOSER_FLAGS="--prefer-lowest"
+    - php: 7.3
+      env: FRAMEWORK_VERSION=laravel/lumen-framework:6.*
+    - php: 7.4
+      env: FRAMEWORK_VERSION=laravel/lumen-framework:6.*
+
+before_install:
+  - phpenv config-rm xdebug.ini || true
 
 before_script:
-  - travis_retry composer self-update
-  - travis_retry composer update ${COMPOSER_FLAGS} --no-interaction
+  - composer require "${FRAMEWORK_VERSION}" --no-update
+  - travis_retry composer update ${COMPOSER_FLAGS} --no-interaction --no-suggest --optimize-autoloader
 
 script:
-  - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
+  - vendor/bin/phpunit
