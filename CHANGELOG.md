@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 3.5.0 - 2020-01-07
+- Added missing `guardName` to Exception `PermissionDoesNotExist` #1316
+
 ## 3.4.1 - 2019-12-28
 - Fix 3.4.0 for Lumen
 
