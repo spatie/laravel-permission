@@ -23,13 +23,13 @@
     ],
     "require": {
         "php" : "^7.2",
-        "illuminate/auth": "^5.8|^6.0",
-        "illuminate/container": "^5.8|^6.0",
-        "illuminate/contracts": "^5.8|^6.0",
-        "illuminate/database": "^5.8|^6.0"
+        "illuminate/auth": "^5.8|^6.0|^7.0",
+        "illuminate/container": "^5.8|^6.0|^7.0",
+        "illuminate/contracts": "^5.8|^6.0|^7.0",
+        "illuminate/database": "^5.8|^6.0|^7.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^3.8|^4.0",
+        "orchestra/testbench": "^3.8|^4.0|^5.0",
         "phpunit/phpunit": "^8.0",
         "predis/predis": "^1.1"
     },
