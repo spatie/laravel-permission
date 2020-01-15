@@ -218,7 +218,7 @@ trait HasRoles
      *
      * @return bool
      */
-    public function hasAnyRole($roles): bool
+    public function hasAnyRole(...$roles): bool
     {
         return $this->hasRole($roles);
     }
