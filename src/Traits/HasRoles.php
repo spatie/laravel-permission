@@ -17,7 +17,7 @@ trait HasRoles
     public static function bootHasRoles()
     {
         static::deleting(function ($model) {
-            if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
+            if (method_exists($model, 'isForceDeleting') && !$model->isForceDeleting()) {
                 return;
             }
 
@@ -27,7 +27,7 @@ trait HasRoles
 
     public function getRoleClass()
     {
-        if (! isset($this->roleClass)) {
+        if (!isset($this->roleClass)) {
             $this->roleClass = app(PermissionRegistrar::class)->getRoleClass();
         }
 
@@ -57,31 +57,42 @@ trait HasRoles
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeRole(Builder $query, $roles, $guard = null): Builder
+    public function scopeRole(Builder $query, $listOfRoles, $guard = null): Builder
     {
-        if ($roles instanceof Collection) {
-            $roles = $roles->all();
+        if ($listOfRoles instanceof Collection) {
+            $listOfRoles = $listOfRoles->all();
         }
 
-        if (! is_array($roles)) {
-            $roles = [$roles];
+        if (!is_array($listOfRoles)) {
+            $listOfRoles = [$listOfRoles];
         }
 
-        $roles = array_map(function ($role) use ($guard) {
+        $guard = $guard ?: $this->getDefaultGuardName();
+
+        $listOfRoleNames = [];
+        $roles = [];
+
+        foreach ($listOfRoles as $role) {
             if ($role instanceof Role) {
-                return $role;
+                $roles[$role->id] = $role;
+            } else {
+                $method = is_numeric($role) ? 'findById' : 'findByName';
+
+                if (!is_numeric($role) && !isset($listOfRoleNames[$role])) {
+                    $thisRole = $this->getRoleClass()->{$method}($role, $guard);
+                    $roles[$thisRole->id] = $thisRole;
+                    $listOfRoleNames[$thisRole->name] = null;
+                } elseif (is_numeric($role) && !isset($roles[$role])) {
+                    $thisRole = $this->getRoleClass()->{$method}($role, $guard);
+                    $roles[$thisRole->id] = $thisRole;
+                }
             }
-
-            $method = is_numeric($role) ? 'findById' : 'findByName';
-            $guard = $guard ?: $this->getDefaultGuardName();
-
-            return $this->getRoleClass()->{$method}($role, $guard);
-        }, $roles);
+        }
 
         return $query->whereHas('roles', function ($query) use ($roles) {
             $query->where(function ($query) use ($roles) {
                 foreach ($roles as $role) {
-                    $query->orWhere(config('permission.table_names.roles').'.id', $role->id);
+                    $query->orWhere(config('permission.table_names.roles') . '.id', $role->id);
                 }
             });
         });
@@ -131,7 +142,8 @@ trait HasRoles
                     $object->roles()->sync($roles, false);
                     $object->load('roles');
                     $modelLastFiredOn = $object;
-                });
+                }
+            );
         }
 
         $this->forgetCachedPermissions();
@@ -253,7 +265,8 @@ trait HasRoles
         return $roles->intersect(
             $guard
                 ? $this->roles->where('guard_name', $guard)->pluck('name')
-                : $this->getRoleNames()) == $roles;
+                : $this->getRoleNames()
+        ) == $roles;
     }
 
     /**
@@ -299,7 +312,7 @@ trait HasRoles
             return explode('|', $pipeString);
         }
 
-        if (! in_array($quoteCharacter, ["'", '"'])) {
+        if (!in_array($quoteCharacter, ["'", '"'])) {
             return explode('|', $pipeString);
         }
 
