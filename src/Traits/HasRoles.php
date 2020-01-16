@@ -17,7 +17,7 @@ trait HasRoles
     public static function bootHasRoles()
     {
         static::deleting(function ($model) {
-            if (method_exists($model, 'isForceDeleting') && !$model->isForceDeleting()) {
+            if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
                 return;
             }
 
@@ -27,7 +27,7 @@ trait HasRoles
 
     public function getRoleClass()
     {
-        if (!isset($this->roleClass)) {
+        if (! isset($this->roleClass)) {
             $this->roleClass = app(PermissionRegistrar::class)->getRoleClass();
         }
 
@@ -63,7 +63,7 @@ trait HasRoles
             $listOfRoles = $listOfRoles->all();
         }
 
-        if (!is_array($listOfRoles)) {
+        if (! is_array($listOfRoles)) {
             $listOfRoles = [$listOfRoles];
         }
 
@@ -78,11 +78,11 @@ trait HasRoles
             } else {
                 $method = is_numeric($role) ? 'findById' : 'findByName';
 
-                if (!is_numeric($role) && !isset($listOfRoleNames[$role])) {
+                if (! is_numeric($role) && ! isset($listOfRoleNames[$role])) {
                     $thisRole = $this->getRoleClass()->{$method}($role, $guard);
                     $roles[$thisRole->id] = $thisRole;
                     $listOfRoleNames[$thisRole->name] = null;
-                } elseif (is_numeric($role) && !isset($roles[$role])) {
+                } elseif (is_numeric($role) && ! isset($roles[$role])) {
                     $thisRole = $this->getRoleClass()->{$method}($role, $guard);
                     $roles[$thisRole->id] = $thisRole;
                 }
@@ -92,7 +92,7 @@ trait HasRoles
         return $query->whereHas('roles', function ($query) use ($roles) {
             $query->where(function ($query) use ($roles) {
                 foreach ($roles as $role) {
-                    $query->orWhere(config('permission.table_names.roles') . '.id', $role->id);
+                    $query->orWhere(config('permission.table_names.roles').'.id', $role->id);
                 }
             });
         });
@@ -312,7 +312,7 @@ trait HasRoles
             return explode('|', $pipeString);
         }
 
-        if (!in_array($quoteCharacter, ["'", '"'])) {
+        if (! in_array($quoteCharacter, ["'", '"'])) {
             return explode('|', $pipeString);
         }
 

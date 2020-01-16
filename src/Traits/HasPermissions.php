@@ -18,7 +18,7 @@ trait HasPermissions
     public static function bootHasPermissions()
     {
         static::deleting(function ($model) {
-            if (method_exists($model, 'isForceDeleting') && !$model->isForceDeleting()) {
+            if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
                 return;
             }
 
@@ -28,7 +28,7 @@ trait HasPermissions
 
     public function getPermissionClass()
     {
-        if (!isset($this->permissionClass)) {
+        if (! isset($this->permissionClass)) {
             $this->permissionClass = app(PermissionRegistrar::class)->getPermissionClass();
         }
 
@@ -69,7 +69,7 @@ trait HasPermissions
             $query->whereHas('permissions', function ($query) use ($permissions) {
                 $query->where(function ($query) use ($permissions) {
                     foreach ($permissions as $permission) {
-                        $query->orWhere(config('permission.table_names.permissions') . '.id', $permission->id);
+                        $query->orWhere(config('permission.table_names.permissions').'.id', $permission->id);
                     }
                 });
             });
@@ -77,7 +77,7 @@ trait HasPermissions
                 $query->orWhereHas('roles', function ($query) use ($rolesWithPermissions) {
                     $query->where(function ($query) use ($rolesWithPermissions) {
                         foreach ($rolesWithPermissions as $role) {
-                            $query->orWhere(config('permission.table_names.roles') . '.id', $role->id);
+                            $query->orWhere(config('permission.table_names.roles').'.id', $role->id);
                         }
                     });
                 });
@@ -96,7 +96,7 @@ trait HasPermissions
             $listOfPermissions = $listOfPermissions->all();
         }
 
-        if (!is_array($listOfPermissions)) {
+        if (! is_array($listOfPermissions)) {
             $listOfPermissions = [$listOfPermissions];
         }
 
@@ -111,11 +111,11 @@ trait HasPermissions
             } else {
                 $method = is_numeric($permission) ? 'findById' : 'findByName';
 
-                if (!is_numeric($permission) && !isset($listOfPermissionNames[$permission])) {
+                if (! is_numeric($permission) && ! isset($listOfPermissionNames[$permission])) {
                     $thisPermission = $this->getPermissionClass()->{$method}($permission, $guard);
                     $permissions[$thisPermission->id] = $thisPermission;
                     $listOfPermissionNames[$thisPermission->name] = null;
-                } elseif (is_numeric($permission) && !isset($permissions[$permission])) {
+                } elseif (is_numeric($permission) && ! isset($permissions[$permission])) {
                     $thisPermission = $this->getPermissionClass()->{$method}($permission, $guard);
                     $permissions[$thisPermission->id] = $thisPermission;
                 }
@@ -152,7 +152,7 @@ trait HasPermissions
             );
         }
 
-        if (!$permission instanceof Permission) {
+        if (! $permission instanceof Permission) {
             throw new PermissionDoesNotExist;
         }
 
@@ -223,7 +223,7 @@ trait HasPermissions
         }
 
         foreach ($permissions as $permission) {
-            if (!$this->hasPermissionTo($permission)) {
+            if (! $this->hasPermissionTo($permission)) {
                 return false;
             }
         }
@@ -263,7 +263,7 @@ trait HasPermissions
             $permission = $permissionClass->findById($permission, $this->getDefaultGuardName());
         }
 
-        if (!$permission instanceof Permission) {
+        if (! $permission instanceof Permission) {
             throw new PermissionDoesNotExist;
         }
 
@@ -421,7 +421,7 @@ trait HasPermissions
      */
     protected function ensureModelSharesGuard($roleOrPermission)
     {
-        if (!$this->getGuardNames()->contains($roleOrPermission->guard_name)) {
+        if (! $this->getGuardNames()->contains($roleOrPermission->guard_name)) {
             throw GuardDoesNotMatch::create($roleOrPermission->guard_name, $this->getGuardNames());
         }
     }
