@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 3.6.0 - 2020-01-17
+- Added Laravel 7.0 support
+- Allow splat operator for passing roles to `hasAnyRole()`
+
 ## 3.5.0 - 2020-01-07
 - Added missing `guardName` to Exception `PermissionDoesNotExist` #1316
 
