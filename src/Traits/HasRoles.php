@@ -213,8 +213,10 @@ trait HasRoles
 
     /**
      * Determine if the model has any of the given role(s).
+     * 
+     * Alias to hasRole() but without Guard controls
      *
-     * @param string|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
+     * @param string|int|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
      *
      * @return bool
      */
