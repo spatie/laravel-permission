@@ -265,11 +265,10 @@ trait HasPermissions
 
     /**
      * Return all the permissions the model has, both directly and via roles.
-     *
-     * @throws \Exception
      */
     public function getAllPermissions(): Collection
     {
+        /** @var Collection $permissions */
         $permissions = $this->permissions;
 
         if ($this->roles) {
