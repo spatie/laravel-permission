@@ -31,12 +31,17 @@ You can determine if a user has a certain role:
 
 ```php
 $user->hasRole('writer');
+
+// or at least one role from an array of roles:
+$user->hasRole(['editor', 'moderator']);
 ```
 
 You can also determine if a user has any of a given list of roles:
 
 ```php
 $user->hasAnyRole(['writer', 'reader']);
+// or
+$user->hasAnyRole('writer', 'reader');
 ```
 
 You can also determine if a user has all of a given list of roles:
