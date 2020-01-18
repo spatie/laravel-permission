@@ -88,6 +88,49 @@ trait HasRoles
     }
 
     /**
+     * Scope the model query to certain roles only.
+     * This will not return an exception if the role does not exist.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
+     * @param string $guard
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWhereRole(Builder $query, $roles, $guard = null): Builder
+    {
+        if ($roles instanceof Collection) {
+            $roles = $roles->all();
+        }
+
+        if (! is_array($roles)) {
+            $roles = [$roles];
+        }
+
+        $roles = collect($roles)->map(function ($role) {
+            if ($role instanceof Role) {
+                return $role->id;
+            }
+
+            return $role;
+        })->unique();
+
+        $guard = is_null($guard) ? $this->getDefaultGuardName() : $guard;
+
+        return $query->whereHas('roles', function ($query) use ($roles, $guard) {
+            $query->where(function ($query) use ($roles, $guard) {
+                foreach ($roles as $role) {
+                    $column = is_numeric($role) ? 'id' : 'name';
+                    $query->orWhere([
+                        [config('permission.table_names.roles').".{$column}", '=', $role],
+                        [config('permission.table_names.roles').'.guard_name', '=', $guard],
+                    ]);
+                }
+            });
+        });
+    }
+    
+    /**
      * Assign the given role to the model.
      *
      * @param array|string|\Spatie\Permission\Contracts\Role ...$roles

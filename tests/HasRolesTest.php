@@ -401,6 +401,112 @@ class HasRolesTest extends TestCase
         $this->assertEquals($scopedUsers3->count(), 1);
     }
 
+   /** @test */
+    public function it_can_scope_users_using_a_string_using_whereRole()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1->assignRole('testRole');
+        $user2->assignRole('testRole2');
+
+        $scopedUsers = User::whereRole('testRole')->get();
+
+        $this->assertEquals($scopedUsers->count(), 1);
+    }
+
+    /** @test */
+    public function it_can_scope_users_using_an_array_using_whereRole()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1->assignRole($this->testUserRole);
+        $user2->assignRole('testRole2');
+
+        $scopedUsers1 = User::whereRole([$this->testUserRole])->get();
+
+        $scopedUsers2 = User::whereRole(['testRole', 'testRole2'])->get();
+
+        $this->assertEquals($scopedUsers1->count(), 1);
+        $this->assertEquals($scopedUsers2->count(), 2);
+    }
+
+    /** @test */
+    public function it_can_scope_users_using_an_array_of_ids_and_names_using_whereRole()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+
+        $user1->assignRole($this->testUserRole);
+
+        $user2->assignRole('testRole2');
+
+        $roleName = $this->testUserRole->name;
+
+        $otherRoleId = app(Role::class)->find(2)->id;
+
+        $scopedUsers = User::whereRole([$roleName, $otherRoleId])->get();
+
+        $this->assertEquals($scopedUsers->count(), 2);
+    }
+
+    /** @test */
+    public function it_can_scope_users_using_a_collection_using_whereRole()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1->assignRole($this->testUserRole);
+        $user2->assignRole('testRole2');
+
+        $scopedUsers1 = User::whereRole([$this->testUserRole])->get();
+        $scopedUsers2 = User::whereRole(collect(['testRole', 'testRole2']))->get();
+
+        $this->assertEquals($scopedUsers1->count(), 1);
+        $this->assertEquals($scopedUsers2->count(), 2);
+    }
+
+    /** @test */
+    public function it_can_scope_users_using_an_object_using_whereRole()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1->assignRole($this->testUserRole);
+        $user2->assignRole('testRole2');
+
+        $scopedUsers1 = User::whereRole($this->testUserRole)->get();
+        $scopedUsers2 = User::whereRole([$this->testUserRole])->get();
+        $scopedUsers3 = User::whereRole(collect([$this->testUserRole]))->get();
+
+        $this->assertEquals($scopedUsers1->count(), 1);
+        $this->assertEquals($scopedUsers2->count(), 1);
+        $this->assertEquals($scopedUsers3->count(), 1);
+    }
+
+    /** @test */
+    public function it_can_scope_against_a_specific_guard_using_whereRole()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1->assignRole('testRole');
+        $user2->assignRole('testRole2');
+
+        $scopedUsers1 = User::whereRole('testRole', 'web')->get();
+
+        $this->assertEquals($scopedUsers1->count(), 1);
+
+        $user3 = Admin::create(['email' => 'user1@test.com']);
+        $user4 = Admin::create(['email' => 'user1@test.com']);
+        $user5 = Admin::create(['email' => 'user2@test.com']);
+        $testAdminRole2 = app(Role::class)->create(['name' => 'testAdminRole2', 'guard_name' => 'admin']);
+        $user3->assignRole($this->testAdminRole);
+        $user4->assignRole($this->testAdminRole);
+        $user5->assignRole($testAdminRole2);
+        $scopedUsers2 = Admin::whereRole('testAdminRole', 'admin')->get();
+        $scopedUsers3 = Admin::whereRole('testAdminRole2', 'admin')->get();
+
+        $this->assertEquals($scopedUsers2->count(), 2);
+        $this->assertEquals($scopedUsers3->count(), 1);
+    }
+
     /** @test */
     public function it_throws_an_exception_when_trying_to_scope_a_role_from_another_guard()
     {
