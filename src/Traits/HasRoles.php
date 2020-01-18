@@ -78,12 +78,8 @@ trait HasRoles
             return $this->getRoleClass()->{$method}($role, $guard);
         }, $roles);
 
-        return $query->whereHas('roles', function ($query) use ($roles) {
-            $query->where(function ($query) use ($roles) {
-                foreach ($roles as $role) {
-                    $query->orWhere(config('permission.table_names.roles').'.id', $role->id);
-                }
-            });
+        return $query->whereHas('roles', function (Builder $subQuery) use ($roles) {
+            $subQuery->whereIn(config('permission.table_names.roles') . '.id', \array_column($roles, 'id'));
         });
     }
 
