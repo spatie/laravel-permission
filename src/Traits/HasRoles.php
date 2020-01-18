@@ -79,7 +79,7 @@ trait HasRoles
         }, $roles);
 
         return $query->whereHas('roles', function (Builder $subQuery) use ($roles) {
-            $subQuery->whereIn(config('permission.table_names.roles') . '.id', \array_column($roles, 'id'));
+            $subQuery->whereIn(config('permission.table_names.roles').'.id', \array_column($roles, 'id'));
         });
     }
 
