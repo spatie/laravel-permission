@@ -401,7 +401,7 @@ class HasRolesTest extends TestCase
         $this->assertEquals($scopedUsers3->count(), 1);
     }
 
-   /** @test */
+    /** @test */
     public function it_can_scope_users_using_a_string_using_whereRole()
     {
         $user1 = User::create(['email' => 'user1@test.com']);

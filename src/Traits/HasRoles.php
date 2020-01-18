@@ -129,7 +129,7 @@ trait HasRoles
             });
         });
     }
-    
+
     /**
      * Assign the given role to the model.
      *
