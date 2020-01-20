@@ -118,13 +118,11 @@ trait HasRoles
         $guard = is_null($guard) ? $this->getDefaultGuardName() : $guard;
 
         return $query->whereHas('roles', function ($query) use ($roles, $guard) {
-            $query->where(function ($query) use ($roles, $guard) {
+            $query->where(config('permission.table_names.roles').'.guard_name', $guard);
+            return $query->where(function ($query) use ($roles) {
                 foreach ($roles as $role) {
                     $column = is_numeric($role) ? 'id' : 'name';
-                    $query->orWhere([
-                        [config('permission.table_names.roles').".{$column}", '=', $role],
-                        [config('permission.table_names.roles').'.guard_name', '=', $guard],
-                    ]);
+                    $query->orWhere(config('permission.table_names.roles').".{$column}", $role);
                 }
             });
         });
