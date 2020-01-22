@@ -29,15 +29,39 @@ class Role extends Model implements RoleContract
         $this->setTable(config('permission.table_names.roles'));
     }
 
-    public static function create(array $attributes = [])
+    public static function create(array $attributes = [], $withException = true)
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? Guard::getDefaultName(static::class);
 
-        if (static::where('name', $attributes['name'])->where('guard_name', $attributes['guard_name'])->first()) {
-            throw RoleAlreadyExists::create($attributes['name'], $attributes['guard_name']);
+        $existingRole = static::where([
+            'name' => $attributes['name'],
+            'guard_name' => $attributes['guard_name'],
+        ])->first();
+
+        if ($existingRole) {
+            if ($withException) throw RoleAlreadyExists::named($attributes['name'], $attributes['guard_name']);
+            return $existingRole;
         }
 
         return static::query()->create($attributes);
+    }
+	
+    /**
+     * Create many roles.
+     *
+     * @param  iterable $records
+     * @param  bool $withException
+     * @return array
+     */
+    public static function createMany(iterable $records, $withException = false)
+    {
+        $instances = [];
+
+        foreach ($records as $key => $record) {
+            $instances[] = static::create($record, $withException);
+        }
+
+        return $instances;
     }
 
     /**
@@ -81,7 +105,7 @@ class Role extends Model implements RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $role = static::where('name', $name)->where('guard_name', $guardName)->first();
+        $role = static::where(['name' => $name, 'guard_name' => $guardName])->first();
 
         if (! $role) {
             throw RoleDoesNotExist::named($name);
@@ -94,7 +118,7 @@ class Role extends Model implements RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $role = static::where('id', $id)->where('guard_name', $guardName)->first();
+        $role = static::where(['id' => $id, 'guard_name' => $guardName])->first();
 
         if (! $role) {
             throw RoleDoesNotExist::withId($id);
@@ -115,10 +139,12 @@ class Role extends Model implements RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $role = static::where('name', $name)->where('guard_name', $guardName)->first();
+        $attributes = ['name' => $name, 'guard_name' => $guardName];
+
+        $role = static::where($attributes)->first();
 
         if (! $role) {
-            return static::query()->create(['name' => $name, 'guard_name' => $guardName]);
+            return static::query()->create($attributes);
         }
 
         return $role;
