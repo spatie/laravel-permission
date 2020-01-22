@@ -39,7 +39,10 @@ class Role extends Model implements RoleContract
         ])->first();
 
         if ($existingRole) {
-            if ($withException) throw RoleAlreadyExists::named($attributes['name'], $attributes['guard_name']);
+            if ($withException) {
+                throw RoleAlreadyExists::named($attributes['name'], $attributes['guard_name']);
+            }
+
             return $existingRole;
         }
 
