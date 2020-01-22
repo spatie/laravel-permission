@@ -48,7 +48,7 @@ class Role extends Model implements RoleContract
 
         return static::query()->create($attributes);
     }
-	
+
     /**
      * Create many roles.
      *
