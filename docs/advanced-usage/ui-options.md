@@ -7,6 +7,8 @@ weight: 10
 
 The package doesn't come with any screens out of the box, you should build that yourself. Here are some options to get you started:
 
+- If you'd like to build your own UI, and understand the underlying logic for Gates and Roles and Users, the [Laravel 6  User Login and Management With Roles](https://www.youtube.com/watch?v=7PpJsho5aak&list=PLxFwlLOncxFLazmEPiB4N0iYc3Dwst6m4) video series by Mark Twigg of Penguin Digital gives thorough coverage to the topic, the theory, and implementation of a basic Roles system, independent of this Permissions Package.
+
 - [Laravel Nova package by @vyuldashev for managing Roles and Permissions](https://github.com/vyuldashev/nova-permission)
 
 - [Laravel Nova package by @paras-malhotra for managing Roles and Permissions and permissions based authorization for Nova Resources](https://github.com/insenseanalytics/laravel-nova-permission)
