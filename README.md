@@ -38,7 +38,7 @@ $user->can('edit articles');
 
 ## Documentation, Installation, and Usage Instructions
 
-See the [documentation site](https://docs.spatie.be/laravel-permission/v3/introduction/) for detailed installation and usage instructions.
+See the [DOCUMENTATION](https://docs.spatie.be/laravel-permission/v3/introduction/) for detailed installation and usage instructions.
 
 
 ### Testing
