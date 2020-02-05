@@ -36,6 +36,12 @@ Because all permissions will be registered on [Laravel's gate](https://laravel.c
 $user->can('edit articles');
 ```
 
+## Support us
+
+We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us). 
+
+We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+
 ## Documentation, Installation, and Usage Instructions
 
 See the [DOCUMENTATION](https://docs.spatie.be/laravel-permission/v3/introduction/) for detailed installation and usage instructions.
@@ -84,13 +90,6 @@ Special thanks to [Alex Vanderbist](https://github.com/AlexVanderbist) who great
 - [ultraware/roles](https://github.com/ultraware/roles) takes a slightly different approach to its features.
 - [santigarcor/laratrust](https://github.com/santigarcor/laratrust) implements team support
 - [zizaco/entrust](https://github.com/zizaco/entrust) offers some wildcard pattern matching
-
-## Support us
-
-Spatie is a web design agency based in Antwerp, Belgium. You'll find an overview of all our open source projects [on our website](https://spatie.be/opensource).
-
-Does your business depend on our contributions? Reach out and support us on [Patreon](https://www.patreon.com/spatie). 
-All pledges will be dedicated to allocating workforce on maintenance and new awesome stuff.
 
 ## License
 
