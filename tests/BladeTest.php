@@ -127,7 +127,7 @@ class BladeTest extends TestCase
     public function the_role_or_permission_directive_will_evaluate_true_when_the_logged_in_user_has_the_role_for_the_given_guard()
     {
         auth('admin')->setUser($this->getSuperAdmin());
-    
+
         $this->assertEquals('has role or permission for guard', $this->renderView('guardroleorpermission', ['roleOrPermission' => 'super-admin', 'guard' => 'admin']));
     }
 
@@ -216,7 +216,7 @@ class BladeTest extends TestCase
 
         auth('admin')->setUser($this->getSuperAdmin());
 
-        $this->assertEquals('has role or permission for guard', $this->renderView('guardroleorpermission', ['roleOrPermission' => $roles , 'guard' => $guard]));
+        $this->assertEquals('has role or permission for guard', $this->renderView('guardroleorpermission', ['roleOrPermission' => $roles, 'guard' => $guard]));
     }
 
     /** @test */
