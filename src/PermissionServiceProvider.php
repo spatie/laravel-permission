@@ -114,6 +114,15 @@ class PermissionServiceProvider extends ServiceProvider
             $bladeCompiler->directive('endunlessrole', function () {
                 return '<?php endif; ?>';
             });
+
+            $bladeCompiler->directive('roleorpermission', function ($arguments) {
+                list($roleOrPermission, $guard) = explode(',', $arguments.',');
+
+                return "<?php if(auth({$guard})->check() && (auth({$guard})->user()->hasAnyRole({$roleOrPermission}) || auth({$guard})->user()->hasAnyPermission({$roleOrPermission})) ): ?>";
+            });
+            $bladeCompiler->directive('endroleorpermission', function () {
+                return '<?php endif; ?>';
+            });
         });
     }
 
