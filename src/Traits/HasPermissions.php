@@ -4,6 +4,7 @@ namespace Spatie\Permission\Traits;
 
 use Spatie\Permission\Guard;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Contracts\Permission;
@@ -305,6 +306,7 @@ trait HasPermissions
             ->map->id
             ->all();
 
+        /** @var Model $model */
         $model = $this->getModel();
 
         if ($model->exists) {
