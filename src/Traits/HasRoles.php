@@ -4,6 +4,7 @@ namespace Spatie\Permission\Traits;
 
 use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Role;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\Permission\PermissionRegistrar;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -114,6 +115,7 @@ trait HasRoles
             ->map->id
             ->all();
 
+        /** @var Model $model */
         $model = $this->getModel();
 
         if ($model->exists) {
