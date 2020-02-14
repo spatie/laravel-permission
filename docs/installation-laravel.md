@@ -39,8 +39,7 @@ This package can be used in Laravel 5.8 or higher.
    Consult the Basic Usage section of the docs for how to get started using the features of this package.
 
 
----
-
 ### Default config file contents
 
-You can view the default config file contents at: https://github.com/spatie/laravel-permission/blob/master/config/permission.php
+You can view the default config file contents at: 
+https://github.com/spatie/laravel-permission/blob/master/config/permission.php
