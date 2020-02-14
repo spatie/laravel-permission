@@ -19,7 +19,6 @@ This package can be used in Laravel 5.8 or higher.
         Spatie\Permission\PermissionServiceProvider::class,
     ];
     ```
-
 4. You should publish [the migration](https://github.com/spatie/laravel-permission/blob/master/database/migrations/create_permission_tables.php.stub) and the [`config/permission.php` config file](https://github.com/spatie/laravel-permission/blob/master/config/permission.php) with:
 
     ```bash
@@ -30,9 +29,7 @@ This package can be used in Laravel 5.8 or higher.
 
 6. Run the migrations: After the config and migration have been published and configured, you can create the tables for this package by running:
 
-    ```bash
-    php artisan migrate
-    ```
+        php artisan migrate
 
 7. Add the necessary trait to your User model.
 
