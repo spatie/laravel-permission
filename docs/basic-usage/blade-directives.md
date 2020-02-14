@@ -1,5 +1,5 @@
 ---
-title: Using Blade directives
+title: Blade directives
 weight: 4
 ---
 
