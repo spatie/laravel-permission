@@ -3,7 +3,7 @@ title: Installation in Laravel
 weight: 4
 ---
 
-This package can be used in Laravel 5.8 or higher.
+This package can be used with Laravel 5.8 or higher.
 
 1. Consult the Prerequisites page for important considerations regarding your User models!
 
@@ -19,6 +19,7 @@ This package can be used in Laravel 5.8 or higher.
         Spatie\Permission\PermissionServiceProvider::class,
     ];
     ```
+
 4. You should publish [the migration](https://github.com/spatie/laravel-permission/blob/master/database/migrations/create_permission_tables.php.stub) and the [`config/permission.php` config file](https://github.com/spatie/laravel-permission/blob/master/config/permission.php) with:
 
     ```bash
