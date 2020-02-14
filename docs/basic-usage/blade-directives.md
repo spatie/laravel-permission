@@ -3,7 +3,7 @@ title: Blade directives
 weight: 4
 ---
 
-### Permissions
+## Permissions
 This package doesn't add any **permission**-specific Blade directives. 
 Instead, use Laravel's native `@can` directive to check if a user has a certain permission.
 
@@ -22,7 +22,7 @@ or
 You can use `@can`, `@cannot`, `@canany`, and `@guest` to test for permission-related access.
 
 
-### Roles 
+## Roles 
 As discussed in the Best Practices section of the docs, **it is strongly recommended to always use permission directives**, instead of role directives.
 
 Additionally, if your reason for testing against Roles is for a Super-Admin, see the *Defining A Super-Admin* section of the docs.
