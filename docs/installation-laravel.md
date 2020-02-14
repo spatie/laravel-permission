@@ -13,7 +13,7 @@ This package can be used with Laravel 5.8 or higher.
 
 3. Optional: The service provider will automatically get registered. Or you may manually add the service provider in your `config/app.php` file:
 
-    ```php
+    ```
     'providers' => [
         // ...
         Spatie\Permission\PermissionServiceProvider::class,
@@ -22,7 +22,7 @@ This package can be used with Laravel 5.8 or higher.
 
 4. You should publish [the migration](https://github.com/spatie/laravel-permission/blob/master/database/migrations/create_permission_tables.php.stub) and the [`config/permission.php` config file](https://github.com/spatie/laravel-permission/blob/master/config/permission.php) with:
 
-    ```bash
+    ```
     php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
     ```
 
@@ -32,12 +32,11 @@ This package can be used with Laravel 5.8 or higher.
 
         php artisan migrate
 
-7. Add the necessary trait to your User model.
-
-   Consult the Basic Usage section of the docs for how to get started using the features of this package.
+7. Add the necessary trait to your User model: Consult the Basic Usage section of the docs for how to get started using the features of this package.
 
 
 ### Default config file contents
 
-You can view the default config file contents at: 
+You can view the default config file contents at:
+
 https://github.com/spatie/laravel-permission/blob/master/config/permission.php
