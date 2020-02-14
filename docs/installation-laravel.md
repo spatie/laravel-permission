@@ -8,11 +8,9 @@ This package can be used in Laravel 5.8 or higher.
 1. Consult the Prerequisites page for important considerations regarding your User models!
 
 2. You can install the package via composer:
-
     ``` bash
     composer require spatie/laravel-permission
     ```
-
 3. Optional: The service provider will automatically get registered. Or you may manually add the service provider in your `config/app.php` file:
 
     ```php
