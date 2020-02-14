@@ -1,6 +1,6 @@
 ---
 title: Extending
-weight: 3
+weight: 4
 ---
 
 ## Extending User Models

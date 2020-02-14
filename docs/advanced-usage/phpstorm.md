@@ -1,6 +1,6 @@
 ---
 title: Extending PhpStorm
-weight: 5
+weight: 7
 ---
 
 # Extending PhpStorm to support Blade Directives of this package
