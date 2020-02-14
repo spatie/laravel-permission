@@ -3,7 +3,7 @@ title: Using Blade directives
 weight: 4
 ---
 
-#### Blade and Permissions
+### Permissions
 This package doesn't add any **permission**-specific Blade directives. 
 Instead, use Laravel's native `@can` directive to check if a user has a certain permission.
 
