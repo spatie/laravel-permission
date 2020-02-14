@@ -25,7 +25,7 @@ You can use `@can`, `@cannot`, `@canany`, and `@guest` to test for permission-re
 ### Roles 
 As discussed in the Best Practices section of the docs, **it is strongly recommended to always use permission directives**, instead of role directives.
 
-Additionally, if your reason for testing against Roles is for a Super-Admin, see the Best Practices section of the docs.
+Additionally, if your reason for testing against Roles is for a Super-Admin, see the *Defining A Super-Admin* section of the docs.
 
 If you actually need to test for Roles, this package offers some Blade directives to verify whether the currently logged in user has all or any of a given list of roles. 
 
