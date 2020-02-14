@@ -430,7 +430,7 @@ trait HasPermissions
      * @param array ...$permissions
      * @return bool
      */
-    public function hasAllDirectPermissions(...$permissions) : bool
+    public function hasAllDirectPermissions(...$permissions): bool
     {
         if (is_array($permissions[0])) {
             $permissions = $permissions[0];
@@ -450,12 +450,12 @@ trait HasPermissions
      * @param array ...$permissions
      * @return bool
      */
-    public function hasAnyDirectPermission(...$permissions) : bool
+    public function hasAnyDirectPermission(...$permissions): bool
     {
         if (is_array($permissions[0])) {
             $permissions = $permissions[0];
         }
-        
+
         foreach ($permissions as $permission) {
             if ($this->hasDirectPermission($permission)) {
                 return true;
