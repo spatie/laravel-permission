@@ -424,4 +424,44 @@ trait HasPermissions
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
+
+    /**
+     * Check if the model has All of the requested Direct permissions.
+     * @param array ...$permissions
+     * @return bool
+     */
+    public function hasAllDirectPermissions(...$permissions) : bool
+    {
+        if (is_array($permissions[0])) {
+            $permissions = $permissions[0];
+        }
+
+        foreach ($permissions as $permission) {
+            if (! $this->hasDirectPermission($permission)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if the model has Any of the requested Direct permissions.
+     * @param array ...$permissions
+     * @return bool
+     */
+    public function hasAnyDirectPermission(...$permissions) : bool
+    {
+        if (is_array($permissions[0])) {
+            $permissions = $permissions[0];
+        }
+        
+        foreach ($permissions as $permission) {
+            if ($this->hasDirectPermission($permission)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
