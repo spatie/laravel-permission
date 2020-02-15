@@ -1,6 +1,6 @@
 ---
 title: Extending
-weight: 3
+weight: 4
 ---
 
 ## Extending User Models
@@ -29,3 +29,6 @@ If you need to REPLACE the existing `Role` or `Permission` models you need to ke
 - Your `Role` model needs to implement the `Spatie\Permission\Contracts\Role` contract
 - Your `Permission` model needs to implement the `Spatie\Permission\Contracts\Permission` contract
 
+## Migrations - Adding fields to your models
+You can add your own migrations to make changes to the role/permission tables, as you would for adding/changing fields in any other tables in your Laravel project.
+Following that, you can add any necessary logic for interacting with those fields ... to your custom/extended Models.

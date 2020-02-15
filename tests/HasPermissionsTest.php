@@ -501,4 +501,19 @@ class HasPermissionsTest extends TestCase
             $this->testUser->getPermissionNames()
         );
     }
+
+    /** @test */
+    public function it_can_check_many_direct_permissions()
+    {
+        $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
+        $this->assertTrue($this->testUser->hasAllDirectPermissions(['edit-news', 'edit-articles']));
+        $this->assertFalse($this->testUser->hasAllDirectPermissions(['edit-articles', 'edit-news', 'edit-blog']));
+    }
+
+    /** @test */
+    public function it_can_check_if_there_is_any_of_the_direct_permissions_given()
+    {
+        $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
+        $this->assertTrue($this->testUser->hasAnyDirectPermission(['edit-news', 'edit-blog']));
+    }
 }

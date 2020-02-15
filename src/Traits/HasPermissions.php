@@ -65,21 +65,13 @@ trait HasPermissions
             return array_merge($result, $permission->roles->all());
         }, []));
 
-        return $query->where(function ($query) use ($permissions, $rolesWithPermissions) {
-            $query->whereHas('permissions', function ($query) use ($permissions) {
-                $query->where(function ($query) use ($permissions) {
-                    foreach ($permissions as $permission) {
-                        $query->orWhere(config('permission.table_names.permissions').'.id', $permission->id);
-                    }
-                });
+        return $query->where(function (Builder $query) use ($permissions, $rolesWithPermissions) {
+            $query->whereHas('permissions', function (Builder $subQuery) use ($permissions) {
+                $subQuery->whereIn(config('permission.table_names.permissions').'.id', \array_column($permissions, 'id'));
             });
             if (count($rolesWithPermissions) > 0) {
-                $query->orWhereHas('roles', function ($query) use ($rolesWithPermissions) {
-                    $query->where(function ($query) use ($rolesWithPermissions) {
-                        foreach ($rolesWithPermissions as $role) {
-                            $query->orWhere(config('permission.table_names.roles').'.id', $role->id);
-                        }
-                    });
+                $query->orWhereHas('roles', function (Builder $subQuery) use ($rolesWithPermissions) {
+                    $subQuery->whereIn(config('permission.table_names.roles').'.id', \array_column($rolesWithPermissions, 'id'));
                 });
             }
         });
@@ -419,5 +411,45 @@ trait HasPermissions
     public function forgetCachedPermissions()
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
+    }
+
+    /**
+     * Check if the model has All of the requested Direct permissions.
+     * @param array ...$permissions
+     * @return bool
+     */
+    public function hasAllDirectPermissions(...$permissions): bool
+    {
+        if (is_array($permissions[0])) {
+            $permissions = $permissions[0];
+        }
+
+        foreach ($permissions as $permission) {
+            if (! $this->hasDirectPermission($permission)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if the model has Any of the requested Direct permissions.
+     * @param array ...$permissions
+     * @return bool
+     */
+    public function hasAnyDirectPermission(...$permissions): bool
+    {
+        if (is_array($permissions[0])) {
+            $permissions = $permissions[0];
+        }
+
+        foreach ($permissions as $permission) {
+            if ($this->hasDirectPermission($permission)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -1,6 +1,6 @@
 ---
 title: Cache
-weight: 4
+weight: 5
 ---
 
 Role and Permission data are cached to speed up performance.
