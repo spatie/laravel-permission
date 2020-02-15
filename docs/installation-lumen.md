@@ -35,7 +35,7 @@ $app->routeMiddleware([
 ]);
 ```
 
-Also in `bootstrap/app.php` register the config file, service provider, and cache alias:
+... and in the same file, in the ServiceProviders section, register the package configuration, service provider, and cache alias:
 
 ```php
 $app->configure('permission');
@@ -48,9 +48,9 @@ If you are using guards you will need to uncomment the AuthServiceProvider line:
 $app->register(App\Providers\AuthServiceProvider::class);
 ```
 
-Now, ensure your database configuration is set.
+Ensure your database configuration is set in your `.env` (or `config/database.php` if you have one).
 
-Then run the migrations:
+Run the migrations to create the tables for this package:
 
 ```bash
 php artisan migrate
@@ -59,3 +59,8 @@ php artisan migrate
 
 NOTE: Remember that Laravel's authorization layer requires that your `User` model implement the `Illuminate\Contracts\Auth\Access\Authorizable` contract. In Lumen you will then also need to use the `Laravel\Lumen\Auth\Authorizable` trait.
 
+NOTE: If you are working with a fresh install of Lumen, then you probably also need a migration file for your Users table. You can create your own, or you can copy a basic one from Laravel:
+
+https://github.com/laravel/laravel/blob/master/database/migrations/2014_10_12_000000_create_users_table.php
+
+(You will need to run `php artisan migrate` after adding this file.)
