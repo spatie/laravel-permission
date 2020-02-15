@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 3.7.1 - 2020-02-15
+- Internal refactoring of scopes to use whereIn instead of orWhere #1334, #1335
+- Internal refactoring to flatten collection on splat #1341
+
 ## 3.7.0 - 2020-02-15
 - Added methods to check any/all when querying direct permissions #1245
 - Removed older Lumen dependencies #1371
