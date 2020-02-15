@@ -4,6 +4,7 @@ All notable changes to `laravel-permission` will be documented in this file
 
 ## (pending)
 - Added methods to check any/all when querying direct permissions #1245
+- Removed older Lumen dependencies #1371
 
 ## 3.6.0 - 2020-01-17
 - Added Laravel 7.0 support
