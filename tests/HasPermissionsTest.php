@@ -267,6 +267,7 @@ class HasPermissionsTest extends TestCase
         $this->testUser->revokePermissionTo($this->testUserPermission);
 
         $this->assertTrue($this->testUser->hasAnyPermission('edit-articles', 'edit-news'));
+        $this->assertFalse($this->testUser->hasAnyPermission('edit-blog', 'Edit News', ['Edit News']));
     }
 
     /** @test */
@@ -293,6 +294,7 @@ class HasPermissionsTest extends TestCase
         $this->testUser->assignRole('testRole');
 
         $this->assertTrue($this->testUser->hasAnyPermission('edit-news', 'edit-articles'));
+        $this->assertFalse($this->testUser->hasAnyPermission('edit-blog', 'Edit News', ['Edit News']));
     }
 
     /** @test */
@@ -305,6 +307,7 @@ class HasPermissionsTest extends TestCase
         $this->testUser->revokePermissionTo('edit-articles');
 
         $this->assertFalse($this->testUser->hasAllPermissions('edit-articles', 'edit-news'));
+        $this->assertFalse($this->testUser->hasAllPermissions(['edit-articles', 'edit-news'], 'edit-blog'));
     }
 
     /** @test */
@@ -507,7 +510,9 @@ class HasPermissionsTest extends TestCase
     {
         $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
         $this->assertTrue($this->testUser->hasAllDirectPermissions(['edit-news', 'edit-articles']));
+        $this->assertTrue($this->testUser->hasAllDirectPermissions('edit-news', 'edit-articles'));
         $this->assertFalse($this->testUser->hasAllDirectPermissions(['edit-articles', 'edit-news', 'edit-blog']));
+        $this->assertFalse($this->testUser->hasAllDirectPermissions(['edit-articles', 'edit-news'], 'edit-blog'));
     }
 
     /** @test */
@@ -515,5 +520,7 @@ class HasPermissionsTest extends TestCase
     {
         $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
         $this->assertTrue($this->testUser->hasAnyDirectPermission(['edit-news', 'edit-blog']));
+        $this->assertTrue($this->testUser->hasAnyDirectPermission('edit-news', 'edit-blog'));
+        $this->assertFalse($this->testUser->hasAnyDirectPermission('edit-blog', 'Edit News', ['Edit News']));
     }
 }
