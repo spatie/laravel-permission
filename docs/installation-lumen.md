@@ -43,7 +43,7 @@ $app->alias('cache', \Illuminate\Cache\CacheManager::class);  // if you don't ha
 $app->register(Spatie\Permission\PermissionServiceProvider::class);
 ```
 
-If you are using guards you will need to uncomment the AuthServiceProvider line:
+... and in the same file, since the Authorization layer uses guards you will need to uncomment the AuthServiceProvider line:
 ```php
 $app->register(App\Providers\AuthServiceProvider::class);
 ```
@@ -56,11 +56,16 @@ Run the migrations to create the tables for this package:
 php artisan migrate
 ```
 
-
+---
+### User Model
 NOTE: Remember that Laravel's authorization layer requires that your `User` model implement the `Illuminate\Contracts\Auth\Access\Authorizable` contract. In Lumen you will then also need to use the `Laravel\Lumen\Auth\Authorizable` trait.
 
+---
+### User Table
 NOTE: If you are working with a fresh install of Lumen, then you probably also need a migration file for your Users table. You can create your own, or you can copy a basic one from Laravel:
 
 https://github.com/laravel/laravel/blob/master/database/migrations/2014_10_12_000000_create_users_table.php
 
 (You will need to run `php artisan migrate` after adding this file.)
+
+Remember to update your ModelFactory.php to match the fields in the migration you create/copy.
