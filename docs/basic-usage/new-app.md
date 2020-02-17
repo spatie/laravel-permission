@@ -148,6 +148,7 @@ You can see examples of these in the demo app at https://github.com/drbyte/spati
 
 ## Sharing
 To share your app on Github for easy collaboration:
+
 - create a new public repository on Github, without any extras like readme/etc.
 - follow github's sample code for linking your local repo and uploading the code. It will look like this:
 
