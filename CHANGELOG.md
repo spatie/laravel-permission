@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 3.7.2 - 2020-02-17
+- Refine test for Lumen dependency. Ref #1371, Fixes #1372.
+
 ## 3.7.1 - 2020-02-15
 - Internal refactoring of scopes to use whereIn instead of orWhere #1334, #1335
 - Internal refactoring to flatten collection on splat #1341
