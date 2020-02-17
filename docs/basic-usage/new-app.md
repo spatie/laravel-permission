@@ -119,6 +119,7 @@ php artisan migrate:fresh --seed --seeder=PermissionsDemoSeeder
 
 ### Grant Super-Admin access
 Super-Admins are a common feature. Using the following approach allows that when your Super-Admin user is logged in, all permission-checks in your app which call `can()` or `@can()` will return true.
+
 - Add a Gate::before check in your `AuthServiceProvider`:
 
 ```diff
