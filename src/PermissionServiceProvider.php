@@ -22,9 +22,9 @@ class PermissionServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->getMigrationFileName($filesystem),
             ], 'migrations');
-
-            $this->registerMacroHelpers();
         }
+
+        $this->registerMacroHelpers();
 
         $this->commands([
             Commands\CacheReset::class,
@@ -117,6 +117,10 @@ class PermissionServiceProvider extends ServiceProvider
 
     protected function registerMacroHelpers()
     {
+        if (! method_exists(Route::class, 'macro')) { // Lumen
+            return;
+        }
+
         Route::macro('role', function ($roles = []) {
             if (! is_array($roles)) {
                 $roles = [$roles];
