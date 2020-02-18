@@ -15,7 +15,7 @@ Route::group(['middleware' => ['can:publish articles']], function () {
 
 ## Package Middleware
 
-This package comes with `RoleMiddleware`, `PermissionMiddleware` and `RoleOrPermissionMiddleware` middleware. You can add them inside your `app/Http/Kernel.php` file.
+This package comes with `RoleMiddleware`, `PermissionMiddleware`, `RoleOrPermissionMiddleware` and `CascadePermissionMiddleware` middleware. You can add them inside your `app/Http/Kernel.php` file.
 
 ```php
 protected $routeMiddleware = [
@@ -23,6 +23,7 @@ protected $routeMiddleware = [
     'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
     'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
     'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
+    'permissionsCascade' => \Spatie\Permission\Middlewares\CascadePermissionMiddleware::class,
 ];
 ```
 
@@ -81,3 +82,15 @@ public function __construct()
     $this->middleware(['role_or_permission:super-admin|edit articles']);
 }
 ```
+
+You can use the `CascadePermissionMiddleware` as a sort of wildcard, where it looks for matches based on progressive lookups of strings delimited with dot-notation:
+
+```php
+Route::group(['middleware' => ['permissionsCascade:users.modify.delete']], function () {
+    // will pass if the logged in user has either the `users`
+    // or `users.modify` or `users.modify.delete` permission. 
+    // (And those permissions must exist for the current guard)
+});
+```
+
+
