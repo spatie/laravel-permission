@@ -3,6 +3,14 @@ title: Using a middleware
 weight: 7
 ---
 
+You can use the built-in Laravel middleware from `\Illuminate\Auth\Middleware\Authorize::class`
+
+```php
+Route::group(['middleware' => ['can:publish articles']], function () {
+    //
+});
+```
+
 This package comes with `RoleMiddleware`, `PermissionMiddleware` and `RoleOrPermissionMiddleware` middleware. You can add them inside your `app/Http/Kernel.php` file.
 
 ```php
