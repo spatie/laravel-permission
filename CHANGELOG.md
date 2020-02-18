@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 3.8.0 - 2020-02-18
+- Clear in-memory permissions on boot, for benefit of long running processes like Swoole. #1378
+
 ## 3.7.2 - 2020-02-17
 - Refine test for Lumen dependency. Ref #1371, Fixes #1372.
 
