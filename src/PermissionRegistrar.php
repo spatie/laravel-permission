@@ -110,8 +110,6 @@ class PermissionRegistrar
     public function clearClassPermissions()
     {
         $this->permissions = null;
-
-        return true;
     }
 
     /**
