@@ -35,6 +35,7 @@ class PermissionServiceProvider extends ServiceProvider
 
         $this->registerModelBindings();
 
+        $permissionLoader->clearClassPermissions();
         $permissionLoader->registerPermissions();
 
         $this->app->singleton(PermissionRegistrar::class, function ($app) use ($permissionLoader) {
