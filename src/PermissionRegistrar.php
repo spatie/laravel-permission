@@ -105,6 +105,16 @@ class PermissionRegistrar
     }
 
     /**
+     * Clear class permissions.
+     */
+    public function clearClassPermissions()
+    {
+        $this->permissions = null;
+
+        return true;
+    }
+
+    /**
      * Get the permissions based on the passed params.
      *
      * @param array $params
