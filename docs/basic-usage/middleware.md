@@ -86,7 +86,7 @@ public function __construct()
 If you want to override the default `403` response, you can catch the `UnauthorizedException` using your app's exception handler:
 
 ```php
-public function render($request, Exception $exception)
+public function render($request, Throwable $exception)
 {
     if ($exception instanceof \Spatie\Permission\Exceptions\UnauthorizedException) {
         // Code here ...
