@@ -81,17 +81,3 @@ public function __construct()
     $this->middleware(['role_or_permission:super-admin|edit articles']);
 }
 ```
-
-### Catching role and permission failures
-If you want to override the default `403` response, you can catch the `UnauthorizedException` using your app's exception handler:
-
-```php
-public function render($request, Throwable $exception)
-{
-    if ($exception instanceof \Spatie\Permission\Exceptions\UnauthorizedException) {
-        // Code here ...
-    }
-
-    return parent::render($request, $exception);
-}
-```
