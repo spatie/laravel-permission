@@ -92,6 +92,13 @@ return [
 
     'display_permission_in_exception' => false,
 
+    /*
+     * By default, wildcard permission usage is disabled.
+     * When set to true, wildcard permission handling is enabled.
+     */
+
+    'enable_wildcard_permission' => false,
+
     'cache' => [
 
         /*
