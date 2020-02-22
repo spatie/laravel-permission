@@ -234,7 +234,7 @@ class HasPermissionsTest extends TestCase
     {
         $this->expectException(PermissionDoesNotExist::class);
 
-        $this->testUser->hasPermissionTo(7892);
+        $this->testUser->hasPermissionTo('does-not-exist');
     }
 
     /** @test */
@@ -242,7 +242,7 @@ class HasPermissionsTest extends TestCase
     {
         $this->expectException(PermissionDoesNotExist::class);
 
-        $this->testUser->hasPermissionTo(83743847);
+        $this->testUser->hasPermissionTo('does-not-exist');
     }
 
     /** @test */

@@ -2,8 +2,11 @@
 
 namespace Spatie\Permission\Test;
 
+use Spatie\Permission\Exceptions\PermissionDoesNotExist;
+use Spatie\Permission\Exceptions\WildcardPermissionInvalidArgument;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Exceptions\WildcardPermissionNotProperlyFormatted;
+use Spatie\Permission\Models\Role;
 
 class WildcardHasPermissionsTest extends TestCase
 {
@@ -102,5 +105,79 @@ class WildcardHasPermissionsTest extends TestCase
         $this->expectException(WildcardPermissionNotProperlyFormatted::class);
 
         $user1->hasPermissionTo('invoices.*');
+    }
+
+    /** @test */
+    public function it_can_verify_permission_instances_not_assigned_to_user()
+    {
+        app('config')->set('permission.enable_wildcard_permission', true);
+
+        $user = User::create(['email' => 'user@test.com']);
+
+        $userPermission = Permission::create(['name' => 'posts.*']);
+        $permissionToVerify = Permission::create(['name' => 'posts.create']);
+
+        $user->givePermissionTo([$userPermission]);
+
+        $this->assertTrue($user->hasPermissionTo('posts.create'));
+        $this->assertTrue($user->hasPermissionTo('posts.create.123'));
+        $this->assertTrue($user->hasPermissionTo($permissionToVerify->id));
+        $this->assertTrue($user->hasPermissionTo($permissionToVerify));
+    }
+
+    /** @test */
+    public function it_can_verify_permission_instances_assigned_to_user()
+    {
+        app('config')->set('permission.enable_wildcard_permission', true);
+
+        $user = User::create(['email' => 'user@test.com']);
+
+        $userPermission = Permission::create(['name' => 'posts.*']);
+        $permissionToVerify = Permission::create(['name' => 'posts.create']);
+
+        $user->givePermissionTo([$userPermission, $permissionToVerify]);
+
+        $this->assertTrue($user->hasPermissionTo('posts.create'));
+        $this->assertTrue($user->hasPermissionTo('posts.create.123'));
+        $this->assertTrue($user->hasPermissionTo($permissionToVerify));
+        $this->assertTrue($user->hasPermissionTo($userPermission));
+    }
+
+    /** @test */
+    public function it_can_verify_integers_as_strings()
+    {
+        app('config')->set('permission.enable_wildcard_permission', true);
+
+        $user = User::create(['email' => 'user@test.com']);
+
+        $userPermission = Permission::create(['name' => '8']);
+
+        $user->givePermissionTo([$userPermission]);
+
+        $this->assertTrue($user->hasPermissionTo('8'));
+    }
+
+    /** @test */
+    public function it_throws_exception_when_permission_has_invalid_arguments()
+    {
+        app('config')->set('permission.enable_wildcard_permission', true);
+
+        $user = User::create(['email' => 'user@test.com']);
+
+        $this->expectException(WildcardPermissionInvalidArgument::class);
+
+        $user->hasPermissionTo(['posts.create']);
+    }
+
+    /** @test */
+    public function it_throws_exception_when_permission_id_not_exists()
+    {
+        app('config')->set('permission.enable_wildcard_permission', true);
+
+        $user = User::create(['email' => 'user@test.com']);
+
+        $this->expectException(PermissionDoesNotExist::class);
+
+        $user->hasPermissionTo(6);
     }
 }

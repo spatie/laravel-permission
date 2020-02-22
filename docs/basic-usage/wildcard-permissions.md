@@ -7,11 +7,11 @@ Wildcard permissions can be enabled in the permission config file:
 
 ```php
 // config/permission.php
-'enable_wildcard_permissions' => true,
+'enable_wildcard_permission' => true,
 ```
 
 When enabled, wildcard permissions offers you a flexible representation for a variety of permission schemes. The idea
- behind wildcard permissions is based on the default permission implementation of 
+ behind wildcard permissions is inspired by the default permission implementation of 
  [Apache Shiro](https://shiro.apache.org/permissions.html).
 
 A wildcard permission string is made of one or more parts separated by dots (.).
@@ -27,7 +27,7 @@ this is the common use-case, representing {resource}.{action}.{target}.
 
 ### Using Wildcards
 
-Each part can also have wildcards (*). So let's say we assign the following permission to a user:
+Each part can also contains wildcards (*). So let's say we assign the following permission to a user:
 
 ```php
 $user->givePermissionTo('posts.*');
@@ -45,8 +45,10 @@ $user->can('posts.edit');
 $user->can('posts.delete');
 ``` 
 
+### Subparts
+
 Besides the use of parts and wildcards, subparts can also be used. Subparts are divided with commas (,). This is a 
-powerful feature, that let's you create complex permission schemes.
+powerful feature that lets you create complex permission schemes.
 
 ```php
 // user can only do the actions create, update and view on both resources posts and users

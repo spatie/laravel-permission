@@ -2,6 +2,8 @@
 
 namespace Spatie\Permission\Traits;
 
+use Spatie\Permission\Exceptions\WildcardPermissionInvalidArgument;
+use Spatie\Permission\Exceptions\WildcardPermissionNotProperlyFormatted;
 use Spatie\Permission\Guard;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
@@ -111,24 +113,17 @@ trait HasPermissions
      */
     public function hasPermissionTo($permission, $guardName = null): bool
     {
+        if (config('permission.enable_wildcard_permission', false)) {
+            return $this->hasWildcardPermission($permission, $guardName);
+        }
+
         $permissionClass = $this->getPermissionClass();
 
         if (is_string($permission)) {
-            try {
-                $permission = $permissionClass->findByName(
-                    $permission,
-                    $guardName ?? $this->getDefaultGuardName()
-                );
-            } catch (PermissionDoesNotExist $e) {
-                // the permission as string is not present in the database
-                // so check wildcard permission if enabled in config
-                // Use sensitive default for backwards compatibility
-                if (config('permission.enable_wildcard_permission', false)) {
-                    return $this->hasWildcardPermission($permission);
-                }
-
-                throw new PermissionDoesNotExist();
-            }
+            $permission = $permissionClass->findByName(
+                $permission,
+                $guardName ?? $this->getDefaultGuardName()
+            );
         }
 
         if (is_int($permission)) {
@@ -138,7 +133,7 @@ trait HasPermissions
             );
         }
 
-        if (! $permission instanceof Permission) {
+        if (!$permission instanceof Permission) {
             throw new PermissionDoesNotExist;
         }
 
@@ -148,18 +143,35 @@ trait HasPermissions
     /**
      * Validates a wildcard permission against all permissions of a user.
      *
-     * @param string $permission
+     * @param string|int|\Spatie\Permission\Contracts\Permission $permission
+     * @param string|null $guardName
      *
      * @return bool
      */
-    protected function hasWildcardPermission(string $permission): bool
+    protected function hasWildcardPermission($permission, $guardName = null): bool
     {
-        $permissionToVerify = new WildcardPermission($permission);
+        $guardName = $guardName ?? $this->getDefaultGuardName();
 
-        foreach ($this->getAllPermissions() as $permission) {
-            $permission = new WildcardPermission($permission->name);
+        if (is_int($permission)) {
+            $permission = $this->getPermissionClass()->findById($permission, $guardName);
+        }
 
-            if ($permission->implies($permissionToVerify)) {
+        if ($permission instanceof Permission) {
+            $permission = $permission->name;
+        }
+
+        if (! is_string($permission)) {
+            throw WildcardPermissionInvalidArgument::create();
+        }
+
+        foreach ($this->getAllPermissions() as $userPermission) {
+            if ($guardName !== $userPermission->guard_name) {
+                continue;
+            }
+
+            $userPermission = new WildcardPermission($userPermission->name);
+
+            if ($userPermission->implies($permission)) {
                 return true;
             }
         }
