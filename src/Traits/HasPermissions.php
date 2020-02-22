@@ -2,8 +2,6 @@
 
 namespace Spatie\Permission\Traits;
 
-use Spatie\Permission\Exceptions\WildcardPermissionInvalidArgument;
-use Spatie\Permission\Exceptions\WildcardPermissionNotProperlyFormatted;
 use Spatie\Permission\Guard;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
@@ -13,6 +11,7 @@ use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
+use Spatie\Permission\Exceptions\WildcardPermissionInvalidArgument;
 
 trait HasPermissions
 {
@@ -133,7 +132,7 @@ trait HasPermissions
             );
         }
 
-        if (!$permission instanceof Permission) {
+        if (! $permission instanceof Permission) {
             throw new PermissionDoesNotExist;
         }
 
