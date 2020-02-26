@@ -242,7 +242,7 @@ class HasPermissionsTest extends TestCase
     {
         $this->expectException(PermissionDoesNotExist::class);
 
-        $this->testUser->hasPermissionTo('admin-permission');
+        $this->testUser->hasPermissionTo('does-not-exist');
     }
 
     /** @test */
