@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 3.9.0 - 2020-02-26
+- Add Wildcard Permissions feature #1381 (see PR or docs for details)
+
 ## 3.8.0 - 2020-02-18
 - Clear in-memory permissions on boot, for benefit of long running processes like Swoole. #1378
 
