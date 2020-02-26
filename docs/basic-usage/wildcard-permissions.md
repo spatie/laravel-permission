@@ -27,7 +27,7 @@ this is the common use-case, representing {resource}.{action}.{target}.
 
 ### Using Wildcards
 
-Each part can also contains wildcards (*). So let's say we assign the following permission to a user:
+Each part can also contain wildcards (*). So let's say we assign the following permission to a user:
 
 ```php
 $user->givePermissionTo('posts.*');
