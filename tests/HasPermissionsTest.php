@@ -527,7 +527,7 @@ class HasPermissionsTest extends TestCase
     /** @test */
     public function it_can_check_permission_based_on_logged_in_user_guard()
     {
-        $this->testUser->givePermissionTo(\Spatie\Permission\Models\Permission::create([
+        $this->testUser->givePermissionTo(app(Permission::class)::create([
             'name' => 'do_that',
             'guard_name' => 'api',
         ]));
