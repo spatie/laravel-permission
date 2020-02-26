@@ -533,7 +533,7 @@ class HasPermissionsTest extends TestCase
         ]));
         $response = $this->actingAs($this->testUser, 'api')->json('GET', '/check-api-guard-permission');
         $response->assertJson([
-            'status' => true
+            'status' => true,
         ]);
     }
 }

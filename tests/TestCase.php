@@ -2,7 +2,9 @@
 
 namespace Spatie\Permission\Test;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Contracts\Role;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
@@ -10,8 +12,6 @@ use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Contracts\Permission;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Spatie\Permission\PermissionServiceProvider;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
 
 abstract class TestCase extends Orchestra
 {
@@ -156,7 +156,7 @@ abstract class TestCase extends Orchestra
     {
         Route::middleware('auth:api')->get('/check-api-guard-permission', function (Request $request) {
             return [
-                'status' => $request->user()->hasPermissionTo('do_that')
+                'status' => $request->user()->hasPermissionTo('do_that'),
             ];
         });
     }
