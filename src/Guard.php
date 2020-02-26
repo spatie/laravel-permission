@@ -39,7 +39,10 @@ class Guard
             ->filter(function ($model) use ($class) {
                 return $class === $model;
             })
-            ->keys();
+            ->keys()
+            ->filter(function ($guard) {
+                return request()->user() ? auth()->guard($guard)->check() : true;
+            });
     }
 
     public static function getDefaultName($class): string

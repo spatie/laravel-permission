@@ -10,6 +10,8 @@ use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Contracts\Permission;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Spatie\Permission\PermissionServiceProvider;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 abstract class TestCase extends Orchestra
 {
@@ -45,6 +47,8 @@ abstract class TestCase extends Orchestra
         $this->testAdmin = Admin::first();
         $this->testAdminRole = app(Role::class)->find(3);
         $this->testAdminPermission = app(Permission::class)->find(4);
+
+        $this->setUpRoutes();
     }
 
     /**
@@ -140,6 +144,20 @@ abstract class TestCase extends Orchestra
             $table->string('key')->unique();
             $table->text('value');
             $table->integer('expiration');
+        });
+    }
+
+    /**
+     * Create routes to tests authentication with guards.
+     *
+     * @return void
+     */
+    public function setUpRoutes()
+    {
+        Route::middleware('auth:api')->get('/check-api-guard-permission', function (Request $request) {
+            return [
+                'status' => $request->user()->hasPermissionTo('do_that')
+            ];
         });
     }
 }
