@@ -25,6 +25,8 @@ The meaning of each part of the string depends on the application layer.
 > You can use as many parts as you like. So you are not limited to the three-tiered structure, even though 
 this is the common use-case, representing {resource}.{action}.{target}.
 
+> NOTE: You must actually create the permissions before you can assign them.
+
 ### Using Wildcards
 
 Each part can also contain wildcards (*). So let's say we assign the following permission to a user:
