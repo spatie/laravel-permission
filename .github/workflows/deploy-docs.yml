@@ -2,13 +2,13 @@ name: deploy-docs
 
 on:
   push:
+    branches:
+      - master
     paths:
         - 'docs/**'
 
 jobs:
     deploy:
-
-        if: secrets.NETLIFY_DEPLOY_URL != ''
 
         runs-on: ubuntu-latest
 
