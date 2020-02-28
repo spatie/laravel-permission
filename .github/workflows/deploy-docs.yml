@@ -8,6 +8,8 @@ on:
 jobs:
     deploy:
 
+        if: secrets.NETLIFY_DEPLOY_URL != ''
+
         runs-on: ubuntu-latest
 
         name: Deploy docs
