@@ -41,7 +41,7 @@ class Guard
             })
             ->keys()
             ->filter(function ($guard) {
-                return request()->user() ? auth()->guard($guard)->check() : true;
+                return app('request')->user() ? app('auth')->guard($guard)->check() : true;
             });
     }
 
