@@ -148,11 +148,9 @@ abstract class TestCase extends Orchestra
     }
 
     /**
-     * Create routes to tests authentication with guards.
-     *
-     * @return void
+     * Create routes to test authentication with guards.
      */
-    public function setUpRoutes()
+    public function setUpRoutes(): void
     {
         Route::middleware('auth:api')->get('/check-api-guard-permission', function (Request $request) {
             return [
