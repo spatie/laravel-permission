@@ -136,7 +136,7 @@ trait HasPermissions
                     return $row == $permission;
                 })->count() > 0;
             } else {
-                return $this->getAllPermissions()->filter(function($row) use ($permission) {
+                return $this->getAllPermissions()->filter(function ($row) use ($permission) {
                     return $row == $permission;
                 })->count() > 0;
             }
