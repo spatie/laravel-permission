@@ -29,12 +29,14 @@ return [
     ],
 
     /*
-     * When using a database other than the default connection, you can assign
-     * the connection name value. To use the default connection, simply leave
-     * the connection value to null, or comment out the line altogether.
+     * When your user permissions tables are stored in a database other than the
+     * one specified by the default database connection, you can specify the
+     * connection name. To use the default connection as assigned in
+     * /app/config/database.php, simply leave the connection value null,
+     * or comment out the line altogether.
      */
-    'connection' => 'staging',
-    
+    'connection' => null,
+
     'table_names' => [
 
         /*
