@@ -131,7 +131,7 @@ trait HasPermissions
         }
 
         if ($permission instanceof Permission) {
-            if($guardName){
+            if ($guardName) {
                 return $this->getAllPermissions()->where('guard_name', '=', $guardName)->filter(function ($row) use ($permission) {
                     return $row == $permission;
                 })->count() > 0;
@@ -143,7 +143,6 @@ trait HasPermissions
         }
 
         return false;
-
     }
 
     /**
@@ -456,7 +455,6 @@ trait HasPermissions
     {
         return Guard::getDefaultName($this);
     }
-
 
     /**
      * Forget the cached permissions.
