@@ -130,7 +130,7 @@ trait HasPermissions
                 : $this->getAllPermissions()->contains('id', $permission);
         }
 
-        if ( $permission instanceof Permission) {
+        if ($permission instanceof Permission) {
             if($guardName){
                 return $this->getAllPermissions()->where('guard_name', '=', $guardName)->filter(function ($row) use ($permission) {
                     return $row == $permission;
@@ -283,7 +283,7 @@ trait HasPermissions
             return $this->permissions->contains('id', $permission);
         }
 
-        if ( $permission instanceof Permission) {
+        if ($permission instanceof Permission) {
             return $this->permissions->filter(function ($row) use ($permission) {
               return $row == $permission;
             })->count() > 0;
