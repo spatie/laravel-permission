@@ -120,23 +120,23 @@ trait HasPermissions
 
         if (is_string($permission)) {
             return $guardName
-                ? $this->getPermissionsViaRoles()->where('guard_name', '=', $guardName)->contains('name', $permission)
-                : $this->getPermissionsViaRoles()->contains('name', $permission);
+                ? $this->getAllPermissions()->where('guard_name', '=', $guardName)->contains('name', $permission)
+                : $this->getAllPermissions()->contains('name', $permission);
         }
 
         if (is_int($permission)) {
             return $guardName
-                ? $this->getPermissionsViaRoles()->where('guard_name', '=', $guardName)->contains('id', $permission)
-                : $this->getPermissionsViaRoles()->contains('id', $permission);
+                ? $this->getAllPermissions()->where('guard_name', '=', $guardName)->contains('id', $permission)
+                : $this->getAllPermissions()->contains('id', $permission);
         }
 
         if ( $permission instanceof Permission) {
             if($guardName){
-                return $this->getPermissionsViaRoles()->where('guard_name', '=', $guardName)->filter(function($row, $key) use ($permission) {
+                return $this->getAllPermissions()->where('guard_name', '=', $guardName)->filter(function ($row, $key) use ($permission) {
                     return $row == $permission;
                 })->count() > 0;
             } else {
-                return $this->getPermissionsViaRoles()->filter(function($row, $key) use ($permission) {
+                return $this->getAllPermissions()->filter(function($row, $key) use ($permission) {
                     return $row == $permission;
                 })->count() > 0;
             }
@@ -284,7 +284,7 @@ trait HasPermissions
         }
 
         if ( $permission instanceof Permission) {
-            return $this->permissions->filter(function($row, $key) use ($permission) {
+            return $this->permissions->filter(function ($row, $key) use ($permission) {
               return $row == $permission;
             })->count() > 0;
         }
