@@ -120,19 +120,19 @@ trait HasPermissions
 
         if (is_string($permission)) {
             return $guardName
-                ? $this->getPermissionsViaRoles()->where('guard_name','=',$guardName)->contains('name', $permission)
+                ? $this->getPermissionsViaRoles()->where('guard_name', '=', $guardName)->contains('name', $permission)
                 : $this->getPermissionsViaRoles()->contains('name', $permission);
         }
 
         if (is_int($permission)) {
             return $guardName
-                ? $this->getPermissionsViaRoles()->where('guard_name','=',$guardName)->contains('id', $permission)
+                ? $this->getPermissionsViaRoles()->where('guard_name', '=', $guardName)->contains('id', $permission)
                 : $this->getPermissionsViaRoles()->contains('id', $permission);
         }
 
         if ( $permission instanceof Permission) {
             if($guardName){
-                return $this->getPermissionsViaRoles()->where('guard_name','=',$guardName)->filter(function($row, $key) use ($permission) {
+                return $this->getPermissionsViaRoles()->where('guard_name', '=', $guardName)->filter(function($row, $key) use ($permission) {
                     return $row == $permission;
                 })->count() > 0;
             } else {
@@ -277,12 +277,10 @@ trait HasPermissions
     {
         if (is_string($permission)) {
             return $this->permissions->contains('name', $permission);
-            // $permission = $this->permissions->where('guard_name','=',$guardName)->firstWhere('name', '=', $permission);
         }
 
         if (is_int($permission)) {
             return $this->permissions->contains('id', $permission);
-            // $permission = $this->permissions->where('guard_name','=',$guardName)->contains('id', $permission);
         }
 
         if ( $permission instanceof Permission) {
