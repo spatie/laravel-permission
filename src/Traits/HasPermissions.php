@@ -132,11 +132,11 @@ trait HasPermissions
 
         if ( $permission instanceof Permission) {
             if($guardName){
-                return $this->getAllPermissions()->where('guard_name', '=', $guardName)->filter(function ($row, $key) use ($permission) {
+                return $this->getAllPermissions()->where('guard_name', '=', $guardName)->filter(function ($row) use ($permission) {
                     return $row == $permission;
                 })->count() > 0;
             } else {
-                return $this->getAllPermissions()->filter(function($row, $key) use ($permission) {
+                return $this->getAllPermissions()->filter(function($row) use ($permission) {
                     return $row == $permission;
                 })->count() > 0;
             }
@@ -284,7 +284,7 @@ trait HasPermissions
         }
 
         if ( $permission instanceof Permission) {
-            return $this->permissions->filter(function ($row, $key) use ($permission) {
+            return $this->permissions->filter(function ($row) use ($permission) {
               return $row == $permission;
             })->count() > 0;
         }
