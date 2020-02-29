@@ -28,6 +28,13 @@ return [
 
     ],
 
+    /*
+     * When using a database other than the default connection, you can assign
+     * the connection name value. To use the default connection, simply leave
+     * the connection value to null, or comment out the line altogether.
+     */
+    'connection' => 'staging',
+    
     'table_names' => [
 
         /*
