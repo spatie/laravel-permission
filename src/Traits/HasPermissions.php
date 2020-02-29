@@ -284,7 +284,7 @@ trait HasPermissions
 
         if ($permission instanceof Permission) {
             return $this->permissions->filter(function ($row) use ($permission) {
-              return $row == $permission;
+                return $row == $permission;
             })->count() > 0;
         }
 
