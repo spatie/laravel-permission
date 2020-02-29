@@ -112,31 +112,38 @@ trait HasPermissions
      */
     public function hasPermissionTo($permission, $guardName = null): bool
     {
+        $guardName = $guardName ?? $this->getDefaultGuardName();
+
         if (config('permission.enable_wildcard_permission', false)) {
             return $this->hasWildcardPermission($permission, $guardName);
         }
 
-        $permissionClass = $this->getPermissionClass();
-
         if (is_string($permission)) {
-            $permission = $permissionClass->findByName(
-                $permission,
-                $guardName ?? $this->getDefaultGuardName()
-            );
+            return $guardName
+                ? $this->getPermissionsViaRoles()->where('guard_name','=',$guardName)->contains('name', $permission)
+                : $this->getPermissionsViaRoles()->contains('name', $permission);
         }
 
         if (is_int($permission)) {
-            $permission = $permissionClass->findById(
-                $permission,
-                $guardName ?? $this->getDefaultGuardName()
-            );
+            return $guardName
+                ? $this->getPermissionsViaRoles()->where('guard_name','=',$guardName)->contains('id', $permission)
+                : $this->getPermissionsViaRoles()->contains('id', $permission);
         }
 
-        if (! $permission instanceof Permission) {
-            throw new PermissionDoesNotExist;
+        if ( $permission instanceof Permission) {
+            if($guardName){
+                return $this->getPermissionsViaRoles()->where('guard_name','=',$guardName)->filter(function($row, $key) use ($permission) {
+                    return $row == $permission;
+                })->count() > 0;
+            } else {
+                return $this->getPermissionsViaRoles()->filter(function($row, $key) use ($permission) {
+                    return $row == $permission;
+                })->count() > 0;
+            }
         }
 
-        return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
+        return false;
+
     }
 
     /**
@@ -268,21 +275,23 @@ trait HasPermissions
      */
     public function hasDirectPermission($permission): bool
     {
-        $permissionClass = $this->getPermissionClass();
-
         if (is_string($permission)) {
-            $permission = $permissionClass->findByName($permission, $this->getDefaultGuardName());
+            return $this->permissions->contains('name', $permission);
+            // $permission = $this->permissions->where('guard_name','=',$guardName)->firstWhere('name', '=', $permission);
         }
 
         if (is_int($permission)) {
-            $permission = $permissionClass->findById($permission, $this->getDefaultGuardName());
+            return $this->permissions->contains('id', $permission);
+            // $permission = $this->permissions->where('guard_name','=',$guardName)->contains('id', $permission);
         }
 
-        if (! $permission instanceof Permission) {
-            throw new PermissionDoesNotExist;
+        if ( $permission instanceof Permission) {
+            return $this->permissions->filter(function($row, $key) use ($permission) {
+              return $row == $permission;
+            })->count() > 0;
         }
 
-        return $this->permissions->contains('id', $permission->id);
+        return false;
     }
 
     /**
@@ -449,6 +458,7 @@ trait HasPermissions
     {
         return Guard::getDefaultName($this);
     }
+
 
     /**
      * Forget the cached permissions.
