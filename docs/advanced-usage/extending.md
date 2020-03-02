@@ -10,7 +10,7 @@ If you are creating your own User models and wish Authorization features to be a
 
 
 ## Extending Role and Permission Models
-If you are extending or replacing the role/permission models, you will need to specify your new models in this package's `config/permissions.php` file. 
+If you are extending or replacing the role/permission models, you will need to specify your new models in this package's `config/permission.php` file. 
 
 First be sure that you've published the configuration file (see the Installation instructions), and edit it to update the `models.role` and `models.permission` values to point to your new models.
 
