@@ -3,13 +3,14 @@
 namespace Spatie\Permission;
 
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 
 class Guard
 {
     /**
-     * return collection of (guard_name) property if exist on class or object
-     * otherwise will return collection of guards names that exists in config/auth.php.
-     * @param $model
+     * Return a collection of guard names suitable for the $model.
+     *
+     * @param string|Model $model model class object or name
      * @return Collection
      */
     public static function getNames($model): Collection
@@ -28,6 +29,24 @@ class Guard
             return collect($guardName);
         }
 
+        return self::getConfigAuthGuards($class);
+    }
+
+    /**
+     * Get list of relevant guards for the $class model based on config(auth) settings.
+     *
+     * Lookup flow:
+     * - get names of models for guards defined in auth.guards where a provider is set
+     * - filter for provider models matching the model $class being checked
+     * - keys() gives just the names of the matched guards
+     * - if logged in, filter out any guards for which the user does not pass the auth->guard->check() test
+     * - return collection of guard names
+     *
+     * @param string $class
+     * @return Collection
+     */
+    protected static function getConfigAuthGuards(string $class): Collection
+    {
         return collect(config('auth.guards'))
             ->map(function ($guard) {
                 if (! isset($guard['provider'])) {
@@ -45,6 +64,12 @@ class Guard
             });
     }
 
+    /**
+     * Lookup a guard name relevant for the $class model and the current user.
+     *
+     * @param string|Model $class model class object or name
+     * @return string guard name
+     */
     public static function getDefaultName($class): string
     {
         $default = config('auth.defaults.guard');
