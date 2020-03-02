@@ -1,6 +1,6 @@
 ---
 title: Upgrading
-weight: 4
+weight: 6
 ---
 
 ### Upgrading from v2 to v3

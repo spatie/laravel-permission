@@ -26,6 +26,9 @@ class CreateRole extends Command
         $this->info("Role `{$role->name}` created");
     }
 
+    /**
+     * @param array|null|string $string
+     */
     protected function makePermissions($string = null)
     {
         if (empty($string)) {

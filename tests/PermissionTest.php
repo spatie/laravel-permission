@@ -27,7 +27,10 @@ class PermissionTest extends TestCase
     /** @test */
     public function it_belongs_to_the_default_guard_by_default()
     {
-        $this->assertEquals($this->app['config']->get('auth.defaults.guard'), $this->testUserPermission->guard_name);
+        $this->assertEquals(
+            $this->app['config']->get('auth.defaults.guard'),
+            $this->testUserPermission->guard_name
+        );
     }
 
     /** @test */

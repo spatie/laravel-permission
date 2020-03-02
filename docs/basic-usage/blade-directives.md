@@ -1,9 +1,9 @@
 ---
-title: Using Blade directives
+title: Blade directives
 weight: 4
 ---
 
-#### Blade and Permissions
+## Permissions
 This package doesn't add any **permission**-specific Blade directives. 
 Instead, use Laravel's native `@can` directive to check if a user has a certain permission.
 
@@ -22,10 +22,12 @@ or
 You can use `@can`, `@cannot`, `@canany`, and `@guest` to test for permission-related access.
 
 
-### Roles 
-As discussed in the Best Practices section of the docs, it is strongly recommended to always use permission directives, instead of role directives.
+## Roles 
+As discussed in the Best Practices section of the docs, **it is strongly recommended to always use permission directives**, instead of role directives.
 
-However, in case you need to test for Roles, this package also adds Blade directives to verify whether the currently logged in user has all or any of a given list of roles. 
+Additionally, if your reason for testing against Roles is for a Super-Admin, see the *Defining A Super-Admin* section of the docs.
+
+If you actually need to test for Roles, this package offers some Blade directives to verify whether the currently logged in user has all or any of a given list of roles. 
 
 Optionally you can pass in the `guard` that the check will be performed on as a second argument.
 

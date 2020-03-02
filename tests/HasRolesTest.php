@@ -493,6 +493,20 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_check_against_any_multiple_roles_using_multiple_arguments()
+    {
+        $this->testUser->assignRole('testRole');
+
+        $this->assertTrue($this->testUser->hasAnyRole($this->testAdminRole, ['testRole'], 'This Role Does Not Even Exist'));
+    }
+
+    /** @test */
+    public function it_returns_false_instead_of_an_exception_when_checking_against_any_undefined_roles_using_multiple_arguments()
+    {
+        $this->assertFalse($this->testUser->hasAnyRole('This Role Does Not Even Exist', $this->testAdminRole));
+    }
+
+    /** @test */
     public function it_can_retrieve_role_names()
     {
         $this->testUser->assignRole('testRole', 'testRole2');
