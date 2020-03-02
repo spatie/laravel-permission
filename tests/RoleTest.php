@@ -239,4 +239,15 @@ class RoleTest extends TestCase
             $this->testUserRole->guard_name
         );
     }
+
+    /** @test */
+    public function role_pivot_data_is_excluded_with_json_output()
+    {
+        $this->testUserRole->givePermissionTo('edit-articles');
+        $this->testUser->assignRole($this->testUserRole);
+
+        $users = User::with('roles', 'permissions')->paginate();
+
+        $this->assertStringNotContainsString('pivot', response()->json($users));
+    }
 }

@@ -52,4 +52,14 @@ class PermissionTest extends TestCase
 
         $this->assertEquals($this->testUserPermission->id, $permission_by_id->id);
     }
+
+    /** @test */
+    public function permission_pivot_data_is_excluded_with_json_output()
+    {
+        $this->testUser->givePermissionTo('edit-news');
+
+        $users = User::with('roles', 'permissions')->paginate();
+
+        $this->assertStringNotContainsString('pivot', response()->json($users));
+    }
 }
