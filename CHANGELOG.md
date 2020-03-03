@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 3.11.0 - 2020-03-03
+- Allow guardName() as a function with priority over $guard_name property #1395
+
 ## 3.10.1 - 2020-03-03
 - Update patch to handle intermittent error in #1370
 
