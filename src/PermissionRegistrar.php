@@ -26,7 +26,7 @@ class PermissionRegistrar
     /** @var \Illuminate\Support\Collection */
     protected $permissions;
 
-    /** @var DateInterval|int */
+    /** @var \DateInterval|int */
     public static $cacheExpirationTime;
 
     /** @var string */

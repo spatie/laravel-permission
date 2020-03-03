@@ -242,11 +242,11 @@ class HasPermissionsTest extends TestCase
     {
         $this->expectException(PermissionDoesNotExist::class);
 
-        $this->testUser->hasPermissionTo('does-not-exist');
+        $this->testUser->hasPermissionTo('does-not-exist', 'web');
     }
 
     /** @test */
-    public function it_can_work_with_a_user_that_does_not_have_any_permissions_at_all()
+    public function it_can_reject_a_user_that_does_not_have_any_permissions_at_all()
     {
         $user = new User();
 

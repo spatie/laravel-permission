@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 3.10.1 - 2020-03-03
+- Update patch to handle intermittent error in #1370
+
+## 3.10.0 - 2020-03-02
+- Ugly patch to handle intermittent error: `Trying to access array offset on value of type null` in #1370
+
 ## 3.9.0 - 2020-02-26
 - Add Wildcard Permissions feature #1381 (see PR or docs for details)
 
