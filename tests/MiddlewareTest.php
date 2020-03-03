@@ -46,6 +46,19 @@ class MiddlewareTest extends TestCase
     }
 
     /** @test */
+    public function a_user_cannot_access_a_route_protected_by_role_middleware_of_another_guard()
+    {
+        Auth::login($this->testUser);
+
+        $this->testUser->assignRole('testRole');
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->roleMiddleware, 'testAdminRole'
+            ), 403);
+    }
+
+    /** @test */
     public function a_user_can_access_a_route_protected_by_role_middleware_if_have_this_role()
     {
         Auth::login($this->testUser);
@@ -117,6 +130,38 @@ class MiddlewareTest extends TestCase
         $this->assertEquals(
             $this->runMiddleware(
                 $this->permissionMiddleware, 'edit-articles'
+            ), 403);
+    }
+
+    /** @test */
+    public function a_user_cannot_access_a_route_protected_by_the_permission_middleware_of_a_different_guard()
+    {
+        Auth::login($this->testAdmin);
+
+        $this->testAdmin->givePermissionTo('admin-permission');
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->permissionMiddleware, 'admin-permission'
+            ), 200);
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->permissionMiddleware, 'edit-articles'
+            ), 403);
+
+        Auth::login($this->testUser);
+
+        $this->testUser->givePermissionTo('edit-articles');
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->permissionMiddleware, 'edit-articles'
+            ), 200);
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->permissionMiddleware, 'admin-permission'
             ), 403);
     }
 
