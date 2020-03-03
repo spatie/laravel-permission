@@ -505,6 +505,7 @@ class HasPermissionsTest extends TestCase
         );
     }
 
+    /** @test */
     public function it_can_check_many_direct_permissions()
     {
         $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
