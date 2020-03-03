@@ -16,6 +16,10 @@ class CreatePermissionTables extends Migration
         $tableNames = config('permission.table_names');
         $columnNames = config('permission.column_names');
 
+        if (empty($tableNames)) {
+            throw new \Exception('Error: config/permission.php not found and defaults could not be merged. Please publish the package configuration before proceeding.');
+        }
+
         Schema::create($tableNames['permissions'], function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
@@ -92,6 +96,10 @@ class CreatePermissionTables extends Migration
     public function down()
     {
         $tableNames = config('permission.table_names');
+
+        if (empty($tableNames)) {
+            throw new \Exception('Error: config/permission.php not found and defaults could not be merged. Please publish the package configuration before proceeding, or drop the tables manually.');
+        }
 
         Schema::drop($tableNames['role_has_permissions']);
         Schema::drop($tableNames['model_has_roles']);

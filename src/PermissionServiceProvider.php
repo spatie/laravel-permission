@@ -58,7 +58,7 @@ class PermissionServiceProvider extends ServiceProvider
     {
         $config = $this->app->config['permission.models'];
 
-        if (! $config) { // for odd config merge issue in #1370
+        if (! $config) {
             return;
         }
 
