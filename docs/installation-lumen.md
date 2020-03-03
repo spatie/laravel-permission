@@ -1,6 +1,6 @@
 ---
 title: Installation in Lumen
-weight: 4
+weight: 5
 ---
 
 NOTE: Lumen is not officially supported by this package. However, the following are some steps which may help get you started.
@@ -19,13 +19,13 @@ cp vendor/spatie/laravel-permission/config/permission.php config/permission.php
 cp vendor/spatie/laravel-permission/database/migrations/create_permission_tables.php.stub database/migrations/2018_01_01_000000_create_permission_tables.php
 ```
 
-You will also need to create another configuration file at `config/auth.php`. Get it on the Laravel repository or just run the following command:
+You will also need the `config/auth.php` file. If you don't already have it, copy it from the vendor folder:
 
 ```bash
-curl -Ls https://raw.githubusercontent.com/laravel/lumen-framework/5.7/config/auth.php -o config/auth.php
+cp vendor/laravel/lumen-framework/config/auth.php config/auth.php
 ```
 
-Then, in `bootstrap/app.php`, register the middlewares:
+Then, in `bootstrap/app.php`, uncomment the `auth` middleware, and register this package's middleware:
 
 ```php
 $app->routeMiddleware([
@@ -35,7 +35,7 @@ $app->routeMiddleware([
 ]);
 ```
 
-Also register the config file, service provider, and cache alias:
+... and in the same file, in the ServiceProviders section, register the package configuration, service provider, and cache alias:
 
 ```php
 $app->configure('permission');
@@ -43,8 +43,29 @@ $app->alias('cache', \Illuminate\Cache\CacheManager::class);  // if you don't ha
 $app->register(Spatie\Permission\PermissionServiceProvider::class);
 ```
 
-Now, run your migrations:
+... and in the same file, since the Authorization layer uses guards you will need to uncomment the AuthServiceProvider line:
+```php
+$app->register(App\Providers\AuthServiceProvider::class);
+```
+
+Ensure your database configuration is set in your `.env` (or `config/database.php` if you have one).
+
+Run the migrations to create the tables for this package:
 
 ```bash
 php artisan migrate
 ```
+
+---
+### User Model
+NOTE: Remember that Laravel's authorization layer requires that your `User` model implement the `Illuminate\Contracts\Auth\Access\Authorizable` contract. In Lumen you will then also need to use the `Laravel\Lumen\Auth\Authorizable` trait.
+
+---
+### User Table
+NOTE: If you are working with a fresh install of Lumen, then you probably also need a migration file for your Users table. You can create your own, or you can copy a basic one from Laravel:
+
+https://github.com/laravel/laravel/blob/master/database/migrations/2014_10_12_000000_create_users_table.php
+
+(You will need to run `php artisan migrate` after adding this file.)
+
+Remember to update your ModelFactory.php to match the fields in the migration you create/copy.

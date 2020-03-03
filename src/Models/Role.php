@@ -39,10 +39,6 @@ class Role extends Model implements RoleContract
             throw RoleAlreadyExists::create($attributes['name'], $attributes['guard_name']);
         }
 
-        if (isNotLumen() && app()::VERSION < '5.4') {
-            return parent::create($attributes);
-        }
-
         return static::query()->create($attributes);
     }
 
@@ -147,6 +143,10 @@ class Role extends Model implements RoleContract
      */
     public function hasPermissionTo($permission): bool
     {
+        if (config('permission.enable_wildcard_permission', false)) {
+            return $this->hasWildcardPermission($permission, $this->getDefaultGuardName());
+        }
+
         $permissionClass = $this->getPermissionClass();
 
         if (is_string($permission)) {

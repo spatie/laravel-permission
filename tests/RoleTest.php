@@ -30,6 +30,10 @@ class RoleTest extends TestCase
         $this->assertCount(1, $this->testUserRole->users);
         $this->assertTrue($this->testUserRole->users->first()->is($this->testUser));
         $this->assertInstanceOf(User::class, $this->testUserRole->users->first());
+
+        $this->assertCount(1, $this->testAdminRole->users);
+        $this->assertTrue($this->testAdminRole->users->first()->is($this->testAdmin));
+        $this->assertInstanceOf(Admin::class, $this->testAdminRole->users->first());
     }
 
     /** @test */
@@ -230,7 +234,10 @@ class RoleTest extends TestCase
     /** @test */
     public function it_belongs_to_the_default_guard_by_default()
     {
-        $this->assertEquals($this->app['config']->get('auth.defaults.guard'), $this->testUserRole->guard_name);
+        $this->assertEquals(
+            $this->app['config']->get('auth.defaults.guard'),
+            $this->testUserRole->guard_name
+        );
     }
 
     /** @test */

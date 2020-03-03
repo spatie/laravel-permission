@@ -12,7 +12,7 @@ You can find all the exceptions added by this package in the code here: https://
 
 **app/Exceptions/Handler.php**
 ```php
-public function render($request, Exception $exception)
+public function render($request, Throwable $exception)
 {
     if ($exception instanceof \Spatie\Permission\Exceptions\UnauthorizedException) {
         return response()->json([

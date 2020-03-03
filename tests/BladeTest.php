@@ -21,7 +21,7 @@ class BladeTest extends TestCase
     }
 
     /** @test */
-    public function all_blade_directives_will_evaluate_falsly_when_there_is_nobody_logged_in()
+    public function all_blade_directives_will_evaluate_false_when_there_is_nobody_logged_in()
     {
         $permission = 'edit-articles';
         $role = 'writer';
@@ -38,7 +38,7 @@ class BladeTest extends TestCase
     }
 
     /** @test */
-    public function all_blade_directives_will_evaluate_falsy_when_somebody_without_roles_or_permissions_is_logged_in()
+    public function all_blade_directives_will_evaluate_false_when_somebody_without_roles_or_permissions_is_logged_in()
     {
         $permission = 'edit-articles';
         $role = 'writer';
@@ -55,7 +55,7 @@ class BladeTest extends TestCase
     }
 
     /** @test */
-    public function all_blade_directives_will_evaluate_falsy_when_somebody_with_another_guard_is_logged_in()
+    public function all_blade_directives_will_evaluate_false_when_somebody_with_another_guard_is_logged_in()
     {
         $permission = 'edit-articles';
         $role = 'writer';
