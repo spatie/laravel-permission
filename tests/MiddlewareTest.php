@@ -5,6 +5,7 @@ namespace Spatie\Permission\Test;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Middlewares\RoleMiddleware;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
@@ -136,32 +137,38 @@ class MiddlewareTest extends TestCase
     /** @test */
     public function a_user_cannot_access_a_route_protected_by_the_permission_middleware_of_a_different_guard()
     {
+        // These permissions are created fresh here in reverse order of guard being applied, so they are not "found first" in the db lookup when matching
+        app(Permission::class)->create(['name' => 'admin-permission2', 'guard_name' => 'web']);
+        app(Permission::class)->create(['name' => 'admin-permission2', 'guard_name' => 'admin']);
+        app(Permission::class)->create(['name' => 'edit-articles2', 'guard_name' => 'admin']);
+        app(Permission::class)->create(['name' => 'edit-articles2', 'guard_name' => 'web']);
+
         Auth::login($this->testAdmin);
 
-        $this->testAdmin->givePermissionTo('admin-permission');
+        $this->testAdmin->givePermissionTo('admin-permission2');
 
         $this->assertEquals(
             $this->runMiddleware(
-                $this->permissionMiddleware, 'admin-permission'
+                $this->permissionMiddleware, 'admin-permission2'
             ), 200);
 
         $this->assertEquals(
             $this->runMiddleware(
-                $this->permissionMiddleware, 'edit-articles'
+                $this->permissionMiddleware, 'edit-articles2'
             ), 403);
 
         Auth::login($this->testUser);
 
-        $this->testUser->givePermissionTo('edit-articles');
+        $this->testUser->givePermissionTo('edit-articles2');
 
         $this->assertEquals(
             $this->runMiddleware(
-                $this->permissionMiddleware, 'edit-articles'
+                $this->permissionMiddleware, 'edit-articles2'
             ), 200);
 
         $this->assertEquals(
             $this->runMiddleware(
-                $this->permissionMiddleware, 'admin-permission'
+                $this->permissionMiddleware, 'admin-permission2'
             ), 403);
     }
 
