@@ -88,21 +88,18 @@ class PermissionsDemoSeeder extends Seeder
         $user = Factory(App\User::class)->create([
             'name' => 'Example User',
             'email' => 'test@example.com',
-            // factory default password is 'secret'
         ]);
         $user->assignRole($role1);
 
         $user = Factory(App\User::class)->create([
             'name' => 'Example Admin User',
             'email' => 'admin@example.com',
-            // factory default password is 'secret'
         ]);
         $user->assignRole($role2);
 
         $user = Factory(App\User::class)->create([
             'name' => 'Example Super-Admin User',
             'email' => 'superadmin@example.com',
-            // factory default password is 'secret'
         ]);
         $user->assignRole($role3);
     }
