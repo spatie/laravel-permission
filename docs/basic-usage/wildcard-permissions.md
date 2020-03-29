@@ -25,15 +25,17 @@ The meaning of each part of the string depends on the application layer.
 > You can use as many parts as you like. So you are not limited to the three-tiered structure, even though 
 this is the common use-case, representing {resource}.{action}.{target}.
 
-> NOTE: You must actually create the permissions before you can assign them.
+> NOTE: You must actually create the permissions (eg: `posts.create.1`) before you can assign them, and must also create any wildcard permission patterns (eg: `posts.create.*`) before you can check for them.
 
 ### Using Wildcards
 
 Each part can also contain wildcards (*). So let's say we assign the following permission to a user:
 
 ```php
+Permission::create('posts.*');
 $user->givePermissionTo('posts.*');
 // is the same as
+Permission::create('posts');
 $user->givePermissionTo('posts');
 ```
 
