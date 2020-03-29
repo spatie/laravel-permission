@@ -32,10 +32,10 @@ this is the common use-case, representing {resource}.{action}.{target}.
 Each part can also contain wildcards (*). So let's say we assign the following permission to a user:
 
 ```php
-Permission::create('posts.*');
+Permission::create(['name'=>'posts.*']);
 $user->givePermissionTo('posts.*');
 // is the same as
-Permission::create('posts');
+Permission::create(['name'=>'posts']);
 $user->givePermissionTo('posts');
 ```
 
