@@ -16,7 +16,7 @@ trait HasRoles
 
     public static function bootHasRoles()
     {
-        static::deleting(function ($model) {
+        static::deleted(function ($model) {
             if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
                 return;
             }
