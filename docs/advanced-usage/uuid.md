@@ -15,10 +15,10 @@ You will probably want to update the `create_permission_tables.php` migration:
 
 - If your User models are using `uuid` instead of `unsignedBigInteger` then you'll need to reflect the change in the migration provided by this package. Something like this would be typical, for both `model_has_permissions` and `model_has_roles`:
 
-```diff
+    ```diff
     -  $table->unsignedBigInteger($columnNames['model_morph_key'])
     +  $table->uuid($columnNames['model_morph_key'])
-```
+    ```
 
 - If you also want the roles and permissions to use a UUID for their `id` value, then you'll need to also change the id fields accordingly, and manually set the primary key. LEAVE THE FIELD NAME AS `id` unless you also change it in dozens of other places.
 
