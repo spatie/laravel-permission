@@ -85,7 +85,7 @@ If you want all the role/permission objects to have a UUID instead of an integer
 
 It is common to use a trait to handle the $keyType and $incrementing settings, as well as add a boot event trigger to ensure new records are assigned a uuid. You would `use` this trait in your User and extended Role/Permission models. An example `UuidTrait` is shown here for inspiration. Adjust to suit your needs.
 
-    ```php
+```php
     <?php
     namespace App;
 
@@ -105,7 +105,7 @@ It is common to use a trait to handle the $keyType and $incrementing settings, a
             });
         }
     }
-    ```
+```
 
 
 ### User Models
