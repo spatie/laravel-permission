@@ -5,7 +5,7 @@ weight: 6
 
 If you're using UUIDs or GUIDs for your User models there are a few considerations to note.
 
-THIS IS NOT A LESSON ON HOW TO IMPLEMENT UUID IN YOUR APP.
+> THIS IS NOT A FULL LESSON ON HOW TO IMPLEMENT UUIDs IN YOUR APP.
 
 Since each UUID implementation approach is different, some of these may or may not benefit you. As always, your implementation may vary.
 
