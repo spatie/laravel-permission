@@ -13,7 +13,7 @@ Since each UUID implementation approach is different, some of these may or may n
 ### Migrations
 You will probably want to update the `create_permission_tables.php` migration:
 
-- If your User models are using `uuid` instead of `unsignedBigInteger` then you'll need to reflect the change in the migration provided by this package. Something like this would be typical, for both `model_has_permissions` and `model_has_roles`:
+- If your User models are using `uuid` instead of `unsignedBigInteger` then you'll need to reflect the change in the migration provided by this package. Something like this would be typical, for both `model_has_permissions` and `model_has_roles` tables:
 
     ```diff
     -  $table->unsignedBigInteger($columnNames['model_morph_key'])
@@ -22,7 +22,7 @@ You will probably want to update the `create_permission_tables.php` migration:
 
 - If you also want the roles and permissions to use a UUID for their `id` value, then you'll need to also change the id fields accordingly, and manually set the primary key. LEAVE THE FIELD NAME AS `id` unless you also change it in dozens of other places.
 
-    ```diff
+```diff
     Schema::create($tableNames['permissions'], function (Blueprint $table) {
     -    $table->bigIncrements('id');
     +    $table->uuid('id');
@@ -58,7 +58,7 @@ You will probably want to update the `create_permission_tables.php` migration:
     -    $table->bigIncrements('role_id');
     +    $table->uuid('permission_id');
     +    $table->uuid('role_id');
-    ```
+```
 
 
 ### Configuration (OPTIONAL)
@@ -112,10 +112,8 @@ It is common to use a trait to handle the $keyType and $incrementing settings, a
 
 
 ### User Models
-Troubleshooting tip: In the ***Prerequisites*** section of the docs we remind you that your User model must implement the `Illuminate\Contracts\Auth\Access\Authorizable` contract so that the Gate features are made available to the User object.
-
+> Troubleshooting tip: In the ***Prerequisites*** section of the docs we remind you that your User model must implement the `Illuminate\Contracts\Auth\Access\Authorizable` contract so that the Gate features are made available to the User object.
 In the default User model provided with Laravel, this is done by extending another model (aliased to `Authenticatable`), which extends the base Eloquent model. 
-
 However, your app's UUID implementation may need to override that in order to set some of the properties mentioned in the Models section above. 
 
 If you are running into difficulties, you may want to double-check whether your User model is doing UUIDs consistent with other parts of your app.
