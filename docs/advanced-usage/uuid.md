@@ -14,6 +14,7 @@ Since each UUID implementation approach is different, some of these may or may n
 You will probably want to update the `create_permission_tables.php` migration:
 
 - If your User models are using `uuid` instead of `unsignedBigInteger` then you'll need to reflect the change in the migration provided by this package. Something like this would be typical, for both `model_has_permissions` and `model_has_roles`:
+
     ```diff
     -  $table->unsignedBigInteger($columnNames['model_morph_key'])
     +  $table->uuid($columnNames['model_morph_key'])
