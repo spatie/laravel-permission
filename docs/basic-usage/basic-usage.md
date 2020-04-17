@@ -92,5 +92,6 @@ Since Role and Permission models are extended from Eloquent models, basic Eloque
 $all_users_with_all_their_roles = User::with('roles')->get();
 $all_users_with_all_direct_permissions = User::with('permissions')->get();
 $all_roles_in_database = Role::all()->pluck('name');
+$users_without_any_roles = User::doesntHave('roles')->get();
 ```
 
