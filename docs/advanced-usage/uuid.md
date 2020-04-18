@@ -80,7 +80,7 @@ For this, in the configuration file edit `column_names.model_morph_key`:
 - If you extend the models into your app, be sure to list those models in your configuration file. See the Extending section of the documentation and the Models section below.
 
 ### Models
-If you want all the role/permission objects to have a UUID instead of an integer, you will need to Extend the default Role and Permission models into your own namespace in order to set some specific properties. (See the Extending section of the docs, where it explains requirements of Extending, as well as the configuratoin settings you need to update.)
+If you want all the role/permission objects to have a UUID instead of an integer, you will need to Extend the default Role and Permission models into your own namespace in order to set some specific properties. (See the Extending section of the docs, where it explains requirements of Extending, as well as the configuration settings you need to update.)
 
 - You may want to set `protected $keyType = 'string';` so Laravel handles joins as strings and doesn't cast to integer.
 - OPTIONAL: If you changed the field name in your migrations, you must set `protected $primaryKey = 'uuid';` to match.
