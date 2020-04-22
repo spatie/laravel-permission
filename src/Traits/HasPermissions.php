@@ -16,6 +16,7 @@ use Spatie\Permission\Exceptions\WildcardPermissionInvalidArgument;
 trait HasPermissions
 {
     private $permissionClass;
+    private $roleClass;
 
     public static function bootHasPermissions()
     {
@@ -35,6 +36,15 @@ trait HasPermissions
         }
 
         return $this->permissionClass;
+    }
+
+    public function getRoleClass()
+    {
+        if (! isset($this->roleClass)) {
+            $this->roleClass = app(PermissionRegistrar::class)->getRoleClass();
+        }
+
+        return $this->roleClass;
     }
 
     /**
@@ -63,17 +73,41 @@ trait HasPermissions
     {
         $permissions = $this->convertToPermissionModels($permissions);
 
-        $rolesWithPermissions = array_unique(array_reduce($permissions, function ($result, $permission) {
-            return array_merge($result, $permission->roles->all());
-        }, []));
+        $roleIdsWithPermission = $this->convertPermissionsToRoleIds($permissions);
 
-        return $query->where(function (Builder $query) use ($permissions, $rolesWithPermissions) {
+        return $query->where(function (Builder $query) use ($permissions, $roleIdsWithPermission) {
             $query->whereHas('permissions', function (Builder $subQuery) use ($permissions) {
                 $subQuery->whereIn(config('permission.table_names.permissions').'.id', \array_column($permissions, 'id'));
             });
-            if (count($rolesWithPermissions) > 0) {
-                $query->orWhereHas('roles', function (Builder $subQuery) use ($rolesWithPermissions) {
-                    $subQuery->whereIn(config('permission.table_names.roles').'.id', \array_column($rolesWithPermissions, 'id'));
+            if (count($roleIdsWithPermission) > 0) {
+                $query->orWhereHas('roles', function (Builder $subQuery) use ($roleIdsWithPermission) {
+                    $subQuery->whereIn(config('permission.table_names.roles').'.id', $roleIdsWithPermission);
+                });
+            }
+        });
+    }
+
+    /**
+     * Scope the model query without certain permissions.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string|array|\Spatie\Permission\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWithoutPermission(Builder $query, $permissions): Builder
+    {
+        $permissions = $this->convertToPermissionModels($permissions);
+
+        $roleIdsWithPermission = $this->convertPermissionsToRoleIds($permissions);
+
+        return $query->where(function (Builder $query) use ($permissions, $roleIdsWithPermission) {
+            $query->whereDoesntHave('permissions', function (Builder $subQuery) use ($permissions) {
+                $subQuery->whereIn(config('permission.table_names.permissions').'.id', \array_column($permissions, 'id'));
+            });
+            if (count($roleIdsWithPermission) > 0) {
+                $query->whereDoesntHave('roles', function (Builder $subQuery) use ($roleIdsWithPermission) {
+                    $subQuery->whereIn(config('permission.table_names.roles').'.id', $roleIdsWithPermission);
                 });
             }
         });
@@ -99,6 +133,15 @@ trait HasPermissions
 
             return $this->getPermissionClass()->findByName($permission, $this->getDefaultGuardName());
         }, $permissions);
+    }
+
+    protected function convertPermissionsToRoleIds($permissions)
+    {
+        $roleClass = $this->getRoleClass();
+
+        return $roleClass::whereHas('permissions', function (Builder $subQuery) use ($permissions) {
+            $subQuery->whereIn(config('permission.table_names.permissions').'.id', \array_column($permissions, 'id'));
+        })->pluck('id')->toArray();
     }
 
     /**

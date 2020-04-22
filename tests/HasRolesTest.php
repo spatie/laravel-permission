@@ -305,7 +305,10 @@ class HasRolesTest extends TestCase
 
         $scopedUsers = User::role('testRole')->get();
 
-        $this->assertEquals($scopedUsers->count(), 1);
+        $this->assertEquals(
+            [$user1->getKey()],
+            $scopedUsers->modelKeys()
+        );
     }
 
     /** @test */
@@ -320,8 +323,14 @@ class HasRolesTest extends TestCase
 
         $scopedUsers2 = User::role(['testRole', 'testRole2'])->get();
 
-        $this->assertEquals($scopedUsers1->count(), 1);
-        $this->assertEquals($scopedUsers2->count(), 2);
+        $this->assertEquals(
+            [$user1->getKey()],
+            $scopedUsers1->modelKeys()
+        );
+        $this->assertEquals(
+            [$user1->getKey(), $user2->getKey()],
+            $scopedUsers2->modelKeys()
+        );
     }
 
     /** @test */
@@ -340,7 +349,10 @@ class HasRolesTest extends TestCase
 
         $scopedUsers = User::role([$roleName, $otherRoleId])->get();
 
-        $this->assertEquals($scopedUsers->count(), 2);
+        $this->assertEquals(
+            [$user1->getKey(), $user2->getKey()],
+            $scopedUsers->modelKeys()
+        );
     }
 
     /** @test */
@@ -354,8 +366,14 @@ class HasRolesTest extends TestCase
         $scopedUsers1 = User::role([$this->testUserRole])->get();
         $scopedUsers2 = User::role(collect(['testRole', 'testRole2']))->get();
 
-        $this->assertEquals($scopedUsers1->count(), 1);
-        $this->assertEquals($scopedUsers2->count(), 2);
+        $this->assertEquals(
+            [$user1->getKey()],
+            $scopedUsers1->modelKeys()
+        );
+        $this->assertEquals(
+            [$user1->getKey(), $user2->getKey()],
+            $scopedUsers2->modelKeys()
+        );
     }
 
     /** @test */
@@ -370,13 +388,22 @@ class HasRolesTest extends TestCase
         $scopedUsers2 = User::role([$this->testUserRole])->get();
         $scopedUsers3 = User::role(collect([$this->testUserRole]))->get();
 
-        $this->assertEquals($scopedUsers1->count(), 1);
-        $this->assertEquals($scopedUsers2->count(), 1);
-        $this->assertEquals($scopedUsers3->count(), 1);
+        $this->assertEquals(
+            [$user1->getKey()],
+            $scopedUsers1->modelKeys()
+        );
+        $this->assertEquals(
+            [$user1->getKey()],
+            $scopedUsers2->modelKeys()
+        );
+        $this->assertEquals(
+            [$user1->getKey()],
+            $scopedUsers3->modelKeys()
+        );
     }
 
     /** @test */
-    public function it_can_scope_against_a_specific_guard()
+    public function it_can_scope_users_against_a_specific_guard()
     {
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
@@ -397,8 +424,14 @@ class HasRolesTest extends TestCase
         $scopedUsers2 = Admin::role('testAdminRole', 'admin')->get();
         $scopedUsers3 = Admin::role('testAdminRole2', 'admin')->get();
 
-        $this->assertEquals($scopedUsers2->count(), 2);
-        $this->assertEquals($scopedUsers3->count(), 1);
+        $this->assertEquals(
+            [$user1->getKey(), $user2->getKey()],
+            $scopedUsers2->modelKeys()
+        );
+        $this->assertEquals(
+            [$user5->getKey()],
+            $scopedUsers3->modelKeys()
+        );
     }
 
     /** @test */
@@ -419,6 +452,166 @@ class HasRolesTest extends TestCase
         $this->expectException(RoleDoesNotExist::class);
 
         User::role('role not defined')->get();
+    }
+
+    /** @test */
+    public function it_can_scope_users_without_roles_using_a_string()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1->assignRole('testRole');
+        $user2->assignRole('testRole2');
+
+        $scopedUsers = User::withoutRole('testRole')->get();
+
+        $this->assertEquals(
+            [$this->testUser->getKey(), $user2->getKey()],
+            $scopedUsers->modelKeys()
+        );
+    }
+
+    /** @test */
+    public function it_can_scope_users_without_roles_using_an_array()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1->assignRole($this->testUserRole);
+        $user2->assignRole('testRole2');
+
+        $scopedUsers1 = User::withoutRole([$this->testUserRole])->get();
+        $scopedUsers2 = User::withoutRole(['testRole', 'testRole2'])->get();
+
+        $this->assertEquals(
+            [$this->testUser->getKey(), $user2->getKey()],
+            $scopedUsers1->modelKeys()
+        );
+        $this->assertEquals(
+            [$this->testUser->getKey()],
+            $scopedUsers2->modelKeys()
+        );
+    }
+
+    /** @test */
+    public function it_can_scope_users_without_roles_using_an_array_of_ids_and_names()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1->assignRole($this->testUserRole);
+        $user2->assignRole('testRole2');
+
+        $roleName = $this->testUserRole->name;
+
+        $otherRoleId = app(Role::class)->find(2)->id;
+
+        $scopedUsers = User::withoutRole([$roleName, $otherRoleId])->get();
+
+        $this->assertEquals(
+            [$this->testUser->getKey()],
+            $scopedUsers->modelKeys()
+        );
+    }
+
+    /** @test */
+    public function it_can_scope_users_without_roles_using_a_collection()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1->assignRole($this->testUserRole);
+        $user2->assignRole('testRole2');
+
+        $scopedUsers1 = User::withoutRole([$this->testUserRole])->get();
+        $scopedUsers2 = User::withoutRole(collect(['testRole', 'testRole2']))->get();
+
+        $this->assertEquals(
+            [$this->testUser->getKey(), $user2->getKey()],
+            $scopedUsers1->modelKeys()
+        );
+        $this->assertEquals(
+            [$this->testUser->getKey()],
+            $scopedUsers2->modelKeys()
+        );
+    }
+
+    /** @test */
+    public function it_can_scope_users_without_roles_using_an_object()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1->assignRole($this->testUserRole);
+        $user2->assignRole('testRole2');
+
+        $scopedUsers1 = User::withoutRole($this->testUserRole)->get();
+        $scopedUsers2 = User::withoutRole([$this->testUserRole])->get();
+        $scopedUsers3 = User::withoutRole(collect([$this->testUserRole]))->get();
+
+        $this->assertEquals(
+            [$this->testUser->getKey(), $user2->getKey()],
+            $scopedUsers1->modelKeys()
+        );
+        $this->assertEquals(
+            [$this->testUser->getKey(), $user2->getKey()],
+            $scopedUsers2->modelKeys()
+        );
+        $this->assertEquals(
+            [$this->testUser->getKey(), $user2->getKey()],
+            $scopedUsers3->modelKeys()
+        );
+    }
+
+    /** @test */
+    public function it_can_scope_users_without_roles_against_a_specific_guard()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1->assignRole('testRole');
+        $user2->assignRole('testRole2');
+
+        $scopedUsers1 = User::withoutRole('testRole', 'web')->get();
+
+        $this->assertEquals(
+            [$this->testUser->getKey(), $user2->getKey()],
+            $scopedUsers1->modelKeys()
+        );
+
+        $user3 = Admin::create(['email' => 'user1@test.com']);
+        $user4 = Admin::create(['email' => 'user1@test.com']);
+        $user5 = Admin::create(['email' => 'user2@test.com']);
+        $testAdminRole2 = app(Role::class)->create(['name' => 'testAdminRole2', 'guard_name' => 'admin']);
+        $user3->assignRole($this->testAdminRole);
+        $user4->assignRole($this->testAdminRole);
+        $user5->assignRole($testAdminRole2);
+
+        $scopedUsers2 = Admin::withoutRole('testAdminRole', 'admin')->get();
+        $scopedUsers3 = Admin::withoutRole('testAdminRole2', 'admin')->get();
+
+        $this->assertEquals(
+            [$this->testAdmin->getKey(), $user5->getKey()],
+            $scopedUsers2->modelKeys()
+        );
+        $this->assertEquals(
+            [$this->testAdmin->getKey(), $user3->getKey(), $user4->getKey()],
+            $scopedUsers3->modelKeys()
+        );
+    }
+
+    /** @test */
+    public function it_throws_an_exception_when_trying_to_scope_out_roles_from_another_guard()
+    {
+        $this->expectException(RoleDoesNotExist::class);
+
+        User::withoutRole('testAdminRole')->get();
+
+        $this->expectException(GuardDoesNotMatch::class);
+
+        User::withoutRole($this->testAdminRole)->get();
+    }
+
+    /** @test */
+    public function it_throws_an_exception_when_trying_to_scope_out_non_existing_roles()
+    {
+        $this->expectException(RoleDoesNotExist::class);
+
+        User::withoutRole('role not defined')->get();
     }
 
     /** @test */

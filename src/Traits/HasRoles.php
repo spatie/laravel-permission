@@ -5,14 +5,11 @@ namespace Spatie\Permission\Traits;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Role;
 use Illuminate\Database\Eloquent\Builder;
-use Spatie\Permission\PermissionRegistrar;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 trait HasRoles
 {
     use HasPermissions;
-
-    private $roleClass;
 
     public static function bootHasRoles()
     {
@@ -23,15 +20,6 @@ trait HasRoles
 
             $model->roles()->detach();
         });
-    }
-
-    public function getRoleClass()
-    {
-        if (! isset($this->roleClass)) {
-            $this->roleClass = app(PermissionRegistrar::class)->getRoleClass();
-        }
-
-        return $this->roleClass;
     }
 
     /**
@@ -67,18 +55,35 @@ trait HasRoles
             $roles = [$roles];
         }
 
-        $roles = array_map(function ($role) use ($guard) {
-            if ($role instanceof Role) {
-                return $role;
-            }
-
-            $method = is_numeric($role) ? 'findById' : 'findByName';
-            $guard = $guard ?: $this->getDefaultGuardName();
-
-            return $this->getRoleClass()->{$method}($role, $guard);
-        }, $roles);
+        $roles = $this->getArgumentRoles($roles, $guard);
 
         return $query->whereHas('roles', function (Builder $subQuery) use ($roles) {
+            $subQuery->whereIn(config('permission.table_names.roles').'.id', \array_column($roles, 'id'));
+        });
+    }
+
+    /**
+     * Scope the model query without certain roles.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
+     * @param string $guard
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWithoutRole(Builder $query, $roles, $guard = null): Builder
+    {
+        if ($roles instanceof Collection) {
+            $roles = $roles->all();
+        }
+
+        if (! is_array($roles)) {
+            $roles = [$roles];
+        }
+
+        $roles = $this->getArgumentRoles($roles, $guard);
+
+        return $query->whereDoesntHave('roles', function (Builder $subQuery) use ($roles) {
             $subQuery->whereIn(config('permission.table_names.roles').'.id', \array_column($roles, 'id'));
         });
     }
@@ -302,5 +307,19 @@ trait HasRoles
         }
 
         return explode('|', trim($pipeString, $quoteCharacter));
+    }
+
+    protected function getArgumentRoles($roles, $guard = null)
+    {
+        return array_map(function ($role) use ($guard) {
+            if ($role instanceof Role) {
+                return $role;
+            }
+
+            $method = is_numeric($role) ? 'findById' : 'findByName';
+            $guard = $guard ?: $this->getDefaultGuardName();
+
+            return $this->getRoleClass()->{$method}($role, $guard);
+        }, $roles);
     }
 }

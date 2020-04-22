@@ -68,22 +68,49 @@ $permissions = $user->getAllPermissions();
 $roles = $user->getRoleNames(); // Returns a collection
 ```
 
-The `HasRoles` trait also adds a `role` scope to your models to scope the query to certain roles or permissions:
+The `HasRoles` trait also adds the following scopes to your models to scope the query by roles or permissions. 
+
+The `role` scope is used to only get users with a certain role.
 
 ```php
-$users = User::role('writer')->get(); // Returns only users with the role 'writer'
+// get a list of users with the 'writer' role
+$users = User::role('writer')->get(); 
+
+// get a list of users with the 'writer' or 'editor' role
+$users = User::role(['editor', 'writer'])->get();
 ```
 
-The `role` scope can accept a string, a `\Spatie\Permission\Models\Role` object or an `\Illuminate\Support\Collection` object.
-
-The same trait also adds a scope to only get users that have a certain permission.
+The `role` scope has an inverse `withoutRole` scope to only get users without a certain role.
 
 ```php
-$users = User::permission('edit articles')->get(); // Returns only users with the permission 'edit articles' (inherited or directly)
+// get a list of users without the 'writer' role
+$users = User::withoutRole('writer')->get();
+
+// get a list of users without the 'writer' or 'editor' role.  
+$users = User::withoutRole(['writer', 'editor'])->get();
 ```
 
-The scope can accept a string, a `\Spatie\Permission\Models\Permission` object or an `\Illuminate\Support\Collection` object.
+The same trait also adds a `permission` scope to only get users with a certain permission.
 
+```php
+// get a list of users with the 'edit articles' permission. (inherited or directly)
+$users = User::permission('edit articles')->get(); 
+
+// get a list of users with the 'edit articles' or 'delete articles' permission. (inherited or directly)
+$users = User::permission(['edit articles', 'delete articles'])->get(); 
+```
+
+The `permission` scope also has an inverse `withoutPermission` scope to only get users without a certain permission.
+
+```php
+// get a list of users without the 'edit articles' permission
+$users = User::withoutPermission('edit articles')->get();
+
+// get a list of users without the 'edit articles' or 'delete articles' permission
+$users = User::withoutPermission(['edit articles', 'delete articles'])->get();
+```
+
+These scopes can all accept a string, a `\Spatie\Permission\Models\Permission` object or an `\Illuminate\Support\Collection` object.
 
 ### Eloquent
 Since Role and Permission models are extended from Eloquent models, basic Eloquent calls can be used as well:

@@ -61,8 +61,14 @@ class HasPermissionsTest extends TestCase
         $scopedUsers1 = User::permission('edit-articles')->get();
         $scopedUsers2 = User::permission(['edit-news'])->get();
 
-        $this->assertEquals($scopedUsers1->count(), 2);
-        $this->assertEquals($scopedUsers2->count(), 1);
+        $this->assertEquals(
+            [$user1->getKey(), $user2->getKey()],
+            $scopedUsers1->modelKeys()
+        );
+        $this->assertEquals(
+            [$user1->getKey()],
+            $scopedUsers2->modelKeys()
+        );
     }
 
     /** @test */
@@ -77,8 +83,14 @@ class HasPermissionsTest extends TestCase
         $scopedUsers1 = User::permission(['edit-articles', 'edit-news'])->get();
         $scopedUsers2 = User::permission(['edit-news'])->get();
 
-        $this->assertEquals($scopedUsers1->count(), 2);
-        $this->assertEquals($scopedUsers2->count(), 1);
+        $this->assertEquals(
+            [$user1->getKey(), $user2->getKey()],
+            $scopedUsers1->modelKeys()
+        );
+        $this->assertEquals(
+            [$user1->getKey()],
+            $scopedUsers2->modelKeys()
+        );
     }
 
     /** @test */
@@ -93,8 +105,14 @@ class HasPermissionsTest extends TestCase
         $scopedUsers1 = User::permission(collect(['edit-articles', 'edit-news']))->get();
         $scopedUsers2 = User::permission(collect(['edit-news']))->get();
 
-        $this->assertEquals($scopedUsers1->count(), 2);
-        $this->assertEquals($scopedUsers2->count(), 1);
+        $this->assertEquals(
+            [$user1->getKey(), $user2->getKey()],
+            $scopedUsers1->modelKeys()
+        );
+        $this->assertEquals(
+            [$user1->getKey()],
+            $scopedUsers2->modelKeys()
+        );
     }
 
     /** @test */
@@ -107,9 +125,18 @@ class HasPermissionsTest extends TestCase
         $scopedUsers2 = User::permission([$this->testUserPermission])->get();
         $scopedUsers3 = User::permission(collect([$this->testUserPermission]))->get();
 
-        $this->assertEquals($scopedUsers1->count(), 1);
-        $this->assertEquals($scopedUsers2->count(), 1);
-        $this->assertEquals($scopedUsers3->count(), 1);
+        $this->assertEquals(
+            [$user1->getKey()],
+            $scopedUsers1->modelKeys()
+        );
+        $this->assertEquals(
+            [$user1->getKey()],
+            $scopedUsers2->modelKeys()
+        );
+        $this->assertEquals(
+            [$user1->getKey()],
+            $scopedUsers3->modelKeys()
+        );
     }
 
     /** @test */
@@ -123,7 +150,10 @@ class HasPermissionsTest extends TestCase
 
         $scopedUsers = User::permission('edit-articles')->get();
 
-        $this->assertEquals($scopedUsers->count(), 2);
+        $this->assertEquals(
+            [$user1->getKey(), $user2->getKey()],
+            $scopedUsers->modelKeys()
+        );
     }
 
     /** @test */
@@ -136,7 +166,140 @@ class HasPermissionsTest extends TestCase
 
         $scopedUsers = User::permission('edit-news')->get();
 
-        $this->assertEquals($scopedUsers->count(), 2);
+        $this->assertEquals(
+            [$user1->getKey(), $user2->getKey()],
+            $scopedUsers->modelKeys()
+        );
+    }
+
+    /** @test */
+    public function it_throws_an_exception_when_trying_to_scope_a_non_existing_permission()
+    {
+        $this->expectException(PermissionDoesNotExist::class);
+
+        User::permission('not defined permission')->get();
+    }
+
+    /** @test */
+    public function it_throws_an_exception_when_trying_to_scope_a_permission_from_another_guard()
+    {
+        $this->expectException(PermissionDoesNotExist::class);
+
+        User::permission('testAdminPermission')->get();
+
+        $this->expectException(GuardDoesNotMatch::class);
+
+        User::permission($this->testAdminPermission)->get();
+    }
+
+    /** @test */
+    public function it_can_scope_users_without_permissions_using_a_string()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1->givePermissionTo(['edit-articles', 'edit-news']);
+        $this->testUserRole->givePermissionTo('edit-articles');
+        $user2->assignRole('testRole');
+
+        $scopedUsers1 = User::withoutPermission('edit-articles')->get();
+        $scopedUsers2 = User::withoutPermission(['edit-news'])->get();
+
+        $this->assertEquals(
+            [$this->testUser->getKey()],
+            $scopedUsers1->modelKeys()
+        );
+        $this->assertEquals(
+            [$this->testUser->getKey(), $user2->getKey()],
+            $scopedUsers2->modelKeys()
+        );
+    }
+
+    /** @test */
+    public function it_can_scope_users_without_permission_using_an_array()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1->givePermissionTo(['edit-articles', 'edit-news']);
+        $this->testUserRole->givePermissionTo('edit-articles');
+        $user2->assignRole('testRole');
+
+        $scopedUsers1 = User::withoutPermission(['edit-articles', 'edit-news'])->get();
+        $scopedUsers2 = User::withoutPermission(['edit-news'])->get();
+
+        $this->assertEquals(
+            [$this->testUser->getKey()],
+            $scopedUsers1->modelKeys()
+        );
+        $this->assertEquals(
+            [$this->testUser->getKey(), $user2->getKey()],
+            $scopedUsers2->modelKeys()
+        );
+    }
+
+    /** @test */
+    public function it_can_scope_users_without_permission_using_a_collection()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1->givePermissionTo(['edit-articles', 'edit-news']);
+        $this->testUserRole->givePermissionTo('edit-articles');
+        $user2->assignRole('testRole');
+
+        $scopedUsers1 = User::withoutPermission(collect(['edit-articles', 'edit-news']))->get();
+        $scopedUsers2 = User::withoutPermission(collect(['edit-news']))->get();
+
+        $this->assertEquals(
+            [$this->testUser->getKey()],
+            $scopedUsers1->modelKeys()
+        );
+        $this->assertEquals(
+            [$this->testUser->getKey(), $user2->getKey()],
+            $scopedUsers2->modelKeys()
+        );
+    }
+
+    /** @test */
+    public function it_can_scope_users_without_permission_using_an_object()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user1->givePermissionTo($this->testUserPermission->name);
+
+        $scopedUsers1 = User::withoutPermission($this->testUserPermission)->get();
+        $scopedUsers2 = User::withoutPermission([$this->testUserPermission])->get();
+        $scopedUsers3 = User::withoutPermission(collect([$this->testUserPermission]))->get();
+
+        $this->assertEquals(
+            [$this->testUser->getKey()],
+            $scopedUsers1->modelKeys()
+        );
+        $this->assertEquals(
+            [$this->testUser->getKey()],
+            $scopedUsers2->modelKeys()
+        );
+        $this->assertEquals(
+            [$this->testUser->getKey()],
+            $scopedUsers3->modelKeys()
+        );
+    }
+
+    /** @test */
+    public function it_throws_an_exception_when_trying_to_scope_without_permission_a_non_existing_permission()
+    {
+        $this->expectException(PermissionDoesNotExist::class);
+
+        User::withoutPermission('not defined permission')->get();
+    }
+
+    /** @test */
+    public function it_throws_an_exception_when_trying_to_scope_without_permission_a_permission_from_another_guard()
+    {
+        $this->expectException(PermissionDoesNotExist::class);
+
+        User::withoutPermission('testAdminPermission')->get();
+
+        $this->expectException(GuardDoesNotMatch::class);
+
+        User::withoutPermission($this->testAdminPermission)->get();
     }
 
     /** @test */
@@ -177,26 +340,6 @@ class HasPermissionsTest extends TestCase
         $this->expectException(PermissionDoesNotExist::class);
 
         $user->hasDirectPermission(null);
-    }
-
-    /** @test */
-    public function it_throws_an_exception_when_trying_to_scope_a_non_existing_permission()
-    {
-        $this->expectException(PermissionDoesNotExist::class);
-
-        User::permission('not defined permission')->get();
-    }
-
-    /** @test */
-    public function it_throws_an_exception_when_trying_to_scope_a_permission_from_another_guard()
-    {
-        $this->expectException(PermissionDoesNotExist::class);
-
-        User::permission('testAdminPermission')->get();
-
-        $this->expectException(GuardDoesNotMatch::class);
-
-        User::permission($this->testAdminPermission)->get();
     }
 
     /** @test */
