@@ -51,10 +51,14 @@ class Permission extends Model implements PermissionContract
     public static function createResource(...$permissions): Collection
     {
         return collect($permissions)->flatten()->map(function ($permission) {
-            if (!is_string($permission)) return false;
+            if (! is_string($permission)) {
+                return false;
+            }
+
             foreach (['index', 'create', 'store', 'show', 'edit', 'update', 'delete'] as $crud) {
                 $array[] = ['name' => "$crud $permission"];
             }
+
             return $array;
         })->collapse()->filter()->map(function ($permission) {
             return static::create($permission);
