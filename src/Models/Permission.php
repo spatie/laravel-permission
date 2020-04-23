@@ -44,6 +44,24 @@ class Permission extends Model implements PermissionContract
     }
 
     /**
+     * Create permissions for resource controllers.
+     * @param  string|array $permissions
+     * @return \Illuminate\Support\Collection
+     */
+    public static function createResource(...$permissions): Collection
+    {
+        return collect($permissions)->flatten()->map(function ($permission) {
+            if (!is_string($permission)) return false;
+            foreach (['index', 'create', 'store', 'show', 'edit', 'update', 'delete'] as $crud) {
+                $array[] = ['name' => "$crud $permission"];
+            }
+            return $array;
+        })->collapse()->filter()->map(function ($permission) {
+            return static::create($permission);
+        });
+    }
+
+    /**
      * A permission can be applied to roles.
      */
     public function roles(): BelongsToMany
