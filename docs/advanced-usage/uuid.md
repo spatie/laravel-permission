@@ -104,7 +104,7 @@ It is common to use a trait to handle the $keyType and $incrementing settings, a
             parent::boot();
 
             static::creating(function ($model) {
-                $model->{$model->getKeyName()} = (string) Str::uuid();
+                $model->{$model->getKeyName()} = $model->{$model->getKeyName()} ?: (string) Str::orderedUuid();
             });
         }
     }
