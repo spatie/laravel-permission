@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 3.12.0 - 2020-05-14
+- Add missing config setting for `display_role_in_exception`
+- Ensure artisan `permission:show` command uses configured models
+
 ## 3.11.0 - 2020-03-03
 - Allow guardName() as a function with priority over $guard_name property #1395
 
