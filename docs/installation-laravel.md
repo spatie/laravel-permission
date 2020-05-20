@@ -32,9 +32,9 @@ This package can be used with Laravel 5.8 or higher.
 
 7. Clear your config cache. This package requires access to the `permission` config. Generally it's bad practice to do config-caching in a development environment. If you've been caching configurations locally, clear your config cache with either of these commands:
 
-        php optimize:clear
+        php artisan optimize:clear
         # or
-        php config:clear
+        php artisan config:clear
 
 8. Run the migrations: After the config and migration have been published and configured, you can create the tables for this package by running:
 
