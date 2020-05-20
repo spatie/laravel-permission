@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 3.13.0 - 2020-05-19
+- Provide migration error text to stop caching local config when installing packages.
+
 ## 3.12.0 - 2020-05-14
 - Add missing config setting for `display_role_in_exception`
 - Ensure artisan `permission:show` command uses configured models
