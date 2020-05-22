@@ -6,7 +6,6 @@ use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
-use Spatie\Permission\Exceptions\RoleAlreadyExists;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class RoleTest extends TestCase
@@ -37,12 +36,13 @@ class RoleTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_the_role_already_exists()
+    public function it_notifies_user_when_the_role_already_exists()
     {
-        $this->expectException(RoleAlreadyExists::class);
+        app(Role::class)->create(['name' => 'test-role']);
+        $result = app(Role::class)->create(['name' => 'test-role']);
+        $expected = "A role test-role already exists for guard web. Seed ignored.";
 
-        app(Role::class)->create(['name' => 'test-role']);
-        app(Role::class)->create(['name' => 'test-role']);
+        $this->assertEquals($expected, $result);
     }
 
     /** @test */

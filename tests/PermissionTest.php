@@ -3,17 +3,17 @@
 namespace Spatie\Permission\Test;
 
 use Spatie\Permission\Contracts\Permission;
-use Spatie\Permission\Exceptions\PermissionAlreadyExists;
 
 class PermissionTest extends TestCase
 {
     /** @test */
-    public function it_throws_an_exception_when_the_permission_already_exists()
+    public function it_notifies_user_when_the_permission_already_exists()
     {
-        $this->expectException(PermissionAlreadyExists::class);
+        app(Permission::class)->create(['name' => 'test-permission']);
+        $result = app(Permission::class)->create(['name' => 'test-permission']);
+        $expected = "A test-permission permission already exists for guard web, seed ignored.";
 
-        app(Permission::class)->create(['name' => 'test-permission']);
-        app(Permission::class)->create(['name' => 'test-permission']);
+        $this->assertEquals($expected, $result);
     }
 
     /** @test */

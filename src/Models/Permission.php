@@ -11,8 +11,8 @@ use Spatie\Permission\Traits\RefreshesPermissionCache;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Spatie\Permission\Exceptions\PermissionAlreadyExists;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 class Permission extends Model implements PermissionContract
 {
@@ -37,7 +37,7 @@ class Permission extends Model implements PermissionContract
         $permission = static::getPermissions(['name' => $attributes['name'], 'guard_name' => $attributes['guard_name']])->first();
 
         if ($permission) {
-            throw PermissionAlreadyExists::create($attributes['name'], $attributes['guard_name']);
+            return static::permissionAlreadyExists($attributes['name'], $attributes['guard_name']);
         }
 
         return static::query()->create($attributes);
@@ -142,4 +142,14 @@ class Permission extends Model implements PermissionContract
             ->setPermissionClass(static::class)
             ->getPermissions($params);
     }
+
+    protected static function permissionAlreadyExists($permissionName, $guardName)
+    {
+        $message = "A $permissionName permission already exists for guard $guardName, seed ignored.";
+        $output = new ConsoleOutput();
+        $output->writeln("<error>$message.</error>");
+
+        return $message;
+    }
+
 }

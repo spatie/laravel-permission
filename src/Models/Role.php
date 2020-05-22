@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
-use Spatie\Permission\Exceptions\RoleAlreadyExists;
 use Spatie\Permission\Contracts\Role as RoleContract;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 class Role extends Model implements RoleContract
 {
@@ -34,7 +34,7 @@ class Role extends Model implements RoleContract
         $attributes['guard_name'] = $attributes['guard_name'] ?? Guard::getDefaultName(static::class);
 
         if (static::where('name', $attributes['name'])->where('guard_name', $attributes['guard_name'])->first()) {
-            throw RoleAlreadyExists::create($attributes['name'], $attributes['guard_name']);
+            return static::roleAlreadyExists($attributes['name'], $attributes['guard_name']);
         }
 
         return static::query()->create($attributes);
@@ -155,4 +155,14 @@ class Role extends Model implements RoleContract
 
         return $this->permissions->contains('id', $permission->id);
     }
+
+    protected static function roleAlreadyExists(string $roleName, string $guardName)
+    {
+        $message = "A role $roleName already exists for guard $guardName. Seed ignored.";
+        $output = new ConsoleOutput();
+        $output->writeln("<error>$message.</error>");
+
+        return $message;
+    }
+
 }
