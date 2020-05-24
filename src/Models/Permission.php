@@ -36,7 +36,7 @@ class Permission extends Model implements PermissionContract
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? Guard::getDefaultName(static::class);
 
-        $permission = static::getPermissions(['name' => $attributes['name'], 'guard_name' => $attributes['guard_name']])->first();
+        $permission = static::getPermission(['name' => $attributes['name'], 'guard_name' => $attributes['guard_name']]);
 
         if ($permission) {
             throw PermissionAlreadyExists::create($attributes['name'], $attributes['guard_name']);
@@ -85,7 +85,7 @@ class Permission extends Model implements PermissionContract
     public static function findByName(string $name, $guardName = null): PermissionContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
-        $permission = static::getPermissions(['name' => $name, 'guard_name' => $guardName])->first();
+        $permission = static::getPermission(['name' => $name, 'guard_name' => $guardName]);
         if (! $permission) {
             throw PermissionDoesNotExist::create($name, $guardName);
         }
@@ -106,7 +106,7 @@ class Permission extends Model implements PermissionContract
     public static function findById(int $id, $guardName = null): PermissionContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
-        $permission = static::getPermissions(['id' => $id, 'guard_name' => $guardName])->first();
+        $permission = static::getPermission(['id' => $id, 'guard_name' => $guardName]);
 
         if (! $permission) {
             throw PermissionDoesNotExist::withId($id, $guardName);
@@ -126,13 +126,23 @@ class Permission extends Model implements PermissionContract
     public static function findOrCreate(string $name, $guardName = null): PermissionContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
-        $permission = static::getPermissions(['name' => $name, 'guard_name' => $guardName])->first();
+        $permission = static::getPermission(['name' => $name, 'guard_name' => $guardName]);
 
         if (! $permission) {
             return static::query()->create(['name' => $name, 'guard_name' => $guardName]);
         }
 
         return $permission;
+    }
+
+    /**
+     * Get a cached permission.
+     */
+    protected static function getPermission(array $params): ?PermissionContract
+    {
+        return app(PermissionRegistrar::class)
+            ->setPermissionClass(static::class)
+            ->getPermission($params);
     }
 
     /**
