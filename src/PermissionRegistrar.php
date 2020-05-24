@@ -114,6 +114,17 @@ class PermissionRegistrar
         $this->permissions = null;
     }
 
+    private function loadPermissions()
+    {
+        if ($this->permissions === null) {
+            $this->permissions = $this->cache->remember(self::$cacheKey, self::$cacheExpirationTime, function () {
+                return $this->getPermissionClass()
+                    ->with('roles')
+                    ->get();
+            });
+        }
+    }
+
     /**
      * Get the permissions based on the passed params.
      *
@@ -123,13 +134,7 @@ class PermissionRegistrar
      */
     public function getPermissions(array $params = []): Collection
     {
-        if ($this->permissions === null) {
-            $this->permissions = $this->cache->remember(self::$cacheKey, self::$cacheExpirationTime, function () {
-                return $this->getPermissionClass()
-                    ->with('roles')
-                    ->get();
-            });
-        }
+        $this->loadPermissions();
 
         $permissions = clone $this->permissions;
 
@@ -138,6 +143,28 @@ class PermissionRegistrar
         }
 
         return $permissions;
+    }
+
+    /**
+     * Get a permission based on the passed params.
+     *
+     * @param array $params
+     *
+     * @return \Spatie\Permission\Contracts\Permission|null
+     */
+    public function getPermission(array $params): ?Permission
+    {
+        $this->loadPermissions();
+
+        return $this->permissions->first(static function ($permission) use ($params) {
+            foreach ($params as $attr => $value) {
+                if ($permission->getAttribute($attr) != $value) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
     }
 
     /**
