@@ -3,17 +3,24 @@ title: Using multiple guards
 weight: 6
 ---
 
-When using the default Laravel auth configuration all of the above methods will work out of the box, no extra configuration required.
+When using the default Laravel auth configuration all of the core methods of this package will work out of the box, no extra configuration required.
 
 However, when using multiple guards they will act like namespaces for your permissions and roles. Meaning every guard has its own set of permissions and roles that can be assigned to their user model.
 
+### The Downside To Multiple Guards
+
+Note that this package requires you to register a permission name for each guard you want to authenticate with. So, "edit-article" would have to be created multiple times for each guard your app uses. An exception will be thrown if you try to authenticate against a non-existing permission+guard combination. Same for roles.
+
+> **Tip**: If your app uses only a single guard, but is not `web` (Laravel's default, which shows "first" in the auth config file) then change the order of your listed guards in your `config/auth.php` to list your primary guard as the default and as the first in the list of defined guards. While you're editing that file, best to remove any guards you don't use, too.
+
+
 ### Using permissions and roles with multiple guards
 
-When creating new permissions and roles, if no guard is specified, then the **first** defined guard in `auth.guards` config array will be used. When creating permissions and roles for specific guards you'll have to specify their `guard_name` on the model:
+When creating new permissions and roles, if no guard is specified, then the **first** defined guard in `auth.guards` config array will be used. 
 
 ```php
-// Create a superadmin role for the admin users
-$role = Role::create(['guard_name' => 'admin', 'name' => 'superadmin']);
+// Create a manager role for users authenticating with the admin guard:
+$role = Role::create(['guard_name' => 'admin', 'name' => 'manager']);
 
 // Define a `publish articles` permission for the admin users belonging to the admin guard
 $permission = Permission::create(['guard_name' => 'admin', 'name' => 'publish articles']);
@@ -28,19 +35,21 @@ To check if a user has permission for a specific guard:
 $user->hasPermissionTo('publish articles', 'admin');
 ```
 
-> **Note**: When determining whether a role/permission is valid on a given model, it chooses the guard in this order: first the `$guard_name` property of the model; then the guard in the config (through a provider); then the first-defined guard in the `auth.guards` config array; then the `auth.defaults.guard` config.
+> **Note**: When determining whether a role/permission is valid on a given model, it checks against the first matching guard in this order (it does NOT check role/permission for EACH possibility, just the first match):
+- first the guardName() method if it exists on the model;
+- then the `$guard_name` property if it exists on the model;
+- then the first-defined guard/provider combination in the `auth.guards` config array that matches the logged-in user's guard;
+- then the `auth.defaults.guard` config (which is the user's guard if they are logged in, else the default in the file).
 
-> **Note**: When using other than the default `web` guard, you will need to declare which `guard_name` you wish each model to use by setting the `$guard_name` property in your model. One per model is simplest. 
-
-> **Note**: If your app uses only a single guard, but is not `web` then change the order of your listed guards in your `config/auth.php` to list your primary guard as the default and as the first in the list of defined guards.
 
 ### Assigning permissions and roles to guard users
 
-You can use the same methods to assign permissions and roles to users as described above in [using permissions via roles](#using-permissions-via-roles). Just make sure the `guard_name` on the permission or role matches the guard of the user, otherwise a `GuardDoesNotMatch` exception will be thrown.
+You can use the same core methods to assign permissions and roles to users; just make sure the `guard_name` on the permission or role matches the guard of the user, otherwise a `GuardDoesNotMatch` or `Role/PermissionDoesNotExist` exception will be thrown.
+
 
 ### Using blade directives with multiple guards
 
-You can use all of the blade directives listed in [using blade directives](#using-blade-directives) by passing in the guard you wish to use as the second argument to the directive:
+You can use all of the blade directives offered by this package by passing in the guard you wish to use as the second argument to the directive:
 
 ```php
 @role('super-admin', 'admin')

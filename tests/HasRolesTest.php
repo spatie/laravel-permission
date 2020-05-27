@@ -12,6 +12,26 @@ class HasRolesTest extends TestCase
     public function it_can_determine_that_the_user_does_not_have_a_role()
     {
         $this->assertFalse($this->testUser->hasRole('testRole'));
+
+        $role = app(Role::class)->findOrCreate('testRoleInWebGuard', 'web');
+
+        $this->assertFalse($this->testUser->hasRole($role));
+
+        $this->testUser->assignRole($role);
+        $this->assertTrue($this->testUser->hasRole($role));
+        $this->assertTrue($this->testUser->hasRole($role->name));
+        $this->assertTrue($this->testUser->hasRole($role->name, $role->guard_name));
+        $this->assertTrue($this->testUser->hasRole([$role->name, 'fakeRole'], $role->guard_name));
+        $this->assertTrue($this->testUser->hasRole($role->id, $role->guard_name));
+        $this->assertTrue($this->testUser->hasRole([$role->id, 'fakeRole'], $role->guard_name));
+
+        $this->assertFalse($this->testUser->hasRole($role->name, 'fakeGuard'));
+        $this->assertFalse($this->testUser->hasRole([$role->name, 'fakeRole'], 'fakeGuard'));
+        $this->assertFalse($this->testUser->hasRole($role->id, 'fakeGuard'));
+        $this->assertFalse($this->testUser->hasRole([$role->id, 'fakeRole'], 'fakeGuard'));
+
+        $role = app(Role::class)->findOrCreate('testRoleInWebGuard2', 'web');
+        $this->assertFalse($this->testUser->hasRole($role));
     }
 
     /** @test */
@@ -444,11 +464,18 @@ class HasRolesTest extends TestCase
 
         $this->testUser->assignRole($this->testUserRole);
 
+        $this->assertTrue($this->testUser->hasAllRoles('testRole'));
+        $this->assertTrue($this->testUser->hasAllRoles('testRole', 'web'));
+        $this->assertFalse($this->testUser->hasAllRoles('testRole', 'fakeGuard'));
+
         $this->assertFalse($this->testUser->hasAllRoles(['testRole', 'second role']));
+        $this->assertFalse($this->testUser->hasAllRoles(['testRole', 'second role'], 'web'));
 
         $this->testUser->assignRole('second role');
 
         $this->assertTrue($this->testUser->hasAllRoles(['testRole', 'second role']));
+        $this->assertTrue($this->testUser->hasAllRoles(['testRole', 'second role'], 'web'));
+        $this->assertFalse($this->testUser->hasAllRoles(['testRole', 'second role'], 'fakeGuard'));
     }
 
     /** @test */
@@ -463,6 +490,20 @@ class HasRolesTest extends TestCase
         $this->assertTrue($this->testUser->hasAnyRole(['testRole', 'testAdminRole']));
 
         $this->assertFalse($this->testUser->hasAnyRole('testAdminRole', $this->testAdminRole));
+    }
+
+    /** @test */
+    public function it_can_check_against_any_multiple_roles_using_multiple_arguments()
+    {
+        $this->testUser->assignRole('testRole');
+
+        $this->assertTrue($this->testUser->hasAnyRole($this->testAdminRole, ['testRole'], 'This Role Does Not Even Exist'));
+    }
+
+    /** @test */
+    public function it_returns_false_instead_of_an_exception_when_checking_against_any_undefined_roles_using_multiple_arguments()
+    {
+        $this->assertFalse($this->testUser->hasAnyRole('This Role Does Not Even Exist', $this->testAdminRole));
     }
 
     /** @test */

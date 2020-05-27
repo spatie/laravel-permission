@@ -1,6 +1,6 @@
 ---
 title: Cache
-weight: 4
+weight: 5
 ---
 
 Role and Permission data are cached to speed up performance.
@@ -22,6 +22,9 @@ $permission->syncRoles(params);
 ```
 
 HOWEVER, if you manipulate permission/role data directly in the database instead of calling the supplied methods, then you will not see the changes reflected in the application unless you manually reset the cache.
+
+Additionally, because the Role and Permission models are Eloquent models which implement the `RefreshesPermissionCache` trait, creating and deleting Roles and Permissions will automatically clear the cache. If you have created your own models which do not extend the default models then you will need to implement the trait yourself.
+
 
 ### Manual cache reset
 To manually reset the cache for this package, you can run the following in your app code:

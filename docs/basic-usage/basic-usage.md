@@ -17,22 +17,6 @@ class User extends Authenticatable
 }
 ```
 
-> - note that if you need to use `HasRoles` trait with another model ex.`Page` you will also need to add `protected $guard_name = 'web';` as well to that model or you would get an error
->
-```php
-use Illuminate\Database\Eloquent\Model;
-use Spatie\Permission\Traits\HasRoles;
-
-class Page extends Model
-{
-    use HasRoles;
-
-    protected $guard_name = 'web'; // or whatever guard you want to use
-
-    // ...
-}
-```
-
 This package allows for users to be associated with permissions and roles. Every role is associated with multiple permissions.
 A `Role` and a `Permission` are regular Eloquent models. They require a `name` and can be created like this:
 
@@ -108,5 +92,6 @@ Since Role and Permission models are extended from Eloquent models, basic Eloque
 $all_users_with_all_their_roles = User::with('roles')->get();
 $all_users_with_all_direct_permissions = User::with('permissions')->get();
 $all_roles_in_database = Role::all()->pluck('name');
+$users_without_any_roles = User::doesntHave('roles')->get();
 ```
 

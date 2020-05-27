@@ -12,7 +12,7 @@
 
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/spatie/laravel-permission.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-permission)
-[![Build Status](https://img.shields.io/travis/spatie/laravel-permission/master.svg?style=flat-square)](https://travis-ci.org/spatie/laravel-permission)
+![](https://github.com/spatie/laravel-permission/workflows/Run%20Tests/badge.svg?branch=master)
 [![StyleCI](https://styleci.io/repos/42480275/shield)](https://styleci.io/repos/42480275)
 [![Total Downloads](https://img.shields.io/packagist/dt/spatie/laravel-permission.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-permission)
 
@@ -36,23 +36,15 @@ Because all permissions will be registered on [Laravel's gate](https://laravel.c
 $user->can('edit articles');
 ```
 
+## Support us
+
+We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us). 
+
+We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+
 ## Documentation, Installation, and Usage Instructions
 
-See the [documentation site](https://docs.spatie.be/laravel-permission/v3/introduction/) for detailed installation and usage instructions.
-
-## Need a UI?
-
-The package doesn't come with any screens out of the box, you should build that yourself. Here are some options to get you started:
-
-- [Laravel Nova package by @vyuldashev for managing Roles and Permissions](https://github.com/vyuldashev/nova-permission)
-
-- [Laravel Nova package by @paras-malhotra for managing Roles and Permissions and permissions based authorization for Nova Resources](https://github.com/insenseanalytics/laravel-nova-permission)
-
-- [Extensive tutorial for building permissions UI](https://scotch.io/tutorials/user-authorization-in-laravel-54-with-spatie-laravel-permission) by [Caleb Oki](http://www.caleboki.com/).
-
-- [How to create a UI for managing the permissions and roles](http://www.qcode.in/easy-roles-and-permissions-in-laravel-5-4/)
-
-- [Laravel User Management for managing users, roles, permissions, departments and authorization](https://github.com/Mekaeil/LaravelUserManagement) by [Mekaeil](https://github.com/Mekaeil)
+See the [DOCUMENTATION](https://docs.spatie.be/laravel-permission/v3/introduction/) for detailed installation and usage instructions.
 
 
 ### Testing
@@ -98,13 +90,6 @@ Special thanks to [Alex Vanderbist](https://github.com/AlexVanderbist) who great
 - [ultraware/roles](https://github.com/ultraware/roles) takes a slightly different approach to its features.
 - [santigarcor/laratrust](https://github.com/santigarcor/laratrust) implements team support
 - [zizaco/entrust](https://github.com/zizaco/entrust) offers some wildcard pattern matching
-
-## Support us
-
-Spatie is a web design agency based in Antwerp, Belgium. You'll find an overview of all our open source projects [on our website](https://spatie.be/opensource).
-
-Does your business depend on our contributions? Reach out and support us on [Patreon](https://www.patreon.com/spatie). 
-All pledges will be dedicated to allocating workforce on maintenance and new awesome stuff.
 
 ## License
 

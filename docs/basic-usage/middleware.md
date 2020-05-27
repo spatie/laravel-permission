@@ -3,6 +3,18 @@ title: Using a middleware
 weight: 7
 ---
 
+## Default Middleware
+
+For checking against a single permission (see Best Practices) using `can`, you can use the built-in Laravel middleware provided by `\Illuminate\Auth\Middleware\Authorize::class` like this:
+
+```php
+Route::group(['middleware' => ['can:publish articles']], function () {
+    //
+});
+```
+
+## Package Middleware
+
 This package comes with `RoleMiddleware`, `PermissionMiddleware` and `RoleOrPermissionMiddleware` middleware. You can add them inside your `app/Http/Kernel.php` file.
 
 ```php
@@ -67,19 +79,5 @@ public function __construct()
 public function __construct()
 {
     $this->middleware(['role_or_permission:super-admin|edit articles']);
-}
-```
-
-### Catching role and permission failures
-If you want to override the default `403` response, you can catch the `UnauthorizedException` using your app's exception handler:
-
-```php
-public function render($request, Exception $exception)
-{
-    if ($exception instanceof \Spatie\Permission\Exceptions\UnauthorizedException) {
-        // Code here ...
-    }
-
-    return parent::render($request, $exception);
 }
 ```

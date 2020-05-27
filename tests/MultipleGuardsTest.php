@@ -33,4 +33,21 @@ class MultipleGuardsTest extends TestCase
             'abc' => ['driver' => 'abc'],
         ]);
     }
+
+    /** @test */
+    public function it_can_honour_guardName_function_on_model_for_overriding_guard_name_property()
+    {
+        $user = Manager::create(['email' => 'manager@test.com']);
+        $user->givePermissionTo(Permission::create([
+            'name' => 'do_that',
+            'guard_name' => 'api',
+        ]));
+
+        // Manager test user has the guardName override method, which returns 'api'
+        $this->assertTrue($user->checkPermissionTo('do_that', 'api'));
+        $this->assertTrue($user->hasPermissionTo('do_that', 'api'));
+
+        // Manager test user has the $guard_name property set to 'web'
+        $this->assertFalse($user->checkPermissionTo('do_that', 'web'));
+    }
 }

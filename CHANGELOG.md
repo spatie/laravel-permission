@@ -2,6 +2,65 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 3.13.0 - 2020-05-19
+- Provide migration error text to stop caching local config when installing packages.
+
+## 3.12.0 - 2020-05-14
+- Add missing config setting for `display_role_in_exception`
+- Ensure artisan `permission:show` command uses configured models
+
+## 3.11.0 - 2020-03-03
+- Allow guardName() as a function with priority over $guard_name property #1395
+
+## 3.10.1 - 2020-03-03
+- Update patch to handle intermittent error in #1370
+
+## 3.10.0 - 2020-03-02
+- Ugly patch to handle intermittent error: `Trying to access array offset on value of type null` in #1370
+
+## 3.9.0 - 2020-02-26
+- Add Wildcard Permissions feature #1381 (see PR or docs for details)
+
+## 3.8.0 - 2020-02-18
+- Clear in-memory permissions on boot, for benefit of long running processes like Swoole. #1378
+
+## 3.7.2 - 2020-02-17
+- Refine test for Lumen dependency. Ref #1371, Fixes #1372.
+
+## 3.7.1 - 2020-02-15
+- Internal refactoring of scopes to use whereIn instead of orWhere #1334, #1335
+- Internal refactoring to flatten collection on splat #1341
+
+## 3.7.0 - 2020-02-15
+- Added methods to check any/all when querying direct permissions #1245
+- Removed older Lumen dependencies #1371
+
+## 3.6.0 - 2020-01-17
+- Added Laravel 7.0 support
+- Allow splat operator for passing roles to `hasAnyRole()`
+
+## 3.5.0 - 2020-01-07
+- Added missing `guardName` to Exception `PermissionDoesNotExist` #1316
+
+## 3.4.1 - 2019-12-28
+- Fix 3.4.0 for Lumen
+
+## 3.4.0 - 2019-12-27
+- Make compatible with Swoole - ie: for long-running Laravel instances
+
+## 3.3.1 - 2019-12-24
+- Expose Artisan commands to app layer, not just to console
+
+## 3.3.0 - 2019-11-22
+- Remove duplicate and unreachable code
+- Remove checks for older Laravel versions
+
+## 3.2.0 - 2019-10-16
+- Implementation of optional guard check for hasRoles and hasAllRoles - See #1236
+
+## 3.1.0 - 2019-10-16
+- Use bigIncrements/bigInteger in migration - See #1224
+
 ## 3.0.0 - 2019-09-02
 - Update dependencies to allow for Laravel 6.0
 - Drop support for Laravel 5.7 and older, and PHP 7.1 and older. (They can use v2 of this package until they upgrade.)

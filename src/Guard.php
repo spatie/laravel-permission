@@ -12,10 +12,14 @@ class Guard
      * @param $model
      * @return Collection
      */
-    public static function getNames($model) : Collection
+    public static function getNames($model): Collection
     {
         if (is_object($model)) {
-            $guardName = $model->guard_name ?? null;
+            if (\method_exists($model, 'guardName')) {
+                $guardName = $model->guardName();
+            } else {
+                $guardName = $model->guard_name ?? null;
+            }
         }
 
         if (! isset($guardName)) {
