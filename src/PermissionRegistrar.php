@@ -87,7 +87,7 @@ class PermissionRegistrar
     {
         app(Gate::class)->before(function (Authorizable $user, string $ability) {
             if (method_exists($user, 'checkPermissionTo')) {
-                return $user->checkPermissionTo($ability) ?: null;
+                return $user->checkPermissionTo($ability, currentAuthGuard()) ?: null;
             }
         });
 
