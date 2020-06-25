@@ -106,6 +106,13 @@ return [
 
     'enable_wildcard_permission' => false,
 
+    /*
+     * By default the guard for permission checks is auto discovered
+     * if enable all permission checks will use the auth guard used for login
+     */
+
+    'enable_dynamic_auth_guard_checks' => false,
+
     'cache' => [
 
         /*

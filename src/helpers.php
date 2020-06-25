@@ -18,3 +18,22 @@ if (! function_exists('getModelForGuard')) {
             })->get($guard);
     }
 }
+
+if (! function_exists('currentAuthGuard')) {
+    /**
+     *
+     * @return string|null
+     */
+    function currentAuthGuard()
+    {
+        if(! config('permission.enable_dynamic_auth_guard_checks')) {
+            return null;
+        }
+
+        foreach (array_keys(config('auth.guards')) as $guard) {
+
+            if (auth()->guard($guard)->check()) return $guard;
+        }
+        return null;
+    }
+}
