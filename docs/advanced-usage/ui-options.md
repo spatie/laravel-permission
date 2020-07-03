@@ -17,4 +17,4 @@ The package doesn't come with any screens out of the box, you should build that 
 
 - [Laravel User Management for managing users, roles, permissions, departments and authorization](https://github.com/Mekaeil/LaravelUserManagement) by [Mekaeil](https://github.com/Mekaeil)
 
-- [Generating UI boilerplate using InfyOm](https://youtu.be/hlGu2pa1bdU) by [Shailesh](https://github.com/shailesh-ladumor)
+- [Generating UI boilerplate using InfyOm](https://youtu.be/hlGu2pa1bdU) video tutorial by [Shailesh](https://github.com/shailesh-ladumor)
