@@ -49,6 +49,9 @@ We highly appreciate you sending us a postcard from your hometown, mentioning wh
 
 See the [DOCUMENTATION](https://docs.spatie.be/laravel-permission/v3/introduction/) for detailed installation and usage instructions.
 
+## Video tutorial
+[<img src="https://img.youtube.com/vi/hlGu2pa1bdU/0.jpg" width="250">](https://youtu.be/hlGu2pa1bdU)
+
 ### Testing
 
 ``` bash
