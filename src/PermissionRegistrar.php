@@ -49,7 +49,7 @@ class PermissionRegistrar
         $this->initializeCache();
     }
 
-    protected function initializeCache()
+    public function initializeCache()
     {
         self::$cacheExpirationTime = config('permission.cache.expiration_time', config('permission.cache_expiration_time'));
 
