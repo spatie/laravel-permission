@@ -106,19 +106,39 @@ class Role extends Model implements RoleContract
     /**
      * Find or create role by its name (and optionally guardName).
      *
-     * @param string $name
-     * @param string|null $guardName
+     * @param string|array $name
+     * @param string|null  $guardName
      *
      * @return \Spatie\Permission\Contracts\Role
      */
-    public static function findOrCreate(string $name, $guardName = null): RoleContract
+    public static function findOrCreate($name, $guardName = null): RoleContract
     {
-        $guardName = $guardName ?? Guard::getDefaultName(static::class);
+        if (!is_string($name) && !is_array($name)) {
+            return null;
+        }
 
-        $role = static::where('name', $name)->where('guard_name', $guardName)->first();
+        $params = is_array($name) ? $name : ['name' => $name, 'guard_name' => $guardName];
+
+        if (!isset($params['name']) || empty($params['name'])) {
+            return null;
+        }
+
+        if (!isset($params['guard_name']) || empty($params['guard_name'])) {
+            $params['guard_name'] = Guard::getDefaultName(static::class);
+        }
+
+        $role = static::where('name', $params['name']);
+
+        foreach ($params as $key => $value) {
+            if ('name' != $key) {
+                $role = $role->where($key, $value);
+            }
+        }
+
+        $role = $role->first();
 
         if (! $role) {
-            return static::query()->create(['name' => $name, 'guard_name' => $guardName]);
+            return static::query()->create($params);
         }
 
         return $role;

@@ -116,18 +116,31 @@ class Permission extends Model implements PermissionContract
     /**
      * Find or create permission by its name (and optionally guardName).
      *
-     * @param string $name
-     * @param string|null $guardName
+     * @param string|array $name
+     * @param string|null  $guardName
      *
      * @return \Spatie\Permission\Contracts\Permission
      */
-    public static function findOrCreate(string $name, $guardName = null): PermissionContract
+    public static function findOrCreate($name, $guardName = null): PermissionContract
     {
-        $guardName = $guardName ?? Guard::getDefaultName(static::class);
-        $permission = static::getPermissions(['name' => $name, 'guard_name' => $guardName])->first();
+        if (!is_string($name) && !is_array($name)) {
+            return null;
+        }
+
+        $params = is_array($name) ? $name : ['name' => $name, 'guard_name' => $guardName];
+
+        if (!isset($params['name']) || empty($params['name'])) {
+            return null;
+        }
+
+        if (!isset($params['guard_name']) || empty($params['guard_name'])) {
+            $params['guard_name'] = Guard::getDefaultName(static::class);
+        }
+
+        $permission = static::getPermissions($params)->first();
 
         if (! $permission) {
-            return static::query()->create(['name' => $name, 'guard_name' => $guardName]);
+            return static::query()->create($params);
         }
 
         return $permission;

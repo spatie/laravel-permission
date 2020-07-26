@@ -15,20 +15,20 @@ php artisan permission:create-role writer
 php artisan permission:create-permission "edit articles"
 ```
 
-When creating permissions/roles for specific guards you can specify the guard names as a second argument:
+When creating permissions/roles for specific guards you can specify the guard names using the "--guard" option:
 
 ```bash
-php artisan permission:create-role writer web
+php artisan permission:create-role writer --guard=web
 ```
 
 ```bash
-php artisan permission:create-permission "edit articles" web
+php artisan permission:create-permission "edit articles" --guard="another guard name"
 ```
 
-When creating roles you can also create and link permissions at the same time:
+When creating roles you can also create and link permissions at the same time (using the "--permissions" option):
 
 ```bash
-php artisan permission:create-role writer web "create articles|edit articles"
+php artisan permission:create-role writer --guard=web --permissions="create articles|edit articles"
 ```
 
 ## Displaying roles and permissions in the console
