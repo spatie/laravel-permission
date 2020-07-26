@@ -3,9 +3,9 @@
 namespace Spatie\Permission\Traits;
 
 use Illuminate\Support\Str;
-use Spatie\Permission\Contracts\Role as RoleContract;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputArgument;
+use Spatie\Permission\Contracts\Role as RoleContract;
 
 trait AdaptiveCommandParams
 {
@@ -39,24 +39,24 @@ trait AdaptiveCommandParams
      */
     protected function registerCustomColumns($model)
     {
-        $table     = $model->getTable();
-        $columns   = $model->getConnection()->getDoctrineSchemaManager()->listTableColumns($table);
+        $table = $model->getTable();
+        $columns = $model->getConnection()->getDoctrineSchemaManager()->listTableColumns($table);
         $modelType = ($model instanceof RoleContract) ? 'role' : 'permission';
 
         foreach ($columns as $column) {
             // We will look for columns that are fillable and
             // are not the inherent columns of the package
 
-            $columnName      = $column->getName();
+            $columnName = $column->getName();
             $isAutoIncrement = $column->getAutoincrement();
 
-            if (!in_array($columnName, $this->builtInFields) && $model->isFillable($columnName) && !$isAutoIncrement) {
+            if (! in_array($columnName, $this->builtInFields) && $model->isFillable($columnName) && ! $isAutoIncrement) {
                 $isNotNullable = $column->getNotnull();
-                $defaultValue  = $column->getDefault();
-                $columnLength  = $column->getLength();
-                $columnType    = $column->getType();
-                $suffixTitle   = ('boolean' == Str::slug($columnType) && Str::startsWith($columnName, 'is')) ? 'status' : null;
-                $columnTitle   = is_null($suffixTitle) ? str_replace(['-', '_'], ' ', $columnName) : ($columnName . ' ' . $suffixTitle);
+                $defaultValue = $column->getDefault();
+                $columnLength = $column->getLength();
+                $columnType = $column->getType();
+                $suffixTitle = ('boolean' == Str::slug($columnType) && Str::startsWith($columnName, 'is')) ? 'status' : null;
+                $columnTitle = is_null($suffixTitle) ? str_replace(['-', '_'], ' ', $columnName) : ($columnName.' '.$suffixTitle);
 
                 if ($isNotNullable && is_null($defaultValue)) {
                     // This is the case that the column needs to fill in the value.
@@ -65,7 +65,7 @@ trait AdaptiveCommandParams
                     $this->requiredExtraFields[] = [
                         $columnName,
                         InputArgument::REQUIRED,
-                        'The ' . Str::lower($columnTitle) . ' of the ' . $modelType,
+                        'The '.Str::lower($columnTitle).' of the '.$modelType,
                     ];
                 } else {
                     // This is the case that the column does not require or has a default value.
@@ -75,7 +75,7 @@ trait AdaptiveCommandParams
                         $columnName,
                         null,
                         InputOption::VALUE_OPTIONAL,
-                        'The ' . Str::lower($columnTitle) . ' of the ' . $modelType,
+                        'The '.Str::lower($columnTitle).' of the '.$modelType,
                         $defaultValue,
                     ];
                 }
@@ -93,14 +93,14 @@ trait AdaptiveCommandParams
         $params = [];
 
         foreach ($this->getArguments() as $argument) {
-            $key   = $argument[0];
+            $key = $argument[0];
             $value = $this->argument($key);
 
             $params[$key] = $value;
         }
 
         foreach ($this->getOptions() as $option) {
-            $key   = $option[0];
+            $key = $option[0];
             $value = $this->option($key);
 
             if ('guard' == $key) {
