@@ -2,14 +2,14 @@
 
 namespace Spatie\Permission\Commands;
 
-use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
-use Spatie\Permission\Contracts\Permission as PermissionContract;
-use Spatie\Permission\Contracts\Role as RoleContract;
 use Spatie\Permission\Guard;
-use Spatie\Permission\Traits\AdaptiveCommandParams;
-use Symfony\Component\Console\Input\InputArgument;
+use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputArgument;
+use Spatie\Permission\Traits\AdaptiveCommandParams;
+use Spatie\Permission\Contracts\Role as RoleContract;
+use Spatie\Permission\Contracts\Permission as PermissionContract;
 
 class CreateRole extends Command
 {
@@ -56,7 +56,7 @@ class CreateRole extends Command
     public function handle()
     {
         $input = $this->getInputParams();
-        $role  = $this->roleApp::findOrCreate(Arr::except($input, ['permissions']));
+        $role = $this->roleApp::findOrCreate(Arr::except($input, ['permissions']));
 
         $role->givePermissionTo($this->makePermissions($this->option('permissions')));
 
@@ -77,8 +77,8 @@ class CreateRole extends Command
         }
 
         $permissionApp = app(PermissionContract::class);
-        $permissions   = array_map('trim', explode('|', $string));
-        $models        = [];
+        $permissions = array_map('trim', explode('|', $string));
+        $models = [];
 
         foreach ($permissions as $permission) {
             if (false === strpos($permission, ',')) {
@@ -93,13 +93,13 @@ class CreateRole extends Command
                 // This is the case where the user enters additional column information for permission
                 // We need to analyze to get the column names and values
 
-                $params     = [];
+                $params = [];
                 $splitParts = array_map('trim', explode(',', $permission));
 
                 foreach ($splitParts as $permissionParams) {
                     $keyValuePair = array_map('trim', explode(':', $permissionParams));
-                    $column       = $keyValuePair[0];
-                    $value        = (isset($keyValuePair[1]) && $keyValuePair[1]) ? $keyValuePair[1] : null;
+                    $column = $keyValuePair[0];
+                    $value = (isset($keyValuePair[1]) && $keyValuePair[1]) ? $keyValuePair[1] : null;
 
                     if ($column) {
                         $params[$column] = $value;

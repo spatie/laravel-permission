@@ -113,17 +113,17 @@ class Role extends Model implements RoleContract
      */
     public static function findOrCreate($name, $guardName = null): RoleContract
     {
-        if (!is_string($name) && !is_array($name)) {
+        if (! is_string($name) && ! is_array($name)) {
             return null;
         }
 
         $params = is_array($name) ? $name : ['name' => $name, 'guard_name' => $guardName];
 
-        if (!isset($params['name']) || empty($params['name'])) {
+        if (! isset($params['name']) || empty($params['name'])) {
             return null;
         }
 
-        if (!isset($params['guard_name']) || empty($params['guard_name'])) {
+        if (! isset($params['guard_name']) || empty($params['guard_name'])) {
             $params['guard_name'] = Guard::getDefaultName(static::class);
         }
 
