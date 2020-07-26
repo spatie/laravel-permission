@@ -56,7 +56,7 @@ class CommandTest extends TestCase
     {
         Artisan::call('permission:create-role', [
             'name' => 'new-role',
-            'permissions' => 'first permission | second permission',
+            '--permissions' => 'first permission | second permission',
         ]);
 
         $role = Role::where('name', 'new-role')->first();
