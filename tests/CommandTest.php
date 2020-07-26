@@ -22,7 +22,7 @@ class CommandTest extends TestCase
     {
         Artisan::call('permission:create-role', [
             'name' => 'new-role',
-            'guard' => 'api',
+            '--guard' => 'api',
         ]);
 
         $this->assertCount(1, Role::where('name', 'new-role')
@@ -43,7 +43,7 @@ class CommandTest extends TestCase
     {
         Artisan::call('permission:create-permission', [
             'name' => 'new-permission',
-            'guard' => 'api',
+            '--guard' => 'api',
         ]);
 
         $this->assertCount(1, Permission::where('name', 'new-permission')
