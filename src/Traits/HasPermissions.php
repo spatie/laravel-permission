@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Traits;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Permission\Guard;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
@@ -9,7 +10,6 @@ use Spatie\Permission\WildcardPermission;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Exceptions\WildcardPermissionInvalidArgument;
 
@@ -40,7 +40,7 @@ trait HasPermissions
     /**
      * A model may have multiple direct permissions.
      */
-    public function permissions(): MorphToMany
+    public function permissions(): BelongsToMany
     {
         return $this->morphToMany(
             config('permission.models.permission'),
