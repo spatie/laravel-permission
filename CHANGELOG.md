@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 3.15.0 - 2020-08-15
+- Change `users` relationship type to BelongsToMany
+
 ## 3.14.0 - 2020-08-15
 - Declare table relations earlier to improve guarded/fillable detection accuracy (relates to Aug 2020 Laravel security patch)
 
