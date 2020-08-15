@@ -2,7 +2,6 @@
 
 namespace Spatie\Permission\Traits;
 
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Permission\Guard;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
@@ -11,6 +10,7 @@ use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Permission\Exceptions\WildcardPermissionInvalidArgument;
 
 trait HasPermissions
