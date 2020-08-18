@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 3.16.0 - 2020-08-18
+- Added Laravel 8 support
+
 ## 3.15.0 - 2020-08-15
 - Change `users` relationship type to BelongsToMany
 
