@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Role;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\Permission\PermissionRegistrar;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 trait HasRoles
 {
@@ -37,7 +37,7 @@ trait HasRoles
     /**
      * A model may have multiple roles.
      */
-    public function roles(): MorphToMany
+    public function roles(): BelongsToMany
     {
         return $this->morphToMany(
             config('permission.models.role'),

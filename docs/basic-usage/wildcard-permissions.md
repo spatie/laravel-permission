@@ -25,11 +25,15 @@ The meaning of each part of the string depends on the application layer.
 > You can use as many parts as you like. So you are not limited to the three-tiered structure, even though 
 this is the common use-case, representing {resource}.{action}.{target}.
 
-> NOTE: You must actually create the permissions (eg: `posts.create.1`) before you can assign them, and must also create any wildcard permission patterns (eg: `posts.create.*`) before you can check for them.
+> NOTE: You must actually create the permissions (eg: `posts.create.1`) before you can assign them or check for them.
+
+> NOTE: You must create any wildcard permission patterns (eg: `posts.create.*`) before you can assign them or check for them.
 
 ### Using Wildcards
 
-Each part can also contain wildcards (*). So let's say we assign the following permission to a user:
+> ALERT: The `*` means "ALL". It does **not** mean "ANY".
+
+Each part can also contain wildcards (`*`). So let's say we assign the following permission to a user:
 
 ```php
 Permission::create(['name'=>'posts.*']);
@@ -48,6 +52,13 @@ $user->can('posts.create');
 $user->can('posts.edit');
 $user->can('posts.delete');
 ``` 
+
+### Meaning of the `*` Asterisk
+
+The `*` means "ALL". It does **not** mean "ANY".
+
+Thus `can('post.*')` will only pass if the user has been assigned `post.*` explicitly.
+
 
 ### Subparts
 
