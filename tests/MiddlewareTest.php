@@ -376,6 +376,19 @@ class MiddlewareTest extends TestCase
     }
 
     /** @test */
+    public function user_can_access_role_with_guard_admin_while_using_default_guard()
+    {
+        Auth::guard('admin')->login($this->testAdmin);
+
+        $this->testAdmin->assignRole('testAdminRole');
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->roleMiddleware, 'testAdminRole', 'admin'
+            ), 200);
+    }
+
+    /** @test */
     public function user_can_not_access_permission_with_guard_admin_while_using_default_guard()
     {
         Auth::login($this->testUser);
@@ -386,6 +399,19 @@ class MiddlewareTest extends TestCase
             $this->runMiddleware(
                 $this->permissionMiddleware, 'edit-articles', 'admin'
             ), 403);
+    }
+
+    /** @test */
+    public function user_can_access_permission_with_guard_admin_while_using_default_guard()
+    {
+        Auth::guard('admin')->login($this->testAdmin);
+
+        $this->testAdmin->givePermissionTo('admin-permission');
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->permissionMiddleware, 'admin-permission', 'admin'
+            ), 200);
     }
 
     /** @test */
@@ -400,6 +426,20 @@ class MiddlewareTest extends TestCase
             $this->runMiddleware(
                 $this->roleOrPermissionMiddleware, 'edit-articles|testRole', 'admin'
             ), 403);
+    }
+
+    /** @test */
+    public function user_can_access_permission_or_role_with_guard_admin_while_using_default_guard()
+    {
+        Auth::guard('admin')->login($this->testAdmin);
+
+        $this->testAdmin->assignRole('testAdminRole');
+        $this->testAdmin->givePermissionTo('admin-permission');
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->roleOrPermissionMiddleware, 'admin-permission|testAdminRole', 'admin'
+            ), 200);
     }
 
     protected function runMiddleware($middleware, $parameter, $guard = null)
