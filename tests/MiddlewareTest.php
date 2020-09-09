@@ -5,6 +5,7 @@ namespace Spatie\Permission\Test;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use InvalidArgumentException;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Middlewares\RoleMiddleware;
 use Spatie\Permission\Exceptions\UnauthorizedException;
@@ -322,11 +323,11 @@ class MiddlewareTest extends TestCase
             $this->roleOrPermissionMiddleware->handle(new Request(), function () {
                 return (new Response())->setContent('<html></html>');
             }, 'testRole', 'xxx');
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $class = get_class($e);
         }
 
-        $this->assertEquals(\InvalidArgumentException::class, $class);
+        $this->assertEquals(InvalidArgumentException::class, $class);
     }
 
     /** @test */
@@ -338,11 +339,11 @@ class MiddlewareTest extends TestCase
             $this->permissionMiddleware->handle(new Request(), function () {
                 return (new Response())->setContent('<html></html>');
             }, 'edit-articles', 'xxx');
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $class = get_class($e);
         }
 
-        $this->assertEquals(\InvalidArgumentException::class, $class);
+        $this->assertEquals(InvalidArgumentException::class, $class);
     }
 
     /** @test */
@@ -354,11 +355,11 @@ class MiddlewareTest extends TestCase
             $this->roleMiddleware->handle(new Request(), function () {
                 return (new Response())->setContent('<html></html>');
             }, 'testRole', 'xxx');
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $class = get_class($e);
         }
 
-        $this->assertEquals(\InvalidArgumentException::class, $class);
+        $this->assertEquals(InvalidArgumentException::class, $class);
     }
 
     protected function runMiddleware($middleware, $parameter)
