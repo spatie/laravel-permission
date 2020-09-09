@@ -5,6 +5,7 @@ namespace Spatie\Permission\Test;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use InvalidArgumentException;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Middlewares\RoleMiddleware;
 use Spatie\Permission\Exceptions\UnauthorizedException;
@@ -313,12 +314,45 @@ class MiddlewareTest extends TestCase
         $this->assertEquals(['some-permission'], $requiredPermissions);
     }
 
-    protected function runMiddleware($middleware, $parameter)
+    /** @test */
+    public function use_not_existing_custom_guard_in_role_or_permission()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectErrorMessage('Auth guard [xxx] is not defined.');
+
+        $this->runMiddleware(
+            $this->roleOrPermissionMiddleware, 'testRole', 'xxx'
+        );
+    }
+
+    /** @test */
+    public function use_not_existing_custom_guard_in_permission()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectErrorMessage('Auth guard [xxx] is not defined.');
+
+        $this->runMiddleware(
+            $this->permissionMiddleware, 'edit-articles', 'xxx'
+        );
+    }
+
+    /** @test */
+    public function use_not_existing_custom_guard_in_role()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectErrorMessage('Auth guard [xxx] is not defined.');
+
+        $this->runMiddleware(
+            $this->roleMiddleware, 'testRole', 'xxx'
+        );
+    }
+
+    protected function runMiddleware($middleware, $parameter, $guard = null)
     {
         try {
             return $middleware->handle(new Request(), function () {
                 return (new Response())->setContent('<html></html>');
-            }, $parameter)->status();
+            }, $parameter, $guard)->status();
         } catch (UnauthorizedException $e) {
             return $e->getStatusCode();
         }
