@@ -15,6 +15,11 @@
 [![StyleCI](https://styleci.io/repos/42480275/shield)](https://styleci.io/repos/42480275)
 [![Total Downloads](https://img.shields.io/packagist/dt/spatie/laravel-permission.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-permission)
 
+## Documentation, Installation, and Usage Instructions
+
+See the [DOCUMENTATION](https://docs.spatie.be/laravel-permission/v3/introduction/) for detailed installation and usage instructions.
+
+## What It Does
 This package allows you to manage user permissions and roles in a database.
 
 Once installed you can do stuff like this:
@@ -44,10 +49,6 @@ Learn how to create a package like this one, by watching our premium video cours
 We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
 
 We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
-
-## Documentation, Installation, and Usage Instructions
-
-See the [DOCUMENTATION](https://docs.spatie.be/laravel-permission/v3/introduction/) for detailed installation and usage instructions.
 
 ### Testing
 
