@@ -4,8 +4,8 @@ namespace Spatie\Permission\Test;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 use InvalidArgumentException;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Middlewares\RoleMiddleware;
 use Spatie\Permission\Exceptions\UnauthorizedException;
