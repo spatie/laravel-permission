@@ -388,6 +388,20 @@ class MiddlewareTest extends TestCase
             ), 403);
     }
 
+    /** @test */
+    public function user_can_not_access_permission_or_role_with_guard_admin_while_using_default_guard()
+    {
+        Auth::login($this->testUser);
+
+        $this->testUser->assignRole('testRole');
+        $this->testUser->givePermissionTo('edit-articles');
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->roleOrPermissionMiddleware, 'edit-articles|testRole', 'admin'
+            ), 403);
+    }
+
     protected function runMiddleware($middleware, $parameter, $guard = null)
     {
         try {
