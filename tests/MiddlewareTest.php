@@ -362,12 +362,25 @@ class MiddlewareTest extends TestCase
         $this->assertEquals(InvalidArgumentException::class, $class);
     }
 
-    protected function runMiddleware($middleware, $parameter)
+    /** @test */
+    public function user_can_not_access_role_with_guard_admin_while_using_default_guard()
+    {
+        Auth::login($this->testUser);
+
+        $this->testUser->assignRole('testRole');
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->roleMiddleware, 'testRole', 'admin'
+            ), 403);
+    }
+
+    protected function runMiddleware($middleware, $parameter, $guard = null)
     {
         try {
             return $middleware->handle(new Request(), function () {
                 return (new Response())->setContent('<html></html>');
-            }, $parameter)->status();
+            }, $parameter, $guard)->status();
         } catch (UnauthorizedException $e) {
             return $e->getStatusCode();
         }
