@@ -60,3 +60,6 @@ To prevent other applications from accidentally using/changing your cached data,
 Most multi-tenant "packages" take care of this for you when switching tenants.
 
 
+### Bypassing Cache During Development
+
+In development mode you can bypass ALL of Laravel's caching between visits by setting `CACHE_DRIVER=array` in `.env`. You can see an example of this in the default `phpunit.xml` file that comes with a new Laravel install. Of course, don't do this in production though!
