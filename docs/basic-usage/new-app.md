@@ -9,7 +9,7 @@ If you want to just try out the features of this package you can get started wit
 
 The examples on this page are primarily added for assistance in creating a quick demo app for troubleshooting purposes, to post the repo on github for convenient sharing to collaborate or get support.
 
-If you're new to Laravel or to any of the concepts mentioned here, you can learn more in the [Laravel documentation](https://laravel.com/docs/) and in the free videos at Laracasts such as this series: https://laracasts.com/series/laravel-6-from-scratch/
+If you're new to Laravel or to any of the concepts mentioned here, you can learn more in the [Laravel documentation](https://laravel.com/docs/) and in the free videos at Laracasts such as in the [Laravel 6 from scratch series](https://laracasts.com/series/laravel-6-from-scratch/).
 
 ### Initial setup:
 
@@ -36,6 +36,7 @@ php artisan migrate:fresh
 
 # Add `HasRoles` trait to User model
 sed -i '' $'s/use Notifiable;/use Notifiable;\\\n    use \\\\Spatie\\\\Permission\\\\Traits\\\\HasRoles;/' app/User.php
+sed -i '' $'s/use HasFactory, Notifiable;/use HasFactory, Notifiable;\\\n    use \\\\Spatie\\\\Permission\\\\Traits\\\\HasRoles;/' app/Models/User.php
 git add . && git commit -m "Add HasRoles trait"
 
 # Add Laravel's basic auth scaffolding
@@ -46,7 +47,7 @@ git add . && git commit -m "Setup auth scaffold"
 ```
 
 ### Add some basic permissions
-- Add a new file, `/database/seeds/PermissionsDemoSeeder.php` such as the following (You could create it with `php artisan make:seed` and then edit the file accordingly):
+- Add a new file, `/database/seeders/PermissionsDemoSeeder.php` such as the following (You could create it with `php artisan make:seed` and then edit the file accordingly):
 
 ```php
 <?php

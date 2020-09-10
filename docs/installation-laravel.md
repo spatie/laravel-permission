@@ -30,11 +30,17 @@ This package can be used with Laravel 5.8 or higher.
 
 6. NOTE: If you are using UUIDs, see the Advanced section of the docs on UUID steps, before you continue. It explains some changes you may want to make to the migrations and config file before continuing. It also mentions important considerations after extending this package's models for UUID capability.
 
-7. Run the migrations: After the config and migration have been published and configured, you can create the tables for this package by running:
+7. Clear your config cache. This package requires access to the `permission` config. Generally it's bad practice to do config-caching in a development environment. If you've been caching configurations locally, clear your config cache with either of these commands:
+
+        php artisan optimize:clear
+        # or
+        php artisan config:clear
+
+8. Run the migrations: After the config and migration have been published and configured, you can create the tables for this package by running:
 
         php artisan migrate
 
-8. Add the necessary trait to your User model: Consult the Basic Usage section of the docs for how to get started using the features of this package.
+9. Add the necessary trait to your User model: Consult the Basic Usage section of the docs for how to get started using the features of this package.
 
 
 ### Default config file contents
