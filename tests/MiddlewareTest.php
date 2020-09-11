@@ -4,6 +4,7 @@ namespace Spatie\Permission\Test;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use InvalidArgumentException;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Middlewares\RoleMiddleware;
@@ -313,12 +314,140 @@ class MiddlewareTest extends TestCase
         $this->assertEquals(['some-permission'], $requiredPermissions);
     }
 
-    protected function runMiddleware($middleware, $parameter)
+    /** @test */
+    public function use_not_existing_custom_guard_in_role_or_permission()
+    {
+        $class = null;
+
+        try {
+            $this->roleOrPermissionMiddleware->handle(new Request(), function () {
+                return (new Response())->setContent('<html></html>');
+            }, 'testRole', 'xxx');
+        } catch (InvalidArgumentException $e) {
+            $class = get_class($e);
+        }
+
+        $this->assertEquals(InvalidArgumentException::class, $class);
+    }
+
+    /** @test */
+    public function use_not_existing_custom_guard_in_permission()
+    {
+        $class = null;
+
+        try {
+            $this->permissionMiddleware->handle(new Request(), function () {
+                return (new Response())->setContent('<html></html>');
+            }, 'edit-articles', 'xxx');
+        } catch (InvalidArgumentException $e) {
+            $class = get_class($e);
+        }
+
+        $this->assertEquals(InvalidArgumentException::class, $class);
+    }
+
+    /** @test */
+    public function use_not_existing_custom_guard_in_role()
+    {
+        $class = null;
+
+        try {
+            $this->roleMiddleware->handle(new Request(), function () {
+                return (new Response())->setContent('<html></html>');
+            }, 'testRole', 'xxx');
+        } catch (InvalidArgumentException $e) {
+            $class = get_class($e);
+        }
+
+        $this->assertEquals(InvalidArgumentException::class, $class);
+    }
+
+    /** @test */
+    public function user_can_not_access_role_with_guard_admin_while_using_default_guard()
+    {
+        Auth::login($this->testUser);
+
+        $this->testUser->assignRole('testRole');
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->roleMiddleware, 'testRole', 'admin'
+            ), 403);
+    }
+
+    /** @test */
+    public function user_can_access_role_with_guard_admin_while_using_default_guard()
+    {
+        Auth::guard('admin')->login($this->testAdmin);
+
+        $this->testAdmin->assignRole('testAdminRole');
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->roleMiddleware, 'testAdminRole', 'admin'
+            ), 200);
+    }
+
+    /** @test */
+    public function user_can_not_access_permission_with_guard_admin_while_using_default_guard()
+    {
+        Auth::login($this->testUser);
+
+        $this->testUser->givePermissionTo('edit-articles');
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->permissionMiddleware, 'edit-articles', 'admin'
+            ), 403);
+    }
+
+    /** @test */
+    public function user_can_access_permission_with_guard_admin_while_using_default_guard()
+    {
+        Auth::guard('admin')->login($this->testAdmin);
+
+        $this->testAdmin->givePermissionTo('admin-permission');
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->permissionMiddleware, 'admin-permission', 'admin'
+            ), 200);
+    }
+
+    /** @test */
+    public function user_can_not_access_permission_or_role_with_guard_admin_while_using_default_guard()
+    {
+        Auth::login($this->testUser);
+
+        $this->testUser->assignRole('testRole');
+        $this->testUser->givePermissionTo('edit-articles');
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->roleOrPermissionMiddleware, 'edit-articles|testRole', 'admin'
+            ), 403);
+    }
+
+    /** @test */
+    public function user_can_access_permission_or_role_with_guard_admin_while_using_default_guard()
+    {
+        Auth::guard('admin')->login($this->testAdmin);
+
+        $this->testAdmin->assignRole('testAdminRole');
+        $this->testAdmin->givePermissionTo('admin-permission');
+
+        $this->assertEquals(
+            $this->runMiddleware(
+                $this->roleOrPermissionMiddleware, 'admin-permission|testAdminRole', 'admin'
+            ), 200);
+    }
+
+    protected function runMiddleware($middleware, $parameter, $guard = null)
     {
         try {
             return $middleware->handle(new Request(), function () {
                 return (new Response())->setContent('<html></html>');
-            }, $parameter)->status();
+            }, $parameter, $guard)->status();
         } catch (UnauthorizedException $e) {
             return $e->getStatusCode();
         }
