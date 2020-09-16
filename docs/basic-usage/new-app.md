@@ -24,7 +24,7 @@ git commit -m "Fresh Laravel Install"
 # Environment
 cp -n .env.example .env
 sed -i '' 's/DB_CONNECTION=mysql/DB_CONNECTION=sqlite/' .env
-sed -i '' 's/DB_DATABASE=laravel/#DB_DATABASE=laravel/' .env
+sed -i '' 's/DB_DATABASE=/#DB_DATABASE=/' .env
 touch database/database.sqlite
 
 # Package
@@ -51,6 +51,8 @@ git add . && git commit -m "Setup auth scaffold"
 
 ```php
 <?php
+
+namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
@@ -88,19 +90,19 @@ class PermissionsDemoSeeder extends Seeder
         // gets all permissions via Gate::before rule; see AuthServiceProvider
 
         // create demo users
-        $user = Factory(App\User::class)->create([
+        $user = \App\Models\User::factory()->create([
             'name' => 'Example User',
             'email' => 'test@example.com',
         ]);
         $user->assignRole($role1);
 
-        $user = Factory(App\User::class)->create([
+        $user = \App\Models\User::factory()->create([
             'name' => 'Example Admin User',
             'email' => 'admin@example.com',
         ]);
         $user->assignRole($role2);
 
-        $user = Factory(App\User::class)->create([
+        $user = \App\Models\User::factory()->create([
             'name' => 'Example Super-Admin User',
             'email' => 'superadmin@example.com',
         ]);
