@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Permission\Guard;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Traits\HasPermissions;
@@ -16,6 +17,7 @@ class Role extends Model implements RoleContract
 {
     use HasPermissions;
     use RefreshesPermissionCache;
+    use HasFactory;
 
     protected $guarded = ['id'];
 
