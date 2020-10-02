@@ -115,7 +115,6 @@ class PermissionsDemoSeeder extends Seeder
 - re-migrate and seed the database:
 
 ```sh
-composer dump-autoload
 php artisan migrate:fresh --seed --seeder=PermissionsDemoSeeder
 ```
 
