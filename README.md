@@ -41,9 +41,7 @@ $user->can('edit articles');
 
 ## Support us
 
-Learn how to create a package like this one, by watching our premium video course:
-
-[![Laravel Package training](https://spatie.be/github/package-training.jpg)](https://laravelpackage.training)
+[![Image](https://github-ads.s3.eu-central-1.amazonaws.com/laravel-permission.jpg)](https://spatie.be/github-ad-click/laravel-permission)
 
 We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
 
