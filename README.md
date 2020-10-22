@@ -1,3 +1,5 @@
+<p align="center"><img src="/art/socialcard.png" alt="Social Card of Laravel Permission"></p>
+
 # Associate users with permissions and roles
 
 ### Sponsor
@@ -83,6 +85,8 @@ on [permissions and roles](https://laracasts.com/series/whats-new-in-laravel-5-1
 can be found [in this repo on GitHub](https://github.com/laracasts/laravel-5-roles-and-permissions-demo).
 
 Special thanks to [Alex Vanderbist](https://github.com/AlexVanderbist) who greatly helped with `v2`, and to [Chris Brown](https://github.com/drbyte) for his longtime support  helping us maintain the package.
+
+And a special thanks to [Caneco](https://twitter.com/caneco) for the logo ✨
 
 ## Alternatives
 
