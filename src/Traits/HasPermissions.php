@@ -149,8 +149,8 @@ trait HasPermissions
      */
     protected function hasWildcardPermission($permission, $guardName = null): bool
     {
-        $guardName = $guardName ?? $this->getDefaultGuardName();
-
+        // $guardName = $guardName ?? $this->getDefaultGuardName();
+        $guardName = null;
         if (is_int($permission)) {
             $permission = $this->getPermissionClass()->findById($permission, $guardName);
         }
@@ -197,6 +197,7 @@ trait HasPermissions
      */
     public function checkPermissionTo($permission, $guardName = null): bool
     {
+        $guardName = null;
         try {
             return $this->hasPermissionTo($permission, $guardName);
         } catch (PermissionDoesNotExist $e) {
