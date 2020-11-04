@@ -50,6 +50,6 @@ class Guard
     {
         $default = config('auth.defaults.guard');
 
-        return static::getNames($class)->first() ?: $default;
+        return $default ?? static::getNames($class)->first();
     }
 }
