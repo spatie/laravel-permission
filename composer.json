@@ -22,7 +22,7 @@
         }
     ],
     "require": {
-        "php" : "^7.2.5",
+        "php" : "^7.2.5|^8.0",
         "illuminate/auth": "^5.8|^6.0|^7.0|^8.0",
         "illuminate/container": "^5.8|^6.0|^7.0|^8.0",
         "illuminate/contracts": "^5.8|^6.0|^7.0|^8.0",
