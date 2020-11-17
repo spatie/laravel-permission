@@ -4,12 +4,14 @@ namespace Spatie\Permission\Middlewares;
 
 use Closure;
 use Spatie\Permission\Exceptions\UnauthorizedException;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 
 class PermissionMiddleware
 {
     public function handle($request, Closure $next, $permission, $guard = null)
     {
-        if (app('auth')->guard($guard)->guest()) {
+        if (Auth::guard($guard)->guest()) {
             throw UnauthorizedException::notLoggedIn();
         }
 
@@ -17,12 +19,14 @@ class PermissionMiddleware
             ? $permission
             : explode('|', $permission);
 
-        foreach ($permissions as $permission) {
-            if (app('auth')->guard($guard)->user()->can($permission)) {
-                return $next($request);
-            }
-        }
+        $driverDatabase = Config::get('database.default', 'mysql');
+        Config::set('database.default', Config::get('permission.spatie_database_driver'));
 
-        throw UnauthorizedException::forPermissions($permissions);
+        if ( !Auth::guard($guard)->user()->hasAnyPermission($permissions)) {
+            throw UnauthorizedException::forPermissions($permissions);
+        }
+        Config::set('database.default', $driverDatabase);
+
+        return $next($request);
     }
 }

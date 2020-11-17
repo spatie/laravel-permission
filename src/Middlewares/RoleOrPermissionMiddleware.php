@@ -4,6 +4,7 @@ namespace Spatie\Permission\Middlewares;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 
 class RoleOrPermissionMiddleware
@@ -13,15 +14,19 @@ class RoleOrPermissionMiddleware
         if (Auth::guard($guard)->guest()) {
             throw UnauthorizedException::notLoggedIn();
         }
-
         $rolesOrPermissions = is_array($roleOrPermission)
             ? $roleOrPermission
             : explode('|', $roleOrPermission);
 
-        if (! Auth::guard($guard)->user()->hasAnyRole($rolesOrPermissions) && ! Auth::guard($guard)->user()->hasAnyPermission($rolesOrPermissions)) {
+        $driverDatabase = Config::get('database.default');
+        Config::set('database.default', Config::get('permission.spatie_database_driver'));
+
+        if ( !Auth::guard($guard)->user()->hasAnyRole($rolesOrPermissions) && !Auth::guard($guard)->user()->hasAnyPermission($rolesOrPermissions)) {
             throw UnauthorizedException::forRolesOrPermissions($rolesOrPermissions);
         }
+        Config::set('database.default', $driverDatabase);
 
         return $next($request);
     }
 }
+
