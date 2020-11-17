@@ -18,7 +18,7 @@ class RoleOrPermissionMiddleware
             ? $roleOrPermission
             : explode('|', $roleOrPermission);
 
-        $driverDatabase = Config::get('database.default');
+        $driverDatabase = Config::get('database.default', 'mysql');
         Config::set('database.default', Config::get('permission.spatie_database_driver'));
 
         if ( !Auth::guard($guard)->user()->hasAnyRole($rolesOrPermissions) && !Auth::guard($guard)->user()->hasAnyPermission($rolesOrPermissions)) {
