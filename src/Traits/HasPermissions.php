@@ -102,6 +102,11 @@ trait HasPermissions
     }
 
     /**
+     * Overdide de la fonction parent pour avoir un guard name * au lieu de web car non comptabile avec
+     * le package LDAP
+     * Plus d'information : https://github.com/spatie/laravel-permission/issues/1156
+     */
+    /**
      * Determine if the model may perform the given permission.
      *
      * @param string|int|\Spatie\Permission\Contracts\Permission $permission
@@ -110,8 +115,13 @@ trait HasPermissions
      * @return bool
      * @throws PermissionDoesNotExist
      */
-    public function hasPermissionTo($permission, $guardName = null): bool
+    public function hasPermissionTo($permission, $guardName = '*'): bool
     {
+        // Since this method comes from a trait,
+        // you cannot simply `parent::hasPermissionTo($permission, '*')`.
+        // You'll have to copy the entire body of the method into yours.
+        // Just replace '*' with the "guard" name from above.
+
         if (config('permission.enable_wildcard_permission', false)) {
             return $this->hasWildcardPermission($permission, $guardName);
         }
@@ -447,7 +457,7 @@ trait HasPermissions
 
     protected function getDefaultGuardName(): string
     {
-        return Guard::getDefaultName($this);
+        return '*';
     }
 
     /**
