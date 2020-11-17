@@ -1,5 +1,5 @@
 {
-    "name": "gestaworld/laravel-permission",
+    "name": "gestadis/laravel-permission",
     "description": "Permission handling for Laravel 6.0 and up",
     "keywords": [
         "spatie",
