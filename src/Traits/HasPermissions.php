@@ -117,11 +117,6 @@ trait HasPermissions
      */
     public function hasPermissionTo($permission, $guardName = '*'): bool
     {
-        // Since this method comes from a trait,
-        // you cannot simply `parent::hasPermissionTo($permission, '*')`.
-        // You'll have to copy the entire body of the method into yours.
-        // Just replace '*' with the "guard" name from above.
-
         if (config('permission.enable_wildcard_permission', false)) {
             return $this->hasWildcardPermission($permission, $guardName);
         }
