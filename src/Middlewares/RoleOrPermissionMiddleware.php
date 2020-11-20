@@ -3,14 +3,15 @@
 namespace Spatie\Permission\Middlewares;
 
 use Closure;
-use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 
 class RoleOrPermissionMiddleware
 {
-    public function handle($request, Closure $next, $roleOrPermission, $guard = null)
+    public function handle($request, Closure $next, $roleOrPermission)
     {
-        if (Auth::guard($guard)->guest()) {
+        $user = $request->user();
+
+        if (!$user) {
             throw UnauthorizedException::notLoggedIn();
         }
 
@@ -18,7 +19,7 @@ class RoleOrPermissionMiddleware
             ? $roleOrPermission
             : explode('|', $roleOrPermission);
 
-        if (! Auth::guard($guard)->user()->hasAnyRole($rolesOrPermissions) && ! Auth::guard($guard)->user()->hasAnyPermission($rolesOrPermissions)) {
+        if (! $user->hasAnyRole($rolesOrPermissions) && ! $user->hasAnyPermission($rolesOrPermissions)) {
             throw UnauthorizedException::forRolesOrPermissions($rolesOrPermissions);
         }
 
