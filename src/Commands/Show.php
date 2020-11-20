@@ -4,8 +4,8 @@ namespace Spatie\Permission\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Contracts\Permission as PermissionContract;
+use Spatie\Permission\Contracts\Role as RoleContract;
 
 class Show extends Command
 {
@@ -17,23 +17,26 @@ class Show extends Command
 
     public function handle()
     {
+        $permissionClass = app(PermissionContract::class);
+        $roleClass = app(RoleContract::class);
+
         $style = $this->argument('style') ?? 'default';
         $guard = $this->argument('guard');
 
         if ($guard) {
             $guards = Collection::make([$guard]);
         } else {
-            $guards = Permission::pluck('guard_name')->merge(Role::pluck('guard_name'))->unique();
+            $guards = $permissionClass::pluck('guard_name')->merge($roleClass::pluck('guard_name'))->unique();
         }
 
         foreach ($guards as $guard) {
             $this->info("Guard: $guard");
 
-            $roles = Role::whereGuardName($guard)->orderBy('name')->get()->mapWithKeys(function (Role $role) {
+            $roles = $roleClass::whereGuardName($guard)->orderBy('name')->get()->mapWithKeys(function ($role) {
                 return [$role->name => $role->permissions->pluck('name')];
             });
 
-            $permissions = Permission::whereGuardName($guard)->orderBy('name')->pluck('name');
+            $permissions = $permissionClass::whereGuardName($guard)->orderBy('name')->pluck('name');
 
             $body = $permissions->map(function ($permission) use ($roles) {
                 return $roles->map(function (Collection $role_permissions) use ($permission) {
