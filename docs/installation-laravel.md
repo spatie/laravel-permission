@@ -51,4 +51,4 @@ This package can be used with Laravel 6.0 or higher.
 
 You can view the default config file contents at:
 
-https://github.com/spatie/laravel-permission/blob/master/config/permission.php
+[https://github.com/spatie/laravel-permission/blob/master/config/permission.php](https://github.com/spatie/laravel-permission/blob/master/config/permission.php)
