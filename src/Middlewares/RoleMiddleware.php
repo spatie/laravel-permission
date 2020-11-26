@@ -8,9 +8,9 @@ use Spatie\Permission\Exceptions\UnauthorizedException;
 
 class RoleMiddleware
 {
-    public function handle($request, Closure $next, $role)
+    public function handle($request, Closure $next, $role, $guard = null)
     {
-        if (Auth::guest()) {
+        if (Auth::guard($guard)->guest()) {
             throw UnauthorizedException::notLoggedIn();
         }
 
@@ -18,7 +18,7 @@ class RoleMiddleware
             ? $role
             : explode('|', $role);
 
-        if (! Auth::user()->hasAnyRole($roles)) {
+        if (! Auth::guard($guard)->user()->hasAnyRole($roles)) {
             throw UnauthorizedException::forRoles($roles);
         }
 

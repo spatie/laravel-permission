@@ -2,14 +2,15 @@
 
 namespace Spatie\Permission\Commands;
 
+use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Spatie\Permission\Guard;
-use Illuminate\Console\Command;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 use Spatie\Permission\Traits\AdaptiveCommandParams;
 use Spatie\Permission\Contracts\Role as RoleContract;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
+use Spatie\Permission\Contracts\Role as RoleContract;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputArgument;
 
 class CreateRole extends Command
 {

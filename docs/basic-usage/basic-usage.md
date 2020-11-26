@@ -93,5 +93,6 @@ $all_users_with_all_their_roles = User::with('roles')->get();
 $all_users_with_all_direct_permissions = User::with('permissions')->get();
 $all_roles_in_database = Role::all()->pluck('name');
 $users_without_any_roles = User::doesntHave('roles')->get();
+$all_roles_except_a_and_b = Role::whereNotIn('name', ['role A', 'role B'])->get();
 ```
 

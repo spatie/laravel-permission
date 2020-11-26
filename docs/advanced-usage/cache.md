@@ -60,3 +60,14 @@ To prevent other applications from accidentally using/changing your cached data,
 Most multi-tenant "packages" take care of this for you when switching tenants.
 
 
+### Custom Cache Store
+
+You can configure the package to use any of the Cache Stores you've configured in Laravel's `config/cache.php`. This way you can point this package's caching to its own specified resource.
+
+In `config/permission.php` set `cache.store` to the name of any one of the `config/cache.php` stores you've defined.
+
+#### Disabling Cache
+
+Setting `'cache.store' => 'array'` in `config/permission.php` will effectively disable caching by this package between requests (it will only cache in-memory until the current request is completed processing, never persisting it).
+
+Alternatively, in development mode you can bypass ALL of Laravel's caching between visits by setting `CACHE_DRIVER=array` in `.env`. You can see an example of this in the default `phpunit.xml` file that comes with a new Laravel install. Of course, don't do this in production though!

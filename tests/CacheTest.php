@@ -2,12 +2,12 @@
 
 namespace Spatie\Permission\Test;
 
-use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Contracts\Role;
 use Illuminate\Support\Facades\Artisan;
-use Spatie\Permission\PermissionRegistrar;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
+use Spatie\Permission\PermissionRegistrar;
 
 class CacheTest extends TestCase
 {
@@ -34,6 +34,7 @@ class CacheTest extends TestCase
             case $cacheStore instanceof \Illuminate\Cache\DatabaseStore:
                 $this->cache_init_count = 1;
                 $this->cache_load_count = 1;
+                // no break
             default:
         }
     }

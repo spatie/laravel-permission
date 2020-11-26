@@ -2,10 +2,10 @@
 
 namespace Spatie\Permission\Test;
 
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Exceptions\WildcardPermissionInvalidArgument;
 use Spatie\Permission\Exceptions\WildcardPermissionNotProperlyFormatted;
+use Spatie\Permission\Models\Permission;
 
 class WildcardHasPermissionsTest extends TestCase
 {

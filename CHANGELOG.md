@@ -2,6 +2,18 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 3.17.0 - 2020-09-16
+- Optional `$guard` parameter may be passed to `RoleMiddleware`, `PermissionMiddleware`, and `RoleOrPermissionMiddleware`. See #1565
+
+## 3.16.0 - 2020-08-18
+- Added Laravel 8 support
+
+## 3.15.0 - 2020-08-15
+- Change `users` relationship type to BelongsToMany
+
+## 3.14.0 - 2020-08-15
+- Declare table relations earlier to improve guarded/fillable detection accuracy (relates to Aug 2020 Laravel security patch)
+
 ## 3.13.0 - 2020-05-19
 - Provide migration error text to stop caching local config when installing packages.
 

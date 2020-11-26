@@ -3,11 +3,11 @@
 namespace Spatie\Permission;
 
 use Illuminate\Cache\CacheManager;
-use Illuminate\Support\Collection;
-use Spatie\Permission\Contracts\Role;
-use Illuminate\Contracts\Auth\Access\Gate;
-use Spatie\Permission\Contracts\Permission;
 use Illuminate\Contracts\Auth\Access\Authorizable;
+use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Database\Eloquent\Collection;
+use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Contracts\Role;
 
 class PermissionRegistrar
 {
@@ -23,7 +23,7 @@ class PermissionRegistrar
     /** @var string */
     protected $roleClass;
 
-    /** @var \Illuminate\Support\Collection */
+    /** @var \Illuminate\Database\Eloquent\Collection */
     protected $permissions;
 
     /** @var \DateInterval|int */
@@ -49,7 +49,7 @@ class PermissionRegistrar
         $this->initializeCache();
     }
 
-    protected function initializeCache()
+    public function initializeCache()
     {
         self::$cacheExpirationTime = config('permission.cache.expiration_time', config('permission.cache_expiration_time'));
 
@@ -119,7 +119,7 @@ class PermissionRegistrar
      *
      * @param array $params
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function getPermissions(array $params = []): Collection
     {

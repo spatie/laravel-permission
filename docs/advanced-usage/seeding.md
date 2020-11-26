@@ -12,7 +12,10 @@ You may discover that it is best to flush this package's cache before seeding, t
 app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 ```
 
-This can be done directly in a seeder class. 
+You can do this in the `SetUp()` method of your test suite (see the Testing page in the docs).
+
+Or it can be done directly in a seeder class, as shown below.
+
 Here is a sample seeder, which first clears the cache, creates permissions and then assigns permissions to roles (the order of these steps is intentional):
 
 ```php
