@@ -3,9 +3,13 @@ title: Installation in Laravel
 weight: 4
 ---
 
-This package can be used with Laravel 5.8 or higher.
+This package can be used with Laravel 6.0 or higher.
 
-1. Consult the Prerequisites page for important considerations regarding your User models!
+(For Laravel 5.8, use v3.17.0)
+
+## Installing
+
+1. Consult the **Prerequisites** page for important considerations regarding your **User** models!
 
 2. This package publishes a `config/permission.php` file. If you already have a file by that name, you must rename or remove it.
 
@@ -47,4 +51,4 @@ This package can be used with Laravel 5.8 or higher.
 
 You can view the default config file contents at:
 
-https://github.com/spatie/laravel-permission/blob/master/config/permission.php
+[https://github.com/spatie/laravel-permission/blob/master/config/permission.php](https://github.com/spatie/laravel-permission/blob/master/config/permission.php)

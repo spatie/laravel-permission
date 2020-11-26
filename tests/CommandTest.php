@@ -2,9 +2,9 @@
 
 namespace Spatie\Permission\Test;
 
-use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Artisan;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class CommandTest extends TestCase
 {

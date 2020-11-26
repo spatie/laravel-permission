@@ -5,11 +5,11 @@ namespace Spatie\Permission\Test;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Middlewares\RoleMiddleware;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
+use Spatie\Permission\Middlewares\RoleMiddleware;
 use Spatie\Permission\Middlewares\RoleOrPermissionMiddleware;
+use Spatie\Permission\Models\Permission;
 
 class WildcardMiddlewareTest extends TestCase
 {
@@ -35,8 +35,11 @@ class WildcardMiddlewareTest extends TestCase
     {
         $this->assertEquals(
             $this->runMiddleware(
-                $this->permissionMiddleware, 'articles.edit'
-            ), 403);
+                $this->permissionMiddleware,
+                'articles.edit'
+            ),
+            403
+        );
     }
 
     /** @test */
@@ -50,8 +53,11 @@ class WildcardMiddlewareTest extends TestCase
 
         $this->assertEquals(
             $this->runMiddleware(
-                $this->permissionMiddleware, 'articles.edit'
-            ), 200);
+                $this->permissionMiddleware,
+                'articles.edit'
+            ),
+            200
+        );
     }
 
     /** @test */
@@ -65,13 +71,19 @@ class WildcardMiddlewareTest extends TestCase
 
         $this->assertEquals(
             $this->runMiddleware(
-                $this->permissionMiddleware, 'news.edit|articles.create.test'
-            ), 200);
+                $this->permissionMiddleware,
+                'news.edit|articles.create.test'
+            ),
+            200
+        );
 
         $this->assertEquals(
             $this->runMiddleware(
-                $this->permissionMiddleware, ['news.edit', 'articles.create.test']
-            ), 200);
+                $this->permissionMiddleware,
+                ['news.edit', 'articles.create.test']
+            ),
+            200
+        );
     }
 
     /** @test */
@@ -85,8 +97,11 @@ class WildcardMiddlewareTest extends TestCase
 
         $this->assertEquals(
             $this->runMiddleware(
-                $this->permissionMiddleware, 'news.edit'
-            ), 403);
+                $this->permissionMiddleware,
+                'news.edit'
+            ),
+            403
+        );
     }
 
     /** @test */
@@ -96,8 +111,11 @@ class WildcardMiddlewareTest extends TestCase
 
         $this->assertEquals(
             $this->runMiddleware(
-                $this->permissionMiddleware, 'articles.edit|news.edit'
-            ), 403);
+                $this->permissionMiddleware,
+                'articles.edit|news.edit'
+            ),
+            403
+        );
     }
 
     /** @test */
