@@ -94,11 +94,16 @@ class CommandTest extends TestCase
         $this->assertTrue(strpos($output, 'Guard: web') !== false);
         $this->assertTrue(strpos($output, 'Guard: admin') !== false);
 
-        // |               | testRole | testRole2 |
-        $this->assertRegExp('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|/', $output);
+        if (method_exists($this, 'assertMatchesRegularExpression')) {
+            // |               | testRole | testRole2 |
+            $this->assertMatchesRegularExpression('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|/', $output);
 
-        // | edit-articles |  ·       |  ·        |
-        $this->assertRegExp('/\|\s+edit-articles\s+\|\s+·\s+\|\s+·\s+\|/', $output);
+            // | edit-articles |  ·       |  ·        |
+            $this->assertMatchesRegularExpression('/\|\s+edit-articles\s+\|\s+·\s+\|\s+·\s+\|/', $output);
+        } else { // phpUnit 9/8
+            $this->assertRegExp('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|/', $output);
+            $this->assertRegExp('/\|\s+edit-articles\s+\|\s+·\s+\|\s+·\s+\|/', $output);
+        }
 
         Role::findByName('testRole')->givePermissionTo('edit-articles');
         $this->reloadPermissions();
@@ -108,7 +113,11 @@ class CommandTest extends TestCase
         $output = Artisan::output();
 
         // | edit-articles |  ·       |  ·        |
-        $this->assertRegExp('/\|\s+edit-articles\s+\|\s+✔\s+\|\s+·\s+\|/', $output);
+        if (method_exists($this, 'assertMatchesRegularExpression')) {
+            $this->assertMatchesRegularExpression('/\|\s+edit-articles\s+\|\s+✔\s+\|\s+·\s+\|/', $output);
+        } else {
+            $this->assertRegExp('/\|\s+edit-articles\s+\|\s+✔\s+\|\s+·\s+\|/', $output);
+        }
     }
 
     /** @test */
