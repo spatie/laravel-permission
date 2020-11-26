@@ -5,7 +5,7 @@ namespace Spatie\Permission;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Contracts\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 
@@ -23,7 +23,7 @@ class PermissionRegistrar
     /** @var string */
     protected $roleClass;
 
-    /** @var \Illuminate\Support\Collection */
+    /** @var \Illuminate\Database\Eloquent\Collection */
     protected $permissions;
 
     /** @var \DateInterval|int */
@@ -119,7 +119,7 @@ class PermissionRegistrar
      *
      * @param array $params
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function getPermissions(array $params = []): Collection
     {
