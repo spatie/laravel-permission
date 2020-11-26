@@ -4,13 +4,13 @@ namespace Spatie\Permission\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
-use Spatie\Permission\Guard;
-use Spatie\Permission\Traits\AdaptiveCommandParams;
-use Spatie\Permission\Contracts\Role as RoleContract;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 use Spatie\Permission\Contracts\Role as RoleContract;
-use Symfony\Component\Console\Input\InputOption;
+use Spatie\Permission\Contracts\Role as RoleContract;
+use Spatie\Permission\Guard;
+use Spatie\Permission\Traits\AdaptiveCommandParams;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 class CreateRole extends Command
 {
@@ -87,7 +87,7 @@ class CreateRole extends Command
                 // We will create the permission with the given name and the guard_name from the guard option
 
                 $params = [
-                    'name'       => $permission,
+                    'name' => $permission,
                     'guard_name' => $this->option('guard'),
                 ];
             } else {

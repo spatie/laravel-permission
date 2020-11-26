@@ -2,12 +2,12 @@
 
 namespace Spatie\Permission\Commands;
 
-use Spatie\Permission\Guard;
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
-use Spatie\Permission\Traits\AdaptiveCommandParams;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
+use Spatie\Permission\Guard;
+use Spatie\Permission\Traits\AdaptiveCommandParams;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 class CreatePermission extends Command
 {

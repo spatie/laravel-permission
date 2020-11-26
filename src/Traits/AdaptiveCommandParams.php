@@ -3,9 +3,9 @@
 namespace Spatie\Permission\Traits;
 
 use Illuminate\Support\Str;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 use Spatie\Permission\Contracts\Role as RoleContract;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 trait AdaptiveCommandParams
 {
