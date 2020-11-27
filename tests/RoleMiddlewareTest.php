@@ -9,7 +9,7 @@ use InvalidArgumentException;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middlewares\RoleMiddleware;
 
-class MiddlewareTest extends TestCase
+class RoleMiddlewareTest extends TestCase
 {
     protected $roleMiddleware;
 
