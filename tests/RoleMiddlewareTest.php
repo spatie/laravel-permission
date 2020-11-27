@@ -23,7 +23,8 @@ class MiddlewareTest extends TestCase
     /** @test */
     public function a_guest_cannot_access_a_route_protected_by_rolemiddleware()
     {
-        $this->assertEquals(403,
+        $this->assertEquals(
+            403,
             $this->runMiddleware($this->roleMiddleware, 'testRole')
         );
     }
@@ -35,7 +36,8 @@ class MiddlewareTest extends TestCase
 
         $this->testUser->assignRole('testRole');
 
-        $this->assertEquals(403,
+        $this->assertEquals(
+            403,
             $this->runMiddleware($this->roleMiddleware, 'testAdminRole')
         );
     }
@@ -47,7 +49,8 @@ class MiddlewareTest extends TestCase
 
         $this->testUser->assignRole('testRole');
 
-        $this->assertEquals(200,
+        $this->assertEquals(
+            200,
             $this->runMiddleware($this->roleMiddleware, 'testRole')
         );
     }
@@ -59,11 +62,13 @@ class MiddlewareTest extends TestCase
 
         $this->testUser->assignRole('testRole');
 
-        $this->assertEquals(200,
+        $this->assertEquals(
+            200,
             $this->runMiddleware($this->roleMiddleware, 'testRole|testRole2')
         );
 
-        $this->assertEquals(200,
+        $this->assertEquals(
+            200,
             $this->runMiddleware($this->roleMiddleware, ['testRole2', 'testRole'])
         );
     }
@@ -75,7 +80,8 @@ class MiddlewareTest extends TestCase
 
         $this->testUser->assignRole(['testRole']);
 
-        $this->assertEquals(403,
+        $this->assertEquals(
+            403,
             $this->runMiddleware($this->roleMiddleware, 'testRole2')
         );
     }
@@ -85,7 +91,8 @@ class MiddlewareTest extends TestCase
     {
         Auth::login($this->testUser);
 
-        $this->assertEquals(403,
+        $this->assertEquals(
+            403,
             $this->runMiddleware($this->roleMiddleware, 'testRole|testRole2')
         );
     }
@@ -95,7 +102,8 @@ class MiddlewareTest extends TestCase
     {
         Auth::login($this->testUser);
 
-        $this->assertEquals(403,
+        $this->assertEquals(
+            403,
             $this->runMiddleware($this->roleMiddleware, '')
         );
     }
@@ -141,7 +149,8 @@ class MiddlewareTest extends TestCase
 
         $this->testUser->assignRole('testRole');
 
-        $this->assertEquals(403,
+        $this->assertEquals(
+            403,
             $this->runMiddleware($this->roleMiddleware, 'testRole', 'admin')
         );
     }
@@ -153,7 +162,8 @@ class MiddlewareTest extends TestCase
 
         $this->testAdmin->assignRole('testAdminRole');
 
-        $this->assertEquals(200,
+        $this->assertEquals(
+            200,
             $this->runMiddleware($this->roleMiddleware, 'testAdminRole', 'admin')
         );
     }

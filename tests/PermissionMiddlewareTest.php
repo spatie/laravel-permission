@@ -24,7 +24,8 @@ class PermissionMiddlewareTest extends TestCase
     /** @test */
     public function a_guest_cannot_access_a_route_protected_by_the_permission_middleware()
     {
-        $this->assertEquals(403,
+        $this->assertEquals(
+            403,
             $this->runMiddleware($this->permissionMiddleware, 'edit-articles')
         );
     }
@@ -42,11 +43,13 @@ class PermissionMiddlewareTest extends TestCase
 
         $this->testAdmin->givePermissionTo('admin-permission2');
 
-        $this->assertEquals(200,
+        $this->assertEquals(
+            200,
             $this->runMiddleware($this->permissionMiddleware, 'admin-permission2')
         );
 
-        $this->assertEquals(403,
+        $this->assertEquals(
+            403,
             $this->runMiddleware($this->permissionMiddleware, 'edit-articles2')
         );
 
@@ -54,11 +57,13 @@ class PermissionMiddlewareTest extends TestCase
 
         $this->testUser->givePermissionTo('edit-articles2');
 
-        $this->assertEquals(200,
+        $this->assertEquals(
+            200,
             $this->runMiddleware($this->permissionMiddleware, 'edit-articles2')
         );
 
-        $this->assertEquals(403,
+        $this->assertEquals(
+            403,
             $this->runMiddleware($this->permissionMiddleware, 'admin-permission2')
         );
     }
@@ -70,7 +75,8 @@ class PermissionMiddlewareTest extends TestCase
 
         $this->testUser->givePermissionTo('edit-articles');
 
-        $this->assertEquals(200,
+        $this->assertEquals(
+            200,
             $this->runMiddleware($this->permissionMiddleware, 'edit-articles')
         );
     }
@@ -82,11 +88,13 @@ class PermissionMiddlewareTest extends TestCase
 
         $this->testUser->givePermissionTo('edit-articles');
 
-        $this->assertEquals(200,
+        $this->assertEquals(
+            200,
             $this->runMiddleware($this->permissionMiddleware, 'edit-news|edit-articles')
         );
 
-        $this->assertEquals(200,
+        $this->assertEquals(
+            200,
             $this->runMiddleware($this->permissionMiddleware, ['edit-news', 'edit-articles'])
         );
     }
@@ -98,7 +106,8 @@ class PermissionMiddlewareTest extends TestCase
 
         $this->testUser->givePermissionTo('edit-articles');
 
-        $this->assertEquals(403,
+        $this->assertEquals(
+            403,
             $this->runMiddleware($this->permissionMiddleware, 'edit-news')
         );
     }
@@ -108,7 +117,8 @@ class PermissionMiddlewareTest extends TestCase
     {
         Auth::login($this->testUser);
 
-        $this->assertEquals(403,
+        $this->assertEquals(
+            403,
             $this->runMiddleware($this->permissionMiddleware, 'edit-articles|edit-news')
         );
     }
@@ -154,7 +164,8 @@ class PermissionMiddlewareTest extends TestCase
 
         $this->testUser->givePermissionTo('edit-articles');
 
-        $this->assertEquals(403,
+        $this->assertEquals(
+            403,
             $this->runMiddleware($this->permissionMiddleware, 'edit-articles', 'admin')
         );
     }
@@ -166,7 +177,8 @@ class PermissionMiddlewareTest extends TestCase
 
         $this->testAdmin->givePermissionTo('admin-permission');
 
-        $this->assertEquals(200,
+        $this->assertEquals(
+            200,
             $this->runMiddleware($this->permissionMiddleware, 'admin-permission', 'admin')
         );
     }
