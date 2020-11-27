@@ -23,7 +23,7 @@ class Manager extends Model implements AuthorizableContract, AuthenticatableCont
     // When present, it takes precedence over the $guard_name property.
     public function guardName()
     {
-        return 'api';
+        return 'jwt';
     }
 
     // intentionally different property value for the sake of unit tests
