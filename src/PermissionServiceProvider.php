@@ -20,7 +20,7 @@ class PermissionServiceProvider extends ServiceProvider
             ], 'config');
 
             $this->publishes([
-                __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->getMigrationFileName($filesystem),
+                __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->getMigrationFileName($filesystem, 'create_permission_tables.php'),
             ], 'migrations');
         }
 
@@ -157,7 +157,7 @@ class PermissionServiceProvider extends ServiceProvider
      * @param Filesystem $filesystem
      * @return string
      */
-    protected function getMigrationFileName(Filesystem $filesystem): string
+    protected function getMigrationFileName(Filesystem $filesystem, $migrationFileName): string
     {
         $timestamp = date('Y_m_d_His');
 
@@ -165,6 +165,10 @@ class PermissionServiceProvider extends ServiceProvider
             ->flatMap(function ($path) use ($filesystem) {
                 return $filesystem->glob($path.'*_create_permission_tables.php');
             })->push($this->app->databasePath()."/migrations/{$timestamp}_create_permission_tables.php")
+            ->flatMap(function ($path) use ($filesystem, $migrationFileName) {
+                return $filesystem->glob($path.'*_'.$migrationFileName);
+            })
+            ->push($this->app->databasePath()."/migrations/{$timestamp}_{$migrationFileName}")
             ->first();
     }
 }
