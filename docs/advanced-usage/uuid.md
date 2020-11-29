@@ -85,6 +85,7 @@ If you want all the role/permission objects to have a UUID instead of an integer
 - You likely want to set `protected $keyType = 'string';` so Laravel handles joins as strings and doesn't cast to integer.
 - OPTIONAL: If you changed the field name in your migrations, you must set `protected $primaryKey = 'uuid';` to match.
 - Usually for UUID you will also set `public $incrementing = false;`. Remove it if it causes problems for you.
+- Cast id to string, i.e., you must set `protected $casts = [ 'id' => 'string' ]`. Otherwise, you might face "Illegal offset type" issue. Laravel may fail to access the id property properly.
 
 It is common to use a trait to handle the $keyType and $incrementing settings, as well as add a boot event trigger to ensure new records are assigned a uuid. You would `use` this trait in your User and extended Role/Permission models. An example `UuidTrait` is shown here for inspiration. Adjust to suit your needs.
 
