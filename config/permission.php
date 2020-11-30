@@ -108,7 +108,7 @@ return [
 
     /*
      * When you use Model has multiple role.
-     * But you want to give permissions directly to Model, Not use default permissions from role.
+     * But you want to give and check permissions directly to Model, Not use default permissions from role.
      */
 
     'check_permission_via_role' => true,
