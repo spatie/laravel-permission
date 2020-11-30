@@ -255,7 +255,7 @@ trait HasPermissions
      */
     protected function hasPermissionViaRole(Permission $permission): bool
     {
-        return $this->hasRole($permission->roles);
+        return config('permission.check_permission_via_role', false) && $this->hasRole($permission->roles);
     }
 
     /**
