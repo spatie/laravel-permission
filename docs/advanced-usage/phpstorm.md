@@ -1,5 +1,5 @@
 ---
-title: Extending PhpStorm
+title: PhpStorm Interaction
 weight: 7
 ---
 
