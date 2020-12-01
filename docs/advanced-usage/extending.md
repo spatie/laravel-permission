@@ -34,7 +34,7 @@ If you need to EXTEND the existing `Role` or `Permission` models note that:
 
 - Your `Role` model needs to extend the `Spatie\Permission\Models\Role` model
 - Your `Permission` model needs to extend the `Spatie\Permission\Models\Permission` model
-- You need to update `config/permisssion.php` to specify your namespaced model
+- You need to update `config/permission.php` to specify your namespaced model
 
 ### Replacing
 If you need to REPLACE the existing `Role` or `Permission` models you need to keep the following things in mind:
