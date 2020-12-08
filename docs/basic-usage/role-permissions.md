@@ -1,7 +1,9 @@
 ---
-title: Using permissions via roles
+title: Using Permissions via Roles
 weight: 3
 ---
+
+## Assigning Roles
 
 A role can be assigned to any user:
 
@@ -26,6 +28,8 @@ Roles can also be synced:
 // All current roles will be removed from the user and replaced by the array given
 $user->syncRoles(['writer', 'admin']);
 ```
+
+## Checking Roles
 
 You can determine if a user has a certain role:
 
@@ -53,6 +57,9 @@ $user->hasAllRoles(Role::all());
 The `assignRole`, `hasRole`, `hasAnyRole`, `hasAllRoles`  and `removeRole` functions can accept a
  string, a `\Spatie\Permission\Models\Role` object or an `\Illuminate\Support\Collection` object.
 
+
+## Assigning Permissions to Roles
+
 A permission can be given to a role:
 
 ```php
@@ -75,7 +82,11 @@ The `givePermissionTo` and `revokePermissionTo` functions can accept a
 string or a `Spatie\Permission\Models\Permission` object.
 
 
-Permissions are inherited from roles automatically. 
+**Permissions are inherited from roles automatically.**
+
+
+## Assigning Direct Permissions To A User
+
 Additionally, individual permissions can be assigned to the user too. 
 For instance:
 
@@ -95,9 +106,13 @@ but `false` for `$user->hasDirectPermission('edit articles')`.
 
 This method is useful if one builds a form for setting permissions for roles and users in an application and wants to restrict or change inherited permissions of roles of the user, i.e. allowing to change only direct permissions of the user.
 
-You can check if the user has All or Any of a set of permissions directly assigned:
+
+You can check if the user has a Specific or All or Any of a set of permissions directly assigned:
 
 ```php
+// Check if the user has Direct permission
+$user->hasDirectPermission('edit articles')
+
 // Check if the user has All direct permissions
 $user->hasAllDirectPermissions(['edit articles', 'delete articles']);
 
@@ -110,7 +125,7 @@ When we call
 `$user->hasAnyDirectPermission('edit articles')`, it returns `true` because the user has one of the provided permissions.
 
 
-You can list all of these permissions:
+You can examine all of these permissions:
 
 ```php
 // Direct permissions
