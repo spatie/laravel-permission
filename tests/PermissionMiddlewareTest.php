@@ -124,6 +124,25 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    public function a_user_can_access_a_route_protected_by_permission_middleware_if_has_permission_via_role()
+    {
+        Auth::login($this->testUser);
+
+        $this->assertEquals(
+            403,
+            $this->runMiddleware($this->permissionMiddleware, 'edit-articles')
+        );
+
+        $this->testUserRole->givePermissionTo('edit-articles');
+        $this->testUser->assignRole('testRole');
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->permissionMiddleware, 'edit-articles')
+        );
+    }
+
+    /** @test */
     public function the_required_permissions_can_be_fetched_from_the_exception()
     {
         Auth::login($this->testUser);
