@@ -124,9 +124,9 @@ trait HasRoles
                     if ($modelLastFiredOn !== null && $modelLastFiredOn === $model) {
                         return;
                     }
-                    $object->roles()->sync($roles, false);
-                    $object->load('roles');
-                    $modelLastFiredOn = $object;
+                    $model->roles()->sync($roles, false);
+                    $model->load('roles');
+                    $modelLastFiredOn = $model;
                 }
             );
         }
