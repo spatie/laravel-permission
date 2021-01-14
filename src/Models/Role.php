@@ -61,7 +61,7 @@ class Role extends Model implements RoleContract
     public function users(): BelongsToMany
     {
         return $this->morphedByMany(
-            getModelForGuard($this->attributes['guard_name']),
+            getModelForGuard($this->attributes['guard_name'] ?? Guard::getDefaultName(static::class)),
             'model',
             config('permission.table_names.model_has_roles'),
             'role_id',
