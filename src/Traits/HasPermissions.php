@@ -352,9 +352,9 @@ trait HasPermissions
                     if ($modelLastFiredOn !== null && $modelLastFiredOn === $model) {
                         return;
                     }
-                    $object->permissions()->sync($permissions, false);
-                    $object->load('permissions');
-                    $modelLastFiredOn = $object;
+                    $model->permissions()->sync($permissions, false);
+                    $model->load('permissions');
+                    $modelLastFiredOn = $model;
                 }
             );
         }
