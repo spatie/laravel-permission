@@ -476,6 +476,9 @@ class HasPermissionsTest extends TestCase
         $user2->givePermissionTo('edit-articles');
         $user2->save();
 
+        $this->assertTrue($user->fresh()->hasPermissionTo('edit-news'));
+        $this->assertFalse($user->fresh()->hasPermissionTo('edit-articles'));
+
         $this->assertTrue($user2->fresh()->hasPermissionTo('edit-articles'));
         $this->assertFalse($user2->fresh()->hasPermissionTo('edit-news'));
     }
@@ -490,6 +493,9 @@ class HasPermissionsTest extends TestCase
         $user2 = new User(['email' => 'test2@user.com']);
         $user2->syncPermissions('edit-articles');
         $user2->save();
+
+        $this->assertTrue($user->fresh()->hasPermissionTo('edit-news'));
+        $this->assertFalse($user->fresh()->hasPermissionTo('edit-articles'));
 
         $this->assertTrue($user2->fresh()->hasPermissionTo('edit-articles'));
         $this->assertFalse($user2->fresh()->hasPermissionTo('edit-news'));
