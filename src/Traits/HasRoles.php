@@ -120,13 +120,8 @@ trait HasRoles
 
             $class::saved(
                 function ($object) use ($roles, $model) {
-                    static $modelLastFiredOn;
-                    if ($modelLastFiredOn !== null && $modelLastFiredOn === $model) {
-                        return;
-                    }
                     $model->roles()->sync($roles, false);
                     $model->load('roles');
-                    $modelLastFiredOn = $model;
                 }
             );
         }
