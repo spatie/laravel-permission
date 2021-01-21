@@ -348,13 +348,8 @@ trait HasPermissions
 
             $class::saved(
                 function ($object) use ($permissions, $model) {
-                    static $modelLastFiredOn;
-                    if ($modelLastFiredOn !== null && $modelLastFiredOn === $model) {
-                        return;
-                    }
                     $model->permissions()->sync($permissions, false);
                     $model->load('permissions');
-                    $modelLastFiredOn = $model;
                 }
             );
         }
