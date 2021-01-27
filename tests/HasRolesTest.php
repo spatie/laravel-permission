@@ -247,6 +247,9 @@ class HasRolesTest extends TestCase
         $user2->syncRoles('testRole2');
         $user2->save();
 
+        $this->assertTrue($user->fresh()->hasRole('testRole'));
+        $this->assertFalse($user->fresh()->hasRole('testRole2'));
+
         $this->assertTrue($user2->fresh()->hasRole('testRole2'));
         $this->assertFalse($user2->fresh()->hasRole('testRole'));
     }
@@ -261,6 +264,9 @@ class HasRolesTest extends TestCase
         $admin_user = new User(['email' => 'admin@user.com']);
         $admin_user->assignRole('testRole2');
         $admin_user->save();
+
+        $this->assertTrue($user->fresh()->hasRole('testRole'));
+        $this->assertFalse($user->fresh()->hasRole('testRole2'));
 
         $this->assertTrue($admin_user->fresh()->hasRole('testRole2'));
         $this->assertFalse($admin_user->fresh()->hasRole('testRole'));
