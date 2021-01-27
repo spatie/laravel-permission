@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 3.18.0 - 2020-11-27
+- Allow PHP 8.0
+
 ## 3.17.0 - 2020-09-16
 - Optional `$guard` parameter may be passed to `RoleMiddleware`, `PermissionMiddleware`, and `RoleOrPermissionMiddleware`. See #1565
 
