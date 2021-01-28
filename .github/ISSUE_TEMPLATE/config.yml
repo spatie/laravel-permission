@@ -6,6 +6,3 @@ contact_links:
     - name: Feature Request
       url: https://github.com/spatie/laravel-permission/discussions/new?category=ideas
       about: Share ideas for new features
-    - name: Bug Report
-      url: https://github.com/spatie/laravel-permission/issues/new
-      about: Report a reproducable bug
