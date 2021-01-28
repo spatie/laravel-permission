@@ -77,6 +77,7 @@ We publish all received postcards [on our company website](https://spatie.be/en/
 
 ## Credits
 
+- [Chris Brown](https://github.com/drbyte)
 - [Freek Van der Herten](https://github.com/freekmurze)
 - [All Contributors](../../contributors)
 
