@@ -71,3 +71,12 @@ In `config/permission.php` set `cache.store` to the name of any one of the `conf
 Setting `'cache.store' => 'array'` in `config/permission.php` will effectively disable caching by this package between requests (it will only cache in-memory until the current request is completed processing, never persisting it).
 
 Alternatively, in development mode you can bypass ALL of Laravel's caching between visits by setting `CACHE_DRIVER=array` in `.env`. You can see an example of this in the default `phpunit.xml` file that comes with a new Laravel install. Of course, don't do this in production though!
+
+
+## File cache driver
+
+This situation is not specific to this package, but is mentioned here due to the common question being asked.
+
+If you are using the `File` cache driver and run into problems clearing the cache, it is most likely because your filesystem's permissions are preventing the PHP CLI from altering the cache files because the PHP-FPM process is running as a different user. 
+
+Work with your server administrator to fix filesystem ownership on your cache files.
