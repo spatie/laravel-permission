@@ -3,6 +3,10 @@
 return [
 
     'models' => [
+        /*
+         * Change this to uuid if you want to type of primary keys in tables to uuid
+         */
+        'keys_type' => 'id',
 
         /*
          * When using the "HasPermissions" trait from this package, we need to know which
@@ -82,6 +86,12 @@ return [
          */
 
         'model_morph_key' => 'model_id',
+
+        /*
+         * Change this to uuid if you want to type of primary keys in tables to uuid
+         */
+
+        'model_morph_key_type' => 'id',
     ],
 
     /*

@@ -21,6 +21,7 @@ class Role extends Model implements RoleContract
 
     public function __construct(array $attributes = [])
     {
+        $this->keyType = config('permission.models.keys_type') == 'uuid' ? 'string' : 'int';
         $attributes['guard_name'] = $attributes['guard_name'] ?? config('auth.defaults.guard');
 
         parent::__construct($attributes);

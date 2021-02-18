@@ -22,6 +22,7 @@ class Permission extends Model implements PermissionContract
 
     public function __construct(array $attributes = [])
     {
+        $this->keyType = config('permission.models.keys_type') == 'uuid' ? 'string' : 'int';
         $attributes['guard_name'] = $attributes['guard_name'] ?? config('auth.defaults.guard');
 
         parent::__construct($attributes);
@@ -78,15 +79,15 @@ class Permission extends Model implements PermissionContract
      * @param string $name
      * @param string|null $guardName
      *
+     * @return \Spatie\Permission\Contracts\Permission
      * @throws \Spatie\Permission\Exceptions\PermissionDoesNotExist
      *
-     * @return \Spatie\Permission\Contracts\Permission
      */
     public static function findByName(string $name, $guardName = null): PermissionContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
         $permission = static::getPermissions(['name' => $name, 'guard_name' => $guardName])->first();
-        if (! $permission) {
+        if (!$permission) {
             throw PermissionDoesNotExist::create($name, $guardName);
         }
 
@@ -99,16 +100,16 @@ class Permission extends Model implements PermissionContract
      * @param int $id
      * @param string|null $guardName
      *
+     * @return \Spatie\Permission\Contracts\Permission
      * @throws \Spatie\Permission\Exceptions\PermissionDoesNotExist
      *
-     * @return \Spatie\Permission\Contracts\Permission
      */
     public static function findById(int $id, $guardName = null): PermissionContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
         $permission = static::getPermissions(['id' => $id, 'guard_name' => $guardName])->first();
 
-        if (! $permission) {
+        if (!$permission) {
             throw PermissionDoesNotExist::withId($id, $guardName);
         }
 
@@ -128,7 +129,7 @@ class Permission extends Model implements PermissionContract
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
         $permission = static::getPermissions(['name' => $name, 'guard_name' => $guardName])->first();
 
-        if (! $permission) {
+        if (!$permission) {
             return static::query()->create(['name' => $name, 'guard_name' => $guardName]);
         }
 
