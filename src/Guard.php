@@ -24,9 +24,9 @@ class Guard
             }
         }
 
-        if (! isset($guardName)) {
-            $class = is_object($model) ? get_class($model) : $model;
+        $class = is_object($model) ? get_class($model) : $model;
 
+        if (! isset($guardName)) {
             $guardName = (new \ReflectionClass($class))->getDefaultProperties()['guard_name'] ?? null;
         }
 
