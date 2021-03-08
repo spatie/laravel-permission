@@ -3,7 +3,7 @@ title: Prerequisites
 weight: 3
 ---
 
-This package can be used in Laravel 5.8 or higher.
+This package can be used in Laravel 6 or higher.
 
 This package uses Laravel's Gate layer to provide Authorization capabilities.
 The Gate/authorization layer requires that your `User` model implement the `Illuminate\Contracts\Auth\Access\Authorizable` contract. 
