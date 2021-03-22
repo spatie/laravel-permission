@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 4.0.1 - 2021-03-22
+- Added note in migration for field lengths on MySQL 8. (either shorten the columns to 125 or use InnoDB)
+
 ## 4.0.0 - 2021-01-27
 - Drop support on Laravel 5.8 #1615
 - Fix bug when adding roles to a model that doesn't yet exist #1663
