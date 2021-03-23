@@ -42,7 +42,7 @@ class PermissionServiceProvider extends ServiceProvider
 
     protected function offerPublishing()
     {
-        if (!function_exists('config_path')) { 
+        if (! function_exists('config_path')) {
             // function not available and 'publish' not relevant in Lumen
             return;
         }
