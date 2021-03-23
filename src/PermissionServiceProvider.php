@@ -14,24 +14,11 @@ class PermissionServiceProvider extends ServiceProvider
 {
     public function boot(PermissionRegistrar $permissionLoader, Filesystem $filesystem)
     {
-        if (function_exists('config_path')) { // function not available and 'publish' not relevant in Lumen
-            $this->publishes([
-                __DIR__.'/../config/permission.php' => config_path('permission.php'),
-            ], 'config');
-
-            $this->publishes([
-                __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->getMigrationFileName($filesystem, 'create_permission_tables.php'),
-            ], 'migrations');
-        }
+        $this->offerPublishing();
 
         $this->registerMacroHelpers();
 
-        $this->commands([
-            Commands\CacheReset::class,
-            Commands\CreateRole::class,
-            Commands\CreatePermission::class,
-            Commands\Show::class,
-        ]);
+        $this->registerCommands();
 
         $this->registerModelBindings();
 
@@ -51,6 +38,32 @@ class PermissionServiceProvider extends ServiceProvider
         );
 
         $this->registerBladeExtensions();
+    }
+
+    protected function offerPublishing()
+    {
+        if (!function_exists('config_path')) { 
+            // function not available and 'publish' not relevant in Lumen
+            return;
+        }
+
+        $this->publishes([
+            __DIR__.'/../config/permission.php' => config_path('permission.php'),
+        ], 'config');
+
+        $this->publishes([
+            __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->getMigrationFileName($filesystem, 'create_permission_tables.php'),
+        ], 'migrations');
+    }
+
+    protected function registerCommands()
+    {
+        $this->commands([
+            Commands\CacheReset::class,
+            Commands\CreateRole::class,
+            Commands\CreatePermission::class,
+            Commands\Show::class,
+        ]);
     }
 
     protected function registerModelBindings()
