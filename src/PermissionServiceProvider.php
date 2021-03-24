@@ -12,7 +12,7 @@ use Spatie\Permission\Contracts\Role as RoleContract;
 
 class PermissionServiceProvider extends ServiceProvider
 {
-    public function boot(PermissionRegistrar $permissionLoader, Filesystem $filesystem)
+    public function boot(PermissionRegistrar $permissionLoader)
     {
         $this->offerPublishing();
 
@@ -52,7 +52,7 @@ class PermissionServiceProvider extends ServiceProvider
         ], 'config');
 
         $this->publishes([
-            __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->getMigrationFileName($filesystem, 'create_permission_tables.php'),
+            __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->getMigrationFileName('create_permission_tables.php'),
         ], 'migrations');
     }
 
@@ -167,12 +167,13 @@ class PermissionServiceProvider extends ServiceProvider
     /**
      * Returns existing migration file if found, else uses the current timestamp.
      *
-     * @param Filesystem $filesystem
      * @return string
      */
-    protected function getMigrationFileName(Filesystem $filesystem, $migrationFileName): string
+    protected function getMigrationFileName($migrationFileName): string
     {
         $timestamp = date('Y_m_d_His');
+
+        $filesystem = $this->app->make(Filesystem::class);
 
         return Collection::make($this->app->databasePath().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR)
             ->flatMap(function ($path) use ($filesystem) {
