@@ -9,7 +9,9 @@ class PermissionMiddleware
 {
     public function handle($request, Closure $next, $permission, $guard = null)
     {
-        if (app('auth')->guard($guard)->guest()) {
+        $authGuard = app('auth')->guard($guard);
+
+        if ($authGuard->guest()) {
             throw UnauthorizedException::notLoggedIn();
         }
 
@@ -18,7 +20,7 @@ class PermissionMiddleware
             : explode('|', $permission);
 
         foreach ($permissions as $permission) {
-            if (app('auth')->guard($guard)->user()->can($permission)) {
+            if ($authGuard->user()->can($permission)) {
                 return $next($request);
             }
         }
