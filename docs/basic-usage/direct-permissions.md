@@ -53,6 +53,12 @@ $user->hasAnyPermission(['edit articles', 'publish articles', 'unpublish article
 $user->hasAllPermissions(['edit articles', 'publish articles', 'unpublish articles']);
 ```
 
+...or if a user has ANY permission matching a regular expression
+
+```php
+$user->hasPregPermission('publish articles'); // Matches "publish articles" AND "unpublish articles"
+```
+
 You may also pass integers to lookup by permission id
 
 ```php
