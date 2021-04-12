@@ -177,6 +177,29 @@ trait HasPermissions
 
         return false;
     }
+    
+    /**
+     * Check if any permissions match PHP Regular Expression
+     * @param  string      $pattern
+     * @param  string|null $guardName
+     * @return boolean
+     */
+    public function hasPregPermission($pattern, string $guardName = null): bool
+    {
+        $guardName = $guardName ?? $this->getDefaultGuardName();
+        
+        foreach ($this->getAllPermissions() as $userPermission) {
+            if ($guardName !== $userPermission->guard_name) {
+                continue;
+            }
+
+            if (preg_match("/$pattern/", $userPermission)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /**
      * @deprecated since 2.35.0
