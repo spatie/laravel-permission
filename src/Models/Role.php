@@ -11,6 +11,7 @@ use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Guard;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
+use Illuminate\Support\Str;
 
 class Role extends Model implements RoleContract
 {
