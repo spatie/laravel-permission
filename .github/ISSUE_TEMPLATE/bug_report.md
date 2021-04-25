@@ -20,6 +20,9 @@ You can use `composer show` to get the version numbers of:
 
 PHP version:
 
+Database version:
+
+
 **To Reproduce**
 Steps to reproduce the behavior:
 

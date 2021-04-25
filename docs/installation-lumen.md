@@ -3,9 +3,11 @@ title: Installation in Lumen
 weight: 5
 ---
 
-NOTE: Lumen is not officially supported by this package. However, the following are some steps which may help get you started.
+NOTE: Lumen is **not** officially supported by this package. However, the following are some steps which may help get you started.
 
-First, install the package via Composer:
+Lumen installation instructions can be found in the [Lumen documentation](https://lumen.laravel.com/docs/master).
+
+Install the permissions package via Composer:
 
 ``` bash
 composer require spatie/laravel-permission
@@ -48,7 +50,7 @@ $app->register(Spatie\Permission\PermissionServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 ```
 
-Ensure your database configuration is set in your `.env` (or `config/database.php` if you have one).
+Ensure the application's database name/credentials are set in your `.env` (or `config/database.php` if you have one), and that the database exists.
 
 Run the migrations to create the tables for this package:
 
@@ -64,8 +66,8 @@ NOTE: Remember that Laravel's authorization layer requires that your `User` mode
 ### User Table
 NOTE: If you are working with a fresh install of Lumen, then you probably also need a migration file for your Users table. You can create your own, or you can copy a basic one from Laravel:
 
-https://github.com/laravel/laravel/blob/master/database/migrations/2014_10_12_000000_create_users_table.php
+[https://github.com/laravel/laravel/blob/master/database/migrations/2014_10_12_000000_create_users_table.php](https://github.com/laravel/laravel/blob/master/database/migrations/2014_10_12_000000_create_users_table.php)
 
 (You will need to run `php artisan migrate` after adding this file.)
 
-Remember to update your ModelFactory.php to match the fields in the migration you create/copy.
+Remember to update your UserFactory.php to match the fields in the migration you create/copy.
