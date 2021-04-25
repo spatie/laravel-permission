@@ -140,11 +140,6 @@ $user->getAllPermissions();
 
 All these responses are collections of `Spatie\Permission\Models\Permission` objects.
 
-
-
-If we follow the previous example, the first response will be a collection with the `delete article` permission and 
-the second will be a collection with the `edit article` permission and the third will contain both.
-
 If we follow the previous example, the first response will be a collection with the `delete article` permission and 
 the second will be a collection with the `edit article` permission and the third will contain both.
 
