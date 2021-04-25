@@ -21,10 +21,30 @@ class Role extends Model implements RoleContract
 
     public function __construct(array $attributes = [])
     {
-        $this->keyType = config('permission.models.keys_type') == 'uuid' ? 'string' : 'int';
+        if (config('permission.models.keys_type') == 'uuid') {
+            $this->keyType = 'string';
+            $this->incrementing = false;
+            $this->casts = [
+                'id' => 'string'
+            ];
+        } else {
+            $this->keyType = 'int';
+        }
         $attributes['guard_name'] = $attributes['guard_name'] ?? config('auth.defaults.guard');
 
         parent::__construct($attributes);
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+        if (config('permission.models.keys_type') == 'uuid') {
+            self::creating(function ($model) {
+                if (is_null($model->id)) {
+                    $model->id = Str::uuid()->toString();
+                }
+            });
+        }
     }
 
     public function getTable()
