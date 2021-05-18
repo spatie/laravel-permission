@@ -89,3 +89,12 @@ Alternatively, `@unlessrole` gives the reverse for checking a singular role, lik
 @endunlessrole
 ```
 
+You can also determine if a user has exactly all of a given list of roles:
+
+```php
+@hasexactroles('writer|admin');
+    I am both a writer and an admin and nothing else!
+@else
+    I do not have all of these roles or have more other roles...
+@endhasexactroles
+```
