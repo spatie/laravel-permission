@@ -11,7 +11,9 @@ use Spatie\Permission\Traits\HasRoles;
 
 class Admin extends Model implements AuthorizableContract, AuthenticatableContract
 {
-    use HasRoles, Authorizable, Authenticatable;
+    use HasRoles;
+    use Authorizable;
+    use Authenticatable;
 
     protected $fillable = ['email'];
 
