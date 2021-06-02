@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 4.1.0 - 2021-06-01
+- Refactor to resolve guard only once during middleware
+- Refactor service provider by extracting some methods
+
 ## 4.0.1 - 2021-03-22
 - Added note in migration for field lengths on MySQL 8. (either shorten the columns to 125 or use InnoDB)
 
