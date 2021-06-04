@@ -485,6 +485,45 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_determine_that_a_user_has_exact_all_of_the_given_roles()
+    {
+        $roleModel = app(Role::class);
+
+        $this->assertFalse($this->testUser->hasExactRoles($roleModel->first()));
+
+        $this->assertFalse($this->testUser->hasExactRoles('testRole'));
+
+        $this->assertFalse($this->testUser->hasExactRoles($roleModel->all()));
+
+        $roleModel->create(['name' => 'second role']);
+
+        $this->testUser->assignRole($this->testUserRole);
+
+        $this->assertTrue($this->testUser->hasExactRoles('testRole'));
+        $this->assertTrue($this->testUser->hasExactRoles('testRole', 'web'));
+        $this->assertFalse($this->testUser->hasExactRoles('testRole', 'fakeGuard'));
+
+        $this->assertFalse($this->testUser->hasExactRoles(['testRole', 'second role']));
+        $this->assertFalse($this->testUser->hasExactRoles(['testRole', 'second role'], 'web'));
+
+        $this->testUser->assignRole('second role');
+
+        $this->assertTrue($this->testUser->hasExactRoles(['testRole', 'second role']));
+        $this->assertTrue($this->testUser->hasExactRoles(['testRole', 'second role'], 'web'));
+        $this->assertFalse($this->testUser->hasExactRoles(['testRole', 'second role'], 'fakeGuard'));
+
+        $roleModel->create(['name' => 'third role']);
+        $this->testUser->assignRole('third role');
+
+        $this->assertFalse($this->testUser->hasExactRoles(['testRole', 'second role']));
+        $this->assertFalse($this->testUser->hasExactRoles(['testRole', 'second role'], 'web'));
+        $this->assertFalse($this->testUser->hasExactRoles(['testRole', 'second role'], 'fakeGuard'));
+        $this->assertTrue($this->testUser->hasExactRoles(['testRole', 'second role', 'third role']));
+        $this->assertTrue($this->testUser->hasExactRoles(['testRole', 'second role', 'third role'], 'web'));
+        $this->assertFalse($this->testUser->hasExactRoles(['testRole', 'second role', 'third role'], 'fakeGuard'));
+    }
+
+    /** @test */
     public function it_can_determine_that_a_user_does_not_have_a_role_from_another_guard()
     {
         $this->assertFalse($this->testUser->hasRole('testAdminRole'));
