@@ -252,6 +252,34 @@ trait HasRoles
     }
 
     /**
+     * Determine if the model has exactly all of the given role(s).
+     *
+     * @param  string|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection  $roles
+     * @param  string|null  $guard
+     * @return bool
+     */
+    public function hasExactRoles($roles, string $guard = null): bool
+    {
+        if (is_string($roles) && false !== strpos($roles, '|')) {
+            $roles = $this->convertPipeToArray($roles);
+        }
+
+        if (is_string($roles)) {
+            $roles = [$roles];
+        }
+
+        if ($roles instanceof Role) {
+            $roles = [$roles->name];
+        }
+
+        $roles = collect()->make($roles)->map(function ($role) {
+            return $role instanceof Role ? $role->name : $role;
+        });
+
+        return $this->roles->count() == $roles->count() && $this->hasAllRoles($roles, $guard);
+    }
+
+    /**
      * Return all permissions directly coupled to the model.
      */
     public function getDirectPermissions(): Collection

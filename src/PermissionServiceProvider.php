@@ -130,6 +130,15 @@ class PermissionServiceProvider extends ServiceProvider
             $bladeCompiler->directive('endunlessrole', function () {
                 return '<?php endif; ?>';
             });
+
+            $bladeCompiler->directive('hasexactroles', function ($arguments) {
+                list($roles, $guard) = explode(',', $arguments.',');
+
+                return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasExactRoles({$roles})): ?>";
+            });
+            $bladeCompiler->directive('endhasexactroles', function () {
+                return '<?php endif; ?>';
+            });
         });
     }
 
