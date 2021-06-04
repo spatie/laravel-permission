@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 4.2.0 - 2021-06-04
+- Add hasExactRoles method #1696
+
 ## 4.1.0 - 2021-06-01
 - Refactor to resolve guard only once during middleware
 - Refactor service provider by extracting some methods
