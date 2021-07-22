@@ -75,7 +75,7 @@ $permissionsByRole = [
 ];
 
 $insertPermissions = fn ($role) => collect($permissionsByRole[$role])
-    ->map(fn ($name) => DB::table()->insertGetId(['name' => $name]))
+    ->map(fn ($name) => DB::table('permissions')->insertGetId(['name' => $name, 'guard_name' => 'web']))
     ->toArray();
 
 $permissionIdsByRole = [
