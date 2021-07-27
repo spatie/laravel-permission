@@ -125,13 +125,42 @@ class PermissionRegistrar
     {
         if ($this->permissions === null) {
             $this->permissions = $this->cache->remember(self::$cacheKey, self::$cacheExpirationTime, function () {
-                return $this->getPermissionClass()
-                    ->with('roles')
-                    ->get();
+                $permissions = $this->getPermissionClass()->select('id', 'name', 'guard_name')
+                    ->with(['roles' => function ($q) {
+                        $q->select('id', 'name', 'guard_name');
+                    }])
+                    ->get()->toArray();
+                foreach ($permissions as $i => $permission) {
+                    foreach ($permission['roles'] ?? [] as $j => $roles) {
+                        unset($permissions[$i]['roles'][$j]['pivot']);
+                    }
+                }
+                return $permissions;
             });
+
+            $permissions = new Collection();
+            foreach ($this->permissions as $permission_array) {
+                $permission = new $this->permissionClass();
+                foreach ($permission_array as $key => $value) {
+                    if($key == 'roles') continue;
+                    $permission->$key = $value;
+                }
+
+                $roles = new Collection();
+                foreach ($permission_array['roles'] ?? [] as $role_array) {
+                    $role = new $this->roleClass();
+                    foreach ($role_array as $key => $value) {
+                        $role->$key = $value;
+                    }
+                    $roles->push($role);
+                }
+                $permission->setRolesCollection($roles);
+                $permissions->push($permission);
+            }
+            $this->permissions = $permissions;
         }
 
-        $permissions = clone $this->permissions;
+        $permissions = $this->permissions;
 
         foreach ($params as $attr => $value) {
             $permissions = $permissions->where($attr, $value);

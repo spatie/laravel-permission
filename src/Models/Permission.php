@@ -144,4 +144,12 @@ class Permission extends Model implements PermissionContract
             ->setPermissionClass(static::class)
             ->getPermissions($params);
     }
+
+    /**
+     * Set roles for cache load.
+     */
+    public function setRolesCollection(Collection $roles)
+    {
+        $this->relations['roles'] = $roles;
+    }
 }
