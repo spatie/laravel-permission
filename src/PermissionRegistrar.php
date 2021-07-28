@@ -115,13 +115,10 @@ class PermissionRegistrar
     }
 
     /**
-     * Get the permissions based on the passed params.
-     *
-     * @param array $params
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * Load permissions from cache
+     * This get cache and turns array into \Illuminate\Database\Eloquent\Collection
      */
-    public function getPermissions(array $params = []): Collection
+    private function loadPermissions()
     {
         if ($this->permissions === null) {
             $this->permissions = $this->cache->remember(self::$cacheKey, self::$cacheExpirationTime, function () {
@@ -159,11 +156,33 @@ class PermissionRegistrar
             }
             $this->permissions = $permissions;
         }
+    }
 
-        $permissions = $this->permissions;
+    /**
+     * Get the permissions based on the passed params.
+     *
+     * @param array $params
+     * @param bool $onlyOne
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getPermissions(array $params = [], bool $onlyOne = false): Collection
+    {
+        $this->loadPermissions();
 
-        foreach ($params as $attr => $value) {
-            $permissions = $permissions->where($attr, $value);
+        $method = $onlyOne ? 'first' : 'filter';
+
+        $permissions = $this->permissions->$method(static function ($permission) use ($params) {
+            foreach ($params as $attr => $value) {
+                if ($permission->getAttribute($attr) != $value) {
+                    return false;
+                }
+            }
+            return true;
+        });
+
+        if ($onlyOne) {
+            $permissions = new Collection($permissions ? [$permissions] : []);
         }
 
         return $permissions;
