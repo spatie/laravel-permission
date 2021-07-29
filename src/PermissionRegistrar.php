@@ -32,9 +32,6 @@ class PermissionRegistrar
     /** @var string */
     public static $cacheKey;
 
-    /** @var string */
-    public static $cacheModelKey;
-
     /**
      * PermissionRegistrar constructor.
      *
@@ -51,17 +48,17 @@ class PermissionRegistrar
 
     public function initializeCache()
     {
-        self::$cacheExpirationTime = config('permission.cache.expiration_time', config('permission.cache_expiration_time'));
+        self::$cacheExpirationTime = config('permission.cache.expiration_time') ?: \DateInterval::createFromDateString('24 hours');
 
         self::$cacheKey = config('permission.cache.key');
-        self::$cacheModelKey = config('permission.cache.model_key');
 
         $this->cache = $this->getCacheStoreFromConfig();
     }
 
     protected function getCacheStoreFromConfig(): \Illuminate\Contracts\Cache\Repository
     {
-        // the 'default' fallback here is from the permission.php config file, where 'default' means to use config(cache.default)
+        // the 'default' fallback here is from the permission.php config file,
+        // where 'default' means to use config(cache.default)
         $cacheDriver = config('permission.cache.store', 'default');
 
         // when 'default' is specified, no action is required since we already have the default instance
@@ -123,9 +120,7 @@ class PermissionRegistrar
         if ($this->permissions === null) {
             $this->permissions = $this->cache->remember(self::$cacheKey, self::$cacheExpirationTime, function () {
                 $permissions = $this->getPermissionClass()->select('id', 'name', 'guard_name')
-                    ->with(['roles' => function ($q) {
-                        $q->select('id', 'name', 'guard_name');
-                    }])
+                    ->with('roles:id,name,guard_name')
                     ->get()->toArray();
                 foreach ($permissions as $i => $permission) {
                     foreach ($permission['roles'] ?? [] as $j => $roles) {
@@ -134,27 +129,13 @@ class PermissionRegistrar
                 }
                 return $permissions;
             });
-
-            $permissions = new Collection();
-            foreach ($this->permissions as $permission_array) {
-                $permission = new $this->permissionClass();
-                foreach ($permission_array as $key => $value) {
-                    if($key == 'roles') continue;
-                    $permission->$key = $value;
+            if (is_array($this->permissions)) {
+                $permissions = new Collection();
+                foreach ($this->permissions as $value) {
+                    $permissions->push($this->permissionClass::getModelFromArray($value));
                 }
-
-                $roles = new Collection();
-                foreach ($permission_array['roles'] ?? [] as $role_array) {
-                    $role = new $this->roleClass();
-                    foreach ($role_array as $key => $value) {
-                        $role->$key = $value;
-                    }
-                    $roles->push($role);
-                }
-                $permission->setRolesCollection($roles);
-                $permissions->push($permission);
+                $this->permissions = $permissions;
             }
-            $this->permissions = $permissions;
         }
     }
 

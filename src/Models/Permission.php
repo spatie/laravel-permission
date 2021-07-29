@@ -163,12 +163,40 @@ class Permission extends Model implements PermissionContract
     }
 
     /**
-     * Set roles for cache load.
+     * Fill model from array.
      *
-     * @param \Illuminate\Database\Eloquent\Collection $roles
+     * @param array $attributes
      */
-    public function setRolesCollection(Collection $roles)
+    protected function fillModelFromArray(array $attributes)
     {
-        $this->relations['roles'] = $roles;
+        if (isset($attributes['roles'])) {
+            $roleClass = app(PermissionRegistrar::class)->getRoleClass();
+            $this->relations['roles'] = new Collection();
+
+            foreach ($attributes['roles'] as $value) {
+                $this->relations['roles']->push($roleClass::getModelFromArray($value));
+            }
+            unset($attributes['roles']);
+        }
+
+        $this->attributes = $attributes;
+        if (isset($attributes['id'])) {
+            $this->exists = true;
+            $this->original['id'] = $attributes['id'];
+        }
+        return $this;
+    }
+
+    /**
+     * Get model from array.
+     *
+     * @param array $attributes
+     *
+     * @return \Spatie\Permission\Contracts\Permission
+     */
+    public static function getModelFromArray(array $attributes): ?PermissionContract
+    {
+        $permission = new static;
+        return $permission->fillModelFromArray($attributes);
     }
 }
