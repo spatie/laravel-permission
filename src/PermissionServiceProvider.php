@@ -28,6 +28,8 @@ class PermissionServiceProvider extends ServiceProvider
         $this->app->singleton(PermissionRegistrar::class, function ($app) use ($permissionLoader) {
             return $permissionLoader;
         });
+
+        $this->loadMigrationsFrom([__DIR__ . '/../database/migrations']);
     }
 
     public function register()
