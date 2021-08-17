@@ -184,6 +184,7 @@ class Permission extends Model implements PermissionContract
             $this->exists = true;
             $this->original['id'] = $attributes['id'];
         }
+
         return $this;
     }
 
@@ -197,6 +198,7 @@ class Permission extends Model implements PermissionContract
     public static function getModelFromArray(array $attributes): ?PermissionContract
     {
         $permission = new static;
+
         return $permission->fillModelFromArray($attributes);
     }
 }

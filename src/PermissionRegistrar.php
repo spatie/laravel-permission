@@ -127,6 +127,7 @@ class PermissionRegistrar
                         unset($permissions[$i]['roles'][$j]['pivot']);
                     }
                 }
+
                 return $permissions;
             });
             if (is_array($this->permissions)) {
@@ -159,6 +160,7 @@ class PermissionRegistrar
                     return false;
                 }
             }
+
             return true;
         });
 

@@ -170,6 +170,7 @@ class Role extends Model implements RoleContract
             $this->exists = true;
             $this->original['id'] = $attributes['id'];
         }
+
         return $this;
     }
 
@@ -183,6 +184,7 @@ class Role extends Model implements RoleContract
     public static function getModelFromArray(array $attributes): ?RoleContract
     {
         $roles = new static;
+
         return $roles->fillModelFromArray($attributes);
     }
 }
