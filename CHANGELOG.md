@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 4.3.0 - 2021-08-17
+- Speed up permissions cache lookups, and make cache smaller #1799
+
 ## 4.2.0 - 2021-06-04
 - Add hasExactRoles method #1696
 
