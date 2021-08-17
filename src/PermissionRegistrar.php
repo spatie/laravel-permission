@@ -32,9 +32,6 @@ class PermissionRegistrar
     /** @var string */
     public static $cacheKey;
 
-    /** @var string */
-    public static $cacheModelKey;
-
     /**
      * PermissionRegistrar constructor.
      *
@@ -51,17 +48,17 @@ class PermissionRegistrar
 
     public function initializeCache()
     {
-        self::$cacheExpirationTime = config('permission.cache.expiration_time', config('permission.cache_expiration_time'));
+        self::$cacheExpirationTime = config('permission.cache.expiration_time') ?: \DateInterval::createFromDateString('24 hours');
 
         self::$cacheKey = config('permission.cache.key');
-        self::$cacheModelKey = config('permission.cache.model_key');
 
         $this->cache = $this->getCacheStoreFromConfig();
     }
 
     protected function getCacheStoreFromConfig(): \Illuminate\Contracts\Cache\Repository
     {
-        // the 'default' fallback here is from the permission.php config file, where 'default' means to use config(cache.default)
+        // the 'default' fallback here is from the permission.php config file,
+        // where 'default' means to use config(cache.default)
         $cacheDriver = config('permission.cache.store', 'default');
 
         // when 'default' is specified, no action is required since we already have the default instance
@@ -115,26 +112,58 @@ class PermissionRegistrar
     }
 
     /**
-     * Get the permissions based on the passed params.
-     *
-     * @param array $params
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * Load permissions from cache
+     * This get cache and turns array into \Illuminate\Database\Eloquent\Collection
      */
-    public function getPermissions(array $params = []): Collection
+    private function loadPermissions()
     {
         if ($this->permissions === null) {
             $this->permissions = $this->cache->remember(self::$cacheKey, self::$cacheExpirationTime, function () {
-                return $this->getPermissionClass()
-                    ->with('roles')
-                    ->get();
+                $permissions = $this->getPermissionClass()->select('id', 'name', 'guard_name')
+                    ->with('roles:id,name,guard_name')
+                    ->get()->toArray();
+                foreach ($permissions as $i => $permission) {
+                    foreach ($permission['roles'] ?? [] as $j => $roles) {
+                        unset($permissions[$i]['roles'][$j]['pivot']);
+                    }
+                }
+                return $permissions;
             });
+            if (is_array($this->permissions)) {
+                $permissions = new Collection();
+                foreach ($this->permissions as $value) {
+                    $permissions->push($this->permissionClass::getModelFromArray($value));
+                }
+                $this->permissions = $permissions;
+            }
         }
+    }
 
-        $permissions = clone $this->permissions;
+    /**
+     * Get the permissions based on the passed params.
+     *
+     * @param array $params
+     * @param bool $onlyOne
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getPermissions(array $params = [], bool $onlyOne = false): Collection
+    {
+        $this->loadPermissions();
 
-        foreach ($params as $attr => $value) {
-            $permissions = $permissions->where($attr, $value);
+        $method = $onlyOne ? 'first' : 'filter';
+
+        $permissions = $this->permissions->$method(static function ($permission) use ($params) {
+            foreach ($params as $attr => $value) {
+                if ($permission->getAttribute($attr) != $value) {
+                    return false;
+                }
+            }
+            return true;
+        });
+
+        if ($onlyOne) {
+            $permissions = new Collection($permissions ? [$permissions] : []);
         }
 
         return $permissions;
