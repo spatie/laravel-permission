@@ -96,7 +96,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function user_can_not_access_permission_or_role_with_guard_admin_while_using_default_guard()
+    public function user_can_not_access_permission_or_role_with_guard_admin_while_login_using_default_guard()
     {
         Auth::login($this->testUser);
 
@@ -110,7 +110,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function user_can_access_permission_or_role_with_guard_admin_while_using_default_guard()
+    public function user_can_access_permission_or_role_with_guard_admin_while_login_using_admin_guard()
     {
         Auth::guard('admin')->login($this->testAdmin);
 
