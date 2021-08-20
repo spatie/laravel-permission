@@ -35,36 +35,36 @@ class PermissionMiddlewareTest extends TestCase
     {
         // These permissions are created fresh here in reverse order of guard being applied, so they are not "found first" in the db lookup when matching
         app(Permission::class)->create(['name' => 'admin-permission2', 'guard_name' => 'web']);
-        app(Permission::class)->create(['name' => 'admin-permission2', 'guard_name' => 'admin']);
+        $p1 = app(Permission::class)->create(['name' => 'admin-permission2', 'guard_name' => 'admin']);
         app(Permission::class)->create(['name' => 'edit-articles2', 'guard_name' => 'admin']);
-        app(Permission::class)->create(['name' => 'edit-articles2', 'guard_name' => 'web']);
+        $p2 = app(Permission::class)->create(['name' => 'edit-articles2', 'guard_name' => 'web']);
 
-        Auth::login($this->testAdmin);
+        Auth::guard('admin')->login($this->testAdmin);
 
-        $this->testAdmin->givePermissionTo('admin-permission2');
+        $this->testAdmin->givePermissionTo($p1);
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->permissionMiddleware, 'admin-permission2')
+            $this->runMiddleware($this->permissionMiddleware, 'admin-permission2', 'admin')
         );
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-articles2')
+            $this->runMiddleware($this->permissionMiddleware, 'edit-articles2', 'admin')
         );
 
         Auth::login($this->testUser);
 
-        $this->testUser->givePermissionTo('edit-articles2');
+        $this->testUser->givePermissionTo($p2);
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-articles2')
+            $this->runMiddleware($this->permissionMiddleware, 'edit-articles2', 'web')
         );
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->permissionMiddleware, 'admin-permission2')
+            $this->runMiddleware($this->permissionMiddleware, 'admin-permission2', 'web')
         );
     }
 
