@@ -156,7 +156,7 @@ To share your app on Github for easy collaboration:
 
 ```sh
 git remote add origin git@github.com:YOURUSERNAME/REPONAME.git
-git push -u origin master
+git push -u origin main
 ```
 The above only needs to be done once. 
 
@@ -165,7 +165,7 @@ The above only needs to be done once.
 ```sh
 git add .
 git commit -m "Explain what your commit is about here"
-git push origin master
+git push origin main
 ```
 Repeat the above process whenever you change code that you want to share.
 
