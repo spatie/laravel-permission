@@ -88,8 +88,25 @@ The `givePermissionTo` and `revokePermissionTo` functions can accept a
 string or a `Spatie\Permission\Models\Permission` object.
 
 
-**Permissions are inherited from roles automatically.**
+**NOTE: Permissions are inherited from roles automatically.**
 
+
+### What Permissions Does A Role Have?
+
+The `permissions` property on any given role returns a collection with all the related permission objects. This collection can respond to usual Eloquent Collection operations, such as count, sort, etc.
+
+```php
+// get collection
+$role->permissions;
+
+// return only the permission names:
+$role->permissions->pluck('name');
+
+// count the number of permissions assigned to a role
+count($role->permissions);
+// or
+$role->permissions->count();
+```
 
 ## Assigning Direct Permissions To A User
 
