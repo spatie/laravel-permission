@@ -26,6 +26,12 @@ class PermissionRegistrar
     /** @var \Illuminate\Database\Eloquent\Collection */
     protected $permissions;
 
+    /** @var string */
+    public static $pivotRole;
+
+    /** @var string */
+    public static $pivotPermission;
+
     /** @var \DateInterval|int */
     public static $cacheExpirationTime;
 
@@ -51,6 +57,9 @@ class PermissionRegistrar
         self::$cacheExpirationTime = config('permission.cache.expiration_time') ?: \DateInterval::createFromDateString('24 hours');
 
         self::$cacheKey = config('permission.cache.key');
+
+        self::$pivotRole = config('permission.column_names.role_pivot_key') ?: 'role_id';
+        self::$pivotPermission = config('permission.column_names.permission_pivot_key') ?: 'permission_id';
 
         $this->cache = $this->getCacheStoreFromConfig();
     }

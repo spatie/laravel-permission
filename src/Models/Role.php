@@ -9,6 +9,7 @@ use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\RoleAlreadyExists;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Guard;
+use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
 
@@ -50,8 +51,8 @@ class Role extends Model implements RoleContract
         return $this->belongsToMany(
             config('permission.models.permission'),
             config('permission.table_names.role_has_permissions'),
-            'role_id',
-            'permission_id'
+            PermissionRegistrar::$pivotRole,
+            PermissionRegistrar::$pivotPermission
         );
     }
 
@@ -64,7 +65,7 @@ class Role extends Model implements RoleContract
             getModelForGuard($this->attributes['guard_name']),
             'model',
             config('permission.table_names.model_has_roles'),
-            'role_id',
+            PermissionRegistrar::$pivotRole,
             config('permission.column_names.model_morph_key')
         );
     }
