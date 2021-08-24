@@ -171,7 +171,7 @@ trait HasRoles
      * @param string|null $guard
      * @return bool
      */
-    public function hasRole($roles, string $guard = null): bool
+    public function hasRole($roles, string $guard = null, string $customField = 'name'): bool
     {
         if (is_string($roles) && false !== strpos($roles, '|')) {
             $roles = $this->convertPipeToArray($roles);
@@ -179,8 +179,8 @@ trait HasRoles
 
         if (is_string($roles)) {
             return $guard
-                ? $this->roles->where('guard_name', $guard)->contains('name', $roles)
-                : $this->roles->contains('name', $roles);
+                ? $this->roles->where('guard_name', $guard)->contains($customField, $roles)
+                : $this->roles->contains($customField, $roles);
         }
 
         if (is_int($roles)) {
@@ -227,7 +227,7 @@ trait HasRoles
      * @param  string|null  $guard
      * @return bool
      */
-    public function hasAllRoles($roles, string $guard = null): bool
+    public function hasAllRoles($roles, string $guard = null, string $customField = 'name'): bool
     {
         if (is_string($roles) && false !== strpos($roles, '|')) {
             $roles = $this->convertPipeToArray($roles);
@@ -235,8 +235,8 @@ trait HasRoles
 
         if (is_string($roles)) {
             return $guard
-                ? $this->roles->where('guard_name', $guard)->contains('name', $roles)
-                : $this->roles->contains('name', $roles);
+                ? $this->roles->where('guard_name', $guard)->contains($customField, $roles)
+                : $this->roles->contains($customField, $roles);
         }
 
         if ($roles instanceof Role) {
@@ -249,7 +249,7 @@ trait HasRoles
 
         return $roles->intersect(
             $guard
-                ? $this->roles->where('guard_name', $guard)->pluck('name')
+                ? $this->roles->where('guard_name', $guard)->pluck($customField)
                 : $this->getRoleNames()
         ) == $roles;
     }
@@ -290,9 +290,9 @@ trait HasRoles
         return $this->permissions;
     }
 
-    public function getRoleNames(): Collection
+    public function getRoleNames(string $customField = 'name'): Collection
     {
-        return $this->roles->pluck('name');
+        return $this->roles->pluck($customField);
     }
 
     protected function getStoredRole($role): Role
