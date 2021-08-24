@@ -349,7 +349,7 @@ trait HasPermissions
             $class::saved(
                 function ($object) use ($permissions, $model) {
                     if ($model->getKey() != $object->getKey()) {
-                       return;
+                        return;
                     }
                     $model->permissions()->sync($permissions, false);
                     $model->load('permissions');
