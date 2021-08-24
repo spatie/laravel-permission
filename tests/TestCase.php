@@ -32,7 +32,7 @@ abstract class TestCase extends Orchestra
     protected $testAdminPermission;
     
     /** @var bool */
-    protected $useCustomModels=false;
+    protected $useCustomModels = false;
 
     public function setUp(): void
     {
