@@ -119,22 +119,22 @@ class PermissionRegistrar
     {
         if ($this->permissions === null) {
             $this->permissions = $this->cache->remember(self::$cacheKey, self::$cacheExpirationTime, function () {
-                $permissions = $this->getPermissionClass()->select('id', 'name', 'guard_name')
-                    ->with('roles:id,name,guard_name')
-                    ->get();
-
-                if (! method_exists($this->getPermissionClass(), 'getModelFromArray')) {
-                    return $permissions;
-                }
-
                 // make the cache smaller using an array with only required fields
-                return $permissions->map(function ($permission) {
-                    return $permission->only('id', 'name', 'guard_name') + ['roles' => $permission->roles->map->only('id', 'name', 'guard_name')->all()];
-                })->all();
+                return $this->getPermissionClass()->select('id', 'name', 'guard_name')
+                    ->with('roles:id,name,guard_name')->get()
+                    ->map(function ($permission) {
+                        return $permission->only('id', 'name', 'guard_name') + 
+                            ['roles' => $permission->roles->map->only('id', 'name', 'guard_name')->all()];
+                    })->all();
             });
             if (is_array($this->permissions)) {
-                $this->permissions = (new Collection($this->permissions))->map(function ($permission) {
-                    return $this->permissionClass::getModelFromArray($permission);
+                $this->permissions = $this->getPermissionClass()::hydrate(
+                    collect($this->permissions)->map(function ($item) {
+                        return collect($item)->only('id', 'name', 'guard_name')->all();
+                    })->all()
+                )
+                ->each(function ($permission, $i) {
+                    $permission->setRelation('roles', $this->getRoleClass()::hydrate($this->permissions[$i]['roles'] ?? []));
                 });
             }
         }

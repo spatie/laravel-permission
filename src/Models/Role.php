@@ -157,34 +157,4 @@ class Role extends Model implements RoleContract
 
         return $this->permissions->contains('id', $permission->id);
     }
-
-    /**
-     * Fill model from array.
-     *
-     * @param array $attributes
-     */
-    protected function fillModelFromArray(array $attributes)
-    {
-        $this->attributes = $attributes;
-        if (isset($attributes['id'])) {
-            $this->exists = true;
-            $this->original['id'] = $attributes['id'];
-        }
-
-        return $this;
-    }
-
-    /**
-     * Get model from array.
-     *
-     * @param array $attributes
-     *
-     * @return \Spatie\Permission\Contracts\Role
-     */
-    public static function getModelFromArray(array $attributes): ?RoleContract
-    {
-        $roles = new static;
-
-        return $roles->fillModelFromArray($attributes);
-    }
 }
