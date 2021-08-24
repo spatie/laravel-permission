@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## unreleased
+- Avoid re-sync on non-persisted objects when firing Eloquent::saved #1819
+
 ## 4.3.0 - 2021-08-17
 - Speed up permissions cache lookups, and make cache smaller #1799
 
