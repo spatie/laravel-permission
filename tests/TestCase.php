@@ -30,6 +30,9 @@ abstract class TestCase extends Orchestra
 
     /** @var \Spatie\Permission\Models\Permission */
     protected $testAdminPermission;
+    
+    /** @var bool */
+    protected $useCustomModels=false;
 
     public function setUp(): void
     {
@@ -78,7 +81,10 @@ abstract class TestCase extends Orchestra
         // Set-up admin guard
         $app['config']->set('auth.guards.admin', ['driver' => 'session', 'provider' => 'admins']);
         $app['config']->set('auth.providers.admins', ['driver' => 'eloquent', 'model' => Admin::class]);
-
+        if ($this->useCustomModels) {
+            $app['config']->set('permission.models.permission', \Spatie\Permission\Test\Permission::class);
+            $app['config']->set('permission.models.role', \Spatie\Permission\Test\Role::class);
+        }
         // Use test User model for users provider
         $app['config']->set('auth.providers.users.model', User::class);
 

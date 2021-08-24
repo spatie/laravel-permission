@@ -121,21 +121,21 @@ class PermissionRegistrar
             $this->permissions = $this->cache->remember(self::$cacheKey, self::$cacheExpirationTime, function () {
                 $permissions = $this->getPermissionClass()->select('id', 'name', 'guard_name')
                     ->with('roles:id,name,guard_name')
-                    ->get()->toArray();
-                foreach ($permissions as $i => $permission) {
-                    foreach ($permission['roles'] ?? [] as $j => $roles) {
-                        unset($permissions[$i]['roles'][$j]['pivot']);
-                    }
+                    ->get();
+
+                if (! method_exists($this->getPermissionClass(), 'getModelFromArray')) {
+                    return $permissions;
                 }
 
-                return $permissions;
+                // make the cache smaller using an array with only required fields
+                return $permissions->map(function ($permission) {
+                    return $permission->only('id', 'name', 'guard_name') + ['roles' => $permission->roles->map->only('id', 'name', 'guard_name')->all()];
+                })->all();
             });
             if (is_array($this->permissions)) {
-                $permissions = new Collection();
-                foreach ($this->permissions as $value) {
-                    $permissions->push($this->permissionClass::getModelFromArray($value));
-                }
-                $this->permissions = $permissions;
+                $this->permissions = (new Collection($this->permissions))->map(function ($permission) {
+                    return $this->permissionClass::getModelFromArray($permission);
+                });
             }
         }
     }
