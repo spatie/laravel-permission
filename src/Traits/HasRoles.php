@@ -120,6 +120,9 @@ trait HasRoles
 
             $class::saved(
                 function ($object) use ($roles, $model) {
+                    if ($model->getKey() != $object->getKey()) {
+                       return;
+                    }
                     $model->roles()->sync($roles, false);
                     $model->load('roles');
                 }

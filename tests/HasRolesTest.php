@@ -245,13 +245,18 @@ class HasRolesTest extends TestCase
 
         $user2 = new User(['email' => 'admin@user.com']);
         $user2->syncRoles('testRole2');
+
+        \DB::enableQueryLog();
         $user2->save();
+        $querys = \DB::getQueryLog();
+        \DB::disableQueryLog();
 
         $this->assertTrue($user->fresh()->hasRole('testRole'));
         $this->assertFalse($user->fresh()->hasRole('testRole2'));
 
         $this->assertTrue($user2->fresh()->hasRole('testRole2'));
         $this->assertFalse($user2->fresh()->hasRole('testRole'));
+        $this->assertSame(4, count($querys)); //avoid unnecessary sync
     }
 
     /** @test */
@@ -263,13 +268,18 @@ class HasRolesTest extends TestCase
 
         $admin_user = new User(['email' => 'admin@user.com']);
         $admin_user->assignRole('testRole2');
+
+        \DB::enableQueryLog();
         $admin_user->save();
+        $querys = \DB::getQueryLog();
+        \DB::disableQueryLog();
 
         $this->assertTrue($user->fresh()->hasRole('testRole'));
         $this->assertFalse($user->fresh()->hasRole('testRole2'));
 
         $this->assertTrue($admin_user->fresh()->hasRole('testRole2'));
         $this->assertFalse($admin_user->fresh()->hasRole('testRole'));
+        $this->assertSame(4, count($querys)); //avoid unnecessary sync
     }
 
     /** @test */
