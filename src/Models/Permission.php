@@ -171,11 +171,9 @@ class Permission extends Model implements PermissionContract
     {
         if (isset($attributes['roles'])) {
             $roleClass = app(PermissionRegistrar::class)->getRoleClass();
-            $this->relations['roles'] = new Collection();
-
-            foreach ($attributes['roles'] as $value) {
-                $this->relations['roles']->push($roleClass::getModelFromArray($value));
-            }
+            $this->relations['roles'] = (new Collection($attributes['roles']))->map(function ($role) use ($roleClass) {
+                return $roleClass::getModelFromArray($role);
+            });
             unset($attributes['roles']);
         }
 
