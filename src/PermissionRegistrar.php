@@ -119,22 +119,26 @@ class PermissionRegistrar
     {
         if ($this->permissions === null) {
             $this->permissions = $this->cache->remember(self::$cacheKey, self::$cacheExpirationTime, function () {
-                $permissions = $this->getPermissionClass()->select('id', 'name', 'guard_name')
-                    ->with('roles:id,name,guard_name')
-                    ->get();
-
-                if (! method_exists($this->getPermissionClass(), 'getModelFromArray')) {
-                    return $permissions;
-                }
-
                 // make the cache smaller using an array with only required fields
-                return $permissions->map(function ($permission) {
-                    return $permission->only('id', 'name', 'guard_name') + ['roles' => $permission->roles->map->only('id', 'name', 'guard_name')->all()];
-                })->all();
+                return $this->getPermissionClass()->select('id', 'id as i', 'name as n', 'guard_name as g')
+                    ->with('roles:id,id as i,name as n,guard_name as g')->get()
+                    ->map(function ($permission) {
+                        return $permission->only('i', 'n', 'g') +
+                            ['r' => $permission->roles->map->only('i', 'n', 'g')->all()];
+                    })->all();
             });
             if (is_array($this->permissions)) {
-                $this->permissions = (new Collection($this->permissions))->map(function ($permission) {
-                    return $this->permissionClass::getModelFromArray($permission);
+                $this->permissions = $this->getPermissionClass()::hydrate(
+                    collect($this->permissions)->map(function ($item) {
+                        return ['id' => $item['i'] ?? $item['id'], 'name' => $item['n'] ?? $item['name'], 'guard_name' => $item['g'] ?? $item['guard_name']];
+                    })->all()
+                )
+                ->each(function ($permission, $i) {
+                    $permission->setRelation('roles', $this->getRoleClass()::hydrate(
+                        collect($this->permissions[$i]['r'] ?? $this->permissions[$i]['roles'] ?? [])->map(function ($item) {
+                            return ['id' => $item['i'] ?? $item['id'], 'name' => $item['n'] ?? $item['name'], 'guard_name' => $item['g'] ?? $item['guard_name']];
+                        })->all()
+                    ));
                 });
             }
         }
