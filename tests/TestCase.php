@@ -37,7 +37,7 @@ abstract class TestCase extends Orchestra
     protected $useCustomModels = false;
 
     /** @var bool */
-    protected $hasTeams=false;
+    protected $hasTeams = false;
 
     public function setUp(): void
     {

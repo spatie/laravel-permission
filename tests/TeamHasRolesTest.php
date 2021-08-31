@@ -7,7 +7,7 @@ use Spatie\Permission\Contracts\Role;
 class TeamHasRolesTest extends HasRolesTest
 {
     /** @var bool */
-    protected $hasTeams=true;
+    protected $hasTeams = true;
 
     /** @test */
     public function it_can_assign_same_and_different_roles_on_same_user_different_teams()

@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Config;
 
 class UpgradeForTeams extends Command
 {
-
     protected $signature = 'permission:setup-teams';
 
     protected $description = 'Setup the teams feature by generating the associated migration.';
@@ -16,9 +15,10 @@ class UpgradeForTeams extends Command
 
     public function handle()
     {
-        if (!Config::get('permission.teams')) {
+        if (! Config::get('permission.teams')) {
             $this->error('Teams feature is disabled in your permission.php file.');
             $this->warn('Please enable the teams setting in your configuration.');
+
             return;
         }
 
@@ -65,9 +65,11 @@ class UpgradeForTeams extends Command
         try {
             $migrationStub = __DIR__."/../../database/migrations/{$this->migrationSuffix}.stub";
             copy($migrationStub, $this->getMigrationPath());
+
             return true;
         } catch (\Throwable $e) {
             $this->error($e->getMessage());
+
             return false;
         }
     }

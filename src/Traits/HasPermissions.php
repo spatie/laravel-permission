@@ -342,8 +342,8 @@ trait HasPermissions
                 $this->ensureModelSharesGuard($permission);
             })
             ->map(function ($permission) {
-                return ['id' => $permission->id, 'values' => PermissionRegistrar::$teams  && !is_a($this, Role::class) ?
-                    [PermissionRegistrar::$teamsKey => app(PermissionRegistrar::class)->getPermissionsTeamId()] : []
+                return ['id' => $permission->id, 'values' => PermissionRegistrar::$teams && ! is_a($this, Role::class) ?
+                    [PermissionRegistrar::$teamsKey => app(PermissionRegistrar::class)->getPermissionsTeamId()] : [],
                 ];
             })
             ->pluck('values', 'id')->toArray();
@@ -351,7 +351,7 @@ trait HasPermissions
         $model = $this->getModel();
 
         if ($model->exists) {
-            if (PermissionRegistrar::$teams && !is_a($this, Role::class)) {
+            if (PermissionRegistrar::$teams && ! is_a($this, Role::class)) {
                 $this->permissions()->wherePivot(PermissionRegistrar::$teamsKey, app(PermissionRegistrar::class)->getPermissionsTeamId())->sync($permissions, false);
             } else {
                 $this->permissions()->sync($permissions, false);

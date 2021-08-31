@@ -26,6 +26,7 @@ class CreateRole extends Command
 
         if (! PermissionRegistrar::$teams && $this->option('team-id')) {
             $this->warn("Teams feature disabled, argument --team-id has no effect. Either enable it in permissions config file or remove --team-id parameter");
+
             return;
         }
 

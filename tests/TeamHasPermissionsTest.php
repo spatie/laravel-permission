@@ -5,8 +5,7 @@ namespace Spatie\Permission\Test;
 class TeamHasPermissionsTest extends HasPermissionsTest
 {
     /** @var bool */
-    protected $hasTeams=true;
-
+    protected $hasTeams = true;
 
     /** @test */
     public function it_can_assign_same_and_different_permission_on_same_user_on_different_teams()

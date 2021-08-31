@@ -105,7 +105,7 @@ class Role extends Model implements RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-         $role = static::findByParam(['id' => $id, 'guard_name' => $guardName]);
+        $role = static::findByParam(['id' => $id, 'guard_name' => $guardName]);
 
         if (! $role) {
             throw RoleDoesNotExist::withId($id);
@@ -147,6 +147,7 @@ class Role extends Model implements RoleContract
         foreach ($params as $key => $value) {
             $query->where($key, $value);
         }
+
         return $query->first();
     }
 

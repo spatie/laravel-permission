@@ -41,6 +41,7 @@ trait HasRoles
     public function roles(): BelongsToMany
     {
         $model_has_roles = config('permission.table_names.model_has_roles');
+
         return $this->morphToMany(
             config('permission.models.role'),
             'model',
@@ -120,8 +121,8 @@ trait HasRoles
                 $this->ensureModelSharesGuard($role);
             })
             ->map(function ($role) {
-                return ['id' => $role->id, 'values' => PermissionRegistrar::$teams && !is_a($this, Permission::class) ?
-                    [PermissionRegistrar::$teamsKey => app(PermissionRegistrar::class)->getPermissionsTeamId()] : []
+                return ['id' => $role->id, 'values' => PermissionRegistrar::$teams && ! is_a($this, Permission::class) ?
+                    [PermissionRegistrar::$teamsKey => app(PermissionRegistrar::class)->getPermissionsTeamId()] : [],
                 ];
             })
             ->pluck('values', 'id')->toArray();
@@ -129,7 +130,7 @@ trait HasRoles
         $model = $this->getModel();
 
         if ($model->exists) {
-            if (PermissionRegistrar::$teams && !is_a($this, Permission::class)) {
+            if (PermissionRegistrar::$teams && ! is_a($this, Permission::class)) {
                 $this->roles()->wherePivot(PermissionRegistrar::$teamsKey, app(PermissionRegistrar::class)->getPermissionsTeamId())->sync($roles, false);
             } else {
                 $this->roles()->sync($roles, false);
