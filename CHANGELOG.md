@@ -2,8 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
-## PENDING 5.0.0 - 2021-08-31
+## 5.0.0 - 2021-08-31
 - Change default-guard-lookup to prefer current user's guard (see BC note in #1817 )
+- Teams/Groups feature (see docs, or PR #1804)
 - Customized pivots instead of `role_id`,`permission_id` #1823
 
 
