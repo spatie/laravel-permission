@@ -10,9 +10,6 @@ Role and Permission data are cached to speed up performance.
 When you **use the built-in functions** for manipulating roles and permissions, the cache is automatically reset for you, and relations are automatically reloaded for the current model record:
 
 ```php
-$user->assignRole('writer');
-$user->removeRole('writer');
-$user->syncRoles(params);
 $role->givePermissionTo('edit articles');
 $role->revokePermissionTo('edit articles');
 $role->syncPermissions(params);
@@ -25,6 +22,14 @@ HOWEVER, if you manipulate permission/role data directly in the database instead
 
 Additionally, because the Role and Permission models are Eloquent models which implement the `RefreshesPermissionCache` trait, creating and deleting Roles and Permissions will automatically clear the cache. If you have created your own models which do not extend the default models then you will need to implement the trait yourself.
 
+**NOTE: User-specific role/permission assignments are kept in-memory since v4.4.0, so the cache-reset is no longer called since v5.1.0 when updating User-related assignments.**
+Examples:
+```php
+// These do not call a cache-reset, because the User-related assignments are in-memory.
+$user->assignRole('writer');
+$user->removeRole('writer');
+$user->syncRoles(params);
+```
 
 ### Manual cache reset
 To manually reset the cache for this package, you can run the following in your app code:
