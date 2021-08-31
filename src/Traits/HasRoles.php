@@ -5,6 +5,7 @@ namespace Spatie\Permission\Traits;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Collection;
+use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -39,13 +40,24 @@ trait HasRoles
      */
     public function roles(): BelongsToMany
     {
+        $model_has_roles = config('permission.table_names.model_has_roles');
         return $this->morphToMany(
             config('permission.models.role'),
             'model',
-            config('permission.table_names.model_has_roles'),
+            $model_has_roles,
             config('permission.column_names.model_morph_key'),
             PermissionRegistrar::$pivotRole
-        );
+        )
+        ->where(function ($q) use ($model_has_roles) {
+            $q->when(PermissionRegistrar::$teams, function ($q) use ($model_has_roles) {
+                $teamId = app(PermissionRegistrar::class)->getPermissionsTeamId();
+                $q->where($model_has_roles.'.'.PermissionRegistrar::$teamsKey, $teamId)
+                    ->where(function ($q) use ($teamId) {
+                        $teamField = config('permission.table_names.roles').'.'.PermissionRegistrar::$teamsKey;
+                        $q->whereNull($teamField)->orWhere($teamField, $teamId);
+                    });
+            });
+        });
     }
 
     /**
@@ -107,13 +119,21 @@ trait HasRoles
             ->each(function ($role) {
                 $this->ensureModelSharesGuard($role);
             })
-            ->map->id
-            ->all();
+            ->map(function ($role) {
+                return ['id' => $role->id, 'values' => PermissionRegistrar::$teams && !is_a($this, Permission::class) ?
+                    [PermissionRegistrar::$teamsKey => app(PermissionRegistrar::class)->getPermissionsTeamId()] : []
+                ];
+            })
+            ->pluck('values', 'id')->toArray();
 
         $model = $this->getModel();
 
         if ($model->exists) {
-            $this->roles()->sync($roles, false);
+            if (PermissionRegistrar::$teams && !is_a($this, Permission::class)) {
+                $this->roles()->wherePivot(PermissionRegistrar::$teamsKey, app(PermissionRegistrar::class)->getPermissionsTeamId())->sync($roles, false);
+            } else {
+                $this->roles()->sync($roles, false);
+            }
             $model->load('roles');
         } else {
             $class = \get_class($model);

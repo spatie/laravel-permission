@@ -516,8 +516,8 @@ class HasPermissionsTest extends TestCase
     {
         $this->testUser->givePermissionTo('edit-news', 'edit-articles');
         $this->assertEquals(
-            collect(['edit-news', 'edit-articles']),
-            $this->testUser->getPermissionNames()
+            collect(['edit-articles', 'edit-news']),
+            $this->testUser->getPermissionNames()->sort()->values()
         );
     }
 

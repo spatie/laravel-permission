@@ -130,4 +130,54 @@ class CommandTest extends TestCase
         $this->assertTrue(strpos($output, 'Guard: web') !== false);
         $this->assertTrue(strpos($output, 'Guard: admin') === false);
     }
+
+    /** @test */
+    public function it_can_setup_teams_upgrade()
+    {
+        config()->set('permission.teams', true);
+
+        $this->artisan('permission:setup-teams')
+            ->expectsQuestion('Proceed with the migration creation?', 'yes')
+            ->assertExitCode(0);
+
+        $matchingFiles = glob(database_path('migrations/*_add_teams_fields.php'));
+        $this->assertTrue(count($matchingFiles) > 0);
+
+        include_once $matchingFiles[count($matchingFiles)-1];
+        (new \AddTeamsFields())->up();
+        (new \AddTeamsFields())->up(); //test upgrade teams migration fresh
+
+        Role::create(['name' => 'new-role', 'team_test_id' => 1]);
+        $role = Role::where('name', 'new-role')->first();
+        $this->assertNotNull($role);
+        $this->assertSame(1, (int) $role->team_test_id);
+
+        // remove migration
+        foreach ($matchingFiles as $file) {
+            unlink($file);
+        }
+    }
+
+    /** @test */
+    public function it_can_show_roles_by_teams()
+    {
+        config()->set('permission.teams', true);
+        app(\Spatie\Permission\PermissionRegistrar::class)->initializeCache();
+
+        Role::create(['name' => 'testRoleTeam', 'team_test_id' => 1]);
+        Role::create(['name' => 'testRoleTeam', 'team_test_id' => 2]); // same name different team
+        Artisan::call('permission:show');
+
+        $output = Artisan::output();
+
+        // |    | Team ID: NULL        | Team ID: 1   | Team ID: 2   |
+        // |    | testRole | testRole2 | testRoleTeam | testRoleTeam |
+        if (method_exists($this, 'assertMatchesRegularExpression')) {
+            $this->assertMatchesRegularExpression('/\|\s+\|\s+Team ID: NULL\s+\|\s+Team ID: 1\s+\|\s+Team ID: 2\s+\|/', $output);
+            $this->assertMatchesRegularExpression('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|\s+testRoleTeam\s+\|\s+testRoleTeam\s+\|/', $output);
+        } else { // phpUnit 9/8
+            $this->assertRegExp('/\|\s+\|\s+Team ID: NULL\s+\|\s+Team ID: 1\s+\|\s+Team ID: 2\s+\|/', $output);
+            $this->assertRegExp('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|\s+testRoleTeam\s+\|\s+testRoleTeam\s+\|/', $output);
+        }
+    }
 }

@@ -52,6 +52,8 @@ $app->register(App\Providers\AuthServiceProvider::class);
 
 Ensure the application's database name/credentials are set in your `.env` (or `config/database.php` if you have one), and that the database exists.
 
+NOTE: If you are going to use teams feature, you have to update your [`config/permission.php` config file](https://github.com/spatie/laravel-permission/blob/master/config/permission.php) and set `'teams' => true,`, if you want to use a custom foreign key for teams you must change `team_foreign_key`.
+
 Run the migrations to create the tables for this package:
 
 ```bash

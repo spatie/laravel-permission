@@ -18,3 +18,14 @@ if (! function_exists('getModelForGuard')) {
             })->get($guard);
     }
 }
+
+if (! function_exists('setPermissionsTeamId')) {
+    /**
+     * @param int $id
+     *
+     */
+    function setPermissionsTeamId(int $id)
+    {
+        app(\Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId($id);
+    }
+}
