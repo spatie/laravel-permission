@@ -47,7 +47,7 @@ trait HasPermissions
             'model',
             config('permission.table_names.model_has_permissions'),
             config('permission.column_names.model_morph_key'),
-            'permission_id'
+            PermissionRegistrar::$pivotPermission
         );
     }
 

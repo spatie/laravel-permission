@@ -44,7 +44,7 @@ trait HasRoles
             'model',
             config('permission.table_names.model_has_roles'),
             config('permission.column_names.model_morph_key'),
-            'role_id'
+            PermissionRegistrar::$pivotRole
         );
     }
 
