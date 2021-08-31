@@ -371,7 +371,9 @@ trait HasPermissions
             );
         }
 
-        $this->forgetCachedPermissions();
+        if (is_a($this, get_class(app(PermissionRegistrar::class)->getRoleClass()))) {
+            $this->forgetCachedPermissions();
+        }
 
         return $this;
     }
@@ -401,7 +403,9 @@ trait HasPermissions
     {
         $this->permissions()->detach($this->getStoredPermission($permission));
 
-        $this->forgetCachedPermissions();
+        if (is_a($this, get_class(app(PermissionRegistrar::class)->getRoleClass()))) {
+            $this->forgetCachedPermissions();
+        }
 
         $this->load('permissions');
 
