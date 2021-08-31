@@ -247,4 +247,14 @@ class PermissionRegistrar
     {
         return $this->cache->getStore();
     }
+
+    /**
+     * Get the instance of the Cache Repository.
+     *
+     * @return \Illuminate\Cache\Repository
+     */
+    public function getCacheRepository(): \Illuminate\Cache\Repository
+    {
+        return $this->cache;
+    }
 }

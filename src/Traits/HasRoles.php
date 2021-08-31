@@ -135,7 +135,7 @@ trait HasRoles
             } else {
                 $this->roles()->sync($roles, false);
             }
-            $model->load('roles');
+            $this->reloadRelation($model, 'roles');
         } else {
             $class = \get_class($model);
 
@@ -145,7 +145,7 @@ trait HasRoles
                         return;
                     }
                     $model->roles()->sync($roles, false);
-                    $model->load('roles');
+                    $this->reloadRelation($model, 'roles');
                 }
             );
         }
@@ -166,7 +166,7 @@ trait HasRoles
     {
         $this->roles()->detach($this->getStoredRole($role));
 
-        $this->load('roles');
+        $this->reloadRelation($this, 'roles');
 
         if (is_a($this, get_class($this->getPermissionClass()))) {
             $this->forgetCachedPermissions();
