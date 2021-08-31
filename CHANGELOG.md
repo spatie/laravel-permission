@@ -193,8 +193,8 @@ https://github.com/laravel/framework/commit/fd6eb89b62ec09df1ffbee164831a827e83f
 The following changes are not "breaking", but worth making the updates to your app for consistency.
 
 1. Config file: The `config/permission.php` file changed to move cache-related settings into a sub-array. **You should review the changes and merge the updates into your own config file.** Specifically the `expiration_time` value has moved into a sub-array entry, and the old top-level entry is no longer used.
-See the master config file here: 
-https://github.com/spatie/laravel-permission/blob/master/config/permission.php
+See the original config file here: 
+https://github.com/spatie/laravel-permission/blob/main/config/permission.php
 
 2. Cache Resets: If your `app` or `tests` are clearing the cache by specifying the cache key, **it is better to use the built-in forgetCachedPermissions() method** so that it properly handles tagged cache entries. Here is the recommended change:
 ```diff

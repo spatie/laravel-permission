@@ -45,5 +45,5 @@ This package publishes a `config/permission.php` file. If you already have a fil
 
 MySQL 8.0 limits index keys to 1000 characters. This package publishes a migration which combines multiple columns in single index. With `utf8mb4` the 4-bytes-per-character requirement of `mb4` means the max length of the columns in the hybrid index can only be `125` characters.
 
-Thus in your AppServiceProvider you will need to set `Schema::defaultStringLength(125)`. [See the Laravel Docs for instructions](https://laravel.com/docs/master/migrations#index-lengths-mysql-mariadb).
+Thus in your AppServiceProvider you will need to set `Schema::defaultStringLength(125)`. [See the Laravel Docs for instructions](https://laravel.com/docs/migrations#index-lengths-mysql-mariadb).
 
