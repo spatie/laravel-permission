@@ -568,7 +568,7 @@ class HasRolesTest extends TestCase
 
         $this->assertEquals(
             collect(['testRole', 'testRole2']),
-            $this->testUser->getRoleNames()
+            $this->testUser->getRoleNames()->sort()->values()
         );
     }
 

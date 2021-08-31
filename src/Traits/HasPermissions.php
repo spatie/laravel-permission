@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Exceptions\WildcardPermissionInvalidArgument;
@@ -48,7 +49,12 @@ trait HasPermissions
             config('permission.table_names.model_has_permissions'),
             config('permission.column_names.model_morph_key'),
             PermissionRegistrar::$pivotPermission
-        );
+        )
+        ->where(function ($q) {
+            $q->when(PermissionRegistrar::$teams, function ($q) {
+                $q->where(PermissionRegistrar::$teamsKey, app(PermissionRegistrar::class)->getPermissionsTeamId());
+            });
+        });
     }
 
     /**
@@ -335,13 +341,21 @@ trait HasPermissions
             ->each(function ($permission) {
                 $this->ensureModelSharesGuard($permission);
             })
-            ->map->id
-            ->all();
+            ->map(function ($permission) {
+                return ['id' => $permission->id, 'values' => PermissionRegistrar::$teams  && !is_a($this, Role::class) ?
+                    [PermissionRegistrar::$teamsKey => app(PermissionRegistrar::class)->getPermissionsTeamId()] : []
+                ];
+            })
+            ->pluck('values', 'id')->toArray();
 
         $model = $this->getModel();
 
         if ($model->exists) {
-            $this->permissions()->sync($permissions, false);
+            if (PermissionRegistrar::$teams && !is_a($this, Role::class)) {
+                $this->permissions()->wherePivot(PermissionRegistrar::$teamsKey, app(PermissionRegistrar::class)->getPermissionsTeamId())->sync($permissions, false);
+            } else {
+                $this->permissions()->sync($permissions, false);
+            }
             $model->load('permissions');
         } else {
             $class = \get_class($model);

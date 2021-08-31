@@ -36,7 +36,15 @@ class Role extends Model implements RoleContract
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? Guard::getDefaultName(static::class);
 
-        if (static::where('name', $attributes['name'])->where('guard_name', $attributes['guard_name'])->first()) {
+        $params = ['name' => $attributes['name'], 'guard_name' => $attributes['guard_name']];
+        if (PermissionRegistrar::$teams) {
+            if (array_key_exists(PermissionRegistrar::$teamsKey, $attributes)) {
+                $params[PermissionRegistrar::$teamsKey] = $attributes[PermissionRegistrar::$teamsKey];
+            } else {
+                $attributes[PermissionRegistrar::$teamsKey] = app(PermissionRegistrar::class)->getPermissionsTeamId();
+            }
+        }
+        if (static::findByParam($params)) {
             throw RoleAlreadyExists::create($attributes['name'], $attributes['guard_name']);
         }
 
@@ -84,7 +92,7 @@ class Role extends Model implements RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $role = static::where('name', $name)->where('guard_name', $guardName)->first();
+        $role = static::findByParam(['name' => $name, 'guard_name' => $guardName]);
 
         if (! $role) {
             throw RoleDoesNotExist::named($name);
@@ -97,7 +105,7 @@ class Role extends Model implements RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $role = static::where('id', $id)->where('guard_name', $guardName)->first();
+         $role = static::findByParam(['id' => $id, 'guard_name' => $guardName]);
 
         if (! $role) {
             throw RoleDoesNotExist::withId($id);
@@ -118,13 +126,28 @@ class Role extends Model implements RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $role = static::where('name', $name)->where('guard_name', $guardName)->first();
+        $role = static::findByParam(['name' => $name, 'guard_name' => $guardName]);
 
         if (! $role) {
-            return static::query()->create(['name' => $name, 'guard_name' => $guardName]);
+            return static::query()->create(['name' => $name, 'guard_name' => $guardName] + (PermissionRegistrar::$teams ? [PermissionRegistrar::$teamsKey => app(PermissionRegistrar::class)->getPermissionsTeamId()] : []));
         }
 
         return $role;
+    }
+
+    protected static function findByParam(array $params = [])
+    {
+        $query = static::when(PermissionRegistrar::$teams, function ($q) use ($params) {
+            $q->where(function ($q) use ($params) {
+                $q->whereNull(PermissionRegistrar::$teamsKey)
+                    ->orWhere(PermissionRegistrar::$teamsKey, $params[PermissionRegistrar::$teamsKey] ?? app(PermissionRegistrar::class)->getPermissionsTeamId());
+            });
+        });
+        unset($params[PermissionRegistrar::$teamsKey]);
+        foreach ($params as $key => $value) {
+            $query->where($key, $value);
+        }
+        return $query->first();
     }
 
     /**

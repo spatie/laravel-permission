@@ -1,0 +1,74 @@
+<?php
+
+namespace Spatie\Permission\Test;
+
+class TeamHasPermissionsTest extends HasPermissionsTest
+{
+    /** @var bool */
+    protected $hasTeams=true;
+
+
+    /** @test */
+    public function it_can_assign_same_and_different_permission_on_same_user_on_different_teams()
+    {
+        $this->setPermissionsTeamId(1);
+        $this->testUser->load('permissions');
+        $this->testUser->givePermissionTo('edit-articles', 'edit-news');
+
+        $this->setPermissionsTeamId(2);
+        $this->testUser->load('permissions');
+        $this->testUser->givePermissionTo('edit-articles', 'edit-blog');
+
+        $this->setPermissionsTeamId(1);
+        $this->testUser->load('permissions');
+        $this->assertEquals(
+            collect(['edit-articles', 'edit-news']),
+            $this->testUser->getPermissionNames()->sort()->values()
+        );
+        $this->assertTrue($this->testUser->hasAllDirectPermissions(['edit-articles', 'edit-news']));
+        $this->assertFalse($this->testUser->hasAllDirectPermissions(['edit-articles', 'edit-blog']));
+
+        $this->setPermissionsTeamId(2);
+        $this->testUser->load('permissions');
+        $this->assertEquals(
+            collect(['edit-articles', 'edit-blog']),
+            $this->testUser->getPermissionNames()->sort()->values()
+        );
+        $this->assertTrue($this->testUser->hasAllDirectPermissions(['edit-articles', 'edit-blog']));
+        $this->assertFalse($this->testUser->hasAllDirectPermissions(['edit-articles', 'edit-news']));
+    }
+
+    /** @test */
+    public function it_can_list_all_the_coupled_permissions_both_directly_and_via_roles_on_same_user_on_different_teams()
+    {
+        $this->testUserRole->givePermissionTo('edit-articles');
+
+        $this->setPermissionsTeamId(1);
+        $this->testUser->load('permissions');
+        $this->testUser->assignRole('testRole');
+        $this->testUser->givePermissionTo('edit-news');
+
+        $this->setPermissionsTeamId(2);
+        $this->testUser->load('permissions');
+        $this->testUser->assignRole('testRole');
+        $this->testUser->givePermissionTo('edit-blog');
+
+        $this->setPermissionsTeamId(1);
+        $this->testUser->load('roles');
+        $this->testUser->load('permissions');
+
+        $this->assertEquals(
+            collect(['edit-articles', 'edit-news']),
+            $this->testUser->getAllPermissions()->pluck('name')->sort()->values()
+        );
+
+        $this->setPermissionsTeamId(2);
+        $this->testUser->load('roles');
+        $this->testUser->load('permissions');
+
+        $this->assertEquals(
+            collect(['edit-articles', 'edit-blog']),
+            $this->testUser->getAllPermissions()->pluck('name')->sort()->values()
+        );
+    }
+}
