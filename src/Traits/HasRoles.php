@@ -150,7 +150,9 @@ trait HasRoles
             );
         }
 
-        $this->forgetCachedPermissions();
+        if (is_a($this, get_class($this->getPermissionClass()))) {
+            $this->forgetCachedPermissions();
+        }
 
         return $this;
     }
@@ -166,7 +168,9 @@ trait HasRoles
 
         $this->load('roles');
 
-        $this->forgetCachedPermissions();
+        if (is_a($this, get_class($this->getPermissionClass()))) {
+            $this->forgetCachedPermissions();
+        }
 
         return $this;
     }

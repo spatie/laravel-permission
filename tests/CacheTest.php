@@ -104,13 +104,57 @@ class CacheTest extends TestCase
     }
 
     /** @test */
-    public function it_flushes_the_cache_when_removing_a_role_from_a_user()
+    public function removing_a_permission_from_a_user_should_not_flush_the_cache()
+    {
+        $this->testUser->givePermissionTo('edit-articles');
+
+        $this->registrar->getPermissions();
+
+        $this->testUser->revokePermissionTo('edit-articles');
+
+        $this->resetQueryCount();
+
+        $this->registrar->getPermissions();
+
+        $this->assertQueryCount(0);
+    }
+
+    /** @test */
+    public function removing_a_role_from_a_user_should_not_flush_the_cache()
     {
         $this->testUser->assignRole('testRole');
 
         $this->registrar->getPermissions();
 
         $this->testUser->removeRole('testRole');
+
+        $this->resetQueryCount();
+
+        $this->registrar->getPermissions();
+
+        $this->assertQueryCount(0);
+    }
+
+    /** @test */
+    public function it_flushes_the_cache_when_removing_a_role_from_a_permission()
+    {
+        $this->testUserPermission->assignRole('testRole');
+
+        $this->registrar->getPermissions();
+
+        $this->testUserPermission->removeRole('testRole');
+
+        $this->resetQueryCount();
+
+        $this->registrar->getPermissions();
+
+        $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
+    }
+
+    /** @test */
+    public function it_flushes_the_cache_when_assign_a_permission_to_a_role()
+    {
+        $this->testUserRole->givePermissionTo('edit-articles');
 
         $this->resetQueryCount();
 
