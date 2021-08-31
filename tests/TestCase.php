@@ -83,6 +83,9 @@ abstract class TestCase extends Orchestra
         $app['config']->set('permission.column_names.permission_pivot_key', 'permission_test_id');
         $app['config']->set('view.paths', [__DIR__.'/resources/views']);
 
+        // ensure api guard exists (required since Laravel 8.55)
+        $app['config']->set('auth.guards.api', ['driver' => 'session', 'provider' => 'users']);
+
         // Set-up admin guard
         $app['config']->set('auth.guards.admin', ['driver' => 'session', 'provider' => 'admins']);
         $app['config']->set('auth.providers.admins', ['driver' => 'eloquent', 'model' => Admin::class]);
