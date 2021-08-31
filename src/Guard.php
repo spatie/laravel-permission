@@ -8,14 +8,16 @@ use Illuminate\Support\Collection;
 class Guard
 {
     /**
-     * return collection of (guard_name) property if exist on class or object
-     * otherwise will return collection of guards names that exists in config/auth.php.
+     * Return a collection of guard names suitable for the $model,
+     * as indicated by the presence of a $guard_name property or a guardName() method on the model.
      *
      * @param string|Model $model model class object or name
      * @return Collection
      */
     public static function getNames($model): Collection
     {
+        $class = is_object($model) ? get_class($model) : $model;
+
         if (is_object($model)) {
             if (\method_exists($model, 'guardName')) {
                 $guardName = $model->guardName();
@@ -25,8 +27,6 @@ class Guard
         }
 
         if (! isset($guardName)) {
-            $class = is_object($model) ? get_class($model) : $model;
-
             $guardName = (new \ReflectionClass($class))->getDefaultProperties()['guard_name'] ?? null;
         }
 
@@ -34,6 +34,23 @@ class Guard
             return collect($guardName);
         }
 
+        return self::getConfigAuthGuards($class);
+    }
+
+    /**
+     * Get list of relevant guards for the $class model based on config(auth) settings.
+     *
+     * Lookup flow:
+     * - get names of models for guards defined in auth.guards where a provider is set
+     * - filter for provider models matching the model $class being checked (important for Lumen)
+     * - keys() gives just the names of the matched guards
+     * - return collection of guard names
+     *
+     * @param string $class
+     * @return Collection
+     */
+    protected static function getConfigAuthGuards(string $class): Collection
+    {
         return collect(config('auth.guards'))
             ->map(function ($guard) {
                 if (! isset($guard['provider'])) {
@@ -58,6 +75,13 @@ class Guard
     {
         $default = config('auth.defaults.guard');
 
-        return static::getNames($class)->first() ?: $default;
+        $possible_guards = static::getNames($class);
+
+        // return current-detected auth.defaults.guard if it matches one of those that have been checked
+        if ($possible_guards->contains($default)) {
+            return $default;
+        }
+
+        return $possible_guards->first() ?: $default;
     }
 }

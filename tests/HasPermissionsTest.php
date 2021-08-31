@@ -539,4 +539,40 @@ class HasPermissionsTest extends TestCase
         $this->assertTrue($this->testUser->hasAnyDirectPermission('edit-news', 'edit-blog'));
         $this->assertFalse($this->testUser->hasAnyDirectPermission('edit-blog', 'Edit News', ['Edit News']));
     }
+
+    /** @test */
+    public function it_can_check_permission_based_on_logged_in_user_guard()
+    {
+        $this->testUser->givePermissionTo(app(Permission::class)::create([
+             'name' => 'do_that',
+             'guard_name' => 'api',
+         ]));
+        $response = $this->actingAs($this->testUser, 'api')
+             ->json('GET', '/check-api-guard-permission');
+        $response->assertJson([
+             'status' => true,
+         ]);
+    }
+
+    /** @test */
+    public function it_can_reject_permission_based_on_logged_in_user_guard()
+    {
+        $unassignedPermission = app(Permission::class)::create([
+             'name' => 'do_that',
+             'guard_name' => 'api',
+         ]);
+
+        $assignedPermission = app(Permission::class)::create([
+             'name' => 'do_that',
+             'guard_name' => 'web',
+         ]);
+
+        $this->testUser->givePermissionTo($assignedPermission);
+        $response = $this->withExceptionHandling()
+             ->actingAs($this->testUser, 'api')
+             ->json('GET', '/check-api-guard-permission');
+        $response->assertJson([
+             'status' => false,
+         ]);
+    }
 }
