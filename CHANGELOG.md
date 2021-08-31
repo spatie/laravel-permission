@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## PENDING 5.0.0 - 2021-08-31
+- Change default-guard-lookup to prefer current user's guard (see BC note in #1817 )
+
+
 ## 4.4.0 - 2021-08-28
 - Avoid BC break (removed interface change) on cache change added in 4.3.0 #1826
 - Made cache even smaller #1826
