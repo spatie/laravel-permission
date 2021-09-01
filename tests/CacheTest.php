@@ -248,6 +248,17 @@ class CacheTest extends TestCase
     }
 
     /** @test */
+    public function get_all_permissions_should_not_over_hydrate_roles()
+    {
+        $this->testUserRole->givePermissionTo(['edit-articles', 'edit-news']);
+        $permissions = $this->registrar->getPermissions();
+        $roles = $permissions->flatMap->roles;
+
+        // Should have same object reference
+        $this->assertSame($roles[0], $roles[1]);
+    }
+
+    /** @test */
     public function it_can_reset_the_cache_with_artisan_command()
     {
         Artisan::call('permission:create-permission', ['name' => 'new-permission']);
