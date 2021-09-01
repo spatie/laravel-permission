@@ -231,11 +231,11 @@ class PermissionRegistrar
 
         $roleClass = $this->getRoleClass();
         $roleInstance = new $roleClass;
+
         return $this->cachedRoles[$roleId] = $roleInstance->newFromBuilder([
             'id' => $roleId,
             'name' => $item['n'] ?? $item['name'],
             'guard_name' => $item['g'] ?? $item['guard_name'],
         ]);
-
     }
 }
