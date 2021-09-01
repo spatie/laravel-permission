@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 5.1.1 - 2021-09-01
+- Avoid Roles over-hydration #1834
+
 ## 5.1.0 - 2021-08-31
 - No longer flush cache on User role/perm assignment changes #1832
   NOTE: You should test your app to be sure that you don't accidentally have deep dependencies on cache resets happening automatically in these cases.
@@ -12,6 +15,8 @@ All notable changes to `laravel-permission` will be documented in this file
 - Teams/Groups feature (see docs, or PR #1804)
 - Customized pivots instead of `role_id`,`permission_id` #1823
 
+## 4.4.1 - 2021-09-01
+- Avoid Roles over-hydration #1834
 
 ## 4.4.0 - 2021-08-28
 - Avoid BC break (removed interface change) on cache change added in 4.3.0 #1826
