@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 4.4.1 - 2021-09-01
+- Avoid Roles over-hydration #1834
+
 ## 4.4.0 - 2021-08-28
 - Avoid BC break (removed interface change) on cache change added in 4.3.0 #1826
 - Made cache even smaller #1826
