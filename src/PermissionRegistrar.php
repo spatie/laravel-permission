@@ -11,6 +11,8 @@ use Spatie\Permission\Contracts\Role;
 
 class PermissionRegistrar
 {
+    use PermissionLoaderTrait;
+
     /** @var \Illuminate\Contracts\Cache\Repository */
     protected $cache;
 
@@ -31,9 +33,6 @@ class PermissionRegistrar
 
     /** @var string */
     public static $cacheKey;
-
-    /** @var array */
-    private $cachedRoles = [];
 
     /**
      * PermissionRegistrar constructor.
@@ -120,37 +119,11 @@ class PermissionRegistrar
      */
     private function loadPermissions()
     {
-        if ($this->permissions !== null) {
+        if ($this->permissions) {
             return;
         }
 
-        $this->permissions = $this->cache->remember(self::$cacheKey, self::$cacheExpirationTime, function () {
-            // make the cache smaller using an array with only required fields
-            return $this->getPermissionClass()->select('id', 'id as i', 'name as n', 'guard_name as g')
-                ->with('roles:id,id as i,name as n,guard_name as g')->get()
-                ->map(function ($permission) {
-                    return $permission->only('i', 'n', 'g') +
-                        ['r' => $permission->roles->map->only('i', 'n', 'g')->all()];
-                })->all();
-        });
-
-        if (is_array($this->permissions)) {
-            $this->permissions = $this->getPermissionClass()::hydrate(
-                collect($this->permissions)->map(function ($item) {
-                    return ['id' => $item['i'] ?? $item['id'], 'name' => $item['n'] ?? $item['name'], 'guard_name' => $item['g'] ?? $item['guard_name']];
-                })->all()
-            )
-            ->each(function ($permission, $i) {
-                $roles = Collection::make($this->permissions[$i]['r'] ?? $this->permissions[$i]['roles'] ?? [])
-                        ->map(function ($item) {
-                            return $this->getHydratedRole($item);
-                        });
-
-                $permission->setRelation('roles', $roles);
-            });
-
-            $this->cachedRoles = [];
-        }
+        $this->loadPermissionsFromCache();
     }
 
     /**
@@ -221,21 +194,13 @@ class PermissionRegistrar
         return $this->cache->getStore();
     }
 
-    private function getHydratedRole(array $item)
+    /**
+     * Get the instance of the Cache Repository.
+     *
+     * @return \Illuminate\Cache\Repository
+     */
+    public function getCacheRepository(): \Illuminate\Cache\Repository
     {
-        $roleId = $item['i'] ?? $item['id'];
-
-        if (isset($this->cachedRoles[$roleId])) {
-            return $this->cachedRoles[$roleId];
-        }
-
-        $roleClass = $this->getRoleClass();
-        $roleInstance = new $roleClass;
-
-        return $this->cachedRoles[$roleId] = $roleInstance->newFromBuilder([
-            'id' => $roleId,
-            'name' => $item['n'] ?? $item['name'],
-            'guard_name' => $item['g'] ?? $item['guard_name'],
-        ]);
+        return $this->cache;
     }
 }
