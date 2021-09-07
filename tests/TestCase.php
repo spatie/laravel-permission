@@ -32,7 +32,7 @@ abstract class TestCase extends Orchestra
 
     /** @var \Spatie\Permission\Models\Permission */
     protected $testAdminPermission;
-    
+
     /** @var bool */
     protected $useCustomModels = false;
 

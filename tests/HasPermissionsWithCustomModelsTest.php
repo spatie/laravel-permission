@@ -6,7 +6,7 @@ class HasPermissionsWithCustomModelsTest extends HasPermissionsTest
 {
     /** @var bool */
     protected $useCustomModels = true;
-    
+
     /** @test */
     public function it_can_use_custom_models()
     {

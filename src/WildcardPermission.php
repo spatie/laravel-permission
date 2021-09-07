@@ -8,13 +8,13 @@ use Spatie\Permission\Exceptions\WildcardPermissionNotProperlyFormatted;
 class WildcardPermission
 {
     /** @var string */
-    const WILDCARD_TOKEN = '*';
+    public const WILDCARD_TOKEN = '*';
 
     /** @var string */
-    const PART_DELIMITER = '.';
+    public const PART_DELIMITER = '.';
 
     /** @var string */
-    const SUBPART_DELIMITER = ',';
+    public const SUBPART_DELIMITER = ',';
 
     /** @var string */
     protected $permission;

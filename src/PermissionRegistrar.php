@@ -266,7 +266,7 @@ class PermissionRegistrar
         }
 
         $roleClass = $this->getRoleClass();
-        $roleInstance = new $roleClass;
+        $roleInstance = new $roleClass();
 
         return $this->cachedRoles[$roleId] = $roleInstance->newFromBuilder([
             'id' => $roleId,
