@@ -21,11 +21,21 @@ if (! function_exists('getModelForGuard')) {
 
 if (! function_exists('setPermissionsTeamId')) {
     /**
-     * @param int $id
+     * @param int|string|\Illuminate\Database\Eloquent\Model $id
      *
      */
-    function setPermissionsTeamId(int $id)
+    function setPermissionsTeamId($id)
     {
         app(\Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId($id);
+    }
+}
+
+if (! function_exists('getPermissionsTeamId')) {
+    /**
+     * @return int|string
+     */
+    function getPermissionsTeamId()
+    {
+        app(\Spatie\Permission\PermissionRegistrar::class)->getPermissionsTeamId();
     }
 }
