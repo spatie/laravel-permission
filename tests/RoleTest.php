@@ -8,6 +8,8 @@ use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Exceptions\RoleAlreadyExists;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Test\RuntimeRole;
+use Spatie\Permission\PermissionRegistrar;
 
 class RoleTest extends TestCase
 {
@@ -238,5 +240,30 @@ class RoleTest extends TestCase
             $this->app['config']->get('auth.defaults.guard'),
             $this->testUserRole->guard_name
         );
+    }
+
+    /** @test */
+    public function it_can_change_role_class_on_runtime()
+    {
+        $role = app(Role::class)->create(['name' => 'test-role-old']);
+        $this->assertNotInstanceOf(RuntimeRole::class, $role);
+
+        $role->givePermissionTo('edit-articles');
+
+        app('config')->set('permission.models.role', RuntimeRole::class);
+        app()->bind(Role::class, RuntimeRole::class);
+        app(PermissionRegistrar::class)->setRoleClass(RuntimeRole::class);
+
+        $permission = app(Permission::class)->findByName('edit-articles');
+        $this->assertInstanceOf(RuntimeRole::class, $permission->roles[0]);
+        $this->assertSame('test-role-old', $permission->roles[0]->name);
+
+        $role = app(Role::class)->create(['name' => 'test-role']);
+        $this->assertInstanceOf(RuntimeRole::class, $role);
+
+        $this->testUser->assignRole('test-role');
+        $this->assertTrue($this->testUser->hasRole('test-role'));
+        $this->assertInstanceOf(RuntimeRole::class, $this->testUser->roles[0]);
+        $this->assertSame('test-role', $this->testUser->roles[0]->name);
     }
 }

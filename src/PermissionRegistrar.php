@@ -233,7 +233,8 @@ class PermissionRegistrar
     public function setPermissionClass($permissionClass)
     {
         $this->permissionClass = $permissionClass;
-
+        config()->set('permission.models.permission', $permissionClass);
+        app()->bind(Permission::class, $permissionClass);
         return $this;
     }
 
@@ -245,6 +246,14 @@ class PermissionRegistrar
     public function getRoleClass(): Role
     {
         return app($this->roleClass);
+    }
+
+    public function setRoleClass($roleClass)
+    {
+        $this->roleClass = $roleClass;
+        config()->set('permission.models.role',  $roleClass);
+        app()->bind(Role::class, $roleClass);
+        return $this;
     }
 
     /**
