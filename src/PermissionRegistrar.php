@@ -41,7 +41,7 @@ class PermissionRegistrar
     /** @var string */
     public static $teamsKey;
 
-    /** @var int */
+    /** @var int|string */
     protected $teamId = null;
 
     /** @var string */
@@ -103,12 +103,12 @@ class PermissionRegistrar
      *
      * @param int $id
      */
-    public function setPermissionsTeamId(?int $id)
+    public function setPermissionsTeamId($id)
     {
         $this->teamId = $id;
     }
 
-    public function getPermissionsTeamId(): ?int
+    public function getPermissionsTeamId()
     {
         return $this->teamId;
     }
