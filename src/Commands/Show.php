@@ -35,6 +35,7 @@ class Show extends Command
             $this->info("Guard: $guard");
 
             $roles = $roleClass::whereGuardName($guard)
+                ->with('permissions')
                 ->when(config('permission.teams'), function ($q) use ($team_key) {
                     $q->orderBy($team_key);
                 })
