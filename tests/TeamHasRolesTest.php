@@ -24,12 +24,10 @@ class TeamHasRolesTest extends HasRolesTest
 
         $this->setPermissionsTeamId(1);
         $this->testUser->load('roles');
-
         $this->testUser->assignRole('testRole', 'testRole2');
 
         $this->setPermissionsTeamId(2);
         $this->testUser->load('roles');
-
         $this->testUser->assignRole('testRole', 'testRole3');
 
         $this->setPermissionsTeamId(1);
@@ -58,5 +56,40 @@ class TeamHasRolesTest extends HasRolesTest
         $this->testUser->assignRole('testRole4');
         $this->assertTrue($this->testUser->hasExactRoles(['testRole', 'testRole3', 'testRole4']));
         $this->assertTrue($this->testUser->hasRole($testRole4NoTeam)); // global role team=null
+    }
+
+    /** @test */
+    public function it_can_sync_or_remove_roles_without_detach_on_different_teams(){
+        app(Role::class)->create(['name' => 'testRole3', 'team_test_id' => 2]);
+
+        $this->setPermissionsTeamId(1);
+        $this->testUser->load('roles');
+        $this->testUser->syncRoles('testRole', 'testRole2');
+
+        $this->setPermissionsTeamId(2);
+        $this->testUser->load('roles');
+        $this->testUser->syncRoles('testRole', 'testRole3');
+
+        $this->setPermissionsTeamId(1);
+        $this->testUser->load('roles');
+
+        $this->assertEquals(
+            collect(['testRole', 'testRole2']),
+            $this->testUser->getRoleNames()->sort()->values()
+        );
+
+        $this->testUser->removeRole('testRole');
+        $this->assertEquals(
+            collect(['testRole2']),
+            $this->testUser->getRoleNames()->sort()->values()
+        );
+
+        $this->setPermissionsTeamId(2);
+        $this->testUser->load('roles');
+
+        $this->assertEquals(
+            collect(['testRole', 'testRole3']),
+            $this->testUser->getRoleNames()->sort()->values()
+        );
     }
 }

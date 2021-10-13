@@ -97,6 +97,20 @@ trait HasRoles
     }
 
     /**
+     * Add teams pivot if teams are enabled
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    protected function getRolesRelation(){
+        $relation = $this->roles();
+        if (PermissionRegistrar::$teams && ! is_a($this, Permission::class)) {
+            $relation->wherePivot(PermissionRegistrar::$teamsKey, app(PermissionRegistrar::class)->getPermissionsTeamId());
+        }
+
+        return $relation;
+    }
+
+    /**
      * Assign the given role to the model.
      *
      * @param array|string|int|\Spatie\Permission\Contracts\Role ...$roles
@@ -130,11 +144,7 @@ trait HasRoles
         $model = $this->getModel();
 
         if ($model->exists) {
-            if (PermissionRegistrar::$teams && ! is_a($this, Permission::class)) {
-                $this->roles()->wherePivot(PermissionRegistrar::$teamsKey, app(PermissionRegistrar::class)->getPermissionsTeamId())->sync($roles, false);
-            } else {
-                $this->roles()->sync($roles, false);
-            }
+            $this->getRolesRelation()->sync($roles, false);
             $model->load('roles');
         } else {
             $class = \get_class($model);
@@ -164,7 +174,7 @@ trait HasRoles
      */
     public function removeRole($role)
     {
-        $this->roles()->detach($this->getStoredRole($role));
+        $this->getRolesRelation()->detach($this->getStoredRole($role));
 
         $this->load('roles');
 
@@ -184,7 +194,7 @@ trait HasRoles
      */
     public function syncRoles(...$roles)
     {
-        $this->roles()->detach();
+        $this->getRolesRelation()->detach();
 
         return $this->assignRole($roles);
     }
