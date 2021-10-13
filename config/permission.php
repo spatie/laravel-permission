@@ -97,6 +97,14 @@ return [
     ],
 
     /*
+     * When set to true, all permissions will be registered on Laravel's gate.
+     * 
+     * Set this to false, if you want to manually register the permissions on the gate.
+     */
+
+    'register_permissions_on_gate' => true,
+
+    /*
      * When set to true the package implements teams using the 'team_foreign_key'. If you want
      * the migrations to register the 'team_foreign_key', you must set this to true
      * before doing the migration. If you already did the migration then you must make a new
