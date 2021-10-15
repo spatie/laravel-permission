@@ -82,6 +82,24 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    public function it_can_scope_users_using_an_array_of_ids_and_names()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1->givePermissionTo(['edit-articles', 'edit-news']);
+        $this->testUserRole->givePermissionTo('edit-articles');
+        $user2->assignRole('testRole');
+
+        $permissionName = $this->testUserPermission->name;
+
+        $otherPermissionId = app(Permission::class)->find(1)->id;
+
+        $scopedUsers = User::permission([$permissionName, $otherPermissionId])->get();
+
+        $this->assertEquals(2, $scopedUsers->count());
+    }
+
+    /** @test */
     public function it_can_scope_users_using_a_collection()
     {
         $user1 = User::create(['email' => 'user1@test.com']);
