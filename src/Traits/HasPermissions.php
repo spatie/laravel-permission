@@ -103,7 +103,7 @@ trait HasPermissions
                 return $permission;
             }
 
-            return $this->getPermissionClass()->findByName($permission, $this->getDefaultGuardName());
+            return $this->getStoredPermission($permission);
         }, $permissions);
     }
 
