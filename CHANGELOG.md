@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 5.2.0 - 2021-10-28
+
+- [V5] Fix detaching on all teams intstead of only current #1888 by @erikn69 in https://github.com/spatie/laravel-permission/pull/1890
+- [V5] Add uuid compatibility support on teams by @erikn69 in https://github.com/spatie/laravel-permission/pull/1857
+- Adds setRoleClass method to PermissionRegistrar by @timschwartz in https://github.com/spatie/laravel-permission/pull/1867
+- Load permissions for preventLazyLoading by @bahramsadin in https://github.com/spatie/laravel-permission/pull/1884
+- [V5] Doc for `Super Admin` on teams by @erikn69 in https://github.com/spatie/laravel-permission/pull/1845
+
 ## 5.1.1 - 2021-09-01
 - Avoid Roles over-hydration #1834
 
