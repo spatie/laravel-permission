@@ -8,7 +8,6 @@ use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Exceptions\RoleAlreadyExists;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Test\RuntimeRole;
 use Spatie\Permission\PermissionRegistrar;
 
 class RoleTest extends TestCase
