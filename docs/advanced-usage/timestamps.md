@@ -1,6 +1,6 @@
 ---
 title: Timestamps
-weight: 8
+weight: 10
 ---
 
 ### Excluding Timestamps from JSON

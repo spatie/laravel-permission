@@ -1,6 +1,6 @@
 ---
 title: UUID
-weight: 6
+weight: 7
 ---
 
 If you're using UUIDs or GUIDs for your User models there are a few considerations to note.
