@@ -101,7 +101,8 @@ trait HasRoles
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    protected function getRolesRelation(){
+    protected function getRolesRelation()
+    {
         $relation = $this->roles();
         if (PermissionRegistrar::$teams && ! is_a($this, Permission::class)) {
             $relation->wherePivot(PermissionRegistrar::$teamsKey, app(PermissionRegistrar::class)->getPermissionsTeamId());

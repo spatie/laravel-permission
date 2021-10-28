@@ -59,7 +59,8 @@ class TeamHasRolesTest extends HasRolesTest
     }
 
     /** @test */
-    public function it_can_sync_or_remove_roles_without_detach_on_different_teams(){
+    public function it_can_sync_or_remove_roles_without_detach_on_different_teams()
+    {
         app(Role::class)->create(['name' => 'testRole3', 'team_test_id' => 2]);
 
         $this->setPermissionsTeamId(1);
