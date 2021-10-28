@@ -318,6 +318,20 @@ trait HasPermissions
     }
 
     /**
+     * Add teams pivot if teams are enabled
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    protected function getPermissionsRelation(){
+        $relation = $this->permissions();
+        if (PermissionRegistrar::$teams && ! is_a($this, Role::class)) {
+            $relation->wherePivot(PermissionRegistrar::$teamsKey, app(PermissionRegistrar::class)->getPermissionsTeamId());
+        }
+
+        return $relation;
+    }
+
+    /**
      * Grant the given permission(s) to a role.
      *
      * @param string|array|\Spatie\Permission\Contracts\Permission|\Illuminate\Support\Collection $permissions
@@ -351,11 +365,7 @@ trait HasPermissions
         $model = $this->getModel();
 
         if ($model->exists) {
-            if (PermissionRegistrar::$teams && ! is_a($this, Role::class)) {
-                $this->permissions()->wherePivot(PermissionRegistrar::$teamsKey, app(PermissionRegistrar::class)->getPermissionsTeamId())->sync($permissions, false);
-            } else {
-                $this->permissions()->sync($permissions, false);
-            }
+            $this->getPermissionsRelation()->sync($permissions, false);
             $model->load('permissions');
         } else {
             $class = \get_class($model);
@@ -387,7 +397,7 @@ trait HasPermissions
      */
     public function syncPermissions(...$permissions)
     {
-        $this->permissions()->detach();
+        $this->getPermissionsRelation()->detach();
 
         return $this->givePermissionTo($permissions);
     }
@@ -401,7 +411,7 @@ trait HasPermissions
      */
     public function revokePermissionTo($permission)
     {
-        $this->permissions()->detach($this->getStoredPermission($permission));
+        $this->getPermissionsRelation()->detach($this->getStoredPermission($permission));
 
         if (is_a($this, get_class(app(PermissionRegistrar::class)->getRoleClass()))) {
             $this->forgetCachedPermissions();

@@ -70,4 +70,37 @@ class TeamHasPermissionsTest extends HasPermissionsTest
             $this->testUser->getAllPermissions()->pluck('name')->sort()->values()
         );
     }
+
+    /** @test */
+    public function it_can_sync_or_remove_permission_without_detach_on_different_teams()
+    {
+        $this->setPermissionsTeamId(1);
+        $this->testUser->load('permissions');
+        $this->testUser->syncPermissions('edit-articles', 'edit-news');
+
+        $this->setPermissionsTeamId(2);
+        $this->testUser->load('permissions');
+        $this->testUser->syncPermissions('edit-articles', 'edit-blog');
+
+        $this->setPermissionsTeamId(1);
+        $this->testUser->load('permissions');
+
+        $this->assertEquals(
+            collect(['edit-articles', 'edit-news']),
+            $this->testUser->getPermissionNames()->sort()->values()
+        );
+
+        $this->testUser->revokePermissionTo('edit-articles');
+        $this->assertEquals(
+            collect(['edit-news']),
+            $this->testUser->getPermissionNames()->sort()->values()
+        );
+
+        $this->setPermissionsTeamId(2);
+        $this->testUser->load('permissions');
+        $this->assertEquals(
+            collect(['edit-articles', 'edit-blog']),
+            $this->testUser->getPermissionNames()->sort()->values()
+        );
+    }
 }
