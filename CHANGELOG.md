@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 5.3.0 - 2021-10-29
+
+- Option for custom logic for checking permissions (#1891)
+
 ## 5.2.0 - 2021-10-28
 
 - [V5] Fix detaching on all teams intstead of only current #1888 by @erikn69 in https://github.com/spatie/laravel-permission/pull/1890
