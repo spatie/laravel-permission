@@ -79,6 +79,7 @@ abstract class TestCase extends Orchestra
      */
     protected function getEnvironmentSetUp($app)
     {
+        $app['config']->set('permission.register_permission_check_method', true);
         $app['config']->set('permission.teams', $this->hasTeams);
         $app['config']->set('permission.testing', true); //fix sqlite
         $app['config']->set('permission.column_names.model_morph_key', 'model_test_id');
