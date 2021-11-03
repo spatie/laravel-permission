@@ -36,6 +36,6 @@ if (! function_exists('getPermissionsTeamId')) {
      */
     function getPermissionsTeamId()
     {
-        app(\Spatie\Permission\PermissionRegistrar::class)->getPermissionsTeamId();
+        return app(\Spatie\Permission\PermissionRegistrar::class)->getPermissionsTeamId();
     }
 }

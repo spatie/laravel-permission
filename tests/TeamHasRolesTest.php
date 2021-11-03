@@ -93,4 +93,63 @@ class TeamHasRolesTest extends HasRolesTest
             $this->testUser->getRoleNames()->sort()->values()
         );
     }
+
+    /** @test */
+    public function it_can_scope_users_on_different_teams()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+
+        $this->setPermissionsTeamId(2);
+        $user1->assignRole($this->testUserRole);
+        $user2->assignRole('testRole2');
+
+        $this->setPermissionsTeamId(1);
+        $user1->assignRole('testRole');
+
+        $this->setPermissionsTeamId(2);
+        $scopedUsers1Team1 = User::role($this->testUserRole)->get();
+        $scopedUsers2Team1 = User::role(['testRole', 'testRole2'])->get();
+
+        $this->assertEquals(1, $scopedUsers1Team1->count());
+        $this->assertEquals(2, $scopedUsers2Team1->count());
+
+        $this->setPermissionsTeamId(1);
+        $scopedUsers1Team2 = User::role($this->testUserRole)->get();
+        $scopedUsers2Team2 = User::role('testRole2')->get();
+
+        $this->assertEquals(1, $scopedUsers1Team2->count());
+        $this->assertEquals(0, $scopedUsers2Team2->count());
+    }
+
+    /** @test */
+    public function it_can_scope_users_by_team_id()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user3 = User::create(['email' => 'user3@test.com']);
+
+        $this->setPermissionsTeamId(1);
+        $user1->assignRole('testRole2');
+        $user2->givePermissionTo(['edit-articles']);
+        $user3->givePermissionTo(['edit-news']);
+
+        $this->setPermissionsTeamId(2);
+        $user1->givePermissionTo(['edit-articles']);
+        $user2->assignRole('testRole2');
+
+        $this->setPermissionsTeamId(3);
+        $scopedUsersTeam1 = User::team(1)->get();
+        $scopedUsersTeam2 = User::team(2)->get();
+
+        $this->assertEquals(3, $this->getPermissionsTeamId());
+        $this->assertEquals(
+            collect(['user1@test.com', 'user2@test.com', 'user3@test.com']),
+            $scopedUsersTeam1->pluck('email')->sort()->values()
+        );
+        $this->assertEquals(
+            collect(['user1@test.com', 'user2@test.com']),
+            $scopedUsersTeam2->pluck('email')->sort()->values()
+        );
+    }
 }

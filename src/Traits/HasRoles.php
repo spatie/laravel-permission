@@ -5,6 +5,7 @@ namespace Spatie\Permission\Traits;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Collection;
+use Spatie\Permission\Exceptions\TeamsNotAllowed;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\PermissionRegistrar;
@@ -94,6 +95,31 @@ trait HasRoles
         return $query->whereHas('roles', function (Builder $subQuery) use ($roles) {
             $subQuery->whereIn(config('permission.table_names.roles').'.id', \array_column($roles, 'id'));
         });
+    }
+
+    /**
+     * Scope the model query to only setted team_id.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param int|string|\Illuminate\Database\Eloquent\Model $team_id
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     * @throws TeamsNotAllowed
+     */
+    public function scopeTeam(Builder $query, $team_id): Builder
+    {
+        if(! PermissionRegistrar::$teams || is_a($this, Permission::class)) {
+            throw new TeamsNotAllowed();
+        }
+
+        $session_team_id = app(PermissionRegistrar::class)->getPermissionsTeamId();
+        app(PermissionRegistrar::class)->setPermissionsTeamId($team_id);
+        $query->where(function (Builder $query) {
+            $query->whereHas('permissions')->orWhereHas('roles');
+        });
+        app(PermissionRegistrar::class)->setPermissionsTeamId($session_team_id);
+
+        return $query;
     }
 
     /**

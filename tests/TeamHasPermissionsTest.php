@@ -103,4 +103,33 @@ class TeamHasPermissionsTest extends HasPermissionsTest
             $this->testUser->getPermissionNames()->sort()->values()
         );
     }
+
+    /** @test */
+    public function it_can_scope_users_on_different_teams()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+
+        $this->setPermissionsTeamId(2);
+        $user1->givePermissionTo(['edit-articles', 'edit-news']);
+        $this->testUserRole->givePermissionTo('edit-articles');
+        $user2->assignRole('testRole');
+
+        $this->setPermissionsTeamId(1);
+        $user1->givePermissionTo(['edit-articles']);
+
+        $this->setPermissionsTeamId(2);
+        $scopedUsers1Team2 = User::permission(['edit-articles', 'edit-news'])->get();
+        $scopedUsers2Team2 = User::permission('edit-news')->get();
+
+        $this->assertEquals(2, $scopedUsers1Team2->count());
+        $this->assertEquals(1, $scopedUsers2Team2->count());
+
+        $this->setPermissionsTeamId(1);
+        $scopedUsers1Team1 = User::permission(['edit-articles', 'edit-news'])->get();
+        $scopedUsers2Team1 = User::permission('edit-news')->get();
+
+        $this->assertEquals(1, $scopedUsers1Team1->count());
+        $this->assertEquals(0, $scopedUsers2Team1->count());
+    }
 }

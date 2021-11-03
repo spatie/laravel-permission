@@ -165,6 +165,14 @@ abstract class TestCase extends Orchestra
         app(PermissionRegistrar::class)->setPermissionsTeamId($id);
     }
 
+    /**
+     * Get the team_id
+     */
+    protected function getPermissionsTeamId()
+    {
+        return app(PermissionRegistrar::class)->getPermissionsTeamId();
+    }
+
     public function createCacheTable()
     {
         Schema::create('cache', function ($table) {

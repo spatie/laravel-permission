@@ -5,6 +5,7 @@ namespace Spatie\Permission\Test;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
+use Spatie\Permission\Exceptions\TeamsNotAllowed;
 
 class HasRolesTest extends TestCase
 {
@@ -582,5 +583,16 @@ class HasRolesTest extends TestCase
         $user = SoftDeletingUser::withTrashed()->find($user->id);
 
         $this->assertTrue($user->hasRole('testRole'));
+    }
+
+    /** @test */
+    public function it_throws_an_exception_when_scope_user_with_team_feature_not_available()
+    {
+        if (! $this->hasTeams) {
+            $this->expectException(TeamsNotAllowed::class);
+        } else {
+            $this->assertTrue(true);
+        }
+        $users = User::team(1)->get();
     }
 }
