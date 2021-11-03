@@ -18,13 +18,15 @@ class Role extends Model implements RoleContract
     use HasPermissions;
     use RefreshesPermissionCache;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function __construct(array $attributes = [])
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? config('auth.defaults.guard');
 
         parent::__construct($attributes);
+        
+        $this->guarded[] = $this->primaryKey;
     }
 
     public function getTable()
@@ -101,11 +103,21 @@ class Role extends Model implements RoleContract
         return $role;
     }
 
-    public static function findById(int $id, $guardName = null): RoleContract
+    /**
+     * Find a role by its id (and optionally guardName).
+     *
+     * @param int|string $id
+     * @param string|null $guardName
+     *
+     * @throws \Spatie\Permission\Exceptions\RoleDoesNotExist
+     *
+     * @return \Spatie\Permission\Contracts\Role
+     */
+    public static function findById($id, $guardName = null): RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $role = static::findByParam(['id' => $id, 'guard_name' => $guardName]);
+        $role = static::findByParam([app(PermissionRegistrar::class)->getRoleKeyName() => $id, 'guard_name' => $guardName]);
 
         if (! $role) {
             throw RoleDoesNotExist::withId($id);
@@ -168,18 +180,19 @@ class Role extends Model implements RoleContract
 
         $permissionClass = $this->getPermissionClass();
 
-        if (is_string($permission)) {
+        if (is_string($permission) && ! \Str::isUuid($permission)) {
             $permission = $permissionClass->findByName($permission, $this->getDefaultGuardName());
         }
 
-        if (is_int($permission)) {
+        if (is_int($permission) || is_string($permission)) {
             $permission = $permissionClass->findById($permission, $this->getDefaultGuardName());
         }
 
         if (! $this->getGuardNames()->contains($permission->guard_name)) {
             throw GuardDoesNotMatch::create($permission->guard_name, $this->getGuardNames());
         }
+        $key = app(PermissionRegistrar::class)->getPermissionKeyName();
 
-        return $this->permissions->contains('id', $permission->id);
+        return $this->permissions->contains($key, $permission->$key);
     }
 }

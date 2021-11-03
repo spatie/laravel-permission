@@ -19,9 +19,15 @@ class PermissionRegistrar
 
     /** @var string */
     protected $permissionClass;
+    
+    /** @var string */
+    private $permissionKeyName;
 
     /** @var string */
     protected $roleClass;
+    
+    /** @var string */
+    private $roleKeyName;
 
     /** @var \Illuminate\Database\Eloquent\Collection */
     protected $permissions;
@@ -41,7 +47,7 @@ class PermissionRegistrar
     /** @var string */
     public static $teamsKey;
 
-    /** @var int */
+    /** @var int|string */
     protected $teamId = null;
 
     /** @var string */
@@ -169,8 +175,8 @@ class PermissionRegistrar
 
         $this->permissions = $this->cache->remember(self::$cacheKey, self::$cacheExpirationTime, function () {
             // make the cache smaller using an array with only required fields
-            return $this->getPermissionClass()->select('id', 'id as i', 'name as n', 'guard_name as g')
-                ->with('roles:id,id as i,name as n,guard_name as g')->get()
+            return $this->getPermissionClass()->select($this->getPermissionKeyName(), $this->getPermissionKeyName().' as i', 'name as n', 'guard_name as g')
+                ->with('roles:'.config('permission.table_names.roles').'.'.$this->getRoleKeyName().','.config('permission.table_names.roles').'.'.$this->getRoleKeyName().' as i,name as n,guard_name as g')->get()
                 ->map(function ($permission) {
                     return $permission->only('i', 'n', 'g') +
                         ['r' => $permission->roles->map->only('i', 'n', 'g')->all()];
@@ -180,7 +186,7 @@ class PermissionRegistrar
         if (is_array($this->permissions)) {
             $this->permissions = $this->getPermissionClass()::hydrate(
                 collect($this->permissions)->map(function ($item) {
-                    return ['id' => $item['i'] ?? $item['id'], 'name' => $item['n'] ?? $item['name'], 'guard_name' => $item['g'] ?? $item['guard_name']];
+                    return [$this->getPermissionKeyName() => $item['i'] ?? $item[$this->getPermissionKeyName()], 'name' => $item['n'] ?? $item['name'], 'guard_name' => $item['g'] ?? $item['guard_name']];
                 })->all()
             )
             ->each(function ($permission, $i) {
@@ -236,6 +242,15 @@ class PermissionRegistrar
     {
         return app($this->permissionClass);
     }
+    public function getPermissionKeyName(): string
+    {
+        if (! $this->permissionKeyName) {
+            $permissionClass = $this->getPermissionClass();
+            $this->permissionKeyName = (new $permissionClass)->getKeyName();
+        }
+
+        return $this->permissionKeyName;
+    }
 
     public function setPermissionClass($permissionClass)
     {
@@ -254,6 +269,15 @@ class PermissionRegistrar
     public function getRoleClass(): Role
     {
         return app($this->roleClass);
+    }
+    public function getRoleKeyName(): string
+    {
+        if (! $this->roleKeyName) {
+            $roleClass = $this->getRoleClass();
+            $this->roleKeyName = (new $roleClass)->getKeyName();
+        }
+
+        return $this->roleKeyName;
     }
 
     public function setRoleClass($roleClass)
@@ -277,7 +301,7 @@ class PermissionRegistrar
 
     private function getHydratedRole(array $item)
     {
-        $roleId = $item['i'] ?? $item['id'];
+        $roleId = $item['i'] ?? $item[$this->getRoleKeyName()];
 
         if (isset($this->cachedRoles[$roleId])) {
             return $this->cachedRoles[$roleId];
@@ -287,7 +311,7 @@ class PermissionRegistrar
         $roleInstance = new $roleClass();
 
         return $this->cachedRoles[$roleId] = $roleInstance->newFromBuilder([
-            'id' => $roleId,
+            $this->getRoleKeyName() => $roleId,
             'name' => $item['n'] ?? $item['name'],
             'guard_name' => $item['g'] ?? $item['guard_name'],
         ]);

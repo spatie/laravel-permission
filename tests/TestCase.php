@@ -49,14 +49,6 @@ abstract class TestCase extends Orchestra
             $this->setPermissionsTeamId(1);
         }
 
-        $this->testUser = User::first();
-        $this->testUserRole = app(Role::class)->find(1);
-        $this->testUserPermission = app(Permission::class)->find(1);
-
-        $this->testAdmin = Admin::first();
-        $this->testAdminRole = app(Role::class)->find(3);
-        $this->testAdminPermission = app(Permission::class)->find(4);
-
         $this->setUpRoutes();
     }
 
@@ -133,19 +125,25 @@ abstract class TestCase extends Orchestra
             $this->createCacheTable();
         }
 
-        include_once __DIR__.'/../database/migrations/create_permission_tables.php.stub';
+        if (! $this->useCustomModels) {
+            include_once __DIR__.'/../database/migrations/create_permission_tables.php.stub';
 
-        (new \CreatePermissionTables())->up();
+            (new \CreatePermissionTables())->up();
+        } else {
+            include_once __DIR__.'/CreatePermissionCustomTables.php';
+            
+            (new CreatePermissionCustomTables())->up();
+        }
 
-        User::create(['email' => 'test@user.com']);
-        Admin::create(['email' => 'admin@user.com']);
-        $app[Role::class]->create(['name' => 'testRole']);
+        $this->testUser = User::create(['email' => 'test@user.com']);
+        $this->testAdmin = Admin::create(['email' => 'admin@user.com']);
+        $this->testUserRole = $app[Role::class]->create(['name' => 'testRole']);
         $app[Role::class]->create(['name' => 'testRole2']);
-        $app[Role::class]->create(['name' => 'testAdminRole', 'guard_name' => 'admin']);
-        $app[Permission::class]->create(['name' => 'edit-articles']);
+        $this->testAdminRole = $app[Role::class]->create(['name' => 'testAdminRole', 'guard_name' => 'admin']);
+        $this->testUserPermission = $app[Permission::class]->create(['name' => 'edit-articles']);
         $app[Permission::class]->create(['name' => 'edit-news']);
         $app[Permission::class]->create(['name' => 'edit-blog']);
-        $app[Permission::class]->create(['name' => 'admin-permission', 'guard_name' => 'admin']);
+        $this->testAdminPermission = $app[Permission::class]->create(['name' => 'admin-permission', 'guard_name' => 'admin']);
         $app[Permission::class]->create(['name' => 'Edit News']);
     }
 

@@ -84,15 +84,14 @@ trait HasRoles
             if ($role instanceof Role) {
                 return $role;
             }
-
-            $method = is_numeric($role) ? 'findById' : 'findByName';
-            $guard = $guard ?: $this->getDefaultGuardName();
+            $method = is_numeric($role) || \Str::isUuid($role) ? 'findById' : 'findByName';
 
             return $this->getRoleClass()->{$method}($role, $guard);
         }, $roles);
 
         return $query->whereHas('roles', function (Builder $subQuery) use ($roles) {
-            $subQuery->whereIn(config('permission.table_names.roles').'.id', \array_column($roles, 'id'));
+            $key = app(PermissionRegistrar::class)->getRoleKeyName();
+            $subQuery->whereIn(config('permission.table_names.roles').'.'.$key, \array_column($roles, $key));
         });
     }
 
@@ -136,11 +135,11 @@ trait HasRoles
                 $this->ensureModelSharesGuard($role);
             })
             ->map(function ($role) {
-                return ['id' => $role->id, 'values' => PermissionRegistrar::$teams && ! is_a($this, Permission::class) ?
+                return [$role->getKeyName() => $role->getKey(), 'values' => PermissionRegistrar::$teams && ! is_a($this, Permission::class) ?
                     [PermissionRegistrar::$teamsKey => app(PermissionRegistrar::class)->getPermissionsTeamId()] : [],
                 ];
             })
-            ->pluck('values', 'id')->toArray();
+            ->pluck('values', app(PermissionRegistrar::class)->getRoleKeyName())->toArray();
 
         $model = $this->getModel();
 
@@ -213,20 +212,22 @@ trait HasRoles
             $roles = $this->convertPipeToArray($roles);
         }
 
-        if (is_string($roles)) {
+        if (is_string($roles) && ! \Str::isUuid($roles)) {
             return $guard
                 ? $this->roles->where('guard_name', $guard)->contains('name', $roles)
                 : $this->roles->contains('name', $roles);
         }
 
-        if (is_int($roles)) {
+        if (is_int($roles) || is_string($roles)) {
+            $key = app(PermissionRegistrar::class)->getRoleKeyName();
+
             return $guard
-                ? $this->roles->where('guard_name', $guard)->contains('id', $roles)
-                : $this->roles->contains('id', $roles);
+                ? $this->roles->where('guard_name', $guard)->contains($key, $roles)
+                : $this->roles->contains($key, $roles);
         }
 
         if ($roles instanceof Role) {
-            return $this->roles->contains('id', $roles->id);
+            return $this->roles->contains($roles->getKeyName(), $roles->getKey());
         }
 
         if (is_array($roles)) {
@@ -276,7 +277,7 @@ trait HasRoles
         }
 
         if ($roles instanceof Role) {
-            return $this->roles->contains('id', $roles->id);
+            return $this->roles->contains($roles->getKeyName(), $roles->getKey());
         }
 
         $roles = collect()->make($roles)->map(function ($role) {
@@ -335,7 +336,7 @@ trait HasRoles
     {
         $roleClass = $this->getRoleClass();
 
-        if (is_numeric($role)) {
+        if (is_numeric($role) || \Str::isUuid($role)) {
             return $roleClass->findById($role, $this->getDefaultGuardName());
         }
 

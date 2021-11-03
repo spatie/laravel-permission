@@ -8,9 +8,8 @@ class HasPermissionsWithCustomModelsTest extends HasPermissionsTest
     protected $useCustomModels = true;
 
     /** @test */
-    public function it_can_use_custom_models()
+    public function it_can_use_custom_model_permission()
     {
         $this->assertSame(get_class($this->testUserPermission), \Spatie\Permission\Test\Permission::class);
-        $this->assertSame(get_class($this->testUserRole), \Spatie\Permission\Test\Role::class);
     }
 }

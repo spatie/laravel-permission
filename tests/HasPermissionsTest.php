@@ -4,6 +4,7 @@ namespace Spatie\Permission\Test;
 
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
@@ -364,8 +365,8 @@ class HasPermissionsTest extends TestCase
         $this->testUser->assignRole('testRole', 'testRole2');
 
         $this->assertEquals(
-            collect(['edit-articles', 'edit-news']),
-            $this->testUser->getPermissionsViaRoles()->pluck('name')
+            collect(['edit-articles', 'edit-news'])->sort()->values(),
+            $this->testUser->getPermissionsViaRoles()->pluck('name')->sort()->values()
         );
     }
 
@@ -402,7 +403,7 @@ class HasPermissionsTest extends TestCase
     {
         $this->testUser->givePermissionTo('edit-news');
 
-        $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-blog'])->pluck('id');
+        $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-blog'])->pluck(app(PermissionRegistrar::class)->getPermissionKeyName());
 
         $this->testUser->syncPermissions($ids);
 
@@ -418,7 +419,7 @@ class HasPermissionsTest extends TestCase
     {
         $this->testUser->givePermissionTo('edit-news');
 
-        $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-blog'])->pluck('id');
+        $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-blog'])->pluck(app(PermissionRegistrar::class)->getPermissionKeyName());
 
         $ids->push(null);
 
