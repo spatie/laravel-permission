@@ -41,7 +41,7 @@ class PermissionRegistrar
     /** @var string */
     public static $teamsKey;
 
-    /** @var int */
+    /** @var int|string */
     protected $teamId = null;
 
     /** @var string */
@@ -163,7 +163,7 @@ class PermissionRegistrar
      */
     private function loadPermissions()
     {
-        if ($this->permissions !== null) {
+        if ($this->permissions) {
             return;
         }
 

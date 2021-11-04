@@ -22,15 +22,15 @@ class TeamHasRolesTest extends HasRolesTest
         $this->assertNotNull($testRole3Team1);
         $this->assertNotNull($testRole4NoTeam);
 
-        $this->setPermissionsTeamId(1);
+        setPermissionsTeamId(1);
         $this->testUser->load('roles');
         $this->testUser->assignRole('testRole', 'testRole2');
 
-        $this->setPermissionsTeamId(2);
+        setPermissionsTeamId(2);
         $this->testUser->load('roles');
         $this->testUser->assignRole('testRole', 'testRole3');
 
-        $this->setPermissionsTeamId(1);
+        setPermissionsTeamId(1);
         $this->testUser->load('roles');
 
         $this->assertEquals(
@@ -44,7 +44,7 @@ class TeamHasRolesTest extends HasRolesTest
         $this->assertTrue($this->testUser->hasRole($testRole3Team1)); //testRole3 team=1
         $this->assertTrue($this->testUser->hasRole($testRole4NoTeam)); // global role team=null
 
-        $this->setPermissionsTeamId(2);
+        setPermissionsTeamId(2);
         $this->testUser->load('roles');
 
         $this->assertEquals(
@@ -63,15 +63,15 @@ class TeamHasRolesTest extends HasRolesTest
     {
         app(Role::class)->create(['name' => 'testRole3', 'team_test_id' => 2]);
 
-        $this->setPermissionsTeamId(1);
+        setPermissionsTeamId(1);
         $this->testUser->load('roles');
         $this->testUser->syncRoles('testRole', 'testRole2');
 
-        $this->setPermissionsTeamId(2);
+        setPermissionsTeamId(2);
         $this->testUser->load('roles');
         $this->testUser->syncRoles('testRole', 'testRole3');
 
-        $this->setPermissionsTeamId(1);
+        setPermissionsTeamId(1);
         $this->testUser->load('roles');
 
         $this->assertEquals(
@@ -85,12 +85,40 @@ class TeamHasRolesTest extends HasRolesTest
             $this->testUser->getRoleNames()->sort()->values()
         );
 
-        $this->setPermissionsTeamId(2);
+        setPermissionsTeamId(2);
         $this->testUser->load('roles');
 
         $this->assertEquals(
             collect(['testRole', 'testRole3']),
             $this->testUser->getRoleNames()->sort()->values()
         );
+    }
+
+    /** @test */
+    public function it_can_scope_users_on_different_teams()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+
+        setPermissionsTeamId(2);
+        $user1->assignRole($this->testUserRole);
+        $user2->assignRole('testRole2');
+
+        setPermissionsTeamId(1);
+        $user1->assignRole('testRole');
+
+        setPermissionsTeamId(2);
+        $scopedUsers1Team1 = User::role($this->testUserRole)->get();
+        $scopedUsers2Team1 = User::role(['testRole', 'testRole2'])->get();
+
+        $this->assertEquals(1, $scopedUsers1Team1->count());
+        $this->assertEquals(2, $scopedUsers2Team1->count());
+
+        setPermissionsTeamId(1);
+        $scopedUsers1Team2 = User::role($this->testUserRole)->get();
+        $scopedUsers2Team2 = User::role('testRole2')->get();
+
+        $this->assertEquals(1, $scopedUsers1Team2->count());
+        $this->assertEquals(0, $scopedUsers2Team2->count());
     }
 }
