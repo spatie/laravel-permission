@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 5.3.1 - 2021-11-04
+
+- Fix hints, support int on scopePermission (#1908)
+
 ## 5.3.0 - 2021-10-29
 
 - Option for custom logic for checking permissions (#1891)
@@ -19,7 +23,7 @@ All notable changes to `laravel-permission` will be documented in this file
 
 ## 5.1.0 - 2021-08-31
 - No longer flush cache on User role/perm assignment changes #1832
-  NOTE: You should test your app to be sure that you don't accidentally have deep dependencies on cache resets happening automatically in these cases.
+  NOTE:  You should test your app to be sure that you don't accidentally have deep dependencies on cache resets happening automatically in these cases.
   ALSO NOTE: If you have added custom code which depended on these flush operations, you may need to add your own cache-reset calls.
 
 ## 5.0.0 - 2021-08-31
