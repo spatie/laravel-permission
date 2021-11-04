@@ -76,11 +76,15 @@ trait HasPermissions
 
         return $query->where(function (Builder $query) use ($permissions, $rolesWithPermissions) {
             $query->whereHas('permissions', function (Builder $subQuery) use ($permissions) {
-                $subQuery->whereIn(config('permission.table_names.permissions').'.id', \array_column($permissions, 'id'));
+                $permissionClass = $this->getPermissionClass();
+                $key = (new $permissionClass)->getKeyName();
+                $subQuery->whereIn(config('permission.table_names.permissions').".$key", \array_column($permissions, $key));
             });
             if (count($rolesWithPermissions) > 0) {
                 $query->orWhereHas('roles', function (Builder $subQuery) use ($rolesWithPermissions) {
-                    $subQuery->whereIn(config('permission.table_names.roles').'.id', \array_column($rolesWithPermissions, 'id'));
+                    $roleClass = $this->getRoleClass();
+                    $key = (new $roleClass)->getKeyName();
+                    $subQuery->whereIn(config('permission.table_names.roles').".$key", \array_column($rolesWithPermissions, $key));
                 });
             }
         });
@@ -281,7 +285,7 @@ trait HasPermissions
             throw new PermissionDoesNotExist();
         }
 
-        return $this->permissions->contains('id', $permission->id);
+        return $this->permissions->contains($permission->getKeyName(), $permission->getKey());
     }
 
     /**
@@ -334,6 +338,7 @@ trait HasPermissions
      */
     public function givePermissionTo(...$permissions)
     {
+        $permissionClass = $this->getPermissionClass();
         $permissions = collect($permissions)
             ->flatten()
             ->map(function ($permission) {
@@ -350,11 +355,11 @@ trait HasPermissions
                 $this->ensureModelSharesGuard($permission);
             })
             ->map(function ($permission) {
-                return ['id' => $permission->id, 'values' => PermissionRegistrar::$teams && ! is_a($this, Role::class) ?
+                return [$permission->getKeyName() => $permission->getKey(), 'values' => PermissionRegistrar::$teams && ! is_a($this, Role::class) ?
                     [PermissionRegistrar::$teamsKey => app(PermissionRegistrar::class)->getPermissionsTeamId()] : [],
                 ];
             })
-            ->pluck('values', 'id')->toArray();
+            ->pluck('values', (new $permissionClass)->getKeyName())->toArray();
 
         $model = $this->getModel();
 
