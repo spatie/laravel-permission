@@ -13,6 +13,7 @@ trait HasRoles
 {
     use HasPermissions;
 
+    /** @var string */
     private $roleClass;
 
     public static function bootHasRoles()
@@ -86,9 +87,8 @@ trait HasRoles
             }
 
             $method = is_numeric($role) ? 'findById' : 'findByName';
-            $guard = $guard ?: $this->getDefaultGuardName();
 
-            return $this->getRoleClass()->{$method}($role, $guard);
+            return $this->getRoleClass()->{$method}($role, $guard ?: $this->getDefaultGuardName());
         }, $roles);
 
         return $query->whereHas('roles', function (Builder $subQuery) use ($roles) {
@@ -114,7 +114,7 @@ trait HasRoles
     /**
      * Assign the given role to the model.
      *
-     * @param array|string|int|\Spatie\Permission\Contracts\Role ...$roles
+     * @param array|string|int|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection ...$roles
      *
      * @return $this
      */
@@ -189,7 +189,7 @@ trait HasRoles
     /**
      * Remove all current roles and set the given ones.
      *
-     * @param  array|\Spatie\Permission\Contracts\Role|string|int  ...$roles
+     * @param  array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection|string|int  ...$roles
      *
      * @return $this
      */
