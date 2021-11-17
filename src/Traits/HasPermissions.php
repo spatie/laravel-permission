@@ -77,13 +77,13 @@ trait HasPermissions
         return $query->where(function (Builder $query) use ($permissions, $rolesWithPermissions) {
             $query->whereHas('permissions', function (Builder $subQuery) use ($permissions) {
                 $permissionClass = $this->getPermissionClass();
-                $key = (new $permissionClass)->getKeyName();
+                $key = (new $permissionClass())->getKeyName();
                 $subQuery->whereIn(config('permission.table_names.permissions').".$key", \array_column($permissions, $key));
             });
             if (count($rolesWithPermissions) > 0) {
                 $query->orWhereHas('roles', function (Builder $subQuery) use ($rolesWithPermissions) {
                     $roleClass = $this->getRoleClass();
-                    $key = (new $roleClass)->getKeyName();
+                    $key = (new $roleClass())->getKeyName();
                     $subQuery->whereIn(config('permission.table_names.roles').".$key", \array_column($rolesWithPermissions, $key));
                 });
             }
@@ -359,7 +359,7 @@ trait HasPermissions
                     [PermissionRegistrar::$teamsKey => app(PermissionRegistrar::class)->getPermissionsTeamId()] : [],
                 ];
             })
-            ->pluck('values', (new $permissionClass)->getKeyName())->toArray();
+            ->pluck('values', (new $permissionClass())->getKeyName())->toArray();
 
         $model = $this->getModel();
 

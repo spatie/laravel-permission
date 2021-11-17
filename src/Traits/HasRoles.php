@@ -93,7 +93,7 @@ trait HasRoles
 
         return $query->whereHas('roles', function (Builder $subQuery) use ($roles) {
             $roleClass = $this->getRoleClass();
-            $key = (new $roleClass)->getKeyName();
+            $key = (new $roleClass())->getKeyName();
             $subQuery->whereIn(config('permission.table_names.roles').".$key", \array_column($roles, $key));
         });
     }
@@ -143,7 +143,7 @@ trait HasRoles
                     [PermissionRegistrar::$teamsKey => app(PermissionRegistrar::class)->getPermissionsTeamId()] : [],
                 ];
             })
-            ->pluck('values', (new $roleClass)->getKeyName())->toArray();
+            ->pluck('values', (new $roleClass())->getKeyName())->toArray();
 
         $model = $this->getModel();
 
@@ -224,7 +224,8 @@ trait HasRoles
 
         if (is_int($roles)) {
             $roleClass = $this->getRoleClass();
-            $key = (new $roleClass)->getKeyName();
+            $key = (new $roleClass())->getKeyName();
+
             return $guard
                 ? $this->roles->where('guard_name', $guard)->contains($key, $roles)
                 : $this->roles->contains($key, $roles);
