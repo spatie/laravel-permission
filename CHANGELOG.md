@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 5.4.0 - 2021-11-17
+
+## What's Changed
+
+- Add support for PHP 8.1 by @freekmurze in https://github.com/spatie/laravel-permission/pull/1926
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/5.3.2...5.4.0
+
 ## 5.3.2 - 2021-11-17
 
 ## What's Changed
@@ -289,12 +297,13 @@ The following changes are not "breaking", but worth making the updates to your a
 - app()['cache']->forget('spatie.permission.cache');
 + $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
 ## 2.25.0 - 2018-11-07
 
-- A model's `roles` and `permissions` relations (respectively) are now automatically reloaded after an Assign/Remove role or Grant/Revoke of permissions. This means there's no longer a need to call `-&gt;fresh()` on the model if the only reason is to reload the role/permission relations. (That said, you may want to call it for other reasons.)
+- A model's `roles` and `permissions` relations (respectively) are now automatically reloaded after an Assign/Remove role or Grant/Revoke of permissions. This means there's no longer a need to call `-&amp;gt;fresh()` on the model if the only reason is to reload the role/permission relations. (That said, you may want to call it for other reasons.)
 - Added support for passing id to HasRole()
 
 ## 2.24.0 - 2018-11-06
@@ -336,6 +345,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 ```
 ## 2.19.1 - 2018-09-14
@@ -468,7 +478,7 @@ BEST NOT TO USE v2.7.7 if you've changed tablenames in the config file.
 
 ## 2.7.2 - 2017-10-18
 
-- refactor `PermissionRegistrar` to use `$gate-&gt;before()`
+- refactor `PermissionRegistrar` to use `$gate-&amp;gt;before()`
 - removed `log_registration_exception` as it is no longer relevant
 
 ## 2.7.1 - 2017-10-12
@@ -587,7 +597,7 @@ BEST NOT TO USE v2.7.7 if you've changed tablenames in the config file.
 
 ## 1.14.0 - 2017-10-18
 
-- refactor `PermissionRegistrar` to use `$gate-&gt;before()`
+- refactor `PermissionRegistrar` to use `$gate-&amp;gt;before()`
 - removed `log_registration_exception` as it is no longer relevant
 
 ## 1.13.0 - 2017-08-31
