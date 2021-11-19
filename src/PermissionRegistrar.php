@@ -174,9 +174,14 @@ class PermissionRegistrar
         });
 
         // fallback for old cache method, must be removed on next mayor version
-        if (! is_array($this->permissions)) {
+        if (! isset($this->permissions['permissions'])) {
+            $this->forgetCachedPermissions();
+            $this->loadPermissions();
+
             return;
         }
+
+        $this->hydrateRolesCache();
 
         $this->permissions = $this->getHydratedPermissionCollection();
 
@@ -273,12 +278,16 @@ class PermissionRegistrar
         $permissionClass = $this->getPermissionClass();
         $permissionKey = (new $permissionClass())->getKeyName();
 
-        return $permissionClass
+        $permissions = $permissionClass
             ->select($permissionKey, "$permissionKey as i", 'name as n', 'guard_name as g')
             ->with("roles:$roleKey,$roleKey as i,name as n,guard_name as g")->get()
             ->map(function ($permission) {
                 return $permission->only('i', 'n', 'g') + $this->getSerializedRoleRelation($permission);
             })->all();
+        $roles = array_values($this->cachedRoles);
+        $this->cachedRoles = [];
+
+        return compact('permissions', 'roles');
     }
 
     private function getSerializedRoleRelation($permission)
@@ -288,7 +297,13 @@ class PermissionRegistrar
         }
 
         return [
-            'r' => $permission->roles->map->only('i', 'n', 'g')->all(),
+            'r' => $permission->roles->map(function ($role) {
+                if (! isset($this->cachedRoles[$role->i])) {
+                    $this->cachedRoles[$role->i] = $role->only('i', 'n', 'g');
+                }
+
+                return $role->i;
+            })->all(),
         ];
     }
 
@@ -306,33 +321,28 @@ class PermissionRegistrar
                         'guard_name' => $item['g'],
                     ])
                     ->setRelation('roles', $this->getHydratedRoleCollection($item['r'] ?? []));
-            }, $this->permissions)
+            }, $this->permissions['permissions'])
         );
     }
 
     private function getHydratedRoleCollection(array $roles)
     {
-        return Collection::make($roles)
-            ->map(function ($role) {
-                return $this->getHydratedRole($role);
-            });
+        return Collection::make(array_values(
+            array_intersect_key($this->cachedRoles, array_flip($roles))
+        ));
     }
 
-    private function getHydratedRole(array $item)
+    private function hydrateRolesCache()
     {
-        $roleId = $item['i'];
-
-        if (isset($this->cachedRoles[$roleId])) {
-            return $this->cachedRoles[$roleId];
-        }
-
         $roleClass = $this->getRoleClass();
         $roleInstance = new $roleClass();
 
-        return $this->cachedRoles[$roleId] = $roleInstance->newFromBuilder([
-            $roleInstance->getKeyName() => $roleId,
-            'name' => $item['n'],
-            'guard_name' => $item['g'],
-        ]);
+        array_map(function ($item) use ($roleInstance) {
+            $this->cachedRoles[$item['i']] = $roleInstance->newFromBuilder([
+                $roleInstance->getKeyName() => $item['i'],
+                'name' => $item['n'],
+                'guard_name' => $item['g'],
+            ]);
+        }, $this->permissions['roles']);
     }
 }
