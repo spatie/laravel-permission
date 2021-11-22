@@ -285,8 +285,9 @@ trait HasPermissions
             throw new PermissionDoesNotExist();
         }
 
+        $negativeKey = '-'.$permission->getKey();
         //check if has negative permission
-        if ($this->permissions->contains($permission->getKeyname(), '-'.$permission->getKey()))
+        if ($this->permissions->contains($permission->getKeyname(), $negativeKey))
         {
             return false;
         }
