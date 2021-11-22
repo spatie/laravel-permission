@@ -241,7 +241,7 @@ trait HasPermissions
         $permissions = collect($permissions)->flatten();
 
         foreach ($permissions as $permission) {
-            if (! $this->hasPermissionTo($permission) && (!$this->hasPermissionTo('-'.$permission))) {
+            if (! $this->hasPermissionTo($permission)) {
                 return false;
             }
         }
@@ -283,6 +283,11 @@ trait HasPermissions
 
         if (! $permission instanceof Permission) {
             throw new PermissionDoesNotExist();
+        }
+
+        if ($this->permissions->contains('-'.$permission->getKeyname(), $permission->getKey()))
+        {
+            return false;
         }
 
         return $this->permissions->contains($permission->getKeyName(), $permission->getKey());
