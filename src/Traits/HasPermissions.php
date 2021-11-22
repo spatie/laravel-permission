@@ -241,7 +241,7 @@ trait HasPermissions
         $permissions = collect($permissions)->flatten();
 
         foreach ($permissions as $permission) {
-            if (! $this->hasPermissionTo($permission)) {
+            if (! $this->hasPermissionTo($permission) && ! $this->hasPermissionTo('-'.$permission)) {
                 return false;
             }
         }
