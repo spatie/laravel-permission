@@ -20,7 +20,8 @@ class PermissionMiddleware
             : explode('|', $permission);
 
         foreach ($permissions as $permission) {
-            if ($authGuard->user()->can($permission) && $authGuard->user()->cannot('-'.$permission) ) {
+            $negativePermission = '-'.$permission;
+            if ($authGuard->user()->can($permission) && $authGuard->user()->cannot($negativePermission) ) {
                 return $next($request);
             }
         }
