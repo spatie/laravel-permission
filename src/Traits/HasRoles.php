@@ -41,25 +41,23 @@ trait HasRoles
      */
     public function roles(): BelongsToMany
     {
-        $model_has_roles = config('permission.table_names.model_has_roles');
-
-        return $this->morphToMany(
+        $relation = $this->morphToMany(
             config('permission.models.role'),
             'model',
-            $model_has_roles,
+            config('permission.table_names.model_has_roles'),
             config('permission.column_names.model_morph_key'),
             PermissionRegistrar::$pivotRole
-        )
-        ->where(function ($q) use ($model_has_roles) {
-            $q->when(PermissionRegistrar::$teams, function ($q) use ($model_has_roles) {
-                $teamId = app(PermissionRegistrar::class)->getPermissionsTeamId();
-                $q->where($model_has_roles.'.'.PermissionRegistrar::$teamsKey, $teamId)
-                    ->where(function ($q) use ($teamId) {
-                        $teamField = config('permission.table_names.roles').'.'.PermissionRegistrar::$teamsKey;
-                        $q->whereNull($teamField)->orWhere($teamField, $teamId);
-                    });
+        );
+
+        if (! PermissionRegistrar::$teams) {
+            return $relation;
+        }
+
+        return $relation->wherePivot(PermissionRegistrar::$teamsKey, getPermissionsTeamId())
+            ->where(function ($q) {
+                $teamField = config('permission.table_names.roles').'.'.PermissionRegistrar::$teamsKey;
+                $q->whereNull($teamField)->orWhere($teamField, getPermissionsTeamId());
             });
-        });
     }
 
     /**

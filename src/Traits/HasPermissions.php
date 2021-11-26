@@ -44,18 +44,19 @@ trait HasPermissions
      */
     public function permissions(): BelongsToMany
     {
-        return $this->morphToMany(
+        $relation = $this->morphToMany(
             config('permission.models.permission'),
             'model',
             config('permission.table_names.model_has_permissions'),
             config('permission.column_names.model_morph_key'),
             PermissionRegistrar::$pivotPermission
-        )
-        ->where(function ($q) {
-            $q->when(PermissionRegistrar::$teams, function ($q) {
-                $q->where(PermissionRegistrar::$teamsKey, app(PermissionRegistrar::class)->getPermissionsTeamId());
-            });
-        });
+        );
+
+        if (! PermissionRegistrar::$teams) {
+            return $relation;
+        }
+
+        return $relation->wherePivot(PermissionRegistrar::$teamsKey, getPermissionsTeamId());
     }
 
     /**
