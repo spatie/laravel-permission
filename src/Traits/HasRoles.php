@@ -97,21 +97,6 @@ trait HasRoles
     }
 
     /**
-     * Add teams pivot if teams are enabled
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    protected function getRolesRelation()
-    {
-        $relation = $this->roles();
-        if (PermissionRegistrar::$teams && ! is_a($this, Permission::class)) {
-            $relation->wherePivot(PermissionRegistrar::$teamsKey, app(PermissionRegistrar::class)->getPermissionsTeamId());
-        }
-
-        return $relation;
-    }
-
-    /**
      * Assign the given role to the model.
      *
      * @param array|string|int|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection ...$roles
@@ -120,33 +105,30 @@ trait HasRoles
      */
     public function assignRole(...$roles)
     {
-        $roleClass = $this->getRoleClass();
         $roles = collect($roles)
             ->flatten()
-            ->map(function ($role) {
+            ->reduce(function ($array, $role) {
                 if (empty($role)) {
-                    return false;
+                    return $array;
                 }
 
-                return $this->getStoredRole($role);
-            })
-            ->filter(function ($role) {
-                return $role instanceof Role;
-            })
-            ->each(function ($role) {
+                $role = $this->getStoredRole($role);
+                if (! $role instanceof Role) {
+                    return $array;
+                }
+
                 $this->ensureModelSharesGuard($role);
-            })
-            ->map(function ($role) {
-                return [$role->getKeyName() => $role->getKey(), 'values' => PermissionRegistrar::$teams && ! is_a($this, Permission::class) ?
-                    [PermissionRegistrar::$teamsKey => app(PermissionRegistrar::class)->getPermissionsTeamId()] : [],
-                ];
-            })
-            ->pluck('values', (new $roleClass())->getKeyName())->toArray();
+
+                $array[$role->getKey()] = PermissionRegistrar::$teams && ! is_a($this, Permission::class) ?
+                    [PermissionRegistrar::$teamsKey => getPermissionsTeamId()] : [];
+
+                return $array;
+            }, []);
 
         $model = $this->getModel();
 
         if ($model->exists) {
-            $this->getRolesRelation()->sync($roles, false);
+            $this->roles()->sync($roles, false);
             $model->load('roles');
         } else {
             $class = \get_class($model);
@@ -176,7 +158,7 @@ trait HasRoles
      */
     public function removeRole($role)
     {
-        $this->getRolesRelation()->detach($this->getStoredRole($role));
+        $this->roles()->detach($this->getStoredRole($role));
 
         $this->load('roles');
 
@@ -196,7 +178,7 @@ trait HasRoles
      */
     public function syncRoles(...$roles)
     {
-        $this->getRolesRelation()->detach();
+        $this->roles()->detach();
 
         return $this->assignRole($roles);
     }
