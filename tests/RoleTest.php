@@ -242,6 +242,25 @@ class RoleTest extends TestCase
     }
 
     /** @test */
+    public function it_can_scope_roles_using_user_id()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user3 = User::create(['email' => 'user3@test.com']);
+
+        $user1->assignRole(['testRole', 'testRole2']);
+        $user2->assignRole('testRole');
+
+        $scopedRoles1 = app(Role::class)::user($user1)->get();
+        $scopedRoles2 = app(Role::class)::user($user2)->get();
+        $scopedRoles3 = app(Role::class)::user($user3->id)->get();
+
+        $this->assertEquals(['testRole', 'testRole2'], $scopedRoles1->pluck('name')->toArray());
+        $this->assertEquals(['testRole'], $scopedRoles2->pluck('name')->toArray());
+        $this->assertEquals([], $scopedRoles3->pluck('name')->toArray());
+    }
+
+    /** @test */
     public function it_can_change_role_class_on_runtime()
     {
         $role = app(Role::class)->create(['name' => 'test-role-old']);

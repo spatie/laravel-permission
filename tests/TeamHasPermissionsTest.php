@@ -8,6 +8,25 @@ class TeamHasPermissionsTest extends HasPermissionsTest
     protected $hasTeams = true;
 
     /** @test */
+    public function it_can_scope_direct_permissions_using_user_id_and_team_id()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+
+        setPermissionsTeamId(1);
+        $user1->givePermissionTo(['edit-articles', 'edit-news']);
+        setPermissionsTeamId(2);
+        $user1->givePermissionTo('edit-articles');
+
+        $scopedPermissions1 = app(Permission::class)::user($user1, 1)->get();
+        $scopedPermissions2 = app(Permission::class)::user($user1, 2)->get();
+        $scopedPermissions3 = app(Permission::class)::user($user1->id, 3)->get();
+
+        $this->assertEquals(['edit-articles', 'edit-news'], $scopedPermissions1->pluck('name')->toArray());
+        $this->assertEquals(['edit-articles'], $scopedPermissions2->pluck('name')->toArray());
+        $this->assertEquals([], $scopedPermissions3->pluck('name')->toArray());
+    }
+
+    /** @test */
     public function it_can_assign_same_and_different_permission_on_same_user_on_different_teams()
     {
         $this->setPermissionsTeamId(1);

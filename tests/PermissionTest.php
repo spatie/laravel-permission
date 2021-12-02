@@ -52,4 +52,23 @@ class PermissionTest extends TestCase
 
         $this->assertEquals($this->testUserPermission->id, $permission_by_id->id);
     }
+
+    /** @test */
+    public function it_can_scope_direct_permissions_using_user_id()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user3 = User::create(['email' => 'user3@test.com']);
+
+        $user1->givePermissionTo(['edit-articles', 'edit-news']);
+        $user2->givePermissionTo('edit-articles');
+
+        $scopedPermissions1 = app(Permission::class)::user($user1)->get();
+        $scopedPermissions2 = app(Permission::class)::user($user2)->get();
+        $scopedPermissions3 = app(Permission::class)::user($user3->id)->get();
+
+        $this->assertEquals(['edit-articles', 'edit-news'], $scopedPermissions1->pluck('name')->toArray());
+        $this->assertEquals(['edit-articles'], $scopedPermissions2->pluck('name')->toArray());
+        $this->assertEquals([], $scopedPermissions3->pluck('name')->toArray());
+    }
 }

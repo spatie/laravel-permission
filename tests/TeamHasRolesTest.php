@@ -10,6 +10,25 @@ class TeamHasRolesTest extends HasRolesTest
     protected $hasTeams = true;
 
     /** @test */
+    public function it_can_scope_roles_using_user_id_and_team_id()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+
+        setPermissionsTeamId(1);
+        $user1->syncRoles(['testRole', 'testRole2']);
+        setPermissionsTeamId(2);
+        $user1->syncRoles('testRole');
+
+        $scopedRoles1 = app(Role::class)::user($user1, 1)->get();
+        $scopedRoles2 = app(Role::class)::user($user1, 2)->get();
+        $scopedRoles3 = app(Role::class)::user($user1->id, 3)->get();
+
+        $this->assertEquals(['testRole', 'testRole2'], $scopedRoles1->pluck('name')->toArray());
+        $this->assertEquals(['testRole'], $scopedRoles2->pluck('name')->toArray());
+        $this->assertEquals([], $scopedRoles3->pluck('name')->toArray());
+    }
+
+    /** @test */
     public function it_can_assign_same_and_different_roles_on_same_user_different_teams()
     {
         app(Role::class)->create(['name' => 'testRole3']); //team_test_id = 1 by main class
