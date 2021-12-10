@@ -20,6 +20,17 @@ In your tests simply add a `setUp()` instruction to re-register the permissions,
     }
 ```
 
+If you are using Laravels `LazilyRefreshDatabase` trait, you most likely want to avoid seeding permissions before every test, because that would negate the use of the `LazilyRefreshDatabase` trait. To overcome this, you should wrap your seeder in an event listener for the `MigrationsEnded` event:
+
+```php
+Event::listen(MigrationsEnded::class, function () {
+    $this->artisan('db:seed', ['--class' => RoleAndPermissionSeeder::class]);
+    $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+});
+```
+
+Note that we call `PermissionRegistrar::forgetCachedPermissions` after seeding. This is to prevent a caching issue that can occur when the database is set up after permissions have already been registered and cached. 
+
 ## Factories
 
 Many applications do not require using factories to create fake roles/permissions for testing, because they use a Seeder to create specific roles and permissions that the application uses; thus tests are performed using the declared roles and permissions.
