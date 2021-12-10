@@ -20,7 +20,7 @@ In your tests simply add a `setUp()` instruction to re-register the permissions,
     }
 ```
 
-If you are using Laravels `LazilyRefreshDatabase` trait, you most likely want to avoid seeding permissions before every test, because that would negate the use of the `LazilyRefreshDatabase` trait. To overcome this, you should wrap your seeder in an event listener for the `MigrationsEnded` event:
+If you are using Laravel's `LazilyRefreshDatabase` trait, you most likely want to avoid seeding permissions before every test, because that would negate the use of the `LazilyRefreshDatabase` trait. To overcome this, you should wrap your seeder in an event listener for the `MigrationsEnded` event:
 
 ```php
 Event::listen(MigrationsEnded::class, function () {
