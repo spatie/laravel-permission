@@ -43,7 +43,7 @@ class Role extends Model implements RoleContract
             if (array_key_exists(PermissionRegistrar::$teamsKey, $attributes)) {
                 $params[PermissionRegistrar::$teamsKey] = $attributes[PermissionRegistrar::$teamsKey];
             } else {
-                $attributes[PermissionRegistrar::$teamsKey] = app(PermissionRegistrar::class)->getPermissionsTeamId();
+                $attributes[PermissionRegistrar::$teamsKey] = getPermissionsTeamId();
             }
         }
         if (static::findByParam($params)) {
@@ -131,7 +131,7 @@ class Role extends Model implements RoleContract
         $role = static::findByParam(['name' => $name, 'guard_name' => $guardName]);
 
         if (! $role) {
-            return static::query()->create(['name' => $name, 'guard_name' => $guardName] + (PermissionRegistrar::$teams ? [PermissionRegistrar::$teamsKey => app(PermissionRegistrar::class)->getPermissionsTeamId()] : []));
+            return static::query()->create(['name' => $name, 'guard_name' => $guardName] + (PermissionRegistrar::$teams ? [PermissionRegistrar::$teamsKey => getPermissionsTeamId()] : []));
         }
 
         return $role;
@@ -139,13 +139,16 @@ class Role extends Model implements RoleContract
 
     protected static function findByParam(array $params = [])
     {
-        $query = static::when(PermissionRegistrar::$teams, function ($q) use ($params) {
-            $q->where(function ($q) use ($params) {
+        $query = static::query();
+
+        if (PermissionRegistrar::$teams) {
+            $query->where(function ($q) use ($params) {
                 $q->whereNull(PermissionRegistrar::$teamsKey)
-                    ->orWhere(PermissionRegistrar::$teamsKey, $params[PermissionRegistrar::$teamsKey] ?? app(PermissionRegistrar::class)->getPermissionsTeamId());
+                    ->orWhere(PermissionRegistrar::$teamsKey, $params[PermissionRegistrar::$teamsKey] ?? getPermissionsTeamId());
             });
-        });
-        unset($params[PermissionRegistrar::$teamsKey]);
+            unset($params[PermissionRegistrar::$teamsKey]);
+        }
+        
         foreach ($params as $key => $value) {
             $query->where($key, $value);
         }
