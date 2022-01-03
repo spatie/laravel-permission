@@ -4,6 +4,7 @@ namespace Spatie\Permission\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
@@ -75,10 +76,6 @@ trait HasRoles
             $roles = $roles->all();
         }
 
-        if (! is_array($roles)) {
-            $roles = [$roles];
-        }
-
         $roles = array_map(function ($role) use ($guard) {
             if ($role instanceof Role) {
                 return $role;
@@ -87,7 +84,7 @@ trait HasRoles
             $method = is_numeric($role) ? 'findById' : 'findByName';
 
             return $this->getRoleClass()->{$method}($role, $guard ?: $this->getDefaultGuardName());
-        }, $roles);
+        }, Arr::wrap($roles));
 
         return $query->whereHas('roles', function (Builder $subQuery) use ($roles) {
             $roleClass = $this->getRoleClass();

@@ -4,6 +4,7 @@ namespace Spatie\Permission\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
@@ -103,8 +104,6 @@ trait HasPermissions
             $permissions = $permissions->all();
         }
 
-        $permissions = is_array($permissions) ? $permissions : [$permissions];
-
         return array_map(function ($permission) {
             if ($permission instanceof Permission) {
                 return $permission;
@@ -112,7 +111,7 @@ trait HasPermissions
             $method = is_string($permission) ? 'findByName' : 'findById';
 
             return $this->getPermissionClass()->{$method}($permission, $this->getDefaultGuardName());
-        }, $permissions);
+        }, Arr::wrap($permissions));
     }
 
     /**

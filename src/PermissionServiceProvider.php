@@ -4,6 +4,7 @@ namespace Spatie\Permission;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Routing\Route;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
@@ -152,11 +153,7 @@ class PermissionServiceProvider extends ServiceProvider
         }
 
         Route::macro('role', function ($roles = []) {
-            if (! is_array($roles)) {
-                $roles = [$roles];
-            }
-
-            $roles = implode('|', $roles);
+            $roles = implode('|', Arr::wrap($roles));
 
             $this->middleware("role:$roles");
 
@@ -164,11 +161,7 @@ class PermissionServiceProvider extends ServiceProvider
         });
 
         Route::macro('permission', function ($permissions = []) {
-            if (! is_array($permissions)) {
-                $permissions = [$permissions];
-            }
-
-            $permissions = implode('|', $permissions);
+            $permissions = implode('|', Arr::wrap($permissions));
 
             $this->middleware("permission:$permissions");
 
