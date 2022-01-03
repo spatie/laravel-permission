@@ -148,7 +148,7 @@ class Role extends Model implements RoleContract
             });
             unset($params[PermissionRegistrar::$teamsKey]);
         }
-        
+
         foreach ($params as $key => $value) {
             $query->where($key, $value);
         }
