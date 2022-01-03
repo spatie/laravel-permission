@@ -10,15 +10,15 @@ class TeamHasPermissionsTest extends HasPermissionsTest
     /** @test */
     public function it_can_assign_same_and_different_permission_on_same_user_on_different_teams()
     {
-        $this->setPermissionsTeamId(1);
+        setPermissionsTeamId(1);
         $this->testUser->load('permissions');
         $this->testUser->givePermissionTo('edit-articles', 'edit-news');
 
-        $this->setPermissionsTeamId(2);
+        setPermissionsTeamId(2);
         $this->testUser->load('permissions');
         $this->testUser->givePermissionTo('edit-articles', 'edit-blog');
 
-        $this->setPermissionsTeamId(1);
+        setPermissionsTeamId(1);
         $this->testUser->load('permissions');
         $this->assertEquals(
             collect(['edit-articles', 'edit-news']),
@@ -27,7 +27,7 @@ class TeamHasPermissionsTest extends HasPermissionsTest
         $this->assertTrue($this->testUser->hasAllDirectPermissions(['edit-articles', 'edit-news']));
         $this->assertFalse($this->testUser->hasAllDirectPermissions(['edit-articles', 'edit-blog']));
 
-        $this->setPermissionsTeamId(2);
+        setPermissionsTeamId(2);
         $this->testUser->load('permissions');
         $this->assertEquals(
             collect(['edit-articles', 'edit-blog']),
@@ -42,17 +42,17 @@ class TeamHasPermissionsTest extends HasPermissionsTest
     {
         $this->testUserRole->givePermissionTo('edit-articles');
 
-        $this->setPermissionsTeamId(1);
+        setPermissionsTeamId(1);
         $this->testUser->load('permissions');
         $this->testUser->assignRole('testRole');
         $this->testUser->givePermissionTo('edit-news');
 
-        $this->setPermissionsTeamId(2);
+        setPermissionsTeamId(2);
         $this->testUser->load('permissions');
         $this->testUser->assignRole('testRole');
         $this->testUser->givePermissionTo('edit-blog');
 
-        $this->setPermissionsTeamId(1);
+        setPermissionsTeamId(1);
         $this->testUser->load('roles');
         $this->testUser->load('permissions');
 
@@ -61,7 +61,7 @@ class TeamHasPermissionsTest extends HasPermissionsTest
             $this->testUser->getAllPermissions()->pluck('name')->sort()->values()
         );
 
-        $this->setPermissionsTeamId(2);
+        setPermissionsTeamId(2);
         $this->testUser->load('roles');
         $this->testUser->load('permissions');
 
@@ -74,15 +74,15 @@ class TeamHasPermissionsTest extends HasPermissionsTest
     /** @test */
     public function it_can_sync_or_remove_permission_without_detach_on_different_teams()
     {
-        $this->setPermissionsTeamId(1);
+        setPermissionsTeamId(1);
         $this->testUser->load('permissions');
         $this->testUser->syncPermissions('edit-articles', 'edit-news');
 
-        $this->setPermissionsTeamId(2);
+        setPermissionsTeamId(2);
         $this->testUser->load('permissions');
         $this->testUser->syncPermissions('edit-articles', 'edit-blog');
 
-        $this->setPermissionsTeamId(1);
+        setPermissionsTeamId(1);
         $this->testUser->load('permissions');
 
         $this->assertEquals(
@@ -96,11 +96,40 @@ class TeamHasPermissionsTest extends HasPermissionsTest
             $this->testUser->getPermissionNames()->sort()->values()
         );
 
-        $this->setPermissionsTeamId(2);
+        setPermissionsTeamId(2);
         $this->testUser->load('permissions');
         $this->assertEquals(
             collect(['edit-articles', 'edit-blog']),
             $this->testUser->getPermissionNames()->sort()->values()
         );
+    }
+
+    /** @test */
+    public function it_can_scope_users_on_different_teams()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+
+        setPermissionsTeamId(2);
+        $user1->givePermissionTo(['edit-articles', 'edit-news']);
+        $this->testUserRole->givePermissionTo('edit-articles');
+        $user2->assignRole('testRole');
+
+        setPermissionsTeamId(1);
+        $user1->givePermissionTo(['edit-articles']);
+
+        setPermissionsTeamId(2);
+        $scopedUsers1Team2 = User::permission(['edit-articles', 'edit-news'])->get();
+        $scopedUsers2Team2 = User::permission('edit-news')->get();
+
+        $this->assertEquals(2, $scopedUsers1Team2->count());
+        $this->assertEquals(1, $scopedUsers2Team2->count());
+
+        setPermissionsTeamId(1);
+        $scopedUsers1Team1 = User::permission(['edit-articles', 'edit-news'])->get();
+        $scopedUsers2Team1 = User::permission('edit-news')->get();
+
+        $this->assertEquals(1, $scopedUsers1Team1->count());
+        $this->assertEquals(0, $scopedUsers2Team1->count());
     }
 }

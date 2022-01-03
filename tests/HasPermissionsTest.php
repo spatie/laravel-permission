@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Test;
 
+use DB;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
@@ -381,7 +382,7 @@ class HasPermissionsTest extends TestCase
 
         $this->assertEquals(
             collect(['edit-articles', 'edit-news']),
-            $this->testUser->getPermissionsViaRoles()->pluck('name')
+            $this->testUser->getPermissionsViaRoles()->pluck('name')->sort()->values()
         );
     }
 
@@ -491,17 +492,16 @@ class HasPermissionsTest extends TestCase
         $user2 = new User(['email' => 'test2@user.com']);
         $user2->givePermissionTo('edit-articles');
 
-        \DB::enableQueryLog();
+        DB::enableQueryLog();
         $user2->save();
-        $querys = \DB::getQueryLog();
-        \DB::disableQueryLog();
+        DB::disableQueryLog();
 
         $this->assertTrue($user->fresh()->hasPermissionTo('edit-news'));
         $this->assertFalse($user->fresh()->hasPermissionTo('edit-articles'));
 
         $this->assertTrue($user2->fresh()->hasPermissionTo('edit-articles'));
         $this->assertFalse($user2->fresh()->hasPermissionTo('edit-news'));
-        $this->assertSame(4, count($querys)); //avoid unnecessary sync
+        $this->assertSame(4, count(DB::getQueryLog())); //avoid unnecessary sync
     }
 
     /** @test */
@@ -514,17 +514,16 @@ class HasPermissionsTest extends TestCase
         $user2 = new User(['email' => 'test2@user.com']);
         $user2->syncPermissions('edit-articles');
 
-        \DB::enableQueryLog();
+        DB::enableQueryLog();
         $user2->save();
-        $querys = \DB::getQueryLog();
-        \DB::disableQueryLog();
+        DB::disableQueryLog();
 
         $this->assertTrue($user->fresh()->hasPermissionTo('edit-news'));
         $this->assertFalse($user->fresh()->hasPermissionTo('edit-articles'));
 
         $this->assertTrue($user2->fresh()->hasPermissionTo('edit-articles'));
         $this->assertFalse($user2->fresh()->hasPermissionTo('edit-news'));
-        $this->assertSame(4, count($querys)); //avoid unnecessary sync
+        $this->assertSame(4, count(DB::getQueryLog())); //avoid unnecessary sync
     }
 
     /** @test */

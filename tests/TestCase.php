@@ -46,16 +46,8 @@ abstract class TestCase extends Orchestra
         // Note: this also flushes the cache from within the migration
         $this->setUpDatabase($this->app);
         if ($this->hasTeams) {
-            $this->setPermissionsTeamId(1);
+            setPermissionsTeamId(1);
         }
-
-        $this->testUser = User::first();
-        $this->testUserRole = app(Role::class)->find(1);
-        $this->testUserPermission = app(Permission::class)->find(1);
-
-        $this->testAdmin = Admin::first();
-        $this->testAdminRole = app(Role::class)->find(3);
-        $this->testAdminPermission = app(Permission::class)->find(4);
 
         $this->setUpRoutes();
     }
@@ -137,32 +129,21 @@ abstract class TestCase extends Orchestra
 
         (new \CreatePermissionTables())->up();
 
-        User::create(['email' => 'test@user.com']);
-        Admin::create(['email' => 'admin@user.com']);
-        $app[Role::class]->create(['name' => 'testRole']);
+        $this->testUser = User::create(['email' => 'test@user.com']);
+        $this->testAdmin = Admin::create(['email' => 'admin@user.com']);
+        $this->testUserRole = $app[Role::class]->create(['name' => 'testRole']);
         $app[Role::class]->create(['name' => 'testRole2']);
-        $app[Role::class]->create(['name' => 'testAdminRole', 'guard_name' => 'admin']);
-        $app[Permission::class]->create(['name' => 'edit-articles']);
+        $this->testAdminRole = $app[Role::class]->create(['name' => 'testAdminRole', 'guard_name' => 'admin']);
+        $this->testUserPermission = $app[Permission::class]->create(['name' => 'edit-articles']);
         $app[Permission::class]->create(['name' => 'edit-news']);
         $app[Permission::class]->create(['name' => 'edit-blog']);
-        $app[Permission::class]->create(['name' => 'admin-permission', 'guard_name' => 'admin']);
+        $this->testAdminPermission = $app[Permission::class]->create(['name' => 'admin-permission', 'guard_name' => 'admin']);
         $app[Permission::class]->create(['name' => 'Edit News']);
     }
 
-    /**
-     * Reload the permissions.
-     */
     protected function reloadPermissions()
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
-    }
-
-    /**
-     * Change the team_id
-     */
-    protected function setPermissionsTeamId(int $id)
-    {
-        app(PermissionRegistrar::class)->setPermissionsTeamId($id);
     }
 
     public function createCacheTable()
