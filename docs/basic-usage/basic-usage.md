@@ -50,7 +50,7 @@ $role->revokePermissionTo($permission);
 $permission->removeRole($role);
 ```
 
-If you're using multiple guards the `guard_name` attribute needs to be set as well. Read about it in the [using multiple guards](../multiple-guards) section of the readme.
+If you're using multiple guards the `guard_name` attribute needs to be set as well. Read about it in the [using multiple guards](./multiple-guards) section of the readme.
 
 The `HasRoles` trait adds Eloquent relationships to your models, which can be accessed directly or used as a base query:
 
