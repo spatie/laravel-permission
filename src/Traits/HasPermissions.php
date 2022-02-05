@@ -384,15 +384,33 @@ trait HasPermissions
     }
 
     /**
-     * Revoke the given permission.
+     * Revoke the given permission(s).
      *
      * @param \Spatie\Permission\Contracts\Permission|\Spatie\Permission\Contracts\Permission[]|string|string[] $permission
      *
      * @return $this
      */
-    public function revokePermissionTo($permission)
+    public function revokePermissionTo(...$permissions)
     {
-        $this->permissions()->detach($this->getStoredPermission($permission));
+        $permissions = collect($permissions)
+            ->flatten()
+            ->reduce(function ($array, $permission) {
+                if (empty($permission)) {
+                    return $array;
+                }
+
+                $permission = $this->getStoredPermission($permission);
+                if (! $permission instanceof Permission) {
+                    return $array;
+                }
+
+                $this->ensureModelSharesGuard($permission);
+
+                $array[] = $permission->getKey();
+                return $array;
+            }, []);
+
+        $this->permissions()->detach($permissions);
 
         if (is_a($this, get_class(app(PermissionRegistrar::class)->getRoleClass()))) {
             $this->forgetCachedPermissions();
