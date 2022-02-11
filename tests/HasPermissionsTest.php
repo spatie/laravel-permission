@@ -241,6 +241,34 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    public function it_can_give_and_revoke_permissions_models_array()
+    {
+        $models = [app(Permission::class)::where('name', 'edit-articles')->first(), app(Permission::class)::where('name', 'edit-news')->first()];
+
+        $this->testUserRole->givePermissionTo($models);
+
+        $this->assertEquals(2, $this->testUserRole->permissions()->count());
+
+        $this->testUserRole->revokePermissionTo($models);
+
+        $this->assertEquals(0, $this->testUserRole->permissions()->count());
+    }
+
+    /** @test */
+    public function it_can_give_and_revoke_permissions_models_collection()
+    {
+        $models = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-news'])->get();
+
+        $this->testUserRole->givePermissionTo($models);
+
+        $this->assertEquals(2, $this->testUserRole->permissions()->count());
+
+        $this->testUserRole->revokePermissionTo($models);
+
+        $this->assertEquals(0, $this->testUserRole->permissions()->count());
+    }
+
+    /** @test */
     public function it_can_determine_that_the_user_does_not_have_a_permission()
     {
         $this->assertFalse($this->testUser->hasPermissionTo('edit-articles'));
