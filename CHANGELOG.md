@@ -2,7 +2,7 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
-## 5.5.0 - 2021-01-11
+## 5.5.0 - 2022-01-11
 
 - add support for Laravel 9
 
