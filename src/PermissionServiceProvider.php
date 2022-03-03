@@ -83,6 +83,9 @@ class PermissionServiceProvider extends ServiceProvider
 
     protected function registerBladeExtensions()
     {
+        if (! isset($this->app['blade.compiler'])) {
+            $this->app['view'];
+        }
         $bladeCompiler = $this->app['blade.compiler'];
 
         $bladeCompiler->directive('role', function ($arguments) {
