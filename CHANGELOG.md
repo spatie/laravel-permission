@@ -2,6 +2,21 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 5.5.1 - 2022-03-03
+
+## What's Changed
+
+- Spelling correction by @gergo85 in https://github.com/spatie/laravel-permission/pull/2024
+- update broken link to laravel exception by @kingzamzon in https://github.com/spatie/laravel-permission/pull/2023
+- Fix Blade Directives incompatibility with renderers by @erikn69 in https://github.com/spatie/laravel-permission/pull/2039
+
+## New Contributors
+
+- @gergo85 made their first contribution in https://github.com/spatie/laravel-permission/pull/2024
+- @kingzamzon made their first contribution in https://github.com/spatie/laravel-permission/pull/2023
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/5.5.0...5.5.1
+
 ## 5.5.0 - 2022-01-11
 
 - add support for Laravel 9
@@ -302,6 +317,7 @@ The following changes are not "breaking", but worth making the updates to your a
 + $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -349,6 +365,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 ```
