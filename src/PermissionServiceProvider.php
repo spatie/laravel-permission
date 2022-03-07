@@ -39,7 +39,6 @@ class PermissionServiceProvider extends ServiceProvider
             'permission'
         );
 
-        });
         $this->registerBladeExtensions();
     }
 
