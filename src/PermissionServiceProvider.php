@@ -40,7 +40,7 @@ class PermissionServiceProvider extends ServiceProvider
             'permission'
         );
 
-        $this->app->afterResolving('blade.compiler', function (BladeCompiler $bladeCompiler) {
+        $this->callAfterResolving('blade.compiler', function (BladeCompiler $bladeCompiler) {
             $this->registerBladeExtensions($bladeCompiler);
         });
     }
