@@ -7,6 +7,7 @@ use Illuminate\Routing\Route;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\View\Compilers\BladeCompiler;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 use Spatie\Permission\Contracts\Role as RoleContract;
 
@@ -39,7 +40,9 @@ class PermissionServiceProvider extends ServiceProvider
             'permission'
         );
 
-        $this->registerBladeExtensions();
+        $this->app->afterResolving('blade.compiler', function (BladeCompiler $bladeCompiler) {
+            $this->registerBladeExtensions($bladeCompiler);
+        });
     }
 
     protected function offerPublishing()
@@ -81,10 +84,8 @@ class PermissionServiceProvider extends ServiceProvider
         $this->app->bind(RoleContract::class, $config['role']);
     }
 
-    protected function registerBladeExtensions()
+    protected function registerBladeExtensions($bladeCompiler)
     {
-        $bladeCompiler = $this->app['blade.compiler'];
-
         $bladeCompiler->directive('role', function ($arguments) {
             list($role, $guard) = explode(',', $arguments.',');
 
