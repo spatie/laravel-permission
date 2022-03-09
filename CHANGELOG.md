@@ -2,6 +2,18 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 5.5.2 - 2022-03-09
+
+## What's Changed
+
+- [Fixes BIG bug] register blade directives after resolving blade compiler by @tabacitu in https://github.com/spatie/laravel-permission/pull/2048
+
+## New Contributors
+
+- @tabacitu made their first contribution in https://github.com/spatie/laravel-permission/pull/2048
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/5.5.1...5.5.2
+
 ## 5.5.1 - 2022-03-03
 
 ## What's Changed
@@ -318,6 +330,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -365,6 +378,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
