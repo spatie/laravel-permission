@@ -30,8 +30,10 @@ this is the common use-case, representing {resource}.{action}.{target}.
 > NOTE: You must create any wildcard permission patterns (eg: `posts.create.*`) before you can assign them or check for them.
 
 ### Using Wildcards
-
-> ALERT: The `*` means "ALL". It does **not** mean "ANY".
+<!---
+The placement of the alert could cause a bit of confusion as when defining the permissions it can actually mean both all and any.
+This distinction only matters while querying the authority.
+-->
 
 Each part can also contain wildcards (`*`). So let's say we assign the following permission to a user:
 
@@ -54,8 +56,14 @@ $user->can('posts.delete');
 ``` 
 
 ### Meaning of the `*` Asterisk
-
-The `*` means "ALL". It does **not** mean "ANY".
+<!---
+Here it does make ore sense that we shouldn't think of it as "any" but still, the English language does not help us.
+If we ask "does this user have permission to any of these" it doesn't work, whereas if we think "can they do anything" it does.
+So I suggest we drop the alert all together in favor of just saying it's not a wildcard here. This will also clarify that
+this won't match if the user can actually do everything but just not defined with an asterisk.
+-->
+The `*` is only a wildcard when defining a permission, not when querying it. It will not match if the user can actually
+do everything but it's defined differently. It most certainly does not match if they're permitted to a single one of the available actions.
 
 Thus `can('post.*')` will only pass if the user has been assigned `post.*` explicitly.
 
