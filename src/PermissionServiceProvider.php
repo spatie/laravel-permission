@@ -15,11 +15,12 @@ class PermissionServiceProvider extends ServiceProvider
 {
     public function boot(PermissionRegistrar $permissionLoader)
     {
-        $this->offerPublishing();
+        if (app()->runningInConsole()) {
+            $this->offerPublishing();
+            $this->registerCommands();
+        }
 
         $this->registerMacroHelpers();
-
-        $this->registerCommands();
 
         $this->registerModelBindings();
 
