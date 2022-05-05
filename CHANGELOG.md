@@ -2,6 +2,23 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 5.5.3 - 2022-05-05
+
+## What's Changed
+
+- Update .gitattributes by @angeljqv in https://github.com/spatie/laravel-permission/pull/2065
+- Remove double semicolon from add_teams_fields.php.stub by @morganarnel in https://github.com/spatie/laravel-permission/pull/2067
+- [V5] Allow revokePermissionTo to accept Permission[] by @erikn69 in https://github.com/spatie/laravel-permission/pull/2014
+- [V5] Improve typing in role's findById and findOrCreate method by @itsfaqih in https://github.com/spatie/laravel-permission/pull/2022
+- [V5] Cache loader improvements by @erikn69 in https://github.com/spatie/laravel-permission/pull/1912
+
+## New Contributors
+
+- @morganarnel made their first contribution in https://github.com/spatie/laravel-permission/pull/2067
+- @itsfaqih made their first contribution in https://github.com/spatie/laravel-permission/pull/2022
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/5.5.2...5.5.3
+
 ## 5.5.2 - 2022-03-09
 
 ## What's Changed
@@ -331,6 +348,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -378,6 +396,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
