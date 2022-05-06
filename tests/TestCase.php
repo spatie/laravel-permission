@@ -39,9 +39,16 @@ abstract class TestCase extends Orchestra
     /** @var bool */
     protected $hasTeams = false;
 
+    /** @var bool */
+    protected static $init = false;
+
     public function setUp(): void
     {
         parent::setUp();
+
+        if (! self::$init) {
+            $this->prepareMigration();
+        }
 
         // Note: this also flushes the cache from within the migration
         $this->setUpDatabase($this->app);
@@ -125,9 +132,15 @@ abstract class TestCase extends Orchestra
             $this->createCacheTable();
         }
 
-        include_once __DIR__.'/../database/migrations/create_permission_tables.php.stub';
+        if (! $this->useCustomModels) {
+            include_once __DIR__.'/../database/migrations/create_permission_tables.php.stub';
 
-        (new \CreatePermissionTables())->up();
+            (new \CreatePermissionTables())->up();
+        } else {
+            include_once __DIR__.'/CreatePermissionCustomTables.php';
+
+            (new \CreatePermissionCustomTables())->up();
+        }
 
         $this->testUser = User::create(['email' => 'test@user.com']);
         $this->testAdmin = Admin::create(['email' => 'admin@user.com']);
@@ -139,6 +152,30 @@ abstract class TestCase extends Orchestra
         $app[Permission::class]->create(['name' => 'edit-blog']);
         $this->testAdminPermission = $app[Permission::class]->create(['name' => 'admin-permission', 'guard_name' => 'admin']);
         $app[Permission::class]->create(['name' => 'Edit News']);
+    }
+
+    private function prepareMigration()
+    {
+        $migration = str_replace(
+            [
+                'CreatePermissionTables',
+                '(\'id\'); // permission id',
+                '(\'id\'); // role id',
+                'references(\'id\') // permission id',
+                'references(\'id\') // role id',
+            ],
+            [
+                'CreatePermissionCustomTables',
+                '(\'permission_test_id\');',
+                '(\'role_test_id\');',
+                'references(\'permission_test_id\')',
+                'references(\'role_test_id\')',
+            ],
+            file_get_contents(__DIR__.'/../database/migrations/create_permission_tables.php.stub')
+        );
+
+        file_put_contents(__DIR__.'/CreatePermissionCustomTables.php', $migration);
+        self::$init = true;
     }
 
     protected function reloadPermissions()

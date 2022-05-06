@@ -273,10 +273,10 @@ class PermissionRegistrar
     private function getSerializedPermissionsForCache()
     {
         $roleClass = $this->getRoleClass();
-        $roleKey = (new $roleClass())->getKeyName();
+        $roleKey = (new $roleClass())->getTable().'.'.(new $roleClass())->getKeyName();
 
         $permissionClass = $this->getPermissionClass();
-        $permissionKey = (new $permissionClass())->getKeyName();
+        $permissionKey = (new $permissionClass())->getTable().'.'.(new $permissionClass())->getKeyName();
 
         $permissions = $permissionClass
             ->select($permissionKey, "$permissionKey as i", 'name as n', 'guard_name as g')

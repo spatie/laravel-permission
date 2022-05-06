@@ -108,7 +108,7 @@ class Permission extends Model implements PermissionContract
     public static function findById(int $id, $guardName = null): PermissionContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
-        $permission = static::getPermission(['id' => $id, 'guard_name' => $guardName]);
+        $permission = static::getPermission([(new static())->getKeyName() => $id, 'guard_name' => $guardName]);
 
         if (! $permission) {
             throw PermissionDoesNotExist::withId($id, $guardName);

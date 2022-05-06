@@ -15,6 +15,10 @@ jobs:
         include:
           - laravel: 7.*
             testbench: 5.20
+        exclude:
+          - laravel: 7.*
+            php: 8.0
+            dependency-version: prefer-lowest
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }}
 
