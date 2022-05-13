@@ -96,10 +96,8 @@ It is common to use a trait to handle the $keyType and $incrementing settings, a
 
     trait UuidTrait
     {
-        protected static function bootUuidTrait()
+        public static function bootUuidTrait()
         {
-            parent::boot();
-
             static::creating(function ($model) {
                 $model->keyType = 'string';
                 $model->incrementing = false;
