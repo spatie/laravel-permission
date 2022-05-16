@@ -2,6 +2,20 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 5.5.4 - 2022-05-16
+
+## What's Changed
+
+- Support custom primary key names on models by @erikn69 in https://github.com/spatie/laravel-permission/pull/2092
+- Fix UuidTrait on uuid doc page by @abhishekpaul in https://github.com/spatie/laravel-permission/pull/2094
+- Support custom fields on cache by @erikn69 in https://github.com/spatie/laravel-permission/pull/2091
+
+## New Contributors
+
+- @abhishekpaul made their first contribution in https://github.com/spatie/laravel-permission/pull/2094
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/5.5.3...5.5.4
+
 ## 5.5.3 - 2022-05-05
 
 ## What's Changed
@@ -349,6 +363,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -396,6 +411,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
