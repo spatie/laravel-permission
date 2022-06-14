@@ -60,7 +60,7 @@ class WildcardPermission
             $i++;
         }
 
-        for ($i; $i < $this->parts->count(); $i++) {
+        for ($i, $count=$this->parts->count(); $i < $count; $i++) {
             if (! $this->parts->get($i)->contains(self::WILDCARD_TOKEN)) {
                 return false;
             }
