@@ -572,6 +572,28 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_detach_roles_when_deleting()
+    {
+        $user = User::create(['email' => 'user1@test.com']);
+        $this->testUserRole->givePermissionTo($this->testUserPermission);
+        $this->testUserPermission->assignRole('testRole2');
+        $user->assignRole($this->testUserRole->name, 'testRole2');
+
+        $this->testUserRole->delete();
+
+        $this->assertDatabaseMissing('model_has_roles', [config('permission.column_names.role_pivot_key') => $this->testUserRole->getKey()]);
+        $this->assertDatabaseMissing('role_has_permissions', [config('permission.column_names.role_pivot_key') => $this->testUserRole->getKey()]);
+
+        $user->load('roles');
+        $this->testUserPermission->load('roles');
+
+        $this->assertTrue($this->testUserPermission->hasRole('testRole2'));
+        $this->assertTrue($user->hasRole('testRole2'));
+        $this->assertFalse($this->testUserPermission->hasRole($this->testUserRole));
+        $this->assertFalse($user->hasRole($this->testUserRole));
+    }
+
+    /** @test */
     public function it_does_not_detach_roles_when_soft_deleting()
     {
         $user = SoftDeletingUser::create(['email' => 'test@example.com']);

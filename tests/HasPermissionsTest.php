@@ -217,6 +217,30 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    public function it_detach_permissions_when_deleting()
+    {
+        $user = User::create(['email' => 'user1@test.com']);
+        $this->testUserRole->givePermissionTo([$this->testUserPermission, 'edit-news']);
+        $user->givePermissionTo([$this->testUserPermission, 'edit-news']);
+
+        $this->assertTrue($user->hasPermissionTo($this->testUserPermission));
+        $this->assertTrue($this->testUserRole->hasPermissionTo($this->testUserPermission));
+
+        $this->testUserPermission->delete();
+
+        $this->assertDatabaseMissing('model_has_permissions', [config('permission.column_names.permission_pivot_key') => $this->testUserPermission->getKey()]);
+        $this->assertDatabaseMissing('role_has_permissions', [config('permission.column_names.permission_pivot_key') => $this->testUserPermission->getKey()]);
+
+        $user->load('permissions');
+        $this->testUserRole->load('permissions');
+
+        $this->assertTrue($this->testUserRole->hasPermissionTo('edit-news'));
+        $this->assertTrue($user->hasPermissionTo('edit-news'));
+        $this->assertFalse($this->testUserRole->hasPermissionTo($this->testUserPermission));
+        $this->assertFalse($user->hasPermissionTo($this->testUserPermission));
+    }
+
+    /** @test */
     public function it_doesnt_detach_permissions_when_soft_deleting()
     {
         $user = SoftDeletingUser::create(['email' => 'test@example.com']);

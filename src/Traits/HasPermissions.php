@@ -27,6 +27,16 @@ trait HasPermissions
                 return;
             }
 
+            if (is_a($model, get_class($model->getPermissionClass()))) {
+                $model->users()->detach();
+
+                return;
+            }
+
+            if (is_a($model, get_class(app(PermissionRegistrar::class)->getRoleClass()))) {
+                $model->users()->detach();
+            }
+
             $model->permissions()->detach();
         });
     }
