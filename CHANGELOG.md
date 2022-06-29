@@ -2,6 +2,22 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 5.5.5 - 2022-06-29
+
+### What's Changed
+
+- Custom primary keys tests(Only tests) by @erikn69 in https://github.com/spatie/laravel-permission/pull/2096
+- [PHP 8.2] Fix `${var}` string interpolation deprecation by @Ayesh in https://github.com/spatie/laravel-permission/pull/2117
+- Use `getKey`, `getKeyName` instead of `id` by @erikn69 in https://github.com/spatie/laravel-permission/pull/2116
+- On WildcardPermission class use static instead of self for extending by @erikn69 in https://github.com/spatie/laravel-permission/pull/2111
+- Clear roles array after hydrate from cache by @angeljqv in https://github.com/spatie/laravel-permission/pull/2099
+
+### New Contributors
+
+- @Ayesh made their first contribution in https://github.com/spatie/laravel-permission/pull/2117
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/5.5.4...5.5.5
+
 ## 5.5.4 - 2022-05-16
 
 ## What's Changed
@@ -364,6 +380,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -411,6 +428,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
