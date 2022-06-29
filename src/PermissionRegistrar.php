@@ -378,5 +378,7 @@ class PermissionRegistrar
             $role = $roleInstance->newFromBuilder($this->aliasedArray($item));
             $this->cachedRoles[$role->getKey()] = $role;
         }, $this->permissions['roles']);
+
+        $this->permissions['roles'] = [];
     }
 }
