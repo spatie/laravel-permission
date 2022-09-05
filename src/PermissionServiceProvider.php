@@ -84,62 +84,53 @@ class PermissionServiceProvider extends ServiceProvider
         $this->app->bind(RoleContract::class, $config['role']);
     }
 
+    public static function bladeMethodWrapper($method, $role, $guard = null)
+    {
+        return auth($guard)->check() && auth($guard)->user()->{$method}($role);
+    }
+
     protected function registerBladeExtensions($bladeCompiler)
     {
         $bladeCompiler->directive('role', function ($arguments) {
-            list($role, $guard) = explode(',', $arguments.',');
-
-            return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasRole({$role})): ?>";
+            return "<?php if(\\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper('hasRole', {$arguments})): ?>";
         });
         $bladeCompiler->directive('elserole', function ($arguments) {
-            list($role, $guard) = explode(',', $arguments.',');
-
-            return "<?php elseif(auth({$guard})->check() && auth({$guard})->user()->hasRole({$role})): ?>";
+            return "<?php elseif(\\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper('hasRole', {$arguments})): ?>";
         });
         $bladeCompiler->directive('endrole', function () {
             return '<?php endif; ?>';
         });
 
         $bladeCompiler->directive('hasrole', function ($arguments) {
-            list($role, $guard) = explode(',', $arguments.',');
-
-            return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasRole({$role})): ?>";
+            return "<?php if(\\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper('hasRole', {$arguments})): ?>";
         });
         $bladeCompiler->directive('endhasrole', function () {
             return '<?php endif; ?>';
         });
 
         $bladeCompiler->directive('hasanyrole', function ($arguments) {
-            list($roles, $guard) = explode(',', $arguments.',');
-
-            return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasAnyRole({$roles})): ?>";
+            return "<?php if(\\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper('hasAnyRole', {$arguments})): ?>";
         });
         $bladeCompiler->directive('endhasanyrole', function () {
             return '<?php endif; ?>';
         });
 
         $bladeCompiler->directive('hasallroles', function ($arguments) {
-            list($roles, $guard) = explode(',', $arguments.',');
-
-            return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasAllRoles({$roles})): ?>";
+            return "<?php if(\\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper('hasAllRoles', {$arguments})): ?>";
         });
         $bladeCompiler->directive('endhasallroles', function () {
             return '<?php endif; ?>';
         });
 
         $bladeCompiler->directive('unlessrole', function ($arguments) {
-            list($role, $guard) = explode(',', $arguments.',');
-
-            return "<?php if(!auth({$guard})->check() || ! auth({$guard})->user()->hasRole({$role})): ?>";
+            return "<?php if(! \\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper('hasRole', {$arguments})): ?>";
         });
         $bladeCompiler->directive('endunlessrole', function () {
             return '<?php endif; ?>';
         });
 
         $bladeCompiler->directive('hasexactroles', function ($arguments) {
-            list($roles, $guard) = explode(',', $arguments.',');
-
-            return "<?php if(auth({$guard})->check() && auth({$guard})->user()->hasExactRoles({$roles})): ?>";
+            return "<?php if(\\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper('hasExactRoles', {$arguments})): ?>";
         });
         $bladeCompiler->directive('endhasexactroles', function () {
             return '<?php endif; ?>';

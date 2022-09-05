@@ -31,9 +31,9 @@ class BladeTest extends TestCase
         $this->assertEquals('does not have permission', $this->renderView('can', ['permission' => $permission]));
         $this->assertEquals('does not have role', $this->renderView('role', compact('role', 'elserole')));
         $this->assertEquals('does not have role', $this->renderView('hasRole', compact('role', 'elserole')));
-        $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', $roles));
+        $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', compact('roles')));
         $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', ['roles' => implode('|', $roles)]));
-        $this->assertEquals('does not have any of the given roles', $this->renderView('hasAnyRole', $roles));
+        $this->assertEquals('does not have any of the given roles', $this->renderView('hasAnyRole', compact('roles')));
         $this->assertEquals('does not have any of the given roles', $this->renderView('hasAnyRole', ['roles' => implode('|', $roles)]));
     }
 
@@ -260,6 +260,33 @@ class BladeTest extends TestCase
         auth()->setUser($user);
 
         $this->assertEquals('does not have all of the given roles', $this->renderView('guardHasAllRolesPipe', compact('guard')));
+    }
+
+    /** @test */
+    public function the_hasallroles_directive_will_evaluate_true_when_the_logged_in_user_does_have_all_required_roles_in_array()
+    {
+        $guard = 'admin';
+
+        $admin = $this->getSuperAdmin();
+
+        $admin->assignRole('moderator');
+
+        auth('admin')->setUser($admin);
+
+        $this->assertEquals('does have all of the given roles', $this->renderView('guardHasAllRolesArray', compact('guard')));
+    }
+
+    /** @test */
+    public function the_hasallroles_directive_will_evaluate_false_when_the_logged_in_user_doesnt_have_all_required_roles_in_array()
+    {
+        $guard = '';
+        $user = $this->getMember();
+
+        $user->assignRole('writer');
+
+        auth()->setUser($user);
+
+        $this->assertEquals('does not have all of the given roles', $this->renderView('guardHasAllRolesArray', compact('guard')));
     }
 
     protected function getWriter()
