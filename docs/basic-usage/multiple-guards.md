@@ -38,7 +38,7 @@ $user->hasPermissionTo('publish articles', 'admin');
 > **Note**: When determining whether a role/permission is valid on a given model, it checks against the first matching guard in this order (it does NOT check role/permission for EACH possibility, just the first match):
 - first the guardName() method if it exists on the model;
 - then the `$guard_name` property if it exists on the model;
-- then the first-defined guard/provider combination in the `auth.guards` config array that matches the logged-in user's guard;
+- then the first-defined guard/provider combination in the `auth.guards` config array that matches the loaded model's guard;
 - then the `auth.defaults.guard` config (which is the user's guard if they are logged in, else the default in the file).
 
 
