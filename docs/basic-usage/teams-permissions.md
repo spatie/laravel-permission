@@ -91,7 +91,7 @@ class YourTeamModel extends \Illuminate\Database\Eloquent\Model
            User::find('your_user_id')->assignRole('Super Admin');
            // restore session team_id to package instance
            setPermissionsTeamId($session_team_id);
-        }
+        });
     }
     // ...
 }
