@@ -14,17 +14,23 @@ class PermissionMiddleware
         if ($authGuard->guest()) {
             throw UnauthorizedException::notLoggedIn();
         }
-
-        $permissions = is_array($permission)
-            ? $permission
-            : explode('|', $permission);
-
-        foreach ($permissions as $permission) {
-            if ($authGuard->user()->can($permission)) {
-                return $next($request);
-            }
+        
+        if (! is_null($permission)) {
+            $permissions = is_array($permission)
+                ? $permission
+                : explode('|', $permission);
         }
 
+        if ( is_null($permission) ) {
+            $permission = $request->route()->getName();
+
+            $permissions = array($permission);
+        }
+
+        if ($authGuard->user()->canany($permissions)) {
+                return $next($request);
+        }
+        
         throw UnauthorizedException::forPermissions($permissions);
     }
 }
