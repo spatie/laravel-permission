@@ -114,6 +114,14 @@ trait HasPermissions
         }, Arr::wrap($permissions));
     }
 
+    /**
+     * Find a permission.
+     *
+     * @param string|int|\Spatie\Permission\Contracts\Permission $permission
+     *
+     * @return \Spatie\Permission\Contracts\Permission
+     * @throws PermissionDoesNotExist
+     */
     public function filterPermission($permission, $guardName = null)
     {
         $permissionClass = $this->getPermissionClass();
@@ -273,19 +281,7 @@ trait HasPermissions
      */
     public function hasDirectPermission($permission): bool
     {
-        $permissionClass = $this->getPermissionClass();
-
-        if (is_string($permission)) {
-            $permission = $permissionClass->findByName($permission, $this->getDefaultGuardName());
-        }
-
-        if (is_int($permission)) {
-            $permission = $permissionClass->findById($permission, $this->getDefaultGuardName());
-        }
-
-        if (! $permission instanceof Permission) {
-            throw new PermissionDoesNotExist();
-        }
+        $permission = $this->filterPermission($permission, $this->getDefaultGuardName());
 
         return $this->permissions->contains($permission->getKeyName(), $permission->getKey());
     }
