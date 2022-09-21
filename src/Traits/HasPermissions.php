@@ -124,15 +124,20 @@ trait HasPermissions
      */
     public function filterPermission($permission, $guardName = null)
     {
-        $permissionClass = $this->getPermissionClass();
-        $guardName = $guardName ?? $this->getDefaultGuardName();
+        $permissionClass = $this->getPermissionClass()
 
         if (is_string($permission)) {
-            $permission = $permissionClass->findByName($permission, $guardName);
+            $permission = $permissionClass->findByName(
+                $permission,
+                $guardName ?? $this->getDefaultGuardName()
+            );
         }
 
         if (is_int($permission)) {
-            $permission = $permissionClass->findById($permission, $guardName);
+            $permission = $permissionClass->findById(
+                $permission,
+                $guardName ?? $this->getDefaultGuardName()
+            );
         }
 
         if (! $permission instanceof Permission) {
@@ -281,7 +286,7 @@ trait HasPermissions
      */
     public function hasDirectPermission($permission): bool
     {
-        $permission = $this->filterPermission($permission, $this->getDefaultGuardName());
+        $permission = $this->filterPermission($permission);
 
         return $this->permissions->contains($permission->getKeyName(), $permission->getKey());
     }
