@@ -114,6 +114,26 @@ trait HasPermissions
         }, Arr::wrap($permissions));
     }
 
+    public function filterPermission($permission, $guardName = null)
+    {
+        $permissionClass = $this->getPermissionClass();
+        $guardName = $guardName ?? $this->getDefaultGuardName();
+
+        if (is_string($permission)) {
+            $permission = $permissionClass->findByName($permission, $guardName);
+        }
+
+        if (is_int($permission)) {
+            $permission = $permissionClass->findById($permission, $guardName);
+        }
+
+        if (! $permission instanceof Permission) {
+            throw new PermissionDoesNotExist();
+        }
+
+        return $permission;
+    }
+
     /**
      * Determine if the model may perform the given permission.
      *
@@ -129,25 +149,7 @@ trait HasPermissions
             return $this->hasWildcardPermission($permission, $guardName);
         }
 
-        $permissionClass = $this->getPermissionClass();
-
-        if (is_string($permission)) {
-            $permission = $permissionClass->findByName(
-                $permission,
-                $guardName ?? $this->getDefaultGuardName()
-            );
-        }
-
-        if (is_int($permission)) {
-            $permission = $permissionClass->findById(
-                $permission,
-                $guardName ?? $this->getDefaultGuardName()
-            );
-        }
-
-        if (! $permission instanceof Permission) {
-            throw new PermissionDoesNotExist();
-        }
+        $permission = $this->filterPermission($permission, $guardName);
 
         return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
     }
