@@ -15,17 +15,9 @@ class PermissionMiddleware
             throw UnauthorizedException::notLoggedIn();
         }
 
-        if (! is_null($permission)) {
-            $permissions = is_array($permission)
-                ? $permission
-                : explode('|', $permission);
-        }
-
-        if (is_null($permission)) {
-            $permission = $request->route()->getName();
-
-            $permissions = [$permission];
-        }
+        $permissions = is_array($permission)
+            ? $permission
+            : explode('|', $permission);
 
         if ($authGuard->user()->canany($permissions)) {
             return $next($request);
