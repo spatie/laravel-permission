@@ -80,10 +80,12 @@ class PermissionRegistrar
     {
         self::$cacheExpirationTime = config('permission.cache.expiration_time') ?: \DateInterval::createFromDateString('24 hours');
 
+        $this->activeGuard = config('permission.register_permissions_for_active_guard_only') ? Auth::getDefaultDriver() : null;
+
         self::$teams = config('permission.teams', false);
         self::$teamsKey = config('permission.column_names.team_foreign_key');
 
-        self::$cacheKey = config('permission.cache.key');
+        self::$cacheKey = $this->activeGuard ? config('permission.cache.key') . '.' . $this->activeGuard : config('permission.cache.key');
 
         self::$pivotRole = config('permission.column_names.role_pivot_key') ?: 'role_id';
         self::$pivotPermission = config('permission.column_names.permission_pivot_key') ?: 'permission_id';
@@ -179,9 +181,7 @@ class PermissionRegistrar
             return;
         }
 
-        $this->activeGuard = Auth::getDefaultDriver();
-
-        $this->permissions = $this->cache->remember(self::$cacheKey . '.' . $this->activeGuard, self::$cacheExpirationTime, function () {
+        $this->permissions = $this->cache->remember(self::$cacheKey, self::$cacheExpirationTime, function () {
             return $this->getSerializedPermissionsForCache();
         });
 
@@ -319,7 +319,8 @@ class PermissionRegistrar
     {
         $this->except = config('permission.cache.column_names_except', ['created_at','updated_at', 'deleted_at']);
 
-        $permissions = $this->getPermissionClass()->select()->with('roles')->where('guard_name', $this->activeGuard)->get()
+        $permissions = $this->getPermissionClass()->select()->with('roles')
+            ->when($this->activeGuard, fn($query) => $query->where('guard_name', $this->activeGuard))->get()
             ->map(function ($permission) {
                 if (! $this->alias) {
                     $this->aliasModelFields($permission);

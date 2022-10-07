@@ -103,6 +103,12 @@ return [
 
     'register_permission_check_method' => true,
 
+    /**
+     * When set to true, only permissions with a guard_name matching the active guard on the request
+     * are pulled from the database and registered at the gate.
+     */
+    'register_permissions_for_active_guard_only' => false,
+
     /*
      * When set to true the package implements teams using the 'team_foreign_key'. If you want
      * the migrations to register the 'team_foreign_key', you must set this to true
