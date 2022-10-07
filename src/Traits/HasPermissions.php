@@ -125,6 +125,8 @@ trait HasPermissions
      */
     public function hasPermissionTo($permission, $guardName = null): bool
     {
+        $guardName = $guardName ?? $this->getDefaultGuardFromConfig();
+
         if (config('permission.enable_wildcard_permission', false)) {
             return $this->hasWildcardPermission($permission, $guardName);
         }
@@ -456,9 +458,18 @@ trait HasPermissions
         return Guard::getNames($this);
     }
 
+    protected function getDefaultGuardFromConfig(): ?string
+    {
+        if (config('permission.default_guard') === true) {
+            return config('auth.defaults.guard');
+        }
+
+        return config('permission.default_guard') ?: null;
+    }
+
     protected function getDefaultGuardName(): string
     {
-        return Guard::getDefaultName($this);
+        return $this->getDefaultGuardFromConfig() ?? Guard::getDefaultName($this);
     }
 
     /**

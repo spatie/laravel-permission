@@ -135,6 +135,15 @@ return [
 
     'enable_wildcard_permission' => false,
 
+    /*
+     * By default the guard name relevant for the model and the current user will be looked up.
+     * If you set this to `web`, all permissions will be checked against the `web` guard, for example.
+     * This is useful if your application relies on multiple guards sharing the exact same permissions.
+     *
+     * If this is set to `true` the guard name from `auth.defaults.guard` will be used.
+     */
+    'default_guard' => null,
+
     'cache' => [
 
         /*
