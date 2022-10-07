@@ -179,7 +179,9 @@ class PermissionRegistrar
             return;
         }
 
-        $this->permissions = $this->cache->remember(self::$cacheKey, self::$cacheExpirationTime, function () {
+        $this->activeGuard = Auth::getDefaultDriver();
+
+        $this->permissions = $this->cache->remember(self::$cacheKey . '.' . $this->activeGuard, self::$cacheExpirationTime, function () {
             return $this->getSerializedPermissionsForCache();
         });
 
@@ -191,7 +193,6 @@ class PermissionRegistrar
             return;
         }
 
-        $this->activeGuard = Auth::getDefaultDriver();
 
         $this->alias = $this->permissions['alias'];
 
