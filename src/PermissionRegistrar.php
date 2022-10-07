@@ -10,6 +10,7 @@ use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\Eloquent\Collection;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
+use Illuminate\Support\Facades\Auth;
 
 class PermissionRegistrar
 {
@@ -51,6 +52,9 @@ class PermissionRegistrar
 
     /** @var array */
     private $cachedRoles = [];
+
+    /** @var string */
+    private $activeGuard;
 
     /** @var array */
     private $alias = [];
@@ -187,6 +191,8 @@ class PermissionRegistrar
             return;
         }
 
+        $this->activeGuard = Auth::getDefaultDriver();
+
         $this->alias = $this->permissions['alias'];
 
         $this->hydrateRolesCache();
@@ -312,7 +318,7 @@ class PermissionRegistrar
     {
         $this->except = config('permission.cache.column_names_except', ['created_at','updated_at', 'deleted_at']);
 
-        $permissions = $this->getPermissionClass()->select()->with('roles')->get()
+        $permissions = $this->getPermissionClass()->select()->with('roles')->where('guard_name', $this->activeGuard)->get()
             ->map(function ($permission) {
                 if (! $this->alias) {
                     $this->aliasModelFields($permission);
