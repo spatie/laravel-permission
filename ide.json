@@ -1,0 +1,72 @@
+{
+    "$schema": "https://laravel-ide.com/schema/laravel-ide-v2.json",
+    "blade": {
+        "directives": [
+            {
+                "name": "role",
+                "prefix": "<?php if(\\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper('hasRole', {",
+                "suffix": "})): ?>"
+            },
+            {
+                "name": "elserole",
+                "prefix": "<?php elseif(\\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper('hasRole', {",
+                "suffix": "})): ?>"
+            },
+            {
+                "name": "endrole",
+                "prefix": "",
+                "suffix": ""
+            },
+            {
+                "name": "hasrole",
+                "prefix": "<?php if(\\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper('hasRole', {",
+                "suffix": "})): ?>"
+            },
+            {
+                "name": "endhasrole",
+                "prefix": "",
+                "suffix": ""
+            },
+            {
+                "name": "hasanyrole",
+                "prefix": "<?php if(\\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper('hasAnyRole', {",
+                "suffix": "})): ?>"
+            },
+            {
+                "name": "endhasanyrole",
+                "prefix": "",
+                "suffix": ""
+            },
+            {
+                "name": "hasallroles",
+                "prefix": "<?php if(\\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper('hasAllRoles', {",
+                "suffix": "})): ?>"
+            },
+            {
+                "name": "endhasallroles",
+                "prefix": "",
+                "suffix": ""
+            },
+            {
+                "name": "unlessrole",
+                "prefix": "<?php if(! \\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper('hasRole', {",
+                "suffix": "})): ?>"
+            },
+            {
+                "name": "endunlessrole",
+                "prefix": "",
+                "suffix": ""
+            },
+            {
+                "name": "hasexactroles",
+                "prefix": "<?php if(\\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper('hasExactRoles', {",
+                "suffix": "})): ?>"
+            },
+            {
+                "name": "endhasexactroles",
+                "prefix": "",
+                "suffix": ""
+            }
+        ]
+    }
+}
