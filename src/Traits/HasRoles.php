@@ -20,7 +20,7 @@ trait HasRoles
     public static function bootHasRoles()
     {
         static::deleting(function ($model) {
-            if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
+            if (method_exists($model, 'isForceDeleting') && !$model->isForceDeleting()) {
                 return;
             }
 
@@ -30,7 +30,7 @@ trait HasRoles
 
     public function getRoleClass()
     {
-        if (! isset($this->roleClass)) {
+        if (!isset($this->roleClass)) {
             $this->roleClass = app(PermissionRegistrar::class)->getRoleClass();
         }
 
@@ -50,13 +50,13 @@ trait HasRoles
             PermissionRegistrar::$pivotRole
         );
 
-        if (! PermissionRegistrar::$teams) {
+        if (!PermissionRegistrar::$teams) {
             return $relation;
         }
 
         return $relation->wherePivot(PermissionRegistrar::$teamsKey, getPermissionsTeamId())
             ->where(function ($q) {
-                $teamField = config('permission.table_names.roles').'.'.PermissionRegistrar::$teamsKey;
+                $teamField = config('permission.table_names.roles') . '.' . PermissionRegistrar::$teamsKey;
                 $q->whereNull($teamField)->orWhere($teamField, getPermissionsTeamId());
             });
     }
@@ -89,7 +89,7 @@ trait HasRoles
         return $query->whereHas('roles', function (Builder $subQuery) use ($roles) {
             $roleClass = $this->getRoleClass();
             $key = (new $roleClass())->getKeyName();
-            $subQuery->whereIn(config('permission.table_names.roles').".$key", \array_column($roles, $key));
+            $subQuery->whereIn(config('permission.table_names.roles') . ".$key", \array_column($roles, $key));
         });
     }
 
@@ -110,13 +110,13 @@ trait HasRoles
                 }
 
                 $role = $this->getStoredRole($role);
-                if (! $role instanceof Role) {
+                if (!$role instanceof Role) {
                     return $array;
                 }
 
                 $this->ensureModelSharesGuard($role);
 
-                $array[$role->getKey()] = PermissionRegistrar::$teams && ! is_a($this, Permission::class) ?
+                $array[$role->getKey()] = PermissionRegistrar::$teams && !is_a($this, Permission::class) ?
                     [PermissionRegistrar::$teamsKey => getPermissionsTeamId()] : [];
 
                 return $array;
@@ -314,6 +314,20 @@ trait HasRoles
         return $this->roles->pluck('name');
     }
 
+    /** Return only single rolename, developer don't need to use an arr key always.
+     * @param integer $key always sets to 0.
+     * @return String $role_name
+     */
+    public function getRoleName($key = 0): String
+    {
+        if (FALSE === is_int($key)) {
+            trigger_error('function getRoleName expected Argument 1 to be Integer', E_USER_WARNING);
+        }
+        if (is_int($key)) {
+            return isset($this->roles[$key]->name) ? $this->roles[$key]->name : '';
+        }
+    }
+
     protected function getStoredRole($role): Role
     {
         $roleClass = $this->getRoleClass();
@@ -344,7 +358,7 @@ trait HasRoles
             return explode('|', $pipeString);
         }
 
-        if (! in_array($quoteCharacter, ["'", '"'])) {
+        if (!in_array($quoteCharacter, ["'", '"'])) {
             return explode('|', $pipeString);
         }
 
