@@ -314,17 +314,20 @@ trait HasRoles
         return $this->roles->pluck('name');
     }
 
-    /** Return only single rolename, developer don't need to use an arr key always.
-     * @param integer $key always sets to 0.
-     * @return String $role_name
+    /** Return only single rolename, developer don't need to use an arr index always.
+     * @param integer $index always sets to 0.
+     * @return string $role_name
+     * OR
+     * @return void
      */
-    public function getRoleName($key = 0): String
+    public function getRoleName($index = 0)
     {
-        if (FALSE === is_int($key)) {
+        if (FALSE == is_int($index)) {
             trigger_error('function getRoleName expected Argument 1 to be Integer', E_USER_WARNING);
         }
-        if (is_int($key)) {
-            return isset($this->roles[$key]->name) ? $this->roles[$key]->name : '';
+        if (array_key_exists($index, $this->roles)) {
+            $role = $this->roles[$index];
+            return isset($role->name) ? $role->name : '';
         }
     }
 
