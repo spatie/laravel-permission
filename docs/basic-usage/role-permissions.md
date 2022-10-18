@@ -143,7 +143,7 @@ $user->hasAllDirectPermissions(['edit articles', 'delete articles']);
 $user->hasAnyDirectPermission(['create articles', 'delete articles']);
 ```
 By following the previous example, when we call `$user->hasAllDirectPermissions(['edit articles', 'delete articles'])` 
-it returns `true`, because the user has all these direct permissions. 
+it returns `false`, because the user does not have `edit articles` as a direct permission.
 When we call
 `$user->hasAnyDirectPermission('edit articles')`, it returns `true` because the user has one of the provided permissions.
 
