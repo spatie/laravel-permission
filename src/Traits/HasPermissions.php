@@ -23,7 +23,7 @@ trait HasPermissions
     public static function bootHasPermissions()
     {
         static::deleting(function ($model) {
-            if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
+            if (method_exists($model, 'isForceDeleting') && !$model->isForceDeleting()) {
                 return;
             }
 
@@ -33,7 +33,7 @@ trait HasPermissions
 
     public function getPermissionClass()
     {
-        if (! isset($this->permissionClass)) {
+        if (!isset($this->permissionClass)) {
             $this->permissionClass = app(PermissionRegistrar::class)->getPermissionClass();
         }
 
@@ -53,7 +53,7 @@ trait HasPermissions
             PermissionRegistrar::$pivotPermission
         );
 
-        if (! PermissionRegistrar::$teams) {
+        if (!PermissionRegistrar::$teams) {
             return $relation;
         }
 
@@ -80,13 +80,13 @@ trait HasPermissions
             $query->whereHas('permissions', function (Builder $subQuery) use ($permissions) {
                 $permissionClass = $this->getPermissionClass();
                 $key = (new $permissionClass())->getKeyName();
-                $subQuery->whereIn(config('permission.table_names.permissions').".$key", \array_column($permissions, $key));
+                $subQuery->whereIn(config('permission.table_names.permissions') . ".$key", \array_column($permissions, $key));
             });
             if (count($rolesWithPermissions) > 0) {
                 $query->orWhereHas('roles', function (Builder $subQuery) use ($rolesWithPermissions) {
                     $roleClass = $this->getRoleClass();
                     $key = (new $roleClass())->getKeyName();
-                    $subQuery->whereIn(config('permission.table_names.roles').".$key", \array_column($rolesWithPermissions, $key));
+                    $subQuery->whereIn(config('permission.table_names.roles') . ".$key", \array_column($rolesWithPermissions, $key));
                 });
             }
         });
@@ -124,8 +124,6 @@ trait HasPermissions
      */
     public function filterPermission($permission, $guardName = null)
     {
-        $guardName = $guardName ?? $this->getDefaultGuardFromConfig();
-
         $permissionClass = $this->getPermissionClass();
 
         if (is_string($permission)) {
@@ -142,7 +140,7 @@ trait HasPermissions
             );
         }
 
-        if (! $permission instanceof Permission) {
+        if (!$permission instanceof Permission) {
             throw new PermissionDoesNotExist();
         }
 
@@ -189,7 +187,7 @@ trait HasPermissions
             $permission = $permission->name;
         }
 
-        if (! is_string($permission)) {
+        if (!is_string($permission)) {
             throw WildcardPermissionInvalidArgument::create();
         }
 
@@ -258,7 +256,7 @@ trait HasPermissions
         $permissions = collect($permissions)->flatten();
 
         foreach ($permissions as $permission) {
-            if (! $this->hasPermissionTo($permission)) {
+            if (!$this->hasPermissionTo($permission)) {
                 return false;
             }
         }
@@ -336,13 +334,13 @@ trait HasPermissions
                 }
 
                 $permission = $this->getStoredPermission($permission);
-                if (! $permission instanceof Permission) {
+                if (!$permission instanceof Permission) {
                     return $array;
                 }
 
                 $this->ensureModelSharesGuard($permission);
 
-                $array[$permission->getKey()] = PermissionRegistrar::$teams && ! is_a($this, Role::class) ?
+                $array[$permission->getKey()] = PermissionRegistrar::$teams && !is_a($this, Role::class) ?
                     [PermissionRegistrar::$teamsKey => getPermissionsTeamId()] : [];
 
                 return $array;
@@ -463,7 +461,7 @@ trait HasPermissions
      */
     protected function ensureModelSharesGuard($roleOrPermission)
     {
-        if (! $this->getGuardNames()->contains($roleOrPermission->guard_name)) {
+        if (!$this->getGuardNames()->contains($roleOrPermission->guard_name)) {
             throw GuardDoesNotMatch::create($roleOrPermission->guard_name, $this->getGuardNames());
         }
     }
@@ -505,7 +503,7 @@ trait HasPermissions
         $permissions = collect($permissions)->flatten();
 
         foreach ($permissions as $permission) {
-            if (! $this->hasDirectPermission($permission)) {
+            if (!$this->hasDirectPermission($permission)) {
                 return false;
             }
         }
