@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 5.5.11 - 2022-10-19
+
+### What's Changed
+
+- Support static arrays on blade directives by @erikn69 in https://github.com/spatie/laravel-permission/pull/2168
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/5.5.10...5.5.11
+
 ## 5.5.10 - 2022-10-19
 
 ### What's Changed
@@ -457,6 +465,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -504,6 +513,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
