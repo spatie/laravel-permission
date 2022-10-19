@@ -72,8 +72,6 @@ The role/permission assignment and removal are the same, but they take the globa
 Global roles can be assigned to different teams, `team_id` as the primary key of the relationships is always required. If you want a "Super Admin" global role for a user, when you creates a new team you must assign it to your user. Example:
 
 ```php
-namespace App\Models;
-
 class YourTeamModel extends \Illuminate\Database\Eloquent\Model
 {
     // ...
@@ -96,3 +94,25 @@ class YourTeamModel extends \Illuminate\Database\Eloquent\Model
     // ...
 }
 ```
+
+## Optional Trait for Teams
+
+`TeamHasRoles` trait must be added to the Team model to enable features like cascade deleting.
+
+Thus, a typical basic Team model would have these basic minimum requirements:
+
+```php
+use Spatie\Permission\Traits\TeamHasRoles;
+
+class YourTeamModel extends \Illuminate\Database\Eloquent\Model
+{
+    use TeamHasRoles;
+
+    // ...
+}
+```
+
+**Prerequisites for `TeamHasRoles`**
+- Team model must not have a `permission` or `permissions` property, nor a `permissions()` method
+- Team model must not have a `role` or `roles` property, nor a `roles()` method
+- Team model must not have a `specific_role` or `specific_roles` property, nor a `specific_roles()` method
