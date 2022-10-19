@@ -315,15 +315,15 @@ trait HasPermissions
     }
 
     /**
-     * Grant the given permission(s) to a role.
+     * Returns permissions ids as array keys
      *
      * @param string|int|array|\Spatie\Permission\Contracts\Permission|\Illuminate\Support\Collection $permissions
      *
-     * @return $this
+     * @return array
      */
-    public function givePermissionTo(...$permissions)
+    public function collectPermissions(...$permissions)
     {
-        $permissions = collect($permissions)
+        return collect($permissions)
             ->flatten()
             ->reduce(function ($array, $permission) {
                 if (empty($permission)) {
@@ -342,6 +342,18 @@ trait HasPermissions
 
                 return $array;
             }, []);
+    }
+
+    /**
+     * Grant the given permission(s) to a role.
+     *
+     * @param string|int|array|\Spatie\Permission\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     *
+     * @return $this
+     */
+    public function givePermissionTo(...$permissions)
+    {
+        $permissions = $this->collectPermissions(...$permissions);
 
         $model = $this->getModel();
 
