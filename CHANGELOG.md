@@ -2,6 +2,18 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 5.5.10 - 2022-10-19
+
+### What's Changed
+
+- Avoid calling the config helper in the role/perm model constructor by @adiafora in https://github.com/spatie/laravel-permission/pull/2098 as discussed in https://github.com/spatie/laravel-permission/issues/2097 regarding `DI`
+
+### New Contributors
+
+- @adiafora made their first contribution in https://github.com/spatie/laravel-permission/pull/2098
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/5.5.9...5.5.10
+
 ## 5.5.9 - 2022-10-19
 
 Compatibility Bugfix
@@ -444,6 +456,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -491,6 +504,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
