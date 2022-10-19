@@ -27,7 +27,10 @@ trait HasPermissions
                 return;
             }
 
+            $teams = PermissionRegistrar::$teams;
+            PermissionRegistrar::$teams = false;
             $model->permissions()->detach();
+            PermissionRegistrar::$teams = $teams;
         });
     }
 
