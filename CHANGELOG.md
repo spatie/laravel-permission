@@ -2,6 +2,30 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 5.5.6 - 2022-10-19
+
+Just a maintenance release.
+
+### What's Changed
+
+- Actions: add PHP 8.2 Build by @erikn69 in https://github.com/spatie/laravel-permission/pull/2214
+- Docs: Fix small syntax error in teams-permissions.md by @miten5 in https://github.com/spatie/laravel-permission/pull/2171
+- Docs: Update documentation for multiple guards by @gms8994 in https://github.com/spatie/laravel-permission/pull/2169
+- Docs: Make Writing Policies link clickable by @maartenpaauw in https://github.com/spatie/laravel-permission/pull/2202
+- Docs: Add note about non-standard User models by @androidacy-user in https://github.com/spatie/laravel-permission/pull/2179
+- Docs: Fix explanation of results for hasAllDirectPermissions in role-permission.md by @drdan18 in https://github.com/spatie/laravel-permission/pull/2139
+- Docs: Add ULIDs reference by @erikn69 in https://github.com/spatie/laravel-permission/pull/2213
+
+### New Contributors
+
+- @miten5 made their first contribution in https://github.com/spatie/laravel-permission/pull/2171
+- @gms8994 made their first contribution in https://github.com/spatie/laravel-permission/pull/2169
+- @maartenpaauw made their first contribution in https://github.com/spatie/laravel-permission/pull/2202
+- @androidacy-user made their first contribution in https://github.com/spatie/laravel-permission/pull/2179
+- @drdan18 made their first contribution in https://github.com/spatie/laravel-permission/pull/2139
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/5.5.5...5.5.6
+
 ## 5.5.5 - 2022-06-29
 
 ### What's Changed
@@ -381,6 +405,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -428,6 +453,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
