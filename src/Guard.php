@@ -22,7 +22,7 @@ class Guard
             if (\method_exists($model, 'guardName')) {
                 $guardName = $model->guardName();
             } else {
-                $guardName = $model->guard_name ?? null;
+                $guardName = $model->getAttributeValue('guard_name');
             }
         }
 
