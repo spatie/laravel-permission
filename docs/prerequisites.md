@@ -47,3 +47,7 @@ MySQL 8.0 limits index keys to 1000 characters. This package publishes a migrati
 
 Thus in your AppServiceProvider you will need to set `Schema::defaultStringLength(125)`. [See the Laravel Docs for instructions](https://laravel.com/docs/migrations#index-lengths-mysql-mariadb).
 
+## Note for apps using UUIDs/ULIDs/GUIDs
+
+This package expects the primary key of your `User` model to be an auto-incrementing `int`. If it is not, you may need to modify the `create_permission_tables` migration and/or modify the default configuration. See [https://spatie.be/docs/laravel-permission/v5/advanced-usage/uuid](https://spatie.be/docs/laravel-permission/v5/advanced-usage/uuid) for more information. 
+
