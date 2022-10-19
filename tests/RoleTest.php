@@ -22,6 +22,19 @@ class RoleTest extends TestCase
     }
 
     /** @test */
+    public function it_get_user_models_using_with()
+    {
+        $this->testUser->assignRole($this->testUserRole);
+
+        $role = app(Role::class)::with('users')
+            ->where($this->testUserRole->getKeyName(), $this->testUserRole->getKey())->first();
+
+        $this->assertEquals($role->getKey(), $this->testUserRole->getKey());
+        $this->assertCount(1, $role->users);
+        $this->assertEquals($role->users[0]->id, $this->testUser->id);
+    }
+
+    /** @test */
     public function it_has_user_models_of_the_right_class()
     {
         $this->testAdmin->assignRole($this->testAdminRole);

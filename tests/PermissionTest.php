@@ -8,6 +8,20 @@ use Spatie\Permission\Exceptions\PermissionAlreadyExists;
 class PermissionTest extends TestCase
 {
     /** @test */
+    public function it_get_user_models_using_with()
+    {
+        $this->testUser->givePermissionTo($this->testUserPermission);
+
+        $permission = app(Permission::class)::with('users')
+            ->where($this->testUserPermission->getKeyName(), $this->testUserPermission->getKey())
+            ->first();
+
+        $this->assertEquals($permission->getKey(), $this->testUserPermission->getKey());
+        $this->assertCount(1, $permission->users);
+        $this->assertEquals($permission->users[0]->id, $this->testUser->id);
+    }
+
+    /** @test */
     public function it_throws_an_exception_when_the_permission_already_exists()
     {
         $this->expectException(PermissionAlreadyExists::class);
