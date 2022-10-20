@@ -124,8 +124,6 @@ trait HasPermissions
      */
     public function filterPermission($permission, $guardName = null)
     {
-        $guardName = $guardName ?? $this->getDefaultGuardFromConfig();
-
         $permissionClass = $this->getPermissionClass();
 
         if (is_string($permission)) {
