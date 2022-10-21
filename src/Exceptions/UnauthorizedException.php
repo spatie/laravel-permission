@@ -14,7 +14,7 @@ class UnauthorizedException extends HttpException
     {
         $message = 'User does not have the right roles.';
 
-        if (config('permission.display_permission_in_exception')) {
+        if (config('permission.display_role_in_exception')) {
             $permStr = implode(', ', $roles);
             $message = 'User does not have the right roles. Necessary roles are '.$permStr;
         }
