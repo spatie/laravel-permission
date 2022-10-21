@@ -5,6 +5,7 @@ namespace Spatie\Permission\Test;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use InvalidArgumentException;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\UnauthorizedException;
@@ -147,6 +148,7 @@ class PermissionMiddlewareTest extends TestCase
     {
         Auth::login($this->testUser);
 
+        $message = null;
         $requiredPermissions = [];
 
         try {
@@ -154,10 +156,31 @@ class PermissionMiddlewareTest extends TestCase
                 return (new Response())->setContent('<html></html>');
             }, 'some-permission');
         } catch (UnauthorizedException $e) {
+            $message = $e->getMessage();
             $requiredPermissions = $e->getRequiredPermissions();
         }
 
+        $this->assertEquals('User does not have the right permissions.', $message);
         $this->assertEquals(['some-permission'], $requiredPermissions);
+    }
+
+    /** @test */
+    public function the_required_permissions_can_be_displayed_in_the_exception()
+    {
+        Auth::login($this->testUser);
+        Config::set(['permission.display_permission_in_exception' => true]);
+
+        $message = null;
+
+        try {
+            $this->permissionMiddleware->handle(new Request(), function () {
+                return (new Response())->setContent('<html></html>');
+            }, 'some-permission');
+        } catch (UnauthorizedException $e) {
+            $message = $e->getMessage();
+        }
+
+        $this->assertStringEndsWith('Necessary permissions are some-permission', $message);
     }
 
     /** @test */
