@@ -5,6 +5,7 @@ namespace Spatie\Permission\Test;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use InvalidArgumentException;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middlewares\RoleMiddleware;
@@ -113,6 +114,7 @@ class RoleMiddlewareTest extends TestCase
     {
         Auth::login($this->testUser);
 
+        $message = null;
         $requiredRoles = [];
 
         try {
@@ -120,10 +122,31 @@ class RoleMiddlewareTest extends TestCase
                 return (new Response())->setContent('<html></html>');
             }, 'some-role');
         } catch (UnauthorizedException $e) {
+            $message = $e->getMessage();
             $requiredRoles = $e->getRequiredRoles();
         }
 
+        $this->assertEquals('User does not have the right roles.', $message);
         $this->assertEquals(['some-role'], $requiredRoles);
+    }
+
+    /** @test */
+    public function the_required_roles_can_be_displayed_in_the_exception()
+    {
+        Auth::login($this->testUser);
+        Config::set(['permission.display_role_in_exception' => true]);
+
+        $message = null;
+
+        try {
+            $this->roleMiddleware->handle(new Request(), function () {
+                return (new Response())->setContent('<html></html>');
+            }, 'some-role');
+        } catch (UnauthorizedException $e) {
+            $message = $e->getMessage();
+        }
+
+        $this->assertStringEndsWith('Necessary roles are some-role', $message);
     }
 
     /** @test */

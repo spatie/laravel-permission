@@ -5,6 +5,7 @@ namespace Spatie\Permission\Test;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use InvalidArgumentException;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middlewares\RoleOrPermissionMiddleware;
@@ -121,6 +122,47 @@ class RoleOrPermissionMiddlewareTest extends TestCase
             200,
             $this->runMiddleware($this->roleOrPermissionMiddleware, 'admin-permission|testAdminRole', 'admin')
         );
+    }
+
+    /** @test */
+    public function the_required_permissions_or_roles_can_be_fetched_from_the_exception()
+    {
+        Auth::login($this->testUser);
+
+        $message = null;
+        $requiredRolesOrPermissions = [];
+
+        try {
+            $this->roleOrPermissionMiddleware->handle(new Request(), function () {
+                return (new Response())->setContent('<html></html>');
+            }, 'some-permission|some-role');
+        } catch (UnauthorizedException $e) {
+            $message = $e->getMessage();
+            $requiredRolesOrPermissions = $e->getRequiredPermissions();
+        }
+
+        $this->assertEquals('User does not have any of the necessary access rights.', $message);
+        $this->assertEquals(['some-permission', 'some-role'], $requiredRolesOrPermissions);
+    }
+
+    /** @test */
+    public function the_required_permissions_or_roles_can_be_displayed_in_the_exception()
+    {
+        Auth::login($this->testUser);
+        Config::set(['permission.display_permission_in_exception' => true]);
+        Config::set(['permission.display_role_in_exception' => true]);
+
+        $message = null;
+
+        try {
+            $this->roleOrPermissionMiddleware->handle(new Request(), function () {
+                return (new Response())->setContent('<html></html>');
+            }, 'some-permission|some-role');
+        } catch (UnauthorizedException $e) {
+            $message = $e->getMessage();
+        }
+
+        $this->assertStringEndsWith('Necessary roles or permissions are some-permission, some-role', $message);
     }
 
     protected function runMiddleware($middleware, $name, $guard = null)
