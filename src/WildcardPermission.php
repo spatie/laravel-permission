@@ -47,7 +47,7 @@ class WildcardPermission
         $otherParts = $permission->getParts();
 
         $i = 0;
-        $partsCount = $this->getParts()->count(); 
+        $partsCount = $this->getParts()->count();
         foreach ($otherParts as $otherPart) {
             if ($partsCount - 1 < $i) {
                 return true;
