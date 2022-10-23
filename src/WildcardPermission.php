@@ -47,8 +47,9 @@ class WildcardPermission
         $otherParts = $permission->getParts();
 
         $i = 0;
+        $partsCount = $this->getParts()->count(); 
         foreach ($otherParts as $otherPart) {
-            if ($this->getParts()->count() - 1 < $i) {
+            if ($partsCount - 1 < $i) {
                 return true;
             }
 
@@ -60,7 +61,7 @@ class WildcardPermission
             $i++;
         }
 
-        for ($i; $i < $this->parts->count(); $i++) {
+        for ($i; $i < $partsCount; $i++) {
             if (! $this->parts->get($i)->contains(static::WILDCARD_TOKEN)) {
                 return false;
             }
