@@ -4,7 +4,6 @@ namespace Spatie\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Role as RoleContract;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\RoleAlreadyExists;
@@ -195,13 +194,5 @@ class Role extends Model implements RoleContract
         }
 
         return $this->permissions->contains($permission->getKeyName(), $permission->getKey());
-    }
-
-    /**
-     * Return all the permissions the model has, both directly and via roles.
-     */
-    public function getAllPermissions(): Collection
-    {
-        return $this->permissions->sort()->values();
     }
 }
