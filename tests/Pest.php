@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,4 +53,14 @@ function renderView($view, $parameters)
     }
 
     return trim((string) ($view));
+}
+
+function resetQueryCount(): void
+{
+    DB::flushQueryLog();
+}
+
+function assertQueryCount(int $expected)
+{
+    expect(DB::getQueryLog())->toHaveCount($expected);
 }
