@@ -1,7 +1,5 @@
 <?php
 
-namespace Spatie\Permission\Test;
-
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Contracts\Permission;

@@ -31,6 +31,7 @@
     "require-dev": {
         "orchestra/testbench": "^5.0|^6.0|^7.0",
         "pestphp/pest": "^1.22",
+        "pestphp/pest-plugin-laravel": "^1.3",
         "phpunit/phpunit": "^9.4",
         "predis/predis": "^1.1"
     },

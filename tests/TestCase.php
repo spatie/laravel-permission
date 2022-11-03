@@ -181,11 +181,6 @@ abstract class TestCase extends Orchestra
         self::$customMigration = new \CreatePermissionCustomTables();
     }
 
-    protected function reloadPermissions()
-    {
-        app(PermissionRegistrar::class)->forgetCachedPermissions();
-    }
-
     public function createCacheTable()
     {
         Schema::create('cache', function ($table) {

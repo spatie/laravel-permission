@@ -23,6 +23,11 @@ uses(Spatie\Permission\Test\TestCase::class)->in('.');
 |--------------------------------------------------------------------------
 */
 
+function reloadPermissions(): void
+{
+    app(PermissionRegistrar::class)->forgetCachedPermissions();
+}
+
 function getWriter()
 {
     test()->testUser->assignRole('writer');
