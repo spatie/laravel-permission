@@ -84,6 +84,12 @@ A permission can be revoked from a role:
 $role->revokePermissionTo('edit articles');
 ```
 
+Or revoke & add new permissions in one go:
+
+```php
+$role->syncPermissions(['edit articles', 'delete articles']);
+```
+
 The `givePermissionTo` and `revokePermissionTo` functions can accept a
 string or a `Spatie\Permission\Models\Permission` object.
 
