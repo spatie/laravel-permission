@@ -46,7 +46,18 @@ This package can be used with Laravel 6.0 or higher.
         php artisan migrate
 
 9. Add the necessary trait to your User model: Consult the Basic Usage section of the docs for how to get started using the features of this package.
+10. Add the `HasRoles` trait to your User model:
+```php
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Spatie\Permission\Traits\HasRoles;
 
+class User extends Authenticatable
+{
+    use HasRoles;
+
+    // ...
+}
+```
 
 ### Default config file contents
 
