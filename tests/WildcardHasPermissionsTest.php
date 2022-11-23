@@ -53,6 +53,55 @@ class WildcardHasPermissionsTest extends TestCase
     }
 
     /** @test */
+    public function it_can_check_custom_wildcard_permission()
+    {
+        app('config')->set('permission.enable_wildcard_permission', true);
+        app('config')->set('permission.wildcard_permission', WildcardPermission::class);
+
+        $user1 = User::create(['email' => 'user1@test.com']);
+
+        $permission1 = Permission::create(['name' => 'articles:edit;view;create']);
+        $permission2 = Permission::create(['name' => 'news:@']);
+        $permission3 = Permission::create(['name' => 'posts:@']);
+
+        $user1->givePermissionTo([$permission1, $permission2, $permission3]);
+
+        $this->assertTrue($user1->hasPermissionTo('posts:create'));
+        $this->assertTrue($user1->hasPermissionTo('posts:create:123'));
+        $this->assertTrue($user1->hasPermissionTo('posts:@'));
+        $this->assertTrue($user1->hasPermissionTo('articles:view'));
+        $this->assertFalse($user1->hasPermissionTo('posts.*'));
+        $this->assertFalse($user1->hasPermissionTo('articles.view'));
+        $this->assertFalse($user1->hasPermissionTo('projects:view'));
+    }
+
+    /** @test */
+    public function it_can_check_custom_wildcard_permissions_via_roles()
+    {
+        app('config')->set('permission.enable_wildcard_permission', true);
+        app('config')->set('permission.wildcard_permission', WildcardPermission::class);
+
+        $user1 = User::create(['email' => 'user1@test.com']);
+
+        $user1->assignRole('testRole');
+
+        $permission1 = Permission::create(['name' => 'articles;projects:edit;view;create']);
+        $permission2 = Permission::create(['name' => 'news:@:456']);
+        $permission3 = Permission::create(['name' => 'posts']);
+
+        $this->testUserRole->givePermissionTo([$permission1, $permission2, $permission3]);
+
+        $this->assertTrue($user1->hasPermissionTo('posts:create'));
+        $this->assertTrue($user1->hasPermissionTo('news:create:456'));
+        $this->assertTrue($user1->hasPermissionTo('projects:create'));
+        $this->assertTrue($user1->hasPermissionTo('articles:view'));
+        $this->assertFalse($user1->hasPermissionTo('news.create.456'));
+        $this->assertFalse($user1->hasPermissionTo('projects.create'));
+        $this->assertFalse($user1->hasPermissionTo('articles:list'));
+        $this->assertFalse($user1->hasPermissionTo('projects:list'));
+    }
+
+    /** @test */
     public function it_can_check_non_wildcard_permissions()
     {
         app('config')->set('permission.enable_wildcard_permission', true);
