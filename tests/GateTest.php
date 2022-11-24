@@ -31,6 +31,12 @@ class GateTest extends TestCase
 
         $this->assertTrue($this->testUser->can('edit-articles'));
 
+        $this->assertTrue($this->testUser->can('edit-articles', 'web'));
+
+        $this->assertFalse($this->testUser->can('edit-articles', 'admin'));
+
+        $this->assertFalse($this->testUser->can('edit-articles', 'non-existing-guard'));
+
         $this->assertFalse($this->testUser->can('non-existing-permission'));
 
         $this->assertFalse($this->testUser->can('admin-permission'));
@@ -47,6 +53,12 @@ class GateTest extends TestCase
 
         $this->assertTrue($this->testUser->can('edit-articles'));
 
+        $this->assertTrue($this->testUser->can('edit-articles', 'web'));
+
+        $this->assertFalse($this->testUser->can('edit-articles', 'admin'));
+
+        $this->assertFalse($this->testUser->can('edit-articles', 'non-existing-guard'));
+
         $this->assertFalse($this->testUser->can('non-existing-permission'));
 
         $this->assertFalse($this->testUser->can('admin-permission'));
@@ -62,6 +74,12 @@ class GateTest extends TestCase
         $this->assertTrue($this->testAdmin->hasPermissionTo($this->testAdminPermission));
 
         $this->assertTrue($this->testAdmin->can('admin-permission'));
+
+        $this->assertTrue($this->testAdmin->can('admin-permission', 'admin'));
+
+        $this->assertFalse($this->testAdmin->can('admin-permission', 'web'));
+
+        $this->assertFalse($this->testAdmin->can('admin-permission', 'non-existing-guard'));
 
         $this->assertFalse($this->testAdmin->can('non-existing-permission'));
 

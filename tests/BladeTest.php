@@ -63,6 +63,7 @@ class BladeTest extends TestCase
         $elserole = 'na';
 
         auth('admin')->setUser($this->testAdmin);
+        auth()->shouldUse('admin');
 
         $this->assertEquals('does not have permission', $this->renderView('can', compact('permission')));
         $this->assertEquals('does not have role', $this->renderView('role', compact('role', 'elserole')));
@@ -82,6 +83,23 @@ class BladeTest extends TestCase
         auth()->setUser($user);
 
         $this->assertEquals('has permission', $this->renderView('can', ['permission' => 'edit-articles']));
+        $this->assertEquals('does not have permission', $this->renderView('can', ['permission' => 'edit-news']));
+    }
+
+    /** @test */
+    public function the_can_directive_will_evaluate_when_somebody_with_another_guard_is_logged_in_and_guard_is_setted()
+    {
+        $permission = 'admin-permission';
+        $user = $this->getAdmin();
+
+        $user->givePermissionTo($permission);
+
+        auth('admin')->setUser($user);
+        auth()->shouldUse('admin');
+
+        $this->assertEquals('has permission', $this->renderView('can', compact('permission')));
+        $this->assertEquals('has permission', $this->renderView('can', compact('permission') + ['guard' => 'admin']));
+        $this->assertEquals('does not have permission', $this->renderView('can', compact('permission') + ['guard' => 'web']));
     }
 
     /** @test */
@@ -301,6 +319,13 @@ class BladeTest extends TestCase
         $this->testUser->assignRole('member');
 
         return $this->testUser;
+    }
+
+    protected function getAdmin()
+    {
+        $this->testAdmin->assignRole('testAdminRole');
+
+        return $this->testAdmin;
     }
 
     protected function getSuperAdmin()
