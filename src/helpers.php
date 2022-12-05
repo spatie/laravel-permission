@@ -6,7 +6,7 @@ if (! function_exists('getModelForGuard')) {
      *
      * @return string|null
      */
-    function getModelForGuard(string $guard)
+    function getModelForGuard(string $guard): ?string
     {
         return collect(config('auth.guards'))
             ->map(function ($guard) {
@@ -24,7 +24,7 @@ if (! function_exists('setPermissionsTeamId')) {
      * @param int|string|\Illuminate\Database\Eloquent\Model $id
      *
      */
-    function setPermissionsTeamId($id)
+    function setPermissionsTeamId($id): void
     {
         app(\Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId($id);
     }

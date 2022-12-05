@@ -8,7 +8,7 @@ class TeamHasPermissionsTest extends HasPermissionsTest
     protected $hasTeams = true;
 
     /** @test */
-    public function it_can_assign_same_and_different_permission_on_same_user_on_different_teams()
+    public function it_can_assign_same_and_different_permission_on_same_user_on_different_teams(): void
     {
         setPermissionsTeamId(1);
         $this->testUser->load('permissions');
@@ -38,7 +38,7 @@ class TeamHasPermissionsTest extends HasPermissionsTest
     }
 
     /** @test */
-    public function it_can_list_all_the_coupled_permissions_both_directly_and_via_roles_on_same_user_on_different_teams()
+    public function it_can_list_all_the_coupled_permissions_both_directly_and_via_roles_on_same_user_on_different_teams(): void
     {
         $this->testUserRole->givePermissionTo('edit-articles');
 
@@ -72,7 +72,7 @@ class TeamHasPermissionsTest extends HasPermissionsTest
     }
 
     /** @test */
-    public function it_can_sync_or_remove_permission_without_detach_on_different_teams()
+    public function it_can_sync_or_remove_permission_without_detach_on_different_teams(): void
     {
         setPermissionsTeamId(1);
         $this->testUser->load('permissions');
@@ -105,7 +105,7 @@ class TeamHasPermissionsTest extends HasPermissionsTest
     }
 
     /** @test */
-    public function it_can_scope_users_on_different_teams()
+    public function it_can_scope_users_on_different_teams(): void
     {
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);

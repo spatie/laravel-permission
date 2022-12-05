@@ -9,7 +9,7 @@ use Spatie\Permission\Models\Role;
 class CommandTest extends TestCase
 {
     /** @test */
-    public function it_can_create_a_role()
+    public function it_can_create_a_role(): void
     {
         Artisan::call('permission:create-role', ['name' => 'new-role']);
 
@@ -18,7 +18,7 @@ class CommandTest extends TestCase
     }
 
     /** @test */
-    public function it_can_create_a_role_with_a_specific_guard()
+    public function it_can_create_a_role_with_a_specific_guard(): void
     {
         Artisan::call('permission:create-role', [
             'name' => 'new-role',
@@ -31,7 +31,7 @@ class CommandTest extends TestCase
     }
 
     /** @test */
-    public function it_can_create_a_permission()
+    public function it_can_create_a_permission(): void
     {
         Artisan::call('permission:create-permission', ['name' => 'new-permission']);
 
@@ -39,7 +39,7 @@ class CommandTest extends TestCase
     }
 
     /** @test */
-    public function it_can_create_a_permission_with_a_specific_guard()
+    public function it_can_create_a_permission_with_a_specific_guard(): void
     {
         Artisan::call('permission:create-permission', [
             'name' => 'new-permission',
@@ -52,7 +52,7 @@ class CommandTest extends TestCase
     }
 
     /** @test */
-    public function it_can_create_a_role_and_permissions_at_same_time()
+    public function it_can_create_a_role_and_permissions_at_same_time(): void
     {
         Artisan::call('permission:create-role', [
             'name' => 'new-role',
@@ -66,7 +66,7 @@ class CommandTest extends TestCase
     }
 
     /** @test */
-    public function it_can_create_a_role_without_duplication()
+    public function it_can_create_a_role_without_duplication(): void
     {
         Artisan::call('permission:create-role', ['name' => 'new-role']);
         Artisan::call('permission:create-role', ['name' => 'new-role']);
@@ -76,7 +76,7 @@ class CommandTest extends TestCase
     }
 
     /** @test */
-    public function it_can_create_a_permission_without_duplication()
+    public function it_can_create_a_permission_without_duplication(): void
     {
         Artisan::call('permission:create-permission', ['name' => 'new-permission']);
         Artisan::call('permission:create-permission', ['name' => 'new-permission']);
@@ -85,7 +85,7 @@ class CommandTest extends TestCase
     }
 
     /** @test */
-    public function it_can_show_permission_tables()
+    public function it_can_show_permission_tables(): void
     {
         Artisan::call('permission:show');
 
@@ -121,7 +121,7 @@ class CommandTest extends TestCase
     }
 
     /** @test */
-    public function it_can_show_permissions_for_guard()
+    public function it_can_show_permissions_for_guard(): void
     {
         Artisan::call('permission:show', ['guard' => 'web']);
 
@@ -132,7 +132,7 @@ class CommandTest extends TestCase
     }
 
     /** @test */
-    public function it_can_setup_teams_upgrade()
+    public function it_can_setup_teams_upgrade(): void
     {
         config()->set('permission.teams', true);
 
@@ -159,7 +159,7 @@ class CommandTest extends TestCase
     }
 
     /** @test */
-    public function it_can_show_roles_by_teams()
+    public function it_can_show_roles_by_teams(): void
     {
         config()->set('permission.teams', true);
         app(\Spatie\Permission\PermissionRegistrar::class)->initializeCache();

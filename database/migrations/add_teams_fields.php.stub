@@ -13,7 +13,7 @@ class AddTeamsFields extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         $teams = config('permission.teams');
         $tableNames = config('permission.table_names');
@@ -87,7 +87,7 @@ class AddTeamsFields extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
 
     }

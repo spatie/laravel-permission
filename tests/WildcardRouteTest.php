@@ -7,7 +7,7 @@ use Illuminate\Http\Response;
 class WildcardRouteTest extends TestCase
 {
     /** @test */
-    public function test_permission_function()
+    public function test_permission_function(): void
     {
         app('config')->set('permission.enable_wildcard_permission', true);
 
@@ -21,7 +21,7 @@ class WildcardRouteTest extends TestCase
     }
 
     /** @test */
-    public function test_role_and_permission_function_together()
+    public function test_role_and_permission_function_together(): void
     {
         app('config')->set('permission.enable_wildcard_permission', true);
 
@@ -51,7 +51,7 @@ class WildcardRouteTest extends TestCase
         return app('router');
     }
 
-    protected function getRouteResponse()
+    protected function getRouteResponse(): callable
     {
         return function () {
             return (new Response())->setContent('<html></html>');

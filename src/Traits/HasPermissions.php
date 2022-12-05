@@ -20,7 +20,7 @@ trait HasPermissions
     /** @var string */
     private $permissionClass;
 
-    public static function bootHasPermissions()
+    public static function bootHasPermissions(): void
     {
         static::deleting(function ($model) {
             if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
@@ -31,7 +31,7 @@ trait HasPermissions
         });
     }
 
-    public function getPermissionClass()
+    public function getPermissionClass(): object
     {
         if (! isset($this->permissionClass)) {
             $this->permissionClass = app(PermissionRegistrar::class)->getPermissionClass();
@@ -118,11 +118,12 @@ trait HasPermissions
      * Find a permission.
      *
      * @param string|int|\Spatie\Permission\Contracts\Permission $permission
+     * @param string|null $guardName
      *
      * @return \Spatie\Permission\Contracts\Permission
      * @throws PermissionDoesNotExist
      */
-    public function filterPermission($permission, $guardName = null)
+    public function filterPermission($permission, ?string $guardName = null): Permission
     {
         $permissionClass = $this->getPermissionClass();
 
@@ -156,7 +157,7 @@ trait HasPermissions
      * @return bool
      * @throws PermissionDoesNotExist
      */
-    public function hasPermissionTo($permission, $guardName = null): bool
+    public function hasPermissionTo($permission, ?string $guardName = null): bool
     {
         if (config('permission.enable_wildcard_permission', false)) {
             return $this->hasWildcardPermission($permission, $guardName);
@@ -175,7 +176,7 @@ trait HasPermissions
      *
      * @return bool
      */
-    protected function hasWildcardPermission($permission, $guardName = null): bool
+    protected function hasWildcardPermission($permission, ?string $guardName = null): bool
     {
         $guardName = $guardName ?? $this->getDefaultGuardName();
 
@@ -214,7 +215,7 @@ trait HasPermissions
      *
      * @return bool
      */
-    public function checkPermissionTo($permission, $guardName = null): bool
+    public function checkPermissionTo($permission, ?string $guardName = null): bool
     {
         try {
             return $this->hasPermissionTo($permission, $guardName);
@@ -323,7 +324,7 @@ trait HasPermissions
      *
      * @return array
      */
-    public function collectPermissions(...$permissions)
+    public function collectPermissions(...$permissions): array
     {
         return collect($permissions)
             ->flatten()
@@ -353,7 +354,7 @@ trait HasPermissions
      *
      * @return $this
      */
-    public function givePermissionTo(...$permissions)
+    public function givePermissionTo(...$permissions): self
     {
         $permissions = $this->collectPermissions(...$permissions);
 
@@ -390,7 +391,7 @@ trait HasPermissions
      *
      * @return $this
      */
-    public function syncPermissions(...$permissions)
+    public function syncPermissions(...$permissions): self
     {
         $this->permissions()->detach();
 
@@ -404,7 +405,7 @@ trait HasPermissions
      *
      * @return $this
      */
-    public function revokePermissionTo($permission)
+    public function revokePermissionTo($permission): self
     {
         $this->permissions()->detach($this->getStoredPermission($permission));
 
@@ -458,7 +459,7 @@ trait HasPermissions
      *
      * @throws \Spatie\Permission\Exceptions\GuardDoesNotMatch
      */
-    protected function ensureModelSharesGuard($roleOrPermission)
+    protected function ensureModelSharesGuard($roleOrPermission): void
     {
         if (! $this->getGuardNames()->contains($roleOrPermission->guard_name)) {
             throw GuardDoesNotMatch::create($roleOrPermission->guard_name, $this->getGuardNames());
@@ -478,7 +479,7 @@ trait HasPermissions
     /**
      * Forget the cached permissions.
      */
-    public function forgetCachedPermissions()
+    public function forgetCachedPermissions(): void
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }

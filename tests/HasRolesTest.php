@@ -2,7 +2,7 @@
 
 namespace Spatie\Permission\Test;
 
-use DB;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
@@ -10,7 +10,7 @@ use Spatie\Permission\Exceptions\RoleDoesNotExist;
 class HasRolesTest extends TestCase
 {
     /** @test */
-    public function it_can_determine_that_the_user_does_not_have_a_role()
+    public function it_can_determine_that_the_user_does_not_have_a_role(): void
     {
         $this->assertFalse($this->testUser->hasRole('testRole'));
 
@@ -36,7 +36,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_assign_and_remove_a_role()
+    public function it_can_assign_and_remove_a_role(): void
     {
         $this->assertFalse($this->testUser->hasRole('testRole'));
 
@@ -50,7 +50,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_removes_a_role_and_returns_roles()
+    public function it_removes_a_role_and_returns_roles(): void
     {
         $this->testUser->assignRole('testRole');
 
@@ -66,7 +66,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_assign_and_remove_a_role_on_a_permission()
+    public function it_can_assign_and_remove_a_role_on_a_permission(): void
     {
         $this->testUserPermission->assignRole('testRole');
 
@@ -78,7 +78,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_assign_a_role_using_an_object()
+    public function it_can_assign_a_role_using_an_object(): void
     {
         $this->testUser->assignRole($this->testUserRole);
 
@@ -86,7 +86,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_assign_a_role_using_an_id()
+    public function it_can_assign_a_role_using_an_id(): void
     {
         $this->testUser->assignRole($this->testUserRole->getKey());
 
@@ -94,7 +94,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_assign_multiple_roles_at_once()
+    public function it_can_assign_multiple_roles_at_once(): void
     {
         $this->testUser->assignRole($this->testUserRole->getKey(), 'testRole2');
 
@@ -104,7 +104,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_assign_multiple_roles_using_an_array()
+    public function it_can_assign_multiple_roles_using_an_array(): void
     {
         $this->testUser->assignRole([$this->testUserRole->getKey(), 'testRole2']);
 
@@ -114,7 +114,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_does_not_remove_already_associated_roles_when_assigning_new_roles()
+    public function it_does_not_remove_already_associated_roles_when_assigning_new_roles(): void
     {
         $this->testUser->assignRole($this->testUserRole->getKey());
 
@@ -124,7 +124,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_does_not_throw_an_exception_when_assigning_a_role_that_is_already_assigned()
+    public function it_does_not_throw_an_exception_when_assigning_a_role_that_is_already_assigned(): void
     {
         $this->testUser->assignRole($this->testUserRole->getKey());
 
@@ -134,7 +134,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_assigning_a_role_that_does_not_exist()
+    public function it_throws_an_exception_when_assigning_a_role_that_does_not_exist(): void
     {
         $this->expectException(RoleDoesNotExist::class);
 
@@ -142,7 +142,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_only_assign_roles_from_the_correct_guard()
+    public function it_can_only_assign_roles_from_the_correct_guard(): void
     {
         $this->expectException(RoleDoesNotExist::class);
 
@@ -150,7 +150,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_assigning_a_role_from_a_different_guard()
+    public function it_throws_an_exception_when_assigning_a_role_from_a_different_guard(): void
     {
         $this->expectException(GuardDoesNotMatch::class);
 
@@ -158,7 +158,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_ignores_null_roles_when_syncing()
+    public function it_ignores_null_roles_when_syncing(): void
     {
         $this->testUser->assignRole('testRole');
 
@@ -170,7 +170,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_sync_roles_from_a_string()
+    public function it_can_sync_roles_from_a_string(): void
     {
         $this->testUser->assignRole('testRole');
 
@@ -182,7 +182,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_sync_roles_from_a_string_on_a_permission()
+    public function it_can_sync_roles_from_a_string_on_a_permission(): void
     {
         $this->testUserPermission->assignRole('testRole');
 
@@ -194,7 +194,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_sync_multiple_roles()
+    public function it_can_sync_multiple_roles(): void
     {
         $this->testUser->syncRoles('testRole', 'testRole2');
 
@@ -204,7 +204,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_sync_multiple_roles_from_an_array()
+    public function it_can_sync_multiple_roles_from_an_array(): void
     {
         $this->testUser->syncRoles(['testRole', 'testRole2']);
 
@@ -214,7 +214,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_will_remove_all_roles_when_an_empty_array_is_passed_to_sync_roles()
+    public function it_will_remove_all_roles_when_an_empty_array_is_passed_to_sync_roles(): void
     {
         $this->testUser->assignRole('testRole');
 
@@ -228,7 +228,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_will_sync_roles_to_a_model_that_is_not_persisted()
+    public function it_will_sync_roles_to_a_model_that_is_not_persisted(): void
     {
         $user = new User(['email' => 'test@user.com']);
         $user->syncRoles([$this->testUserRole]);
@@ -238,7 +238,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function calling_syncRoles_before_saving_object_doesnt_interfere_with_other_objects()
+    public function calling_syncRoles_before_saving_object_doesnt_interfere_with_other_objects(): void
     {
         $user = new User(['email' => 'test@user.com']);
         $user->syncRoles('testRole');
@@ -260,7 +260,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function calling_assignRole_before_saving_object_doesnt_interfere_with_other_objects()
+    public function calling_assignRole_before_saving_object_doesnt_interfere_with_other_objects(): void
     {
         $user = new User(['email' => 'test@user.com']);
         $user->assignRole('testRole');
@@ -282,7 +282,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_syncing_a_role_from_another_guard()
+    public function it_throws_an_exception_when_syncing_a_role_from_another_guard(): void
     {
         $this->expectException(RoleDoesNotExist::class);
 
@@ -294,7 +294,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_deletes_pivot_table_entries_when_deleting_models()
+    public function it_deletes_pivot_table_entries_when_deleting_models(): void
     {
         $user = User::create(['email' => 'user@test.com']);
 
@@ -311,7 +311,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_scope_users_using_a_string()
+    public function it_can_scope_users_using_a_string(): void
     {
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
@@ -324,7 +324,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_scope_users_using_an_array()
+    public function it_can_scope_users_using_an_array(): void
     {
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
@@ -340,7 +340,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_scope_users_using_an_array_of_ids_and_names()
+    public function it_can_scope_users_using_an_array_of_ids_and_names(): void
     {
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
@@ -359,7 +359,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_scope_users_using_a_collection()
+    public function it_can_scope_users_using_a_collection(): void
     {
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
@@ -374,7 +374,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_scope_users_using_an_object()
+    public function it_can_scope_users_using_an_object(): void
     {
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
@@ -391,7 +391,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_scope_against_a_specific_guard()
+    public function it_can_scope_against_a_specific_guard(): void
     {
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
@@ -417,7 +417,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_trying_to_scope_a_role_from_another_guard()
+    public function it_throws_an_exception_when_trying_to_scope_a_role_from_another_guard(): void
     {
         $this->expectException(RoleDoesNotExist::class);
 
@@ -429,7 +429,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_trying_to_scope_a_non_existing_role()
+    public function it_throws_an_exception_when_trying_to_scope_a_non_existing_role(): void
     {
         $this->expectException(RoleDoesNotExist::class);
 
@@ -437,7 +437,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_determine_that_a_user_has_one_of_the_given_roles()
+    public function it_can_determine_that_a_user_has_one_of_the_given_roles(): void
     {
         $roleModel = app(Role::class);
 
@@ -465,7 +465,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_determine_that_a_user_has_all_of_the_given_roles()
+    public function it_can_determine_that_a_user_has_all_of_the_given_roles(): void
     {
         $roleModel = app(Role::class);
 
@@ -494,7 +494,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_determine_that_a_user_has_exact_all_of_the_given_roles()
+    public function it_can_determine_that_a_user_has_exact_all_of_the_given_roles(): void
     {
         $roleModel = app(Role::class);
 
@@ -533,7 +533,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_determine_that_a_user_does_not_have_a_role_from_another_guard()
+    public function it_can_determine_that_a_user_does_not_have_a_role_from_another_guard(): void
     {
         $this->assertFalse($this->testUser->hasRole('testAdminRole'));
 
@@ -547,7 +547,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_check_against_any_multiple_roles_using_multiple_arguments()
+    public function it_can_check_against_any_multiple_roles_using_multiple_arguments(): void
     {
         $this->testUser->assignRole('testRole');
 
@@ -555,13 +555,13 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_false_instead_of_an_exception_when_checking_against_any_undefined_roles_using_multiple_arguments()
+    public function it_returns_false_instead_of_an_exception_when_checking_against_any_undefined_roles_using_multiple_arguments(): void
     {
         $this->assertFalse($this->testUser->hasAnyRole('This Role Does Not Even Exist', $this->testAdminRole));
     }
 
     /** @test */
-    public function it_can_retrieve_role_names()
+    public function it_can_retrieve_role_names(): void
     {
         $this->testUser->assignRole('testRole', 'testRole2');
 
@@ -572,7 +572,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_does_not_detach_roles_when_soft_deleting()
+    public function it_does_not_detach_roles_when_soft_deleting(): void
     {
         $user = SoftDeletingUser::create(['email' => 'test@example.com']);
         $user->assignRole('testRole');

@@ -14,7 +14,7 @@ class TestHelper
      *
      * @return int
      */
-    public function testMiddleware($middleware, $parameter)
+    public function testMiddleware( string $middleware, object $parameter): int
     {
         try {
             return $middleware->handle(new Request(), function () {

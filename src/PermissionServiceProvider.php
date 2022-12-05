@@ -13,7 +13,7 @@ use Spatie\Permission\Contracts\Role as RoleContract;
 
 class PermissionServiceProvider extends ServiceProvider
 {
-    public function boot(PermissionRegistrar $permissionLoader)
+    public function boot(PermissionRegistrar $permissionLoader): void
     {
         $this->offerPublishing();
 
@@ -33,7 +33,7 @@ class PermissionServiceProvider extends ServiceProvider
         });
     }
 
-    public function register()
+    public function register(): void
     {
         $this->mergeConfigFrom(
             __DIR__.'/../config/permission.php',
@@ -45,7 +45,7 @@ class PermissionServiceProvider extends ServiceProvider
         });
     }
 
-    protected function offerPublishing()
+    protected function offerPublishing(): void
     {
         if (! function_exists('config_path')) {
             // function not available and 'publish' not relevant in Lumen
@@ -61,7 +61,7 @@ class PermissionServiceProvider extends ServiceProvider
         ], 'migrations');
     }
 
-    protected function registerCommands()
+    protected function registerCommands(): void
     {
         $this->commands([
             Commands\CacheReset::class,
@@ -72,7 +72,7 @@ class PermissionServiceProvider extends ServiceProvider
         ]);
     }
 
-    protected function registerModelBindings()
+    protected function registerModelBindings(): void
     {
         $config = $this->app->config['permission.models'];
 
@@ -84,12 +84,12 @@ class PermissionServiceProvider extends ServiceProvider
         $this->app->bind(RoleContract::class, $config['role']);
     }
 
-    public static function bladeMethodWrapper($method, $role, $guard = null)
+    public static function bladeMethodWrapper($method, $role, $guard = null): bool
     {
         return auth($guard)->check() && auth($guard)->user()->{$method}($role);
     }
 
-    protected function registerBladeExtensions($bladeCompiler)
+    protected function registerBladeExtensions($bladeCompiler): void
     {
         $bladeCompiler->directive('role', function ($arguments) {
             return "<?php if(\\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper('hasRole', {$arguments})): ?>";
@@ -137,7 +137,7 @@ class PermissionServiceProvider extends ServiceProvider
         });
     }
 
-    protected function registerMacroHelpers()
+    protected function registerMacroHelpers(): void
     {
         if (! method_exists(Route::class, 'macro')) { // Lumen
             return;

@@ -17,7 +17,7 @@ class CreateRole extends Command
 
     protected $description = 'Create a role';
 
-    public function handle()
+    public function handle(): int
     {
         $roleClass = app(RoleContract::class);
 
@@ -27,7 +27,7 @@ class CreateRole extends Command
         if (! PermissionRegistrar::$teams && $this->option('team-id')) {
             $this->warn("Teams feature disabled, argument --team-id has no effect. Either enable it in permissions config file or remove --team-id parameter");
 
-            return;
+            return 1;
         }
 
         $role = $roleClass::findOrCreate($this->argument('name'), $this->argument('guard'));
@@ -41,6 +41,8 @@ class CreateRole extends Command
         $role->givePermissionTo($this->makePermissions($this->argument('permissions')));
 
         $this->info("Role `{$role->name}` ".($role->wasRecentlyCreated ? 'created' : 'updated'));
+
+        return 0;
     }
 
     /**

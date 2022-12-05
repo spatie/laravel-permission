@@ -10,7 +10,7 @@ class TeamHasRolesTest extends HasRolesTest
     protected $hasTeams = true;
 
     /** @test */
-    public function it_can_assign_same_and_different_roles_on_same_user_different_teams()
+    public function it_can_assign_same_and_different_roles_on_same_user_different_teams(): void
     {
         app(Role::class)->create(['name' => 'testRole3']); //team_test_id = 1 by main class
         app(Role::class)->create(['name' => 'testRole3', 'team_test_id' => 2]);
@@ -59,7 +59,7 @@ class TeamHasRolesTest extends HasRolesTest
     }
 
     /** @test */
-    public function it_can_sync_or_remove_roles_without_detach_on_different_teams()
+    public function it_can_sync_or_remove_roles_without_detach_on_different_teams(): void
     {
         app(Role::class)->create(['name' => 'testRole3', 'team_test_id' => 2]);
 
@@ -95,7 +95,7 @@ class TeamHasRolesTest extends HasRolesTest
     }
 
     /** @test */
-    public function it_can_scope_users_on_different_teams()
+    public function it_can_scope_users_on_different_teams(): void
     {
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);

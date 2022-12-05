@@ -22,7 +22,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function a_guest_cannot_access_a_route_protected_by_the_role_or_permission_middleware()
+    public function a_guest_cannot_access_a_route_protected_by_the_role_or_permission_middleware(): void
     {
         $this->assertEquals(
             403,
@@ -31,7 +31,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function a_user_can_access_a_route_protected_by_permission_or_role_middleware_if_has_this_permission_or_role()
+    public function a_user_can_access_a_route_protected_by_permission_or_role_middleware_if_has_this_permission_or_role(): void
     {
         Auth::login($this->testUser);
 
@@ -65,7 +65,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function a_user_can_not_access_a_route_protected_by_permission_or_role_middleware_if_have_not_this_permission_and_role()
+    public function a_user_can_not_access_a_route_protected_by_permission_or_role_middleware_if_have_not_this_permission_and_role(): void
     {
         Auth::login($this->testUser);
 
@@ -81,7 +81,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function use_not_existing_custom_guard_in_role_or_permission()
+    public function use_not_existing_custom_guard_in_role_or_permission(): void
     {
         $class = null;
 
@@ -97,7 +97,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function user_can_not_access_permission_or_role_with_guard_admin_while_login_using_default_guard()
+    public function user_can_not_access_permission_or_role_with_guard_admin_while_login_using_default_guard(): void
     {
         Auth::login($this->testUser);
 
@@ -111,7 +111,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function user_can_access_permission_or_role_with_guard_admin_while_login_using_admin_guard()
+    public function user_can_access_permission_or_role_with_guard_admin_while_login_using_admin_guard(): void
     {
         Auth::guard('admin')->login($this->testAdmin);
 
@@ -125,7 +125,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function the_required_permissions_or_roles_can_be_fetched_from_the_exception()
+    public function the_required_permissions_or_roles_can_be_fetched_from_the_exception(): void
     {
         Auth::login($this->testUser);
 
@@ -146,7 +146,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function the_required_permissions_or_roles_can_be_displayed_in_the_exception()
+    public function the_required_permissions_or_roles_can_be_displayed_in_the_exception(): void
     {
         Auth::login($this->testUser);
         Config::set(['permission.display_permission_in_exception' => true]);

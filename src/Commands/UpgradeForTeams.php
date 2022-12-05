@@ -13,13 +13,13 @@ class UpgradeForTeams extends Command
 
     protected $migrationSuffix = 'add_teams_fields.php';
 
-    public function handle()
+    public function handle(): int
     {
         if (! Config::get('permission.teams')) {
             $this->error('Teams feature is disabled in your permission.php file.');
             $this->warn('Please enable the teams setting in your configuration.');
 
-            return;
+            return 1;
         }
 
         $this->line('');
@@ -36,7 +36,7 @@ class UpgradeForTeams extends Command
         $this->line('');
 
         if (! $this->confirm("Proceed with the migration creation?", "yes")) {
-            return;
+            return 1;
         }
 
         $this->line('');
@@ -50,9 +50,11 @@ class UpgradeForTeams extends Command
                 "Couldn't create migration.\n".
                 "Check the write permissions within the database/migrations directory."
             );
+            return 1;
         }
 
         $this->line('');
+        return 0;
     }
 
     /**
@@ -60,7 +62,7 @@ class UpgradeForTeams extends Command
      *
      * @return bool
      */
-    protected function createMigration()
+    protected function createMigration(): bool
     {
         try {
             $migrationStub = __DIR__."/../../database/migrations/{$this->migrationSuffix}.stub";
@@ -81,7 +83,7 @@ class UpgradeForTeams extends Command
      * @param  array $existingMigrations
      * @return string
      */
-    protected function getExistingMigrationsWarning(array $existingMigrations)
+    protected function getExistingMigrationsWarning(array $existingMigrations): string
     {
         if (count($existingMigrations) > 1) {
             $base = "Setup teams migrations already exist.\nFollowing files were found: ";
@@ -100,7 +102,7 @@ class UpgradeForTeams extends Command
      *
      * @return array
      */
-    protected function alreadyExistingMigrations()
+    protected function alreadyExistingMigrations(): array
     {
         $matchingFiles = glob($this->getMigrationPath('*'));
 
@@ -118,7 +120,7 @@ class UpgradeForTeams extends Command
      * @param  string|null $date
      * @return string
      */
-    protected function getMigrationPath($date = null)
+    protected function getMigrationPath($date = null): string
     {
         $date = $date ?: date('Y_m_d_His');
 

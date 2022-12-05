@@ -16,7 +16,7 @@ class Show extends Command
 
     protected $description = 'Show a table of roles and permissions per guard';
 
-    public function handle()
+    public function handle(): int
     {
         $permissionClass = app(PermissionContract::class);
         $roleClass = app(RoleContract::class);
@@ -71,5 +71,7 @@ class Show extends Command
                 $style
             );
         }
+
+        return 0;
     }
 }

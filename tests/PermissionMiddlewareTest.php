@@ -23,7 +23,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function a_guest_cannot_access_a_route_protected_by_the_permission_middleware()
+    public function a_guest_cannot_access_a_route_protected_by_the_permission_middleware(): void
     {
         $this->assertEquals(
             403,
@@ -32,7 +32,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function a_user_cannot_access_a_route_protected_by_the_permission_middleware_of_a_different_guard()
+    public function a_user_cannot_access_a_route_protected_by_the_permission_middleware_of_a_different_guard(): void
     {
         // These permissions are created fresh here in reverse order of guard being applied, so they are not "found first" in the db lookup when matching
         app(Permission::class)->create(['name' => 'admin-permission2', 'guard_name' => 'web']);
@@ -70,7 +70,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function a_user_can_access_a_route_protected_by_permission_middleware_if_have_this_permission()
+    public function a_user_can_access_a_route_protected_by_permission_middleware_if_have_this_permission(): void
     {
         Auth::login($this->testUser);
 
@@ -83,7 +83,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function a_user_can_access_a_route_protected_by_this_permission_middleware_if_have_one_of_the_permissions()
+    public function a_user_can_access_a_route_protected_by_this_permission_middleware_if_have_one_of_the_permissions(): void
     {
         Auth::login($this->testUser);
 
@@ -101,7 +101,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function a_user_cannot_access_a_route_protected_by_the_permission_middleware_if_have_a_different_permission()
+    public function a_user_cannot_access_a_route_protected_by_the_permission_middleware_if_have_a_different_permission(): void
     {
         Auth::login($this->testUser);
 
@@ -114,7 +114,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function a_user_cannot_access_a_route_protected_by_permission_middleware_if_have_not_permissions()
+    public function a_user_cannot_access_a_route_protected_by_permission_middleware_if_have_not_permissions(): void
     {
         Auth::login($this->testUser);
 
@@ -125,7 +125,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function a_user_can_access_a_route_protected_by_permission_middleware_if_has_permission_via_role()
+    public function a_user_can_access_a_route_protected_by_permission_middleware_if_has_permission_via_role(): void
     {
         Auth::login($this->testUser);
 
@@ -144,7 +144,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function the_required_permissions_can_be_fetched_from_the_exception()
+    public function the_required_permissions_can_be_fetched_from_the_exception(): void
     {
         Auth::login($this->testUser);
 
@@ -165,7 +165,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function the_required_permissions_can_be_displayed_in_the_exception()
+    public function the_required_permissions_can_be_displayed_in_the_exception(): void
     {
         Auth::login($this->testUser);
         Config::set(['permission.display_permission_in_exception' => true]);
@@ -184,7 +184,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function use_not_existing_custom_guard_in_permission()
+    public function use_not_existing_custom_guard_in_permission(): void
     {
         $class = null;
 
@@ -200,7 +200,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function user_can_not_access_permission_with_guard_admin_while_login_using_default_guard()
+    public function user_can_not_access_permission_with_guard_admin_while_login_using_default_guard(): void
     {
         Auth::login($this->testUser);
 
@@ -213,7 +213,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function user_can_access_permission_with_guard_admin_while_login_using_admin_guard()
+    public function user_can_access_permission_with_guard_admin_while_login_using_admin_guard(): void
     {
         Auth::guard('admin')->login($this->testAdmin);
 

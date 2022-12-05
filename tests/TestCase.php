@@ -64,7 +64,7 @@ abstract class TestCase extends Orchestra
      *
      * @return array
      */
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
             PermissionServiceProvider::class,
@@ -76,7 +76,7 @@ abstract class TestCase extends Orchestra
      *
      * @param \Illuminate\Foundation\Application $app
      */
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         $app['config']->set('permission.register_permission_check_method', true);
         $app['config']->set('permission.teams', $this->hasTeams);
@@ -114,7 +114,7 @@ abstract class TestCase extends Orchestra
      *
      * @param \Illuminate\Foundation\Application $app
      */
-    protected function setUpDatabase($app)
+    protected function setUpDatabase($app): void
     {
         $app['db']->connection()->getSchemaBuilder()->create('users', function (Blueprint $table) {
             $table->increments('id');
@@ -150,7 +150,7 @@ abstract class TestCase extends Orchestra
         $app[Permission::class]->create(['name' => 'Edit News']);
     }
 
-    private function prepareMigration()
+    private function prepareMigration(): void
     {
         $migration = str_replace(
             [
@@ -179,12 +179,12 @@ abstract class TestCase extends Orchestra
         self::$customMigration = new \CreatePermissionCustomTables();
     }
 
-    protected function reloadPermissions()
+    protected function reloadPermissions(): void
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 
-    public function createCacheTable()
+    public function createCacheTable(): void
     {
         Schema::create('cache', function ($table) {
             $table->string('key')->unique();

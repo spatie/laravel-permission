@@ -8,7 +8,7 @@ use Spatie\Permission\Exceptions\PermissionAlreadyExists;
 class PermissionTest extends TestCase
 {
     /** @test */
-    public function it_get_user_models_using_with()
+    public function it_get_user_models_using_with(): void
     {
         $this->testUser->givePermissionTo($this->testUserPermission);
 
@@ -22,7 +22,7 @@ class PermissionTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_the_permission_already_exists()
+    public function it_throws_an_exception_when_the_permission_already_exists(): void
     {
         $this->expectException(PermissionAlreadyExists::class);
 
@@ -31,7 +31,7 @@ class PermissionTest extends TestCase
     }
 
     /** @test */
-    public function it_belongs_to_a_guard()
+    public function it_belongs_to_a_guard(): void
     {
         $permission = app(Permission::class)->create(['name' => 'can-edit', 'guard_name' => 'admin']);
 
@@ -39,7 +39,7 @@ class PermissionTest extends TestCase
     }
 
     /** @test */
-    public function it_belongs_to_the_default_guard_by_default()
+    public function it_belongs_to_the_default_guard_by_default(): void
     {
         $this->assertEquals(
             $this->app['config']->get('auth.defaults.guard'),
@@ -48,7 +48,7 @@ class PermissionTest extends TestCase
     }
 
     /** @test */
-    public function it_has_user_models_of_the_right_class()
+    public function it_has_user_models_of_the_right_class(): void
     {
         $this->testAdmin->givePermissionTo($this->testAdminPermission);
 
@@ -60,7 +60,7 @@ class PermissionTest extends TestCase
     }
 
     /** @test */
-    public function it_is_retrievable_by_id()
+    public function it_is_retrievable_by_id(): void
     {
         $permission_by_id = app(Permission::class)->findById($this->testUserPermission->id);
 

@@ -10,7 +10,7 @@ use Spatie\Permission\Models\Permission;
 class WildcardHasPermissionsTest extends TestCase
 {
     /** @test */
-    public function it_can_check_wildcard_permission()
+    public function it_can_check_wildcard_permission(): void
     {
         app('config')->set('permission.enable_wildcard_permission', true);
 
@@ -30,7 +30,7 @@ class WildcardHasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_check_wildcard_permissions_via_roles()
+    public function it_can_check_wildcard_permissions_via_roles(): void
     {
         app('config')->set('permission.enable_wildcard_permission', true);
 
@@ -53,7 +53,7 @@ class WildcardHasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_check_non_wildcard_permissions()
+    public function it_can_check_non_wildcard_permissions(): void
     {
         app('config')->set('permission.enable_wildcard_permission', true);
 
@@ -71,7 +71,7 @@ class WildcardHasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_verify_complex_wildcard_permissions()
+    public function it_can_verify_complex_wildcard_permissions(): void
     {
         app('config')->set('permission.enable_wildcard_permission', true);
 
@@ -91,7 +91,7 @@ class WildcardHasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_exception_when_wildcard_permission_is_not_properly_formatted()
+    public function it_throws_exception_when_wildcard_permission_is_not_properly_formatted(): void
     {
         app('config')->set('permission.enable_wildcard_permission', true);
 
@@ -107,7 +107,7 @@ class WildcardHasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_verify_permission_instances_not_assigned_to_user()
+    public function it_can_verify_permission_instances_not_assigned_to_user(): void
     {
         app('config')->set('permission.enable_wildcard_permission', true);
 
@@ -125,7 +125,7 @@ class WildcardHasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_verify_permission_instances_assigned_to_user()
+    public function it_can_verify_permission_instances_assigned_to_user(): void
     {
         app('config')->set('permission.enable_wildcard_permission', true);
 
@@ -143,7 +143,7 @@ class WildcardHasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_verify_integers_as_strings()
+    public function it_can_verify_integers_as_strings(): void
     {
         app('config')->set('permission.enable_wildcard_permission', true);
 
@@ -157,7 +157,7 @@ class WildcardHasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_exception_when_permission_has_invalid_arguments()
+    public function it_throws_exception_when_permission_has_invalid_arguments(): void
     {
         app('config')->set('permission.enable_wildcard_permission', true);
 
@@ -169,7 +169,7 @@ class WildcardHasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_exception_when_permission_id_not_exists()
+    public function it_throws_exception_when_permission_id_not_exists(): void
     {
         app('config')->set('permission.enable_wildcard_permission', true);
 

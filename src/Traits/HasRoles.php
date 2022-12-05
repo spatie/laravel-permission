@@ -17,7 +17,7 @@ trait HasRoles
     /** @var string */
     private $roleClass;
 
-    public static function bootHasRoles()
+    public static function bootHasRoles(): void
     {
         static::deleting(function ($model) {
             if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
@@ -28,7 +28,7 @@ trait HasRoles
         });
     }
 
-    public function getRoleClass()
+    public function getRoleClass(): object
     {
         if (! isset($this->roleClass)) {
             $this->roleClass = app(PermissionRegistrar::class)->getRoleClass();
@@ -66,11 +66,11 @@ trait HasRoles
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param string|int|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
-     * @param string $guard
+     * @param string|null $guard
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeRole(Builder $query, $roles, $guard = null): Builder
+    public function scopeRole(Builder $query, $roles, ?string $guard = null): Builder
     {
         if ($roles instanceof Collection) {
             $roles = $roles->all();
@@ -100,7 +100,7 @@ trait HasRoles
      *
      * @return $this
      */
-    public function assignRole(...$roles)
+    public function assignRole(...$roles): self
     {
         $roles = collect($roles)
             ->flatten()
@@ -152,8 +152,10 @@ trait HasRoles
      * Revoke the given role from the model.
      *
      * @param string|int|\Spatie\Permission\Contracts\Role $role
+     *
+     * @return $this
      */
-    public function removeRole($role)
+    public function removeRole($role): self
     {
         $this->roles()->detach($this->getStoredRole($role));
 
@@ -173,7 +175,7 @@ trait HasRoles
      *
      * @return $this
      */
-    public function syncRoles(...$roles)
+    public function syncRoles(...$roles): self
     {
         $this->roles()->detach();
 
@@ -185,9 +187,10 @@ trait HasRoles
      *
      * @param string|int|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
      * @param string|null $guard
+     *
      * @return bool
      */
-    public function hasRole($roles, string $guard = null): bool
+    public function hasRole($roles, ?string $guard = null): bool
     {
         $this->loadMissing('roles');
 
@@ -248,7 +251,7 @@ trait HasRoles
      * @param  string|null  $guard
      * @return bool
      */
-    public function hasAllRoles($roles, string $guard = null): bool
+    public function hasAllRoles($roles, ?string $guard = null): bool
     {
         $this->loadMissing('roles');
 
@@ -284,7 +287,7 @@ trait HasRoles
      * @param  string|null  $guard
      * @return bool
      */
-    public function hasExactRoles($roles, string $guard = null): bool
+    public function hasExactRoles($roles, ?string $guard = null): bool
     {
         $this->loadMissing('roles');
 

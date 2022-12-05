@@ -8,7 +8,7 @@ class HasRolesWithCustomModelsTest extends HasRolesTest
     protected $useCustomModels = true;
 
     /** @test */
-    public function it_can_use_custom_model_role()
+    public function it_can_use_custom_model_role(): void
     {
         $this->assertSame(get_class($this->testUserRole), Role::class);
     }

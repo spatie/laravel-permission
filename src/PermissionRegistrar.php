@@ -72,7 +72,7 @@ class PermissionRegistrar
         $this->initializeCache();
     }
 
-    public function initializeCache()
+    public function initializeCache(): void
     {
         self::$cacheExpirationTime = config('permission.cache.expiration_time') ?: \DateInterval::createFromDateString('24 hours');
 
@@ -111,7 +111,7 @@ class PermissionRegistrar
      *
      * @param int|string|\Illuminate\Database\Eloquent\Model $id
      */
-    public function setPermissionsTeamId($id)
+    public function setPermissionsTeamId($id): void
     {
         if ($id instanceof \Illuminate\Database\Eloquent\Model) {
             $id = $id->getKey();
@@ -148,7 +148,7 @@ class PermissionRegistrar
     /**
      * Flush the cache.
      */
-    public function forgetCachedPermissions()
+    public function forgetCachedPermissions(): bool
     {
         $this->permissions = null;
 
@@ -160,7 +160,7 @@ class PermissionRegistrar
      * This is only intended to be called by the PermissionServiceProvider on boot,
      * so that long-running instances like Swoole don't keep old data in memory.
      */
-    public function clearClassPermissions()
+    public function clearClassPermissions(): void
     {
         $this->permissions = null;
     }
@@ -169,7 +169,7 @@ class PermissionRegistrar
      * Load permissions from cache
      * This get cache and turns array into \Illuminate\Database\Eloquent\Collection
      */
-    private function loadPermissions()
+    private function loadPermissions(): void
     {
         if ($this->permissions) {
             return;
@@ -237,7 +237,7 @@ class PermissionRegistrar
         return app($this->permissionClass);
     }
 
-    public function setPermissionClass($permissionClass)
+    public function setPermissionClass($permissionClass): self
     {
         $this->permissionClass = $permissionClass;
         config()->set('permission.models.permission', $permissionClass);
@@ -256,7 +256,7 @@ class PermissionRegistrar
         return app($this->roleClass);
     }
 
-    public function setRoleClass($roleClass)
+    public function setRoleClass($roleClass): self
     {
         $this->roleClass = $roleClass;
         config()->set('permission.models.role',  $roleClass);
@@ -308,7 +308,7 @@ class PermissionRegistrar
     /*
      * Make the cache smaller using an array with only required fields
      */
-    private function getSerializedPermissionsForCache()
+    private function getSerializedPermissionsForCache(): array
     {
         $this->except = config('permission.cache.column_names_except', ['created_at','updated_at', 'deleted_at']);
 
@@ -326,7 +326,7 @@ class PermissionRegistrar
         return ['alias' => array_flip($this->alias)] + compact('permissions', 'roles');
     }
 
-    private function getSerializedRoleRelation($permission)
+    private function getSerializedRoleRelation($permission): array
     {
         if (! $permission->roles->count()) {
             return [];
@@ -348,7 +348,7 @@ class PermissionRegistrar
         ];
     }
 
-    private function getHydratedPermissionCollection()
+    private function getHydratedPermissionCollection(): Collection
     {
         $permissionClass = $this->getPermissionClass();
         $permissionInstance = new $permissionClass();
@@ -362,14 +362,14 @@ class PermissionRegistrar
         );
     }
 
-    private function getHydratedRoleCollection(array $roles)
+    private function getHydratedRoleCollection(array $roles): Collection
     {
         return Collection::make(array_values(
             array_intersect_key($this->cachedRoles, array_flip($roles))
         ));
     }
 
-    private function hydrateRolesCache()
+    private function hydrateRolesCache(): void
     {
         $roleClass = $this->getRoleClass();
         $roleInstance = new $roleClass();

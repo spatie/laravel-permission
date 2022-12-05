@@ -8,7 +8,7 @@ use Spatie\Permission\Contracts\Permission;
 
 class MultipleGuardsTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 
@@ -35,7 +35,7 @@ class MultipleGuardsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_give_a_permission_to_a_model_that_is_used_by_multiple_guards()
+    public function it_can_give_a_permission_to_a_model_that_is_used_by_multiple_guards(): void
     {
         $this->testUser->givePermissionTo(app(Permission::class)::create([
             'name' => 'do_this',
@@ -53,7 +53,7 @@ class MultipleGuardsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_honour_guardName_function_on_model_for_overriding_guard_name_property()
+    public function it_can_honour_guardName_function_on_model_for_overriding_guard_name_property(): void
     {
         $user = Manager::create(['email' => 'manager@test.com']);
         $user->givePermissionTo(app(Permission::class)::create([

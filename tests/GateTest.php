@@ -7,13 +7,13 @@ use Illuminate\Contracts\Auth\Access\Gate;
 class GateTest extends TestCase
 {
     /** @test */
-    public function it_can_determine_if_a_user_does_not_have_a_permission()
+    public function it_can_determine_if_a_user_does_not_have_a_permission(): void
     {
         $this->assertFalse($this->testUser->can('edit-articles'));
     }
 
     /** @test */
-    public function it_allows_other_gate_before_callbacks_to_run_if_a_user_does_not_have_a_permission()
+    public function it_allows_other_gate_before_callbacks_to_run_if_a_user_does_not_have_a_permission(): void
     {
         $this->assertFalse($this->testUser->can('edit-articles'));
 
@@ -25,7 +25,7 @@ class GateTest extends TestCase
     }
 
     /** @test */
-    public function it_can_determine_if_a_user_has_a_direct_permission()
+    public function it_can_determine_if_a_user_has_a_direct_permission(): void
     {
         $this->testUser->givePermissionTo('edit-articles');
 
@@ -37,7 +37,7 @@ class GateTest extends TestCase
     }
 
     /** @test */
-    public function it_can_determine_if_a_user_has_a_permission_through_roles()
+    public function it_can_determine_if_a_user_has_a_permission_through_roles(): void
     {
         $this->testUserRole->givePermissionTo($this->testUserPermission);
 
@@ -53,7 +53,7 @@ class GateTest extends TestCase
     }
 
     /** @test */
-    public function it_can_determine_if_a_user_with_a_different_guard_has_a_permission_when_using_roles()
+    public function it_can_determine_if_a_user_with_a_different_guard_has_a_permission_when_using_roles(): void
     {
         $this->testAdminRole->givePermissionTo($this->testAdminPermission);
 

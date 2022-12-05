@@ -2,7 +2,7 @@
 
 namespace Spatie\Permission\Test;
 
-use DB;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
@@ -11,7 +11,7 @@ use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 class HasPermissionsTest extends TestCase
 {
     /** @test */
-    public function it_can_assign_a_permission_to_a_user()
+    public function it_can_assign_a_permission_to_a_user(): void
     {
         $this->testUser->givePermissionTo($this->testUserPermission);
 
@@ -19,7 +19,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_assigning_a_permission_that_does_not_exist()
+    public function it_throws_an_exception_when_assigning_a_permission_that_does_not_exist(): void
     {
         $this->expectException(PermissionDoesNotExist::class);
 
@@ -27,7 +27,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_assigning_a_permission_to_a_user_from_a_different_guard()
+    public function it_throws_an_exception_when_assigning_a_permission_to_a_user_from_a_different_guard(): void
     {
         $this->expectException(GuardDoesNotMatch::class);
 
@@ -39,7 +39,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_revoke_a_permission_from_a_user()
+    public function it_can_revoke_a_permission_from_a_user(): void
     {
         $this->testUser->givePermissionTo($this->testUserPermission);
 
@@ -51,7 +51,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_scope_users_using_a_string()
+    public function it_can_scope_users_using_a_string(): void
     {
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
@@ -67,7 +67,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_scope_users_using_a_int()
+    public function it_can_scope_users_using_a_int(): void
     {
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
@@ -83,7 +83,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_scope_users_using_an_array()
+    public function it_can_scope_users_using_an_array(): void
     {
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
@@ -99,7 +99,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_scope_users_using_a_collection()
+    public function it_can_scope_users_using_a_collection(): void
     {
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
@@ -115,7 +115,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_scope_users_using_an_object()
+    public function it_can_scope_users_using_an_object(): void
     {
         $user1 = User::create(['email' => 'user1@test.com']);
         $user1->givePermissionTo($this->testUserPermission->name);
@@ -130,7 +130,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_scope_users_without_permissions_only_role()
+    public function it_can_scope_users_without_permissions_only_role(): void
     {
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
@@ -144,7 +144,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_scope_users_without_permissions_only_permission()
+    public function it_can_scope_users_without_permissions_only_permission(): void
     {
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
@@ -157,7 +157,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_calling_hasPermissionTo_with_an_invalid_type()
+    public function it_throws_an_exception_when_calling_hasPermissionTo_with_an_invalid_type(): void
     {
         $user = User::create(['email' => 'user1@test.com']);
 
@@ -167,7 +167,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_calling_hasPermissionTo_with_null()
+    public function it_throws_an_exception_when_calling_hasPermissionTo_with_null(): void
     {
         $user = User::create(['email' => 'user1@test.com']);
 
@@ -177,7 +177,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_calling_hasDirectPermission_with_an_invalid_type()
+    public function it_throws_an_exception_when_calling_hasDirectPermission_with_an_invalid_type(): void
     {
         $user = User::create(['email' => 'user1@test.com']);
 
@@ -187,7 +187,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_calling_hasDirectPermission_with_null()
+    public function it_throws_an_exception_when_calling_hasDirectPermission_with_null(): void
     {
         $user = User::create(['email' => 'user1@test.com']);
 
@@ -197,7 +197,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_trying_to_scope_a_non_existing_permission()
+    public function it_throws_an_exception_when_trying_to_scope_a_non_existing_permission(): void
     {
         $this->expectException(PermissionDoesNotExist::class);
 
@@ -205,7 +205,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_trying_to_scope_a_permission_from_another_guard()
+    public function it_throws_an_exception_when_trying_to_scope_a_permission_from_another_guard(): void
     {
         $this->expectException(PermissionDoesNotExist::class);
 
@@ -217,7 +217,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_doesnt_detach_permissions_when_soft_deleting()
+    public function it_doesnt_detach_permissions_when_soft_deleting(): void
     {
         $user = SoftDeletingUser::create(['email' => 'test@example.com']);
         $user->givePermissionTo(['edit-news']);
@@ -229,7 +229,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_give_and_revoke_multiple_permissions()
+    public function it_can_give_and_revoke_multiple_permissions(): void
     {
         $this->testUserRole->givePermissionTo(['edit-articles', 'edit-news']);
 
@@ -241,7 +241,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_give_and_revoke_permissions_models_array()
+    public function it_can_give_and_revoke_permissions_models_array(): void
     {
         $models = [app(Permission::class)::where('name', 'edit-articles')->first(), app(Permission::class)::where('name', 'edit-news')->first()];
 
@@ -255,7 +255,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_give_and_revoke_permissions_models_collection()
+    public function it_can_give_and_revoke_permissions_models_collection(): void
     {
         $models = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-news'])->get();
 
@@ -269,13 +269,13 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_determine_that_the_user_does_not_have_a_permission()
+    public function it_can_determine_that_the_user_does_not_have_a_permission(): void
     {
         $this->assertFalse($this->testUser->hasPermissionTo('edit-articles'));
     }
 
     /** @test */
-    public function it_throws_an_exception_when_the_permission_does_not_exist()
+    public function it_throws_an_exception_when_the_permission_does_not_exist(): void
     {
         $this->expectException(PermissionDoesNotExist::class);
 
@@ -283,7 +283,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_the_permission_does_not_exist_for_this_guard()
+    public function it_throws_an_exception_when_the_permission_does_not_exist_for_this_guard(): void
     {
         $this->expectException(PermissionDoesNotExist::class);
 
@@ -291,7 +291,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_reject_a_user_that_does_not_have_any_permissions_at_all()
+    public function it_can_reject_a_user_that_does_not_have_any_permissions_at_all(): void
     {
         $user = new User();
 
@@ -299,7 +299,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_determine_that_the_user_has_any_of_the_permissions_directly()
+    public function it_can_determine_that_the_user_has_any_of_the_permissions_directly(): void
     {
         $this->assertFalse($this->testUser->hasAnyPermission('edit-articles'));
 
@@ -316,7 +316,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_determine_that_the_user_has_any_of_the_permissions_directly_using_an_array()
+    public function it_can_determine_that_the_user_has_any_of_the_permissions_directly_using_an_array(): void
     {
         $this->assertFalse($this->testUser->hasAnyPermission(['edit-articles']));
 
@@ -332,7 +332,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_determine_that_the_user_has_any_of_the_permissions_via_role()
+    public function it_can_determine_that_the_user_has_any_of_the_permissions_via_role(): void
     {
         $this->testUserRole->givePermissionTo('edit-articles');
 
@@ -343,7 +343,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_determine_that_the_user_has_all_of_the_permissions_directly()
+    public function it_can_determine_that_the_user_has_all_of_the_permissions_directly(): void
     {
         $this->testUser->givePermissionTo('edit-articles', 'edit-news');
 
@@ -356,7 +356,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_determine_that_the_user_has_all_of_the_permissions_directly_using_an_array()
+    public function it_can_determine_that_the_user_has_all_of_the_permissions_directly_using_an_array(): void
     {
         $this->assertFalse($this->testUser->hasAllPermissions(['edit-articles', 'edit-news']));
 
@@ -372,7 +372,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_determine_that_the_user_has_all_of_the_permissions_via_role()
+    public function it_can_determine_that_the_user_has_all_of_the_permissions_via_role(): void
     {
         $this->testUserRole->givePermissionTo('edit-articles', 'edit-news');
 
@@ -382,7 +382,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_determine_that_user_has_direct_permission()
+    public function it_can_determine_that_user_has_direct_permission(): void
     {
         $this->testUser->givePermissionTo('edit-articles');
         $this->assertTrue($this->testUser->hasDirectPermission('edit-articles'));
@@ -400,7 +400,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_list_all_the_permissions_via_roles_of_user()
+    public function it_can_list_all_the_permissions_via_roles_of_user(): void
     {
         $roleModel = app(Role::class);
         $roleModel->findByName('testRole2')->givePermissionTo('edit-news');
@@ -415,7 +415,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_list_all_the_coupled_permissions_both_directly_and_via_roles()
+    public function it_can_list_all_the_coupled_permissions_both_directly_and_via_roles(): void
     {
         $this->testUser->givePermissionTo('edit-news');
 
@@ -429,7 +429,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_sync_multiple_permissions()
+    public function it_can_sync_multiple_permissions(): void
     {
         $this->testUser->givePermissionTo('edit-news');
 
@@ -443,7 +443,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_sync_multiple_permissions_by_id()
+    public function it_can_sync_multiple_permissions_by_id(): void
     {
         $this->testUser->givePermissionTo('edit-news');
 
@@ -459,7 +459,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function sync_permission_ignores_null_inputs()
+    public function sync_permission_ignores_null_inputs(): void
     {
         $this->testUser->givePermissionTo('edit-news');
 
@@ -477,7 +477,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_does_not_remove_already_associated_permissions_when_assigning_new_permissions()
+    public function it_does_not_remove_already_associated_permissions_when_assigning_new_permissions(): void
     {
         $this->testUser->givePermissionTo('edit-news');
 
@@ -487,7 +487,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_does_not_throw_an_exception_when_assigning_a_permission_that_is_already_assigned()
+    public function it_does_not_throw_an_exception_when_assigning_a_permission_that_is_already_assigned(): void
     {
         $this->testUser->givePermissionTo('edit-news');
 
@@ -497,7 +497,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_sync_permissions_to_a_model_that_is_not_persisted()
+    public function it_can_sync_permissions_to_a_model_that_is_not_persisted(): void
     {
         $user = new User(['email' => 'test@user.com']);
         $user->syncPermissions('edit-articles');
@@ -511,7 +511,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function calling_givePermissionTo_before_saving_object_doesnt_interfere_with_other_objects()
+    public function calling_givePermissionTo_before_saving_object_doesnt_interfere_with_other_objects(): void
     {
         $user = new User(['email' => 'test@user.com']);
         $user->givePermissionTo('edit-news');
@@ -533,7 +533,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function calling_syncPermissions_before_saving_object_doesnt_interfere_with_other_objects()
+    public function calling_syncPermissions_before_saving_object_doesnt_interfere_with_other_objects(): void
     {
         $user = new User(['email' => 'test@user.com']);
         $user->syncPermissions('edit-news');
@@ -555,7 +555,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_retrieve_permission_names()
+    public function it_can_retrieve_permission_names(): void
     {
         $this->testUser->givePermissionTo('edit-news', 'edit-articles');
         $this->assertEquals(
@@ -565,7 +565,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_check_many_direct_permissions()
+    public function it_can_check_many_direct_permissions(): void
     {
         $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
         $this->assertTrue($this->testUser->hasAllDirectPermissions(['edit-news', 'edit-articles']));
@@ -575,7 +575,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_check_if_there_is_any_of_the_direct_permissions_given()
+    public function it_can_check_if_there_is_any_of_the_direct_permissions_given(): void
     {
         $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
         $this->assertTrue($this->testUser->hasAnyDirectPermission(['edit-news', 'edit-blog']));
@@ -584,7 +584,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_check_permission_based_on_logged_in_user_guard()
+    public function it_can_check_permission_based_on_logged_in_user_guard(): void
     {
         $this->testUser->givePermissionTo(app(Permission::class)::create([
              'name' => 'do_that',
@@ -598,7 +598,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_reject_permission_based_on_logged_in_user_guard()
+    public function it_can_reject_permission_based_on_logged_in_user_guard(): void
     {
         $unassignedPermission = app(Permission::class)::create([
              'name' => 'do_that',

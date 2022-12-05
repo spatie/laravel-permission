@@ -2,7 +2,7 @@
 
 namespace Spatie\Permission\Test;
 
-use DB;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\PermissionRegistrar;
 
 class HasPermissionsWithCustomModelsTest extends HasPermissionsTest
@@ -11,13 +11,13 @@ class HasPermissionsWithCustomModelsTest extends HasPermissionsTest
     protected $useCustomModels = true;
 
     /** @test */
-    public function it_can_use_custom_model_permission()
+    public function it_can_use_custom_model_permission(): void
     {
         $this->assertSame(get_class($this->testUserPermission), Permission::class);
     }
 
     /** @test */
-    public function it_can_use_custom_fields_from_cache()
+    public function it_can_use_custom_fields_from_cache(): void
     {
         DB::connection()->getSchemaBuilder()->table(config('permission.table_names.roles'), function ($table) {
             $table->string('type')->default('R');

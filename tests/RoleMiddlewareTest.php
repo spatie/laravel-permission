@@ -22,7 +22,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function a_guest_cannot_access_a_route_protected_by_rolemiddleware()
+    public function a_guest_cannot_access_a_route_protected_by_rolemiddleware(): void
     {
         $this->assertEquals(
             403,
@@ -31,7 +31,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function a_user_cannot_access_a_route_protected_by_role_middleware_of_another_guard()
+    public function a_user_cannot_access_a_route_protected_by_role_middleware_of_another_guard(): void
     {
         Auth::login($this->testUser);
 
@@ -44,7 +44,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function a_user_can_access_a_route_protected_by_role_middleware_if_have_this_role()
+    public function a_user_can_access_a_route_protected_by_role_middleware_if_have_this_role(): void
     {
         Auth::login($this->testUser);
 
@@ -57,7 +57,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function a_user_can_access_a_route_protected_by_this_role_middleware_if_have_one_of_the_roles()
+    public function a_user_can_access_a_route_protected_by_this_role_middleware_if_have_one_of_the_roles(): void
     {
         Auth::login($this->testUser);
 
@@ -75,7 +75,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function a_user_cannot_access_a_route_protected_by_the_role_middleware_if_have_a_different_role()
+    public function a_user_cannot_access_a_route_protected_by_the_role_middleware_if_have_a_different_role(): void
     {
         Auth::login($this->testUser);
 
@@ -88,7 +88,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function a_user_cannot_access_a_route_protected_by_role_middleware_if_have_not_roles()
+    public function a_user_cannot_access_a_route_protected_by_role_middleware_if_have_not_roles(): void
     {
         Auth::login($this->testUser);
 
@@ -99,7 +99,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function a_user_cannot_access_a_route_protected_by_role_middleware_if_role_is_undefined()
+    public function a_user_cannot_access_a_route_protected_by_role_middleware_if_role_is_undefined(): void
     {
         Auth::login($this->testUser);
 
@@ -110,7 +110,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function the_required_roles_can_be_fetched_from_the_exception()
+    public function the_required_roles_can_be_fetched_from_the_exception(): void
     {
         Auth::login($this->testUser);
 
@@ -131,7 +131,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function the_required_roles_can_be_displayed_in_the_exception()
+    public function the_required_roles_can_be_displayed_in_the_exception(): void
     {
         Auth::login($this->testUser);
         Config::set(['permission.display_role_in_exception' => true]);
@@ -150,7 +150,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function use_not_existing_custom_guard_in_role()
+    public function use_not_existing_custom_guard_in_role(): void
     {
         $class = null;
 
@@ -166,7 +166,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function user_can_not_access_role_with_guard_admin_while_login_using_default_guard()
+    public function user_can_not_access_role_with_guard_admin_while_login_using_default_guard(): void
     {
         Auth::login($this->testUser);
 
@@ -179,7 +179,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function user_can_access_role_with_guard_admin_while_login_using_admin_guard()
+    public function user_can_access_role_with_guard_admin_while_login_using_admin_guard(): void
     {
         Auth::guard('admin')->login($this->testAdmin);
 
