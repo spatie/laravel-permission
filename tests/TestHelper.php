@@ -9,9 +9,8 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class TestHelper
 {
     /**
-     * @param string $middleware
-     * @param object $parameter
-     *
+     * @param  string  $middleware
+     * @param  object  $parameter
      * @return int
      */
     public function testMiddleware($middleware, $parameter)

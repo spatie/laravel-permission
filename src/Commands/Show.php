@@ -40,7 +40,7 @@ class Show extends Command
                     $q->orderBy($team_key);
                 })
                 ->orderBy('name')->get()->mapWithKeys(function ($role) use ($team_key) {
-                    return [$role->name.'_'.($role->$team_key ?: '') => ['permissions' => $role->permissions->pluck('id'), $team_key => $role->$team_key ]];
+                    return [$role->name.'_'.($role->$team_key ?: '') => ['permissions' => $role->permissions->pluck('id'), $team_key => $role->$team_key]];
                 });
 
             $permissions = $permissionClass::whereGuardName($guard)->orderBy('name')->pluck('name', 'id');

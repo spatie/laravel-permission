@@ -40,6 +40,7 @@ abstract class TestCase extends Orchestra
     protected $hasTeams = false;
 
     protected static $migration;
+
     protected static $customMigration;
 
     public function setUp(): void
@@ -60,8 +61,7 @@ abstract class TestCase extends Orchestra
     }
 
     /**
-     * @param \Illuminate\Foundation\Application $app
-     *
+     * @param  \Illuminate\Foundation\Application  $app
      * @return array
      */
     protected function getPackageProviders($app)
@@ -74,7 +74,7 @@ abstract class TestCase extends Orchestra
     /**
      * Set up the environment.
      *
-     * @param \Illuminate\Foundation\Application $app
+     * @param  \Illuminate\Foundation\Application  $app
      */
     protected function getEnvironmentSetUp($app)
     {
@@ -112,7 +112,7 @@ abstract class TestCase extends Orchestra
     /**
      * Set up the database.
      *
-     * @param \Illuminate\Foundation\Application $app
+     * @param  \Illuminate\Foundation\Application  $app
      */
     protected function setUpDatabase($app)
     {
@@ -200,8 +200,8 @@ abstract class TestCase extends Orchestra
     {
         Route::middleware('auth:api')->get('/check-api-guard-permission', function (Request $request) {
             return [
-                 'status' => $request->user()->hasPermissionTo('do_that'),
-             ];
+                'status' => $request->user()->hasPermissionTo('do_that'),
+            ];
         });
     }
 }
