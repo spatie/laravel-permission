@@ -150,7 +150,7 @@ abstract class TestCase extends Orchestra
         $app[Permission::class]->create(['name' => 'Edit News']);
     }
 
-    private function prepareMigration()
+    protected function prepareMigration()
     {
         $migration = str_replace(
             [

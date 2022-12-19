@@ -1,0 +1,40 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+use Spatie\Permission\PermissionRegistrar;
+
+require_once __DIR__."/../../database/migrations/create_permission_tables.php.stub";
+class CreatePermissionTablesWithNested extends CreatePermissionTables
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        parent::up();
+        $tableNames = config('permission.table_names');
+
+        Schema::create(\Spatie\Permission\Test\RoleWithNesting::HIERARCHY_TABLE,function(Blueprint $table) use ($tableNames){
+            $table->id();
+            $table->bigInteger("parent_id", false, true);
+            $table->bigInteger("child_id", false, true);
+            $table->foreign("parent_id")->references("id")->on($tableNames['roles']);
+            $table->foreign("child_id")->references("id")->on($tableNames['roles']);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        parent::down();
+        Schema::drop(\Spatie\Permission\Test\RoleWithNesting::HIERARCHY_TABLE);
+    }
+}
