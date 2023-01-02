@@ -68,7 +68,7 @@ class RoleWithNestingTest extends TestCase
         $role = $this->$role_group[$index];
         $count_field_name = sprintf("%s_count", $relation);
 
-        $actualCount = RoleWithNesting::query()->withCount($relation)->find($role->id)->$count_field_name;
+        $actualCount = intval(RoleWithNesting::query()->withCount($relation)->find($role->id)->$count_field_name);
 
         $this->assertSame(
             $expectedCount,
