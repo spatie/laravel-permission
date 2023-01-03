@@ -313,19 +313,20 @@ trait HasPermissions
     /**
      * Returns permissions ids as array keys
      *
+     * @param  string  $guardName
      * @param  string|int|array|\Spatie\Permission\Contracts\Permission|\Illuminate\Support\Collection  $permissions
      * @return array
      */
-    public function collectPermissions(...$permissions)
+    public function collectPermissions(string $guardName = null, ...$permissions)
     {
         return collect($permissions)
             ->flatten()
-            ->reduce(function ($array, $permission) {
+            ->reduce(function ($array, $permission) use ($guardName) {
                 if (empty($permission)) {
                     return $array;
                 }
 
-                $permission = $this->getStoredPermission($permission);
+                $permission = $this->getStoredPermission($permission, $guardName);
                 if (! $permission instanceof Permission) {
                     return $array;
                 }
@@ -342,12 +343,13 @@ trait HasPermissions
     /**
      * Grant the given permission(s) to a role.
      *
+     * @param  string  $guardName
      * @param  string|int|array|\Spatie\Permission\Contracts\Permission|\Illuminate\Support\Collection  $permissions
      * @return $this
      */
-    public function givePermissionTo(...$permissions)
+    public function givePermissionTo(string $guardName = null, ...$permissions)
     {
-        $permissions = $this->collectPermissions(...$permissions);
+        $permissions = $this->collectPermissions($guardName,...$permissions);
 
         $model = $this->getModel();
 
@@ -413,19 +415,20 @@ trait HasPermissions
     }
 
     /**
+     * @param  string  $guardName
      * @param  string|int|array|\Spatie\Permission\Contracts\Permission|\Illuminate\Support\Collection  $permissions
      * @return \Spatie\Permission\Contracts\Permission|\Spatie\Permission\Contracts\Permission[]|\Illuminate\Support\Collection
      */
-    protected function getStoredPermission($permissions)
+    protected function getStoredPermission($permissions, string $guardName = null)
     {
         $permissionClass = $this->getPermissionClass();
 
         if (is_numeric($permissions)) {
-            return $permissionClass->findById($permissions, $this->getDefaultGuardName());
+            return $permissionClass->findById($permissions, $guardName ?? $this->getDefaultGuardName());
         }
 
         if (is_string($permissions)) {
-            return $permissionClass->findByName($permissions, $this->getDefaultGuardName());
+            return $permissionClass->findByName($permissions, $guardName ?? $this->getDefaultGuardName());
         }
 
         if (is_array($permissions)) {
