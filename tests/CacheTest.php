@@ -6,6 +6,7 @@ use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\PermissionRegistrar;
+use Spatie\Permission\Test\User;
 
 beforeEach(function () {
     $this->cache_init_count = 0;
