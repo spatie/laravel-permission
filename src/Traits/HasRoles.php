@@ -64,10 +64,9 @@ trait HasRoles
     /**
      * Scope the model query to certain roles only.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string|int|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
-     * @param string $guard
-     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string|int|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection  $roles
+     * @param  string  $guard
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeRole(Builder $query, $roles, $guard = null): Builder
@@ -96,8 +95,7 @@ trait HasRoles
     /**
      * Assign the given role to the model.
      *
-     * @param array|string|int|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection ...$roles
-     *
+     * @param  array|string|int|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection  ...$roles
      * @return $this
      */
     public function assignRole(...$roles)
@@ -151,7 +149,7 @@ trait HasRoles
     /**
      * Revoke the given role from the model.
      *
-     * @param string|int|\Spatie\Permission\Contracts\Role $role
+     * @param  string|int|\Spatie\Permission\Contracts\Role  $role
      */
     public function removeRole($role)
     {
@@ -170,7 +168,6 @@ trait HasRoles
      * Remove all current roles and set the given ones.
      *
      * @param  array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection|string|int  ...$roles
-     *
      * @return $this
      */
     public function syncRoles(...$roles)
@@ -183,8 +180,8 @@ trait HasRoles
     /**
      * Determine if the model has (one of) the given role(s).
      *
-     * @param string|int|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
-     * @param string|null $guard
+     * @param  string|int|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection  $roles
+     * @param  string|null  $guard
      * @return bool
      */
     public function hasRole($roles, string $guard = null): bool
@@ -232,8 +229,7 @@ trait HasRoles
      *
      * Alias to hasRole() but without Guard controls
      *
-     * @param string|int|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
-     *
+     * @param  string|int|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection  $roles
      * @return bool
      */
     public function hasAnyRole(...$roles): bool

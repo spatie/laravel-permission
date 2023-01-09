@@ -20,4 +20,4 @@ The package doesn't come with any screens out of the box, you should build that 
 - [Generating UI boilerplate using InfyOm](https://youtu.be/hlGu2pa1bdU) video tutorial by [Shailesh](https://github.com/shailesh-ladumor)
 
 
-- [LiveWire Base Admin Panel](https://github.com/alighasemzadeh/bap) User management by [AliGhasemzadeh](https://github.com/alighasemzadeh)
+- [LiveWire Base Admin Panel](https://github.com/aliqasemzadeh/bap) User management by [AliQasemzadeh](https://github.com/aliqasemzadeh)

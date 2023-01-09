@@ -1,6 +1,7 @@
 {
     "name": "spatie/laravel-permission",
     "description": "Permission handling for Laravel 6.0 and up",
+    "license": "MIT",
     "keywords": [
         "spatie",
         "laravel",
@@ -11,8 +12,6 @@
         "rbac",
         "security"
     ],
-    "homepage": "https://github.com/spatie/laravel-permission",
-    "license": "MIT",
     "authors": [
         {
             "name": "Freek Van der Herten",
@@ -21,8 +20,9 @@
             "role": "Developer"
         }
     ],
+    "homepage": "https://github.com/spatie/laravel-permission",
     "require": {
-        "php" : "^7.3|^8.0|^8.1",
+        "php": "^7.3|^8.0|^8.1",
         "illuminate/auth": "^7.0|^8.0|^9.0",
         "illuminate/container": "^7.0|^8.0|^9.0",
         "illuminate/contracts": "^7.0|^8.0|^9.0",
@@ -49,14 +49,14 @@
         }
     },
     "extra": {
+        "branch-alias": {
+            "dev-main": "5.x-dev",
+            "dev-master": "5.x-dev"
+        },
         "laravel": {
             "providers": [
                 "Spatie\\Permission\\PermissionServiceProvider"
             ]
-        },
-        "branch-alias": {
-            "dev-main": "5.x-dev",
-            "dev-master": "5.x-dev"
         }
     },
     "scripts": {

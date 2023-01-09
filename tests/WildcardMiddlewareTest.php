@@ -14,7 +14,9 @@ use Spatie\Permission\Models\Permission;
 class WildcardMiddlewareTest extends TestCase
 {
     protected $roleMiddleware;
+
     protected $permissionMiddleware;
+
     protected $roleOrPermissionMiddleware;
 
     public function setUp(): void

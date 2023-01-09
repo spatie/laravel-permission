@@ -38,7 +38,7 @@ Jeffrey Way explains the concept of a super-admin (and a model owner, and model 
 
 Alternatively you might want to move the Super Admin check to the `Gate::after` phase instead, particularly if your Super Admin shouldn't be allowed to do things your app doesn't want "anyone" to do, such as writing more than 1 review, or bypassing unsubscribe rules, etc.
 
-The following code snippet is inspired from [Freek's blog article](https://murze.be/when-to-use-gateafter-in-laravel) where this topic is discussed further.
+The following code snippet is inspired from [Freek's blog article](https://freek.dev/1325-when-to-use-gateafter-in-laravel) where this topic is discussed further.
 
 ```php
 // somewhere in a service provider

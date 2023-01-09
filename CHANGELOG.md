@@ -2,6 +2,37 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 5.7.0 - 2022-11-23
+
+### What's Changed
+
+- [Bugfix] Avoid checking permissions-via-roles on `Role` model (ref `Model::preventAccessingMissingAttributes()`) by @juliomotol in https://github.com/spatie/laravel-permission/pull/2227
+
+### New Contributors
+
+- @juliomotol made their first contribution in https://github.com/spatie/laravel-permission/pull/2227
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/5.6.0...5.7.0
+
+## 5.6.0 - 2022-11-19
+
+### What's Changed
+
+- No longer throws an exception when checking `hasAllPermissions()` if the permission name does not exist by @mtawil in https://github.com/spatie/laravel-permission/pull/2248
+
+### Doc Updates
+
+- [Docs] Add syncPermissions() in role-permissions.md by @xorinzor in https://github.com/spatie/laravel-permission/pull/2235
+- [Docs] Fix broken Link that link to freek's blog post by @chengkangzai in https://github.com/spatie/laravel-permission/pull/2234
+
+### New Contributors
+
+- @xorinzor made their first contribution in https://github.com/spatie/laravel-permission/pull/2235
+- @chengkangzai made their first contribution in https://github.com/spatie/laravel-permission/pull/2234
+- @mtawil made their first contribution in https://github.com/spatie/laravel-permission/pull/2248
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/5.5.16...5.6.0
+
 ## 5.5.16 - 2022-10-23
 
 ### What's Changed
@@ -509,6 +540,8 @@ The following changes are not "breaking", but worth making the updates to your a
 - app()['cache']->forget('spatie.permission.cache');
 + $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
 
+
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -556,6 +589,8 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
+
 
 ```
 ## 2.19.1 - 2018-09-14
