@@ -83,7 +83,7 @@ test('the "elserole" directive will evaluate true when the logged in user has th
     ->toEqual('has else role');
 
 test('the "role" directive will evaluate true when the logged in user has the role for the given guard')
-    ->tap(fn () =>  auth('admin')->setUser(getSuperAdmin()))
+    ->tap(fn () => auth('admin')->setUser(getSuperAdmin()))
     ->expect(fn () => renderView('guardRole', ['role' => 'super-admin', 'guard' => 'admin']))
     ->toEqual('has role for guard');
 
@@ -96,7 +96,6 @@ test('the "hasrole" directive will evaluate true when the logged in user has the
     ->tap(fn () => auth('admin')->setUser(getSuperAdmin()))
     ->expect(fn () => renderView('guardHasRole', ['role' => 'super-admin', 'guard' => 'admin']))
     ->toEqual('has role');
-
 
 test('the "unlessrole" directive will evaluate true when the logged in user does not have the role')
     ->tap(fn () => auth()->setUser(getWriter()))
@@ -136,7 +135,7 @@ test(
         expect(renderView('hasAnyRole', compact('roles')))
             ->toEqual('does have some of the roles')
             ->and(renderView('hasAnyRole', ['roles' => implode('|', $roles)]))
-            ->toEqual('does have some of the roles');;
+            ->toEqual('does have some of the roles');
     }
 );
 

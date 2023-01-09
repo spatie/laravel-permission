@@ -47,7 +47,7 @@ abstract class TestCase extends Orchestra
     {
         parent::setUp();
 
-        if (!self::$migration) {
+        if (! self::$migration) {
             $this->prepareMigration();
         }
 
@@ -91,7 +91,7 @@ abstract class TestCase extends Orchestra
         ]);
         $app['config']->set('permission.column_names.role_pivot_key', 'role_test_id');
         $app['config']->set('permission.column_names.permission_pivot_key', 'permission_test_id');
-        $app['config']->set('view.paths', [__DIR__ . '/resources/views']);
+        $app['config']->set('view.paths', [__DIR__.'/resources/views']);
 
         // ensure api guard exists (required since Laravel 8.55)
         $app['config']->set('auth.guards.api', ['driver' => 'session', 'provider' => 'users']);
@@ -134,7 +134,7 @@ abstract class TestCase extends Orchestra
             $this->createCacheTable();
         }
 
-        if (!$this->useCustomModels) {
+        if (! $this->useCustomModels) {
             self::$migration->up();
         } else {
             self::$customMigration->up();
@@ -169,15 +169,15 @@ abstract class TestCase extends Orchestra
                 'references(\'permission_test_id\')',
                 'references(\'role_test_id\')',
             ],
-            file_get_contents(__DIR__ . '/../database/migrations/create_permission_tables.php.stub')
+            file_get_contents(__DIR__.'/../database/migrations/create_permission_tables.php.stub')
         );
 
-        file_put_contents(__DIR__ . '/CreatePermissionCustomTables.php', $migration);
+        file_put_contents(__DIR__.'/CreatePermissionCustomTables.php', $migration);
 
-        include_once __DIR__ . '/../database/migrations/create_permission_tables.php.stub';
+        include_once __DIR__.'/../database/migrations/create_permission_tables.php.stub';
         self::$migration = new \CreatePermissionTables();
 
-        include_once __DIR__ . '/CreatePermissionCustomTables.php';
+        include_once __DIR__.'/CreatePermissionCustomTables.php';
         self::$customMigration = new \CreatePermissionCustomTables();
     }
 

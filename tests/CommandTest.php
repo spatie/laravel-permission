@@ -1,10 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Artisan;
+use function Pest\Laravel\artisan;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-
-use function Pest\Laravel\artisan;
 
 it('can create a role')
     ->tap(fn () => Artisan::call(
@@ -149,5 +148,5 @@ it('can show roles by teams', function () {
     expect($output)
         ->toMatch('/\|\s+\|\s+Team ID: NULL\s+\|\s+Team ID: 1\s+\|\s+Team ID: 2\s+\|/') // |    | Team ID: NULL        | Team ID: 1   | Team ID: 2   |
         ->toMatch('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|\s+testRoleTeam\s+\|\s+testRoleTeam\s+\|/') // |    | testRole | testRole2 | testRoleTeam | testRoleTeam |
-    ;
+;
 });
