@@ -13,7 +13,7 @@ use Spatie\Permission\Contracts\Role as RoleContract;
 
 class PermissionServiceProvider extends ServiceProvider
 {
-    public function boot(PermissionRegistrar $permissionLoader)
+    public function boot()
     {
         $this->offerPublishing();
 
@@ -23,14 +23,14 @@ class PermissionServiceProvider extends ServiceProvider
 
         $this->registerModelBindings();
 
-        if ($this->app->config['permission.register_permission_check_method']) {
-            $permissionLoader->clearClassPermissions();
-            $permissionLoader->registerPermissions();
-        }
-
-        $this->app->singleton(PermissionRegistrar::class, function ($app) use ($permissionLoader) {
-            return $permissionLoader;
+        $this->callAfterResolving(PermissionRegistrar::class, function (PermissionRegistrar $permissionLoader) {
+            if ($this->app->config['permission.register_permission_check_method']) {
+                $permissionLoader->clearClassPermissions();
+                $permissionLoader->registerPermissions();
+            }
         });
+
+        $this->app->singleton(PermissionRegistrar::class);
     }
 
     public function register()
@@ -74,14 +74,16 @@ class PermissionServiceProvider extends ServiceProvider
 
     protected function registerModelBindings()
     {
-        $config = $this->app->config['permission.models'];
+        $this->app->bind(PermissionContract::class, function ($app) {
+            $config = $app->config['permission.models'];
 
-        if (! $config) {
-            return;
-        }
+            return $app->make($config['permission']);
+        });
+        $this->app->bind(RoleContract::class, function ($app) {
+            $config = $app->config['permission.models'];
 
-        $this->app->bind(PermissionContract::class, $config['permission']);
-        $this->app->bind(RoleContract::class, $config['role']);
+            return $app->make($config['role']);
+        });
     }
 
     public static function bladeMethodWrapper($method, $role, $guard = null)
