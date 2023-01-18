@@ -3,9 +3,19 @@ title: Installation in Laravel
 weight: 4
 ---
 
+## Laravel Version Compatibility
+
 This package can be used with Laravel 6.0 or higher.
 
-(For Laravel 5.8, use v3.17.0)
+Package | Laravel Version
+--------|-----------
+  ^5.8   | 7,8,9,10
+  ^5.7   |  7,8,9
+^5.4-^5.6 |   7,8
+5.0-5.3 |  6,7,8
+   ^4    |  6,7,8
+   ^3    |  5.8
+   
 
 ## Installing
 
