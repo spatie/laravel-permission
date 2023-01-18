@@ -41,16 +41,12 @@ Route::group(['middleware' => ['role:super-admin','permission:publish articles']
     //
 });
 
-Route::group(['middleware' => ['role_or_permission:super-admin|edit articles']], function () {
-    //
-});
-
 Route::group(['middleware' => ['role_or_permission:publish articles']], function () {
     //
 });
 ```
 
-Alternatively, you can separate multiple roles or permission with a `|` (pipe) character:
+You can specify multiple roles or permissions with a `|` (pipe) character, which is treated as `OR`:
 
 ```php
 Route::group(['middleware' => ['role:super-admin|writer']], function () {
