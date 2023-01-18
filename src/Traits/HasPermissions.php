@@ -317,7 +317,7 @@ trait HasPermissions
      * @param  string|int|array|\Spatie\Permission\Contracts\Permission|\Illuminate\Support\Collection  $permissions
      * @return array
      */
-    public function collectPermissions(string $guardName = null, ...$permissions)
+    public function collectPermissions(?string $guardName = null, ...$permissions)
     {
         return collect($permissions)
             ->flatten()
@@ -347,7 +347,7 @@ trait HasPermissions
      * @param  string|int|array|\Spatie\Permission\Contracts\Permission|\Illuminate\Support\Collection  $permissions
      * @return $this
      */
-    public function givePermissionTo(string $guardName = null, ...$permissions)
+    public function givePermissionTo(?string $guardName = null, ...$permissions)
     {
         $permissions = $this->collectPermissions($guardName,...$permissions);
 
@@ -419,7 +419,7 @@ trait HasPermissions
      * @param  string|int|array|\Spatie\Permission\Contracts\Permission|\Illuminate\Support\Collection  $permissions
      * @return \Spatie\Permission\Contracts\Permission|\Spatie\Permission\Contracts\Permission[]|\Illuminate\Support\Collection
      */
-    protected function getStoredPermission($permissions, string $guardName = null)
+    protected function getStoredPermission($permissions, ?string $guardName = null)
     {
         $permissionClass = $this->getPermissionClass();
 
