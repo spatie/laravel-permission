@@ -108,11 +108,11 @@ class Role extends Model implements RoleContract
     /**
      * Find a role by its id (and optionally guardName).
      *
-     * @param  int  $id
+     * @param  int|string  $id
      * @param  string|null  $guardName
      * @return \Spatie\Permission\Contracts\Role|\Spatie\Permission\Models\Role
      */
-    public static function findById(int $id, $guardName = null): RoleContract
+    public static function findById($id, $guardName = null): RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
