@@ -2,6 +2,28 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 5.9.0 - 2023-02-06
+
+### What's Changed
+
+- Add `permission-` prefix to publish tag names by @sedehi in https://github.com/spatie/laravel-permission/pull/2301
+- Fix detaching user models on teams feature #2220 by @erikn69 in https://github.com/spatie/laravel-permission/pull/2221
+- Hint model properties by @AJenbo in https://github.com/spatie/laravel-permission/pull/2230
+- Custom wildcard verification/separators support by @erikn69 in https://github.com/spatie/laravel-permission/pull/2252
+- fix: Lazily bind dependencies by @olivernybroe in https://github.com/spatie/laravel-permission/pull/2309
+- Extract query to `getPermissionsWithRoles` method. by @xiCO2k in https://github.com/spatie/laravel-permission/pull/2316
+- This will allow to extend the PermissionRegistrar class and change the query.
+
+### New Contributors
+
+- @sedehi made their first contribution in https://github.com/spatie/laravel-permission/pull/2301
+- @parallels999 made their first contribution in https://github.com/spatie/laravel-permission/pull/2265
+- @AJenbo made their first contribution in https://github.com/spatie/laravel-permission/pull/2230
+- @olivernybroe made their first contribution in https://github.com/spatie/laravel-permission/pull/2309
+- @xiCO2k made their first contribution in https://github.com/spatie/laravel-permission/pull/2316
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/5.8.0...5.9.0
+
 ## 5.8.0 - 2023-01-14
 
 ### What's Changed
@@ -559,6 +581,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -606,6 +629,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
