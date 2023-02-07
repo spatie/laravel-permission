@@ -45,14 +45,14 @@ class AddTeamsFields extends Migration
                 $table->index($columnNames['team_foreign_key'], 'model_has_permissions_team_foreign_key_index');
 
                 if (DB::getDriverName() !== 'sqlite') {
-                    $table->dropForeign([PermissionRegistrar::$pivotPermission]);
+                    $table->dropForeign([app(PermissionRegistrar::class)->pivotPermission]);
                 }
                 $table->dropPrimary();
 
-                $table->primary([$columnNames['team_foreign_key'], PermissionRegistrar::$pivotPermission, $columnNames['model_morph_key'], 'model_type'],
+                $table->primary([$columnNames['team_foreign_key'], app(PermissionRegistrar::class)->pivotPermission, $columnNames['model_morph_key'], 'model_type'],
                     'model_has_permissions_permission_model_type_primary');
                 if (DB::getDriverName() !== 'sqlite') {
-                    $table->foreign(PermissionRegistrar::$pivotPermission)
+                    $table->foreign(app(PermissionRegistrar::class)->pivotPermission)
                         ->references('id')->on($tableNames['permissions'])->onDelete('cascade');
                 }
             });
@@ -64,14 +64,14 @@ class AddTeamsFields extends Migration
                 $table->index($columnNames['team_foreign_key'], 'model_has_roles_team_foreign_key_index');
 
                 if (DB::getDriverName() !== 'sqlite') {
-                    $table->dropForeign([PermissionRegistrar::$pivotRole]);
+                    $table->dropForeign([app(PermissionRegistrar::class)->pivotRole]);
                 }
                 $table->dropPrimary();
 
-                $table->primary([$columnNames['team_foreign_key'], PermissionRegistrar::$pivotRole, $columnNames['model_morph_key'], 'model_type'],
+                $table->primary([$columnNames['team_foreign_key'], app(PermissionRegistrar::class)->pivotRole, $columnNames['model_morph_key'], 'model_type'],
                     'model_has_roles_role_model_type_primary');
                 if (DB::getDriverName() !== 'sqlite') {
-                    $table->foreign(PermissionRegistrar::$pivotRole)
+                    $table->foreign(app(PermissionRegistrar::class)->pivotRole)
                         ->references('id')->on($tableNames['roles'])->onDelete('cascade');
                 }
             });
