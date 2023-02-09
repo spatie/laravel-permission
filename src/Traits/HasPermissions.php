@@ -134,7 +134,7 @@ trait HasPermissions
             if ($permission instanceof Permission) {
                 return $permission;
             }
-            $method = is_string($permission) && ! \Str::isUuid($permission) ? 'findByName' : 'findById';
+            $method = is_string($permission) && ! PermissionRegistrar::isUid($permission) ? 'findByName' : 'findById';
 
             return $this->getPermissionClass()->{$method}($permission, $this->getDefaultGuardName());
         }, Arr::wrap($permissions));
@@ -152,7 +152,7 @@ trait HasPermissions
     {
         $permissionClass = $this->getPermissionClass();
 
-        if (is_string($permission) && ! \Str::isUuid($permission)) {
+        if (is_string($permission) && ! PermissionRegistrar::isUid($permission)) {
             $permission = $permissionClass->findByName(
                 $permission,
                 $guardName ?? $this->getDefaultGuardName()
@@ -204,7 +204,7 @@ trait HasPermissions
     {
         $guardName = $guardName ?? $this->getDefaultGuardName();
 
-        if (is_int($permission) || \Str::isUuid($permission)) {
+        if (is_int($permission) || PermissionRegistrar::isUid($permission)) {
             $permission = $this->getPermissionClass()->findById($permission, $guardName);
         }
 
@@ -449,7 +449,7 @@ trait HasPermissions
     {
         $permissionClass = $this->getPermissionClass();
 
-        if (is_numeric($permissions) || \Str::isUuid($permissions)) {
+        if (is_numeric($permissions) || PermissionRegistrar::isUid($permissions)) {
             return $permissionClass->findById($permissions, $this->getDefaultGuardName());
         }
 
