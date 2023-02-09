@@ -34,7 +34,6 @@ class PermissionServiceProvider extends ServiceProvider
             }
         });
 
-
         $this->app->singleton(PermissionRegistrar::class);
     }
 
