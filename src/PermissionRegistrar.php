@@ -384,4 +384,25 @@ class PermissionRegistrar
 
         $this->permissions['roles'] = [];
     }
+
+    public static function isUid($value)
+    {
+        if (! is_string($value) || empty(trim($value))) {
+            return false;
+        }
+
+        // check if is UUID/GUID
+        $uid = preg_match('/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iD', $value) > 0;
+        if ($uid) {
+            return true;
+        }
+
+        // check if is ULID
+        $ulid = 26 == strlen($value) && 26 == strspn($value, '0123456789ABCDEFGHJKMNPQRSTVWXYZabcdefghjkmnpqrstvwxyz') && $value[0] <= '7';
+        if ($ulid) {
+            return true;
+        }
+
+        return false;
+    }
 }

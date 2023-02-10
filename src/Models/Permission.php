@@ -104,13 +104,13 @@ class Permission extends Model implements PermissionContract
     /**
      * Find a permission by its id (and optionally guardName).
      *
-     * @param  int  $id
+     * @param  int|string  $id
      * @param  string|null  $guardName
      * @return \Spatie\Permission\Contracts\Permission
      *
      * @throws \Spatie\Permission\Exceptions\PermissionDoesNotExist
      */
-    public static function findById(int $id, $guardName = null): PermissionContract
+    public static function findById($id, $guardName = null): PermissionContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
         $permission = static::getPermission([(new static())->getKeyName() => $id, 'guard_name' => $guardName]);
