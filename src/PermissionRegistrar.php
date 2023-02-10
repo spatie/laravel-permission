@@ -29,25 +29,25 @@ class PermissionRegistrar
     protected $permissions;
 
     /** @var string */
-    public static $pivotRole;
+    public $pivotRole;
 
     /** @var string */
-    public static $pivotPermission;
+    public $pivotPermission;
 
     /** @var \DateInterval|int */
-    public static $cacheExpirationTime;
+    public $cacheExpirationTime;
 
     /** @var bool */
-    public static $teams;
+    public $teams;
 
     /** @var string */
-    public static $teamsKey;
+    public $teamsKey;
 
     /** @var int|string */
     protected $teamId = null;
 
     /** @var string */
-    public static $cacheKey;
+    public $cacheKey;
 
     /** @var array */
     private $cachedRoles = [];
@@ -74,15 +74,15 @@ class PermissionRegistrar
 
     public function initializeCache()
     {
-        self::$cacheExpirationTime = config('permission.cache.expiration_time') ?: \DateInterval::createFromDateString('24 hours');
+        $this->cacheExpirationTime = config('permission.cache.expiration_time') ?: \DateInterval::createFromDateString('24 hours');
 
-        self::$teams = config('permission.teams', false);
-        self::$teamsKey = config('permission.column_names.team_foreign_key');
+        $this->teams = config('permission.teams', false);
+        $this->teamsKey = config('permission.column_names.team_foreign_key');
 
-        self::$cacheKey = config('permission.cache.key');
+        $this->cacheKey = config('permission.cache.key');
 
-        self::$pivotRole = config('permission.column_names.role_pivot_key') ?: 'role_id';
-        self::$pivotPermission = config('permission.column_names.permission_pivot_key') ?: 'permission_id';
+        $this->pivotRole = config('permission.column_names.role_pivot_key') ?: 'role_id';
+        $this->pivotPermission = config('permission.column_names.permission_pivot_key') ?: 'permission_id';
 
         $this->cache = $this->getCacheStoreFromConfig();
     }
@@ -151,7 +151,7 @@ class PermissionRegistrar
     {
         $this->permissions = null;
 
-        return $this->cache->forget(self::$cacheKey);
+        return $this->cache->forget($this->cacheKey);
     }
 
     /**
@@ -174,7 +174,7 @@ class PermissionRegistrar
             return;
         }
 
-        $this->permissions = $this->cache->remember(self::$cacheKey, self::$cacheExpirationTime, function () {
+        $this->permissions = $this->cache->remember($this->cacheKey, $this->cacheExpirationTime, function () {
             return $this->getSerializedPermissionsForCache();
         });
 

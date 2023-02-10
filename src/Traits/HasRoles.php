@@ -24,10 +24,10 @@ trait HasRoles
                 return;
             }
 
-            $teams = PermissionRegistrar::$teams;
-            PermissionRegistrar::$teams = false;
+            $teams = app(PermissionRegistrar::class)->teams;
+            app(PermissionRegistrar::class)->teams = false;
             $model->roles()->detach();
-            PermissionRegistrar::$teams = $teams;
+            app(PermissionRegistrar::class)->teams = $teams;
         });
     }
 
@@ -50,16 +50,16 @@ trait HasRoles
             'model',
             config('permission.table_names.model_has_roles'),
             config('permission.column_names.model_morph_key'),
-            PermissionRegistrar::$pivotRole
+            app(PermissionRegistrar::class)->pivotRole
         );
 
-        if (! PermissionRegistrar::$teams) {
+        if (! app(PermissionRegistrar::class)->teams) {
             return $relation;
         }
 
-        return $relation->wherePivot(PermissionRegistrar::$teamsKey, getPermissionsTeamId())
+        return $relation->wherePivot(app(PermissionRegistrar::class)->teamsKey, getPermissionsTeamId())
             ->where(function ($q) {
-                $teamField = config('permission.table_names.roles').'.'.PermissionRegistrar::$teamsKey;
+                $teamField = config('permission.table_names.roles').'.'. app(PermissionRegistrar::class)->teamsKey;
                 $q->whereNull($teamField)->orWhere($teamField, getPermissionsTeamId());
             });
     }
@@ -117,8 +117,8 @@ trait HasRoles
 
                 $this->ensureModelSharesGuard($role);
 
-                $array[$role->getKey()] = PermissionRegistrar::$teams && ! is_a($this, Permission::class) ?
-                    [PermissionRegistrar::$teamsKey => getPermissionsTeamId()] : [];
+                $array[$role->getKey()] = app(PermissionRegistrar::class)->teams && ! is_a($this, Permission::class) ?
+                    [app(PermissionRegistrar::class)->teamsKey => getPermissionsTeamId()] : [];
 
                 return $array;
             }, []);
