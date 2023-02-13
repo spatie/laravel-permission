@@ -158,4 +158,13 @@ return [
 
         'store' => 'default',
     ],
+
+     /*
+      * Change this if you want to have a different connection 
+      *
+      * You can enter the database connection for the database where your roles and 
+      * permissions are located here, for instance, if the model using this package is
+      * in a different database.
+      */
+    "connection"=> env("DB_CONNECTION", "mysql")
 ];

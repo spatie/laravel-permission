@@ -35,6 +35,8 @@ class Role extends Model implements RoleContract
 
         $this->guarded[] = $this->primaryKey;
         $this->table = config('permission.table_names.roles', parent::getTable());
+        
+        $this->connection = config('permission.connection');
     }
 
     public static function create(array $attributes = [])
