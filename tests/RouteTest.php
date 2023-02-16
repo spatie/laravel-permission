@@ -1,68 +1,41 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
 use Illuminate\Http\Response;
 
-class RouteTest extends TestCase
-{
-    /** @test */
-    public function test_role_function()
-    {
-        $router = $this->getRouter();
+it('test role function', function () {
+    $router = getRouter();
 
-        $router->get('role-test', $this->getRouteResponse())
-                ->name('role.test')
-                ->role('superadmin');
+    $router->get('role-test', getRouteResponse())
+        ->name('role.test')
+        ->role('superadmin');
 
-        $this->assertEquals(['role:superadmin'], $this->getLastRouteMiddlewareFromRouter($router));
-    }
+    expect(getLastRouteMiddlewareFromRouter($router))->toEqual(['role:superadmin']);
+});
 
-    /** @test */
-    public function test_permission_function()
-    {
-        $router = $this->getRouter();
+it('test permission function', function () {
+    $router = getRouter();
 
-        $router->get('permission-test', $this->getRouteResponse())
-                ->name('permission.test')
-                ->permission(['edit articles', 'save articles']);
+    $router->get('permission-test', getRouteResponse())
+        ->name('permission.test')
+        ->permission(['edit articles', 'save articles']);
 
-        $this->assertEquals(['permission:edit articles|save articles'], $this->getLastRouteMiddlewareFromRouter($router));
-    }
+    expect(getLastRouteMiddlewareFromRouter($router))->toEqual(['permission:edit articles|save articles']);
+});
 
-    /** @test */
-    public function test_role_and_permission_function_together()
-    {
-        $router = $this->getRouter();
+it('test role and permission function together', function () {
+    $router = getRouter();
 
-        $router->get('role-permission-test', $this->getRouteResponse())
-                ->name('role-permission.test')
-                ->role('superadmin|admin')
-                ->permission('create user|edit user');
+    $router->get('role-permission-test', getRouteResponse())
+        ->name('role-permission.test')
+        ->role('superadmin|admin')
+        ->permission('create user|edit user');
 
-        $this->assertEquals(
-            [
-                'role:superadmin|admin',
-                'permission:create user|edit user',
-            ],
-            $this->getLastRouteMiddlewareFromRouter($router)
-        );
-    }
-
-    protected function getLastRouteMiddlewareFromRouter($router)
-    {
-        return last($router->getRoutes()->get())->middleware();
-    }
-
-    protected function getRouter()
-    {
-        return app('router');
-    }
-
-    protected function getRouteResponse()
-    {
-        return function () {
-            return (new Response())->setContent('<html></html>');
-        };
-    }
-}
+    expect(getLastRouteMiddlewareFromRouter($router))->toEqual(
+        [
+            'role:superadmin|admin',
+            'permission:create user|edit user',
+        ],
+    );
+});

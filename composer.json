@@ -30,6 +30,7 @@
     },
     "require-dev": {
         "orchestra/testbench": "^5.0|^6.0|^7.0|^8.0",
+        "pestphp/pest": "^1.22",
         "phpunit/phpunit": "^9.4",
         "predis/predis": "^1.1"
     },
@@ -45,11 +46,14 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Spatie\\Permission\\Test\\": "tests"
+            "Spatie\\Permission\\Tests\\": "tests"
         }
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
     },
     "extra": {
         "branch-alias": {
@@ -63,6 +67,6 @@
         }
     },
     "scripts": {
-        "test": "phpunit"
+        "test": "./vendor/bin/pest"
     }
 }

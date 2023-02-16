@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -11,159 +11,92 @@ use Spatie\Permission\Middlewares\RoleMiddleware;
 use Spatie\Permission\Middlewares\RoleOrPermissionMiddleware;
 use Spatie\Permission\Models\Permission;
 
-class WildcardMiddlewareTest extends TestCase
-{
-    protected $roleMiddleware;
+beforeEach(function () {
+    $this->roleMiddleware = new RoleMiddleware();
 
-    protected $permissionMiddleware;
+    $this->permissionMiddleware = new PermissionMiddleware();
 
-    protected $roleOrPermissionMiddleware;
+    $this->roleOrPermissionMiddleware = new RoleOrPermissionMiddleware();
 
-    public function setUp(): void
-    {
-        parent::setUp();
+    app('config')->set('permission.enable_wildcard_permission', true);
+});
 
-        $this->roleMiddleware = new RoleMiddleware();
+it('a guest cannot access a route protected by the permission middleware', function () {
+    expect(runMiddleware($this->permissionMiddleware, 'articles.edit'))->toEqual(403);
+});
 
-        $this->permissionMiddleware = new PermissionMiddleware();
+it('a user can access a route protected by permission middleware if have this permission', function () {
+    Auth::login($this->testUser);
 
-        $this->roleOrPermissionMiddleware = new RoleOrPermissionMiddleware();
+    Permission::create(['name' => 'articles']);
 
-        app('config')->set('permission.enable_wildcard_permission', true);
+    $this->testUser->givePermissionTo('articles');
+
+    expect(runMiddleware($this->permissionMiddleware, 'articles.edit'))->toEqual(200);
+});
+
+it('a user can access a route protected by this permission middleware if have one of the permissions', function () {
+    Auth::login($this->testUser);
+
+    Permission::create(['name' => 'articles.*.test']);
+
+    $this->testUser->givePermissionTo('articles.*.test');
+
+    expect(runMiddleware($this->permissionMiddleware, 'news.edit|articles.create.test'))->toEqual(200);
+
+    expect(runMiddleware($this->permissionMiddleware, ['news.edit', 'articles.create.test']))->toEqual(200);
+});
+
+it('a user cannot access a route protected by the permission middleware if have a different permission', function () {
+    Auth::login($this->testUser);
+
+    Permission::create(['name' => 'articles.*']);
+
+    $this->testUser->givePermissionTo('articles.*');
+
+    expect(runMiddleware($this->permissionMiddleware, 'news.edit'))->toEqual(403);
+});
+
+it('a user cannot access a route protected by permission middleware if have not permissions', function () {
+    Auth::login($this->testUser);
+
+    expect(runMiddleware($this->permissionMiddleware, 'articles.edit|news.edit'))->toEqual(403);
+});
+
+it('a user can access a route protected by permission or role middleware if has this permission or role', function () {
+    Auth::login($this->testUser);
+
+    Permission::create(['name' => 'articles.*']);
+
+    $this->testUser->assignRole('testRole');
+    $this->testUser->givePermissionTo('articles.*');
+
+    expect(runMiddleware($this->roleOrPermissionMiddleware, 'testRole|news.edit|articles.create'))->toEqual(200);
+
+    $this->testUser->removeRole('testRole');
+
+    expect(runMiddleware($this->roleOrPermissionMiddleware, 'testRole|articles.edit'))->toEqual(200);
+
+    $this->testUser->revokePermissionTo('articles.*');
+    $this->testUser->assignRole('testRole');
+
+    expect(runMiddleware($this->roleOrPermissionMiddleware, 'testRole|articles.edit'))->toEqual(200);
+
+    expect(runMiddleware($this->roleOrPermissionMiddleware, ['testRole', 'articles.edit']))->toEqual(200);
+});
+
+it('the required permissions can be fetched from the exception', function () {
+    Auth::login($this->testUser);
+
+    $requiredPermissions = [];
+
+    try {
+        $this->permissionMiddleware->handle(new Request(), function () {
+        return (new Response())->setContent('<html></html>');
+        }, 'permission.some');
+    } catch (UnauthorizedException $e) {
+        $requiredPermissions = $e->getRequiredPermissions();
     }
 
-    /** @test */
-    public function a_guest_cannot_access_a_route_protected_by_the_permission_middleware()
-    {
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->permissionMiddleware, 'articles.edit')
-        );
-    }
-
-    /** @test */
-    public function a_user_can_access_a_route_protected_by_permission_middleware_if_have_this_permission()
-    {
-        Auth::login($this->testUser);
-
-        Permission::create(['name' => 'articles']);
-
-        $this->testUser->givePermissionTo('articles');
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->permissionMiddleware, 'articles.edit')
-        );
-    }
-
-    /** @test */
-    public function a_user_can_access_a_route_protected_by_this_permission_middleware_if_have_one_of_the_permissions()
-    {
-        Auth::login($this->testUser);
-
-        Permission::create(['name' => 'articles.*.test']);
-
-        $this->testUser->givePermissionTo('articles.*.test');
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->permissionMiddleware, 'news.edit|articles.create.test')
-        );
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->permissionMiddleware, ['news.edit', 'articles.create.test'])
-        );
-    }
-
-    /** @test */
-    public function a_user_cannot_access_a_route_protected_by_the_permission_middleware_if_have_a_different_permission()
-    {
-        Auth::login($this->testUser);
-
-        Permission::create(['name' => 'articles.*']);
-
-        $this->testUser->givePermissionTo('articles.*');
-
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->permissionMiddleware, 'news.edit')
-        );
-    }
-
-    /** @test */
-    public function a_user_cannot_access_a_route_protected_by_permission_middleware_if_have_not_permissions()
-    {
-        Auth::login($this->testUser);
-
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->permissionMiddleware, 'articles.edit|news.edit')
-        );
-    }
-
-    /** @test */
-    public function a_user_can_access_a_route_protected_by_permission_or_role_middleware_if_has_this_permission_or_role()
-    {
-        Auth::login($this->testUser);
-
-        Permission::create(['name' => 'articles.*']);
-
-        $this->testUser->assignRole('testRole');
-        $this->testUser->givePermissionTo('articles.*');
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|news.edit|articles.create')
-        );
-
-        $this->testUser->removeRole('testRole');
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|articles.edit')
-        );
-
-        $this->testUser->revokePermissionTo('articles.*');
-        $this->testUser->assignRole('testRole');
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|articles.edit')
-        );
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, ['testRole', 'articles.edit'])
-        );
-    }
-
-    /** @test */
-    public function the_required_permissions_can_be_fetched_from_the_exception()
-    {
-        Auth::login($this->testUser);
-
-        $requiredPermissions = [];
-
-        try {
-            $this->permissionMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
-            }, 'permission.some');
-        } catch (UnauthorizedException $e) {
-            $requiredPermissions = $e->getRequiredPermissions();
-        }
-
-        $this->assertEquals(['permission.some'], $requiredPermissions);
-    }
-
-    protected function runMiddleware($middleware, $parameter)
-    {
-        try {
-            return $middleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
-            }, $parameter)->status();
-        } catch (UnauthorizedException $e) {
-            return $e->getStatusCode();
-        }
-    }
-}
+    expect($requiredPermissions)->toEqual(['permission.some']);
+});

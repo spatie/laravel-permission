@@ -1,231 +1,200 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Exceptions\WildcardPermissionInvalidArgument;
 use Spatie\Permission\Exceptions\WildcardPermissionNotProperlyFormatted;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Tests\TestModels\User;
+use Spatie\Permission\Tests\TestModels\WildcardPermission;
 
-class WildcardHasPermissionsTest extends TestCase
-{
-    /** @test */
-    public function it_can_check_wildcard_permission()
-    {
-        app('config')->set('permission.enable_wildcard_permission', true);
+it('can check wildcard permission', function () {
+    app('config')->set('permission.enable_wildcard_permission', true);
 
-        $user1 = User::create(['email' => 'user1@test.com']);
+    $user1 = User::create(['email' => 'user1@test.com']);
 
-        $permission1 = Permission::create(['name' => 'articles.edit,view,create']);
-        $permission2 = Permission::create(['name' => 'news.*']);
-        $permission3 = Permission::create(['name' => 'posts.*']);
+    $permission1 = Permission::create(['name' => 'articles.edit,view,create']);
+    $permission2 = Permission::create(['name' => 'news.*']);
+    $permission3 = Permission::create(['name' => 'posts.*']);
 
-        $user1->givePermissionTo([$permission1, $permission2, $permission3]);
+    $user1->givePermissionTo([$permission1, $permission2, $permission3]);
 
-        $this->assertTrue($user1->hasPermissionTo('posts.create'));
-        $this->assertTrue($user1->hasPermissionTo('posts.create.123'));
-        $this->assertTrue($user1->hasPermissionTo('posts.*'));
-        $this->assertTrue($user1->hasPermissionTo('articles.view'));
-        $this->assertFalse($user1->hasPermissionTo('projects.view'));
-    }
+    expect($user1->hasPermissionTo('posts.create'))->toBeTrue();
+    expect($user1->hasPermissionTo('posts.create.123'))->toBeTrue();
+    expect($user1->hasPermissionTo('posts.*'))->toBeTrue();
+    expect($user1->hasPermissionTo('articles.view'))->toBeTrue();
+    expect($user1->hasPermissionTo('projects.view'))->toBeFalse();
+});
 
-    /** @test */
-    public function it_can_check_wildcard_permissions_via_roles()
-    {
-        app('config')->set('permission.enable_wildcard_permission', true);
+it('can check wildcard permissions via roles', function () {
+    app('config')->set('permission.enable_wildcard_permission', true);
 
-        $user1 = User::create(['email' => 'user1@test.com']);
+    $user1 = User::create(['email' => 'user1@test.com']);
 
-        $user1->assignRole('testRole');
+    $user1->assignRole('testRole');
 
-        $permission1 = Permission::create(['name' => 'articles,projects.edit,view,create']);
-        $permission2 = Permission::create(['name' => 'news.*.456']);
-        $permission3 = Permission::create(['name' => 'posts']);
+    $permission1 = Permission::create(['name' => 'articles,projects.edit,view,create']);
+    $permission2 = Permission::create(['name' => 'news.*.456']);
+    $permission3 = Permission::create(['name' => 'posts']);
 
-        $this->testUserRole->givePermissionTo([$permission1, $permission2, $permission3]);
+    $this->testUserRole->givePermissionTo([$permission1, $permission2, $permission3]);
 
-        $this->assertTrue($user1->hasPermissionTo('posts.create'));
-        $this->assertTrue($user1->hasPermissionTo('news.create.456'));
-        $this->assertTrue($user1->hasPermissionTo('projects.create'));
-        $this->assertTrue($user1->hasPermissionTo('articles.view'));
-        $this->assertFalse($user1->hasPermissionTo('articles.list'));
-        $this->assertFalse($user1->hasPermissionTo('projects.list'));
-    }
+    expect($user1->hasPermissionTo('posts.create'))->toBeTrue();
+    expect($user1->hasPermissionTo('news.create.456'))->toBeTrue();
+    expect($user1->hasPermissionTo('projects.create'))->toBeTrue();
+    expect($user1->hasPermissionTo('articles.view'))->toBeTrue();
+    expect($user1->hasPermissionTo('articles.list'))->toBeFalse();
+    expect($user1->hasPermissionTo('projects.list'))->toBeFalse();
+});
 
-    /** @test */
-    public function it_can_check_custom_wildcard_permission()
-    {
-        app('config')->set('permission.enable_wildcard_permission', true);
-        app('config')->set('permission.wildcard_permission', WildcardPermission::class);
+it('can check custom wildcard permission', function () {
+    app('config')->set('permission.enable_wildcard_permission', true);
+    app('config')->set('permission.wildcard_permission', WildcardPermission::class);
 
-        $user1 = User::create(['email' => 'user1@test.com']);
+    $user1 = User::create(['email' => 'user1@test.com']);
 
-        $permission1 = Permission::create(['name' => 'articles:edit;view;create']);
-        $permission2 = Permission::create(['name' => 'news:@']);
-        $permission3 = Permission::create(['name' => 'posts:@']);
+    $permission1 = Permission::create(['name' => 'articles:edit;view;create']);
+    $permission2 = Permission::create(['name' => 'news:@']);
+    $permission3 = Permission::create(['name' => 'posts:@']);
 
-        $user1->givePermissionTo([$permission1, $permission2, $permission3]);
+    $user1->givePermissionTo([$permission1, $permission2, $permission3]);
 
-        $this->assertTrue($user1->hasPermissionTo('posts:create'));
-        $this->assertTrue($user1->hasPermissionTo('posts:create:123'));
-        $this->assertTrue($user1->hasPermissionTo('posts:@'));
-        $this->assertTrue($user1->hasPermissionTo('articles:view'));
-        $this->assertFalse($user1->hasPermissionTo('posts.*'));
-        $this->assertFalse($user1->hasPermissionTo('articles.view'));
-        $this->assertFalse($user1->hasPermissionTo('projects:view'));
-    }
+    expect($user1->hasPermissionTo('posts:create'))->toBeTrue();
+    expect($user1->hasPermissionTo('posts:create:123'))->toBeTrue();
+    expect($user1->hasPermissionTo('posts:@'))->toBeTrue();
+    expect($user1->hasPermissionTo('articles:view'))->toBeTrue();
+    expect($user1->hasPermissionTo('posts.*'))->toBeFalse();
+    expect($user1->hasPermissionTo('articles.view'))->toBeFalse();
+    expect($user1->hasPermissionTo('projects:view'))->toBeFalse();
+});
 
-    /** @test */
-    public function it_can_check_custom_wildcard_permissions_via_roles()
-    {
-        app('config')->set('permission.enable_wildcard_permission', true);
-        app('config')->set('permission.wildcard_permission', WildcardPermission::class);
+it('can check custom wildcard permissions via roles', function () {
+    app('config')->set('permission.enable_wildcard_permission', true);
+    app('config')->set('permission.wildcard_permission', WildcardPermission::class);
 
-        $user1 = User::create(['email' => 'user1@test.com']);
+    $user1 = User::create(['email' => 'user1@test.com']);
 
-        $user1->assignRole('testRole');
+    $user1->assignRole('testRole');
 
-        $permission1 = Permission::create(['name' => 'articles;projects:edit;view;create']);
-        $permission2 = Permission::create(['name' => 'news:@:456']);
-        $permission3 = Permission::create(['name' => 'posts']);
+    $permission1 = Permission::create(['name' => 'articles;projects:edit;view;create']);
+    $permission2 = Permission::create(['name' => 'news:@:456']);
+    $permission3 = Permission::create(['name' => 'posts']);
 
-        $this->testUserRole->givePermissionTo([$permission1, $permission2, $permission3]);
+    $this->testUserRole->givePermissionTo([$permission1, $permission2, $permission3]);
 
-        $this->assertTrue($user1->hasPermissionTo('posts:create'));
-        $this->assertTrue($user1->hasPermissionTo('news:create:456'));
-        $this->assertTrue($user1->hasPermissionTo('projects:create'));
-        $this->assertTrue($user1->hasPermissionTo('articles:view'));
-        $this->assertFalse($user1->hasPermissionTo('news.create.456'));
-        $this->assertFalse($user1->hasPermissionTo('projects.create'));
-        $this->assertFalse($user1->hasPermissionTo('articles:list'));
-        $this->assertFalse($user1->hasPermissionTo('projects:list'));
-    }
+    expect($user1->hasPermissionTo('posts:create'))->toBeTrue();
+    expect($user1->hasPermissionTo('news:create:456'))->toBeTrue();
+    expect($user1->hasPermissionTo('projects:create'))->toBeTrue();
+    expect($user1->hasPermissionTo('articles:view'))->toBeTrue();
+    expect($user1->hasPermissionTo('news.create.456'))->toBeFalse();
+    expect($user1->hasPermissionTo('projects.create'))->toBeFalse();
+    expect($user1->hasPermissionTo('articles:list'))->toBeFalse();
+    expect($user1->hasPermissionTo('projects:list'))->toBeFalse();
+});
 
-    /** @test */
-    public function it_can_check_non_wildcard_permissions()
-    {
-        app('config')->set('permission.enable_wildcard_permission', true);
+it('can check non wildcard permissions', function () {
+    app('config')->set('permission.enable_wildcard_permission', true);
 
-        $user1 = User::create(['email' => 'user1@test.com']);
+    $user1 = User::create(['email' => 'user1@test.com']);
 
-        $permission1 = Permission::create(['name' => 'edit articles']);
-        $permission2 = Permission::create(['name' => 'create news']);
-        $permission3 = Permission::create(['name' => 'update comments']);
+    $permission1 = Permission::create(['name' => 'edit articles']);
+    $permission2 = Permission::create(['name' => 'create news']);
+    $permission3 = Permission::create(['name' => 'update comments']);
 
-        $user1->givePermissionTo([$permission1, $permission2, $permission3]);
+    $user1->givePermissionTo([$permission1, $permission2, $permission3]);
 
-        $this->assertTrue($user1->hasPermissionTo('edit articles'));
-        $this->assertTrue($user1->hasPermissionTo('create news'));
-        $this->assertTrue($user1->hasPermissionTo('update comments'));
-    }
+    expect($user1->hasPermissionTo('edit articles'))->toBeTrue();
+    expect($user1->hasPermissionTo('create news'))->toBeTrue();
+    expect($user1->hasPermissionTo('update comments'))->toBeTrue();
+});
 
-    /** @test */
-    public function it_can_verify_complex_wildcard_permissions()
-    {
-        app('config')->set('permission.enable_wildcard_permission', true);
+it('can verify complex wildcard permissions', function () {
+    app('config')->set('permission.enable_wildcard_permission', true);
 
-        $user1 = User::create(['email' => 'user1@test.com']);
+    $user1 = User::create(['email' => 'user1@test.com']);
 
-        $permission1 = Permission::create(['name' => '*.create,update,delete.*.test,course,finance']);
-        $permission2 = Permission::create(['name' => 'papers,posts,projects,orders.*.test,test1,test2.*']);
-        $permission3 = Permission::create(['name' => 'User::class.create,edit,view']);
+    $permission1 = Permission::create(['name' => '*.create,update,delete.*.test,course,finance']);
+    $permission2 = Permission::create(['name' => 'papers,posts,projects,orders.*.test,test1,test2.*']);
+    $permission3 = Permission::create(['name' => 'User::class.create,edit,view']);
 
-        $user1->givePermissionTo([$permission1, $permission2, $permission3]);
+    $user1->givePermissionTo([$permission1, $permission2, $permission3]);
 
-        $this->assertTrue($user1->hasPermissionTo('invoices.delete.367463.finance'));
-        $this->assertTrue($user1->hasPermissionTo('projects.update.test2.test3'));
-        $this->assertTrue($user1->hasPermissionTo('User::class.edit'));
-        $this->assertFalse($user1->hasPermissionTo('User::class.delete'));
-        $this->assertFalse($user1->hasPermissionTo('User::class.*'));
-    }
+    expect($user1->hasPermissionTo('invoices.delete.367463.finance'))->toBeTrue();
+    expect($user1->hasPermissionTo('projects.update.test2.test3'))->toBeTrue();
+    expect($user1->hasPermissionTo('User::class.edit'))->toBeTrue();
+    expect($user1->hasPermissionTo('User::class.delete'))->toBeFalse();
+    expect($user1->hasPermissionTo('User::class.*'))->toBeFalse();
+});
 
-    /** @test */
-    public function it_throws_exception_when_wildcard_permission_is_not_properly_formatted()
-    {
-        app('config')->set('permission.enable_wildcard_permission', true);
+it('throws exception when wildcard permission is not properly formatted', function () {
+    app('config')->set('permission.enable_wildcard_permission', true);
 
-        $user1 = User::create(['email' => 'user1@test.com']);
+    $user1 = User::create(['email' => 'user1@test.com']);
 
-        $permission = Permission::create(['name' => '*..']);
+    $permission = Permission::create(['name' => '*..']);
 
-        $user1->givePermissionTo([$permission]);
+    $user1->givePermissionTo([$permission]);
 
-        $this->expectException(WildcardPermissionNotProperlyFormatted::class);
+    $user1->hasPermissionTo('invoices.*');
+})->throws(WildcardPermissionNotProperlyFormatted::class);
 
-        $user1->hasPermissionTo('invoices.*');
-    }
+it('can verify permission instances not assigned to user', function () {
+    app('config')->set('permission.enable_wildcard_permission', true);
 
-    /** @test */
-    public function it_can_verify_permission_instances_not_assigned_to_user()
-    {
-        app('config')->set('permission.enable_wildcard_permission', true);
+    $user = User::create(['email' => 'user@test.com']);
 
-        $user = User::create(['email' => 'user@test.com']);
+    $userPermission = Permission::create(['name' => 'posts.*']);
+    $permissionToVerify = Permission::create(['name' => 'posts.create']);
 
-        $userPermission = Permission::create(['name' => 'posts.*']);
-        $permissionToVerify = Permission::create(['name' => 'posts.create']);
+    $user->givePermissionTo([$userPermission]);
 
-        $user->givePermissionTo([$userPermission]);
+    expect($user->hasPermissionTo('posts.create'))->toBeTrue()
+        ->and($user->hasPermissionTo('posts.create.123'))->toBeTrue()
+        ->and($user->hasPermissionTo($permissionToVerify->id))->toBeTrue()
+        ->and($user->hasPermissionTo($permissionToVerify))->toBeTrue();
+});
 
-        $this->assertTrue($user->hasPermissionTo('posts.create'));
-        $this->assertTrue($user->hasPermissionTo('posts.create.123'));
-        $this->assertTrue($user->hasPermissionTo($permissionToVerify->id));
-        $this->assertTrue($user->hasPermissionTo($permissionToVerify));
-    }
+it('can verify permission instances assigned to user', function () {
+    app('config')->set('permission.enable_wildcard_permission', true);
 
-    /** @test */
-    public function it_can_verify_permission_instances_assigned_to_user()
-    {
-        app('config')->set('permission.enable_wildcard_permission', true);
+    $user = User::create(['email' => 'user@test.com']);
 
-        $user = User::create(['email' => 'user@test.com']);
+    $userPermission = Permission::create(['name' => 'posts.*']);
+    $permissionToVerify = Permission::create(['name' => 'posts.create']);
 
-        $userPermission = Permission::create(['name' => 'posts.*']);
-        $permissionToVerify = Permission::create(['name' => 'posts.create']);
+    $user->givePermissionTo([$userPermission, $permissionToVerify]);
 
-        $user->givePermissionTo([$userPermission, $permissionToVerify]);
+    expect($user->hasPermissionTo('posts.create'))->toBeTrue()
+        ->and($user->hasPermissionTo('posts.create.123'))->toBeTrue()
+        ->and($user->hasPermissionTo($permissionToVerify))->toBeTrue()
+        ->and($user->hasPermissionTo($userPermission))->toBeTrue();
+});
 
-        $this->assertTrue($user->hasPermissionTo('posts.create'));
-        $this->assertTrue($user->hasPermissionTo('posts.create.123'));
-        $this->assertTrue($user->hasPermissionTo($permissionToVerify));
-        $this->assertTrue($user->hasPermissionTo($userPermission));
-    }
+it('can verify integers as strings', function () {
+    app('config')->set('permission.enable_wildcard_permission', true);
 
-    /** @test */
-    public function it_can_verify_integers_as_strings()
-    {
-        app('config')->set('permission.enable_wildcard_permission', true);
+    $user = User::create(['email' => 'user@test.com']);
 
-        $user = User::create(['email' => 'user@test.com']);
+    $userPermission = Permission::create(['name' => '8']);
 
-        $userPermission = Permission::create(['name' => '8']);
+    $user->givePermissionTo([$userPermission]);
 
-        $user->givePermissionTo([$userPermission]);
+    expect($user->hasPermissionTo('8'))->toBeTrue();
+});
 
-        $this->assertTrue($user->hasPermissionTo('8'));
-    }
+it('throws exception when permission has invalid arguments', function () {
+    app('config')->set('permission.enable_wildcard_permission', true);
 
-    /** @test */
-    public function it_throws_exception_when_permission_has_invalid_arguments()
-    {
-        app('config')->set('permission.enable_wildcard_permission', true);
+    $user = User::create(['email' => 'user@test.com']);
 
-        $user = User::create(['email' => 'user@test.com']);
+    $user->hasPermissionTo(['posts.create']);
+})->throws(WildcardPermissionInvalidArgument::class);
 
-        $this->expectException(WildcardPermissionInvalidArgument::class);
+it('throws exception when permission id not exists', function () {
+    app('config')->set('permission.enable_wildcard_permission', true);
 
-        $user->hasPermissionTo(['posts.create']);
-    }
+    $user = User::create(['email' => 'user@test.com']);
 
-    /** @test */
-    public function it_throws_exception_when_permission_id_not_exists()
-    {
-        app('config')->set('permission.enable_wildcard_permission', true);
-
-        $user = User::create(['email' => 'user@test.com']);
-
-        $this->expectException(PermissionDoesNotExist::class);
-
-        $user->hasPermissionTo(6);
-    }
-}
+    $user->hasPermissionTo(6);
+})->throws(PermissionDoesNotExist::class);

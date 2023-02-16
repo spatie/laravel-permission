@@ -1,621 +1,491 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
-use DB;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
+use Spatie\Permission\Tests\TestModels\SoftDeletingUser;
+use Spatie\Permission\Tests\TestModels\User;
+
+it('can assign a permission to a user', function () {
+    $this->testUser->givePermissionTo($this->testUserPermission);
+
+    expect($this->testUser->hasPermissionTo($this->testUserPermission))->toBeTrue();
+});
+
+it('throws an exception when assigning a permission that does not exist', function () {
+    $this->testUser->givePermissionTo('permission-does-not-exist');
+})->throws(PermissionDoesNotExist::class);
+
+it('throws an exception when assigning a permission to a user from a different guard', function () {
+    expect(fn () => $this->testUser->givePermissionTo($this->testAdminPermission))->toThrow(GuardDoesNotMatch::class)
+        ->and(fn () => $this->testUser->givePermissionTo('admin-permission'))->toThrow(PermissionDoesNotExist::class);
+});
+
+it('can revoke a permission from a user', function () {
+    $this->testUser->givePermissionTo($this->testUserPermission);
 
-class HasPermissionsTest extends TestCase
-{
-    /** @test */
-    public function it_can_assign_a_permission_to_a_user()
-    {
-        $this->testUser->givePermissionTo($this->testUserPermission);
-
-        $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission));
-    }
-
-    /** @test */
-    public function it_throws_an_exception_when_assigning_a_permission_that_does_not_exist()
-    {
-        $this->expectException(PermissionDoesNotExist::class);
-
-        $this->testUser->givePermissionTo('permission-does-not-exist');
-    }
-
-    /** @test */
-    public function it_throws_an_exception_when_assigning_a_permission_to_a_user_from_a_different_guard()
-    {
-        $this->expectException(GuardDoesNotMatch::class);
-
-        $this->testUser->givePermissionTo($this->testAdminPermission);
-
-        $this->expectException(PermissionDoesNotExist::class);
-
-        $this->testUser->givePermissionTo('admin-permission');
-    }
-
-    /** @test */
-    public function it_can_revoke_a_permission_from_a_user()
-    {
-        $this->testUser->givePermissionTo($this->testUserPermission);
-
-        $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission));
-
-        $this->testUser->revokePermissionTo($this->testUserPermission);
-
-        $this->assertFalse($this->testUser->hasPermissionTo($this->testUserPermission));
-    }
-
-    /** @test */
-    public function it_can_scope_users_using_a_string()
-    {
-        $user1 = User::create(['email' => 'user1@test.com']);
-        $user2 = User::create(['email' => 'user2@test.com']);
-        $user1->givePermissionTo(['edit-articles', 'edit-news']);
-        $this->testUserRole->givePermissionTo('edit-articles');
-        $user2->assignRole('testRole');
-
-        $scopedUsers1 = User::permission('edit-articles')->get();
-        $scopedUsers2 = User::permission(['edit-news'])->get();
-
-        $this->assertEquals(2, $scopedUsers1->count());
-        $this->assertEquals(1, $scopedUsers2->count());
-    }
-
-    /** @test */
-    public function it_can_scope_users_using_a_int()
-    {
-        $user1 = User::create(['email' => 'user1@test.com']);
-        $user2 = User::create(['email' => 'user2@test.com']);
-        $user1->givePermissionTo([1, 2]);
-        $this->testUserRole->givePermissionTo(1);
-        $user2->assignRole('testRole');
-
-        $scopedUsers1 = User::permission(1)->get();
-        $scopedUsers2 = User::permission([2])->get();
-
-        $this->assertEquals(2, $scopedUsers1->count());
-        $this->assertEquals(1, $scopedUsers2->count());
-    }
-
-    /** @test */
-    public function it_can_scope_users_using_an_array()
-    {
-        $user1 = User::create(['email' => 'user1@test.com']);
-        $user2 = User::create(['email' => 'user2@test.com']);
-        $user1->givePermissionTo(['edit-articles', 'edit-news']);
-        $this->testUserRole->givePermissionTo('edit-articles');
-        $user2->assignRole('testRole');
-
-        $scopedUsers1 = User::permission(['edit-articles', 'edit-news'])->get();
-        $scopedUsers2 = User::permission(['edit-news'])->get();
-
-        $this->assertEquals(2, $scopedUsers1->count());
-        $this->assertEquals(1, $scopedUsers2->count());
-    }
-
-    /** @test */
-    public function it_can_scope_users_using_a_collection()
-    {
-        $user1 = User::create(['email' => 'user1@test.com']);
-        $user2 = User::create(['email' => 'user2@test.com']);
-        $user1->givePermissionTo(['edit-articles', 'edit-news']);
-        $this->testUserRole->givePermissionTo('edit-articles');
-        $user2->assignRole('testRole');
-
-        $scopedUsers1 = User::permission(collect(['edit-articles', 'edit-news']))->get();
-        $scopedUsers2 = User::permission(collect(['edit-news']))->get();
+    expect($this->testUser->hasPermissionTo($this->testUserPermission))->toBeTrue();
+
+    $this->testUser->revokePermissionTo($this->testUserPermission);
 
-        $this->assertEquals(2, $scopedUsers1->count());
-        $this->assertEquals(1, $scopedUsers2->count());
-    }
+    expect($this->testUser->hasPermissionTo($this->testUserPermission))->toBeFalse();
+});
 
-    /** @test */
-    public function it_can_scope_users_using_an_object()
-    {
-        $user1 = User::create(['email' => 'user1@test.com']);
-        $user1->givePermissionTo($this->testUserPermission->name);
+it('can scope users using a string', function () {
+    $user1 = User::create(['email' => 'user1@test.com']);
+    $user2 = User::create(['email' => 'user2@test.com']);
+    $user1->givePermissionTo(['edit-articles', 'edit-news']);
+    $this->testUserRole->givePermissionTo('edit-articles');
+    $user2->assignRole('testRole');
 
-        $scopedUsers1 = User::permission($this->testUserPermission)->get();
-        $scopedUsers2 = User::permission([$this->testUserPermission])->get();
-        $scopedUsers3 = User::permission(collect([$this->testUserPermission]))->get();
+    $scopedUsers1 = User::permission('edit-articles')->get();
+    $scopedUsers2 = User::permission(['edit-news'])->get();
 
-        $this->assertEquals(1, $scopedUsers1->count());
-        $this->assertEquals(1, $scopedUsers2->count());
-        $this->assertEquals(1, $scopedUsers3->count());
-    }
+    expect($scopedUsers1->count())->toEqual(2)
+        ->and($scopedUsers2->count())->toEqual(1);
+});
 
-    /** @test */
-    public function it_can_scope_users_without_permissions_only_role()
-    {
-        $user1 = User::create(['email' => 'user1@test.com']);
-        $user2 = User::create(['email' => 'user2@test.com']);
-        $this->testUserRole->givePermissionTo('edit-articles');
-        $user1->assignRole('testRole');
-        $user2->assignRole('testRole');
+it('can scope users using a int', function () {
+    $user1 = User::create(['email' => 'user1@test.com']);
+    $user2 = User::create(['email' => 'user2@test.com']);
+    $user1->givePermissionTo([1, 2]);
+    $this->testUserRole->givePermissionTo(1);
+    $user2->assignRole('testRole');
 
-        $scopedUsers = User::permission('edit-articles')->get();
+    $scopedUsers1 = User::permission(1)->get();
+    $scopedUsers2 = User::permission([2])->get();
 
-        $this->assertEquals(2, $scopedUsers->count());
-    }
+    expect($scopedUsers1->count())->toEqual(2)
+        ->and($scopedUsers2->count())->toEqual(1);
+})->skip(fn () => $this->useCustomModels);
 
-    /** @test */
-    public function it_can_scope_users_without_permissions_only_permission()
-    {
-        $user1 = User::create(['email' => 'user1@test.com']);
-        $user2 = User::create(['email' => 'user2@test.com']);
-        $user1->givePermissionTo(['edit-news']);
-        $user2->givePermissionTo(['edit-articles', 'edit-news']);
+it('can scope users using an array', function () {
+    $user1 = User::create(['email' => 'user1@test.com']);
+    $user2 = User::create(['email' => 'user2@test.com']);
+    $user1->givePermissionTo(['edit-articles', 'edit-news']);
+    $this->testUserRole->givePermissionTo('edit-articles');
+    $user2->assignRole('testRole');
 
-        $scopedUsers = User::permission('edit-news')->get();
+    $scopedUsers1 = User::permission(['edit-articles', 'edit-news'])->get();
+    $scopedUsers2 = User::permission(['edit-news'])->get();
 
-        $this->assertEquals(2, $scopedUsers->count());
-    }
+    expect($scopedUsers1->count())->toEqual(2)
+        ->and($scopedUsers2->count())->toEqual(1);
+});
 
-    /** @test */
-    public function it_throws_an_exception_when_calling_hasPermissionTo_with_an_invalid_type()
-    {
-        $user = User::create(['email' => 'user1@test.com']);
+it('can scope users using a collection', function () {
+    $user1 = User::create(['email' => 'user1@test.com']);
+    $user2 = User::create(['email' => 'user2@test.com']);
+    $user1->givePermissionTo(['edit-articles', 'edit-news']);
+    $this->testUserRole->givePermissionTo('edit-articles');
+    $user2->assignRole('testRole');
 
-        $this->expectException(PermissionDoesNotExist::class);
+    $scopedUsers1 = User::permission(collect(['edit-articles', 'edit-news']))->get();
+    $scopedUsers2 = User::permission(collect(['edit-news']))->get();
 
-        $user->hasPermissionTo(new \stdClass());
-    }
+    expect($scopedUsers1->count())->toEqual(2)
+        ->and($scopedUsers2->count())->toEqual(1);
+});
 
-    /** @test */
-    public function it_throws_an_exception_when_calling_hasPermissionTo_with_null()
-    {
-        $user = User::create(['email' => 'user1@test.com']);
+it('can scope users using an object', function () {
+    $user1 = User::create(['email' => 'user1@test.com']);
+    $user1->givePermissionTo($this->testUserPermission->name);
 
-        $this->expectException(PermissionDoesNotExist::class);
+    $scopedUsers1 = User::permission($this->testUserPermission)->get();
+    $scopedUsers2 = User::permission([$this->testUserPermission])->get();
+    $scopedUsers3 = User::permission(collect([$this->testUserPermission]))->get();
 
-        $user->hasPermissionTo(null);
-    }
+    expect($scopedUsers1->count())->toEqual(1)
+        ->and($scopedUsers2->count())->toEqual(1)
+        ->and($scopedUsers3->count())->toEqual(1);
+});
 
-    /** @test */
-    public function it_throws_an_exception_when_calling_hasDirectPermission_with_an_invalid_type()
-    {
-        $user = User::create(['email' => 'user1@test.com']);
+it('can scope users without permissions only role', function () {
+    $user1 = User::create(['email' => 'user1@test.com']);
+    $user2 = User::create(['email' => 'user2@test.com']);
+    $this->testUserRole->givePermissionTo('edit-articles');
+    $user1->assignRole('testRole');
+    $user2->assignRole('testRole');
 
-        $this->expectException(PermissionDoesNotExist::class);
+    $scopedUsers = User::permission('edit-articles')->get();
 
-        $user->hasDirectPermission(new \stdClass());
-    }
+    expect($scopedUsers->count())->toEqual(2);
+});
 
-    /** @test */
-    public function it_throws_an_exception_when_calling_hasDirectPermission_with_null()
-    {
-        $user = User::create(['email' => 'user1@test.com']);
+it('can scope users without permissions only permission', function () {
+    $user1 = User::create(['email' => 'user1@test.com']);
+    $user2 = User::create(['email' => 'user2@test.com']);
+    $user1->givePermissionTo(['edit-news']);
+    $user2->givePermissionTo(['edit-articles', 'edit-news']);
 
-        $this->expectException(PermissionDoesNotExist::class);
+    $scopedUsers = User::permission('edit-news')->get();
 
-        $user->hasDirectPermission(null);
-    }
+    expect($scopedUsers->count())->toEqual(2);
+});
 
-    /** @test */
-    public function it_throws_an_exception_when_trying_to_scope_a_non_existing_permission()
-    {
-        $this->expectException(PermissionDoesNotExist::class);
+it('throws an exception when calling hasPermissionTo with an invalid type', function () {
+    $user = User::create(['email' => 'user1@test.com']);
 
-        User::permission('not defined permission')->get();
-    }
+    $user->hasPermissionTo(new \stdClass());
+})->throws(PermissionDoesNotExist::class);
 
-    /** @test */
-    public function it_throws_an_exception_when_trying_to_scope_a_permission_from_another_guard()
-    {
-        $this->expectException(PermissionDoesNotExist::class);
+it('throws an exception when calling hasPermissionTo with null', function () {
+    $user = User::create(['email' => 'user1@test.com']);
 
-        User::permission('testAdminPermission')->get();
+    $user->hasPermissionTo(null);
+})->throws(PermissionDoesNotExist::class);
 
-        $this->expectException(GuardDoesNotMatch::class);
+it('throws an exception when calling hasDirectPermission with an invalid type', function () {
+    $user = User::create(['email' => 'user1@test.com']);
 
-        User::permission($this->testAdminPermission)->get();
-    }
+    $user->hasDirectPermission(new \stdClass());
+})->throws(PermissionDoesNotExist::class);
 
-    /** @test */
-    public function it_doesnt_detach_permissions_when_soft_deleting()
-    {
-        $user = SoftDeletingUser::create(['email' => 'test@example.com']);
-        $user->givePermissionTo(['edit-news']);
-        $user->delete();
+it('throws an exception when calling hasDirectPermission with null', function () {
+    $user = User::create(['email' => 'user1@test.com']);
 
-        $user = SoftDeletingUser::withTrashed()->find($user->id);
+    $user->hasDirectPermission(null);
+})->throws(PermissionDoesNotExist::class);
 
-        $this->assertTrue($user->hasPermissionTo('edit-news'));
-    }
+it('throws an exception when trying to scope a non existing permission', function () {
+    User::permission('not defined permission')->get();
+})->throws(PermissionDoesNotExist::class);
 
-    /** @test */
-    public function it_can_give_and_revoke_multiple_permissions()
-    {
-        $this->testUserRole->givePermissionTo(['edit-articles', 'edit-news']);
+it('throws an exception when trying to scope a permission from another guard', function () {
+    $this->expectException(PermissionDoesNotExist::class);
 
-        $this->assertEquals(2, $this->testUserRole->permissions()->count());
+    User::permission('testAdminPermission')->get();
 
-        $this->testUserRole->revokePermissionTo(['edit-articles', 'edit-news']);
+    $this->expectException(GuardDoesNotMatch::class);
 
-        $this->assertEquals(0, $this->testUserRole->permissions()->count());
-    }
+    User::permission($this->testAdminPermission)->get();
+});
 
-    /** @test */
-    public function it_can_give_and_revoke_permissions_models_array()
-    {
-        $models = [app(Permission::class)::where('name', 'edit-articles')->first(), app(Permission::class)::where('name', 'edit-news')->first()];
+it('doesnt detach permissions when soft deleting', function () {
+    $user = SoftDeletingUser::create(['email' => 'test@example.com']);
+    $user->givePermissionTo(['edit-news']);
+    $user->delete();
 
-        $this->testUserRole->givePermissionTo($models);
+    $user = SoftDeletingUser::withTrashed()->find($user->id);
 
-        $this->assertEquals(2, $this->testUserRole->permissions()->count());
+    expect($user->hasPermissionTo('edit-news'))->toBeTrue();
+});
 
-        $this->testUserRole->revokePermissionTo($models);
+it('can give and revoke multiple permissions', function () {
+    $this->testUserRole->givePermissionTo(['edit-articles', 'edit-news']);
 
-        $this->assertEquals(0, $this->testUserRole->permissions()->count());
-    }
+    expect($this->testUserRole->permissions()->count())->toEqual(2);
 
-    /** @test */
-    public function it_can_give_and_revoke_permissions_models_collection()
-    {
-        $models = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-news'])->get();
+    $this->testUserRole->revokePermissionTo(['edit-articles', 'edit-news']);
 
-        $this->testUserRole->givePermissionTo($models);
+    expect($this->testUserRole->permissions()->count())->toEqual(0);
+});
 
-        $this->assertEquals(2, $this->testUserRole->permissions()->count());
+it('can give and revoke permissions models array', function () {
+    $models = [app(Permission::class)::where('name', 'edit-articles')->first(), app(Permission::class)::where('name', 'edit-news')->first()];
 
-        $this->testUserRole->revokePermissionTo($models);
+    $this->testUserRole->givePermissionTo($models);
 
-        $this->assertEquals(0, $this->testUserRole->permissions()->count());
-    }
+    expect($this->testUserRole->permissions()->count())->toEqual(2);
 
-    /** @test */
-    public function it_can_determine_that_the_user_does_not_have_a_permission()
-    {
-        $this->assertFalse($this->testUser->hasPermissionTo('edit-articles'));
-    }
+    $this->testUserRole->revokePermissionTo($models);
 
-    /** @test */
-    public function it_throws_an_exception_when_the_permission_does_not_exist()
-    {
-        $this->expectException(PermissionDoesNotExist::class);
+    expect($this->testUserRole->permissions()->count())->toEqual(0);
+});
 
-        $this->testUser->hasPermissionTo('does-not-exist');
-    }
+it('can give and revoke permissions models collection', function () {
+    $models = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-news'])->get();
 
-    /** @test */
-    public function it_throws_an_exception_when_the_permission_does_not_exist_for_this_guard()
-    {
-        $this->expectException(PermissionDoesNotExist::class);
+    $this->testUserRole->givePermissionTo($models);
 
-        $this->testUser->hasPermissionTo('does-not-exist', 'web');
-    }
+    expect($this->testUserRole->permissions()->count())->toEqual(2);
 
-    /** @test */
-    public function it_can_reject_a_user_that_does_not_have_any_permissions_at_all()
-    {
-        $user = new User();
+    $this->testUserRole->revokePermissionTo($models);
 
-        $this->assertFalse($user->hasPermissionTo('edit-articles'));
-    }
+    expect($this->testUserRole->permissions()->count())->toEqual(0);
+});
 
-    /** @test */
-    public function it_can_determine_that_the_user_has_any_of_the_permissions_directly()
-    {
-        $this->assertFalse($this->testUser->hasAnyPermission('edit-articles'));
+it('can determine that the user does not have a permission', function () {
+    expect($this->testUser->hasPermissionTo('edit-articles'))->toBeFalse();
+});
 
-        $this->testUser->givePermissionTo('edit-articles');
+it('throws an exception when the permission does not exist', function () {
+    $this->testUser->hasPermissionTo('does-not-exist');
+})->throws(PermissionDoesNotExist::class);
 
-        $this->assertTrue($this->testUser->hasAnyPermission('edit-news', 'edit-articles'));
+it('throws an exception when the permission does not exist for this guard', function () {
+    $this->testUser->hasPermissionTo('does-not-exist', 'web');
+})->throws(PermissionDoesNotExist::class);
 
-        $this->testUser->givePermissionTo('edit-news');
+it('can reject a user that does not have any permissions at all', function () {
+    $user = new User();
 
-        $this->testUser->revokePermissionTo($this->testUserPermission);
+    expect($user->hasPermissionTo('edit-articles'))->toBeFalse();
+});
 
-        $this->assertTrue($this->testUser->hasAnyPermission('edit-articles', 'edit-news'));
-        $this->assertFalse($this->testUser->hasAnyPermission('edit-blog', 'Edit News', ['Edit News']));
-    }
+it('can determine that the user has any of the permissions directly', function () {
+    expect($this->testUser->hasAnyPermission('edit-articles'))->toBeFalse();
 
-    /** @test */
-    public function it_can_determine_that_the_user_has_any_of_the_permissions_directly_using_an_array()
-    {
-        $this->assertFalse($this->testUser->hasAnyPermission(['edit-articles']));
+    $this->testUser->givePermissionTo('edit-articles');
 
-        $this->testUser->givePermissionTo('edit-articles');
+    expect($this->testUser->hasAnyPermission('edit-news', 'edit-articles'))->toBeTrue();
 
-        $this->assertTrue($this->testUser->hasAnyPermission(['edit-news', 'edit-articles']));
+    $this->testUser->givePermissionTo('edit-news');
 
-        $this->testUser->givePermissionTo('edit-news');
+    $this->testUser->revokePermissionTo($this->testUserPermission);
 
-        $this->testUser->revokePermissionTo($this->testUserPermission);
+    expect($this->testUser->hasAnyPermission('edit-articles', 'edit-news'))->toBeTrue()
+        ->and($this->testUser->hasAnyPermission('edit-blog', 'Edit News', ['Edit News']))->toBeFalse();
+});
 
-        $this->assertTrue($this->testUser->hasAnyPermission(['edit-articles', 'edit-news']));
-    }
+it('can determine that the user has any of the permissions directly using an array', function () {
+    expect($this->testUser->hasAnyPermission(['edit-articles']))->toBeFalse();
 
-    /** @test */
-    public function it_can_determine_that_the_user_has_any_of_the_permissions_via_role()
-    {
-        $this->testUserRole->givePermissionTo('edit-articles');
+    $this->testUser->givePermissionTo('edit-articles');
 
-        $this->testUser->assignRole('testRole');
+    expect($this->testUser->hasAnyPermission(['edit-news', 'edit-articles']))->toBeTrue();
 
-        $this->assertTrue($this->testUser->hasAnyPermission('edit-news', 'edit-articles'));
-        $this->assertFalse($this->testUser->hasAnyPermission('edit-blog', 'Edit News', ['Edit News']));
-    }
+    $this->testUser->givePermissionTo('edit-news');
 
-    /** @test */
-    public function it_can_determine_that_the_user_has_all_of_the_permissions_directly()
-    {
-        $this->testUser->givePermissionTo('edit-articles', 'edit-news');
+    $this->testUser->revokePermissionTo($this->testUserPermission);
 
-        $this->assertTrue($this->testUser->hasAllPermissions('edit-articles', 'edit-news'));
+    expect($this->testUser->hasAnyPermission(['edit-articles', 'edit-news']))->toBeTrue();
+});
 
-        $this->testUser->revokePermissionTo('edit-articles');
+it('can determine that the user has any of the permissions via role', function () {
+    $this->testUserRole->givePermissionTo('edit-articles');
 
-        $this->assertFalse($this->testUser->hasAllPermissions('edit-articles', 'edit-news'));
-        $this->assertFalse($this->testUser->hasAllPermissions(['edit-articles', 'edit-news'], 'edit-blog'));
-    }
+    $this->testUser->assignRole('testRole');
 
-    /** @test */
-    public function it_can_determine_that_the_user_has_all_of_the_permissions_directly_using_an_array()
-    {
-        $this->assertFalse($this->testUser->hasAllPermissions(['edit-articles', 'edit-news']));
+    expect($this->testUser->hasAnyPermission('edit-news', 'edit-articles'))->toBeTrue()
+        ->and($this->testUser->hasAnyPermission('edit-blog', 'Edit News', ['Edit News']))->toBeFalse();
+});
 
-        $this->testUser->revokePermissionTo('edit-articles');
+it('can determine that the user has all of the permissions directly', function () {
+    $this->testUser->givePermissionTo('edit-articles', 'edit-news');
 
-        $this->assertFalse($this->testUser->hasAllPermissions(['edit-news', 'edit-articles']));
+    expect($this->testUser->hasAllPermissions('edit-articles', 'edit-news'))->toBeTrue();
 
-        $this->testUser->givePermissionTo('edit-news');
+    $this->testUser->revokePermissionTo('edit-articles');
 
-        $this->testUser->revokePermissionTo($this->testUserPermission);
+    expect($this->testUser->hasAllPermissions('edit-articles', 'edit-news'))->toBeFalse()
+        ->and($this->testUser->hasAllPermissions(['edit-articles', 'edit-news'], 'edit-blog'))->toBeFalse();
+});
 
-        $this->assertFalse($this->testUser->hasAllPermissions(['edit-articles', 'edit-news']));
-    }
+it('can determine that the user has all of the permissions directly using an array', function () {
+    expect($this->testUser->hasAllPermissions(['edit-articles', 'edit-news']))->toBeFalse();
 
-    /** @test */
-    public function it_can_determine_that_the_user_has_all_of_the_permissions_via_role()
-    {
-        $this->testUserRole->givePermissionTo('edit-articles', 'edit-news');
+    $this->testUser->revokePermissionTo('edit-articles');
 
-        $this->testUser->assignRole('testRole');
+    expect($this->testUser->hasAllPermissions(['edit-news', 'edit-articles']))->toBeFalse();
 
-        $this->assertTrue($this->testUser->hasAllPermissions('edit-articles', 'edit-news'));
-    }
+    $this->testUser->givePermissionTo('edit-news');
 
-    /** @test */
-    public function it_can_determine_that_user_has_direct_permission()
-    {
-        $this->testUser->givePermissionTo('edit-articles');
-        $this->assertTrue($this->testUser->hasDirectPermission('edit-articles'));
-        $this->assertEquals(
-            collect(['edit-articles']),
-            $this->testUser->getDirectPermissions()->pluck('name')
-        );
+    $this->testUser->revokePermissionTo($this->testUserPermission);
 
-        $this->testUser->revokePermissionTo('edit-articles');
-        $this->assertFalse($this->testUser->hasDirectPermission('edit-articles'));
+    expect($this->testUser->hasAllPermissions(['edit-articles', 'edit-news']))->toBeFalse();
+});
 
-        $this->testUser->assignRole('testRole');
-        $this->testUserRole->givePermissionTo('edit-articles');
-        $this->assertFalse($this->testUser->hasDirectPermission('edit-articles'));
-    }
+it('can determine that the user has all of the permissions via role', function () {
+    $this->testUserRole->givePermissionTo('edit-articles', 'edit-news');
 
-    /** @test */
-    public function it_can_list_all_the_permissions_via_roles_of_user()
-    {
-        $roleModel = app(Role::class);
-        $roleModel->findByName('testRole2')->givePermissionTo('edit-news');
+    $this->testUser->assignRole('testRole');
 
-        $this->testUserRole->givePermissionTo('edit-articles');
-        $this->testUser->assignRole('testRole', 'testRole2');
+    expect($this->testUser->hasAllPermissions('edit-articles', 'edit-news'))->toBeTrue();
+});
 
-        $this->assertEquals(
-            collect(['edit-articles', 'edit-news']),
-            $this->testUser->getPermissionsViaRoles()->pluck('name')->sort()->values()
-        );
-    }
+it('can determine that user has direct permission', function () {
+    $this->testUser->givePermissionTo('edit-articles');
+    expect($this->testUser->hasDirectPermission('edit-articles'))->toBeTrue()
+        ->and($this->testUser->getDirectPermissions()->pluck('name'))->toEqual(collect(['edit-articles']));
 
-    /** @test */
-    public function it_can_list_all_the_coupled_permissions_both_directly_and_via_roles()
-    {
-        $this->testUser->givePermissionTo('edit-news');
+    $this->testUser->revokePermissionTo('edit-articles');
+    expect($this->testUser->hasDirectPermission('edit-articles'))->toBeFalse();
 
-        $this->testUserRole->givePermissionTo('edit-articles');
-        $this->testUser->assignRole('testRole');
+    $this->testUser->assignRole('testRole');
+    $this->testUserRole->givePermissionTo('edit-articles');
+    expect($this->testUser->hasDirectPermission('edit-articles'))->toBeFalse();
+});
 
-        $this->assertEquals(
-            collect(['edit-articles', 'edit-news']),
-            $this->testUser->getAllPermissions()->pluck('name')->sort()->values()
-        );
-    }
+it('can list all the permissions via roles of user', function () {
+    $roleModel = app(Role::class);
+    $roleModel->findByName('testRole2')->givePermissionTo('edit-news');
 
-    /** @test */
-    public function it_can_sync_multiple_permissions()
-    {
-        $this->testUser->givePermissionTo('edit-news');
+    $this->testUserRole->givePermissionTo('edit-articles');
+    $this->testUser->assignRole('testRole', 'testRole2');
 
-        $this->testUser->syncPermissions('edit-articles', 'edit-blog');
+    expect($this->testUser->getPermissionsViaRoles()->pluck('name')->sort()->values())
+        ->toEqual(collect(['edit-articles', 'edit-news']));
+});
 
-        $this->assertTrue($this->testUser->hasDirectPermission('edit-articles'));
+it('can list all the coupled permissions both directly and via roles', function () {
+    $this->testUser->givePermissionTo('edit-news');
 
-        $this->assertTrue($this->testUser->hasDirectPermission('edit-blog'));
+    $this->testUserRole->givePermissionTo('edit-articles');
+    $this->testUser->assignRole('testRole');
 
-        $this->assertFalse($this->testUser->hasDirectPermission('edit-news'));
-    }
+    expect($this->testUser->getAllPermissions()->pluck('name')->sort()->values())
+        ->toEqual(collect(['edit-articles', 'edit-news']));
+});
 
-    /** @test */
-    public function it_can_sync_multiple_permissions_by_id()
-    {
-        $this->testUser->givePermissionTo('edit-news');
+it('can sync multiple permissions', function () {
+    $this->testUser->givePermissionTo('edit-news');
 
-        $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-blog'])->pluck($this->testUserPermission->getKeyName());
+    $this->testUser->syncPermissions('edit-articles', 'edit-blog');
 
-        $this->testUser->syncPermissions($ids);
+    expect($this->testUser->hasDirectPermission('edit-articles'))->toBeTrue()
+        ->and($this->testUser->hasDirectPermission('edit-blog'))->toBeTrue()
+        ->and($this->testUser->hasDirectPermission('edit-news'))->toBeFalse();
 
-        $this->assertTrue($this->testUser->hasDirectPermission('edit-articles'));
+});
 
-        $this->assertTrue($this->testUser->hasDirectPermission('edit-blog'));
+it('can sync multiple permissions by id', function () {
+    $this->testUser->givePermissionTo('edit-news');
 
-        $this->assertFalse($this->testUser->hasDirectPermission('edit-news'));
-    }
+    $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-blog'])->pluck($this->testUserPermission->getKeyName());
 
-    /** @test */
-    public function sync_permission_ignores_null_inputs()
-    {
-        $this->testUser->givePermissionTo('edit-news');
+    $this->testUser->syncPermissions($ids);
 
-        $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-blog'])->pluck($this->testUserPermission->getKeyName());
+    expect($this->testUser->hasDirectPermission('edit-articles'))->toBeTrue()
+        ->and($this->testUser->hasDirectPermission('edit-blog'))->toBeTrue()
+        ->and($this->testUser->hasDirectPermission('edit-news'))->toBeFalse();
 
-        $ids->push(null);
+});
 
-        $this->testUser->syncPermissions($ids);
+it('sync permission ignores null inputs', function () {
+    $this->testUser->givePermissionTo('edit-news');
 
-        $this->assertTrue($this->testUser->hasDirectPermission('edit-articles'));
+    $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-blog'])->pluck($this->testUserPermission->getKeyName());
 
-        $this->assertTrue($this->testUser->hasDirectPermission('edit-blog'));
+    $ids->push(null);
 
-        $this->assertFalse($this->testUser->hasDirectPermission('edit-news'));
-    }
+    $this->testUser->syncPermissions($ids);
 
-    /** @test */
-    public function it_does_not_remove_already_associated_permissions_when_assigning_new_permissions()
-    {
-        $this->testUser->givePermissionTo('edit-news');
+    expect($this->testUser->hasDirectPermission('edit-articles'))->toBeTrue()
+        ->and($this->testUser->hasDirectPermission('edit-blog'))->toBeTrue()
+        ->and($this->testUser->hasDirectPermission('edit-news'))->toBeFalse();
 
-        $this->testUser->givePermissionTo('edit-articles');
+});
 
-        $this->assertTrue($this->testUser->fresh()->hasDirectPermission('edit-news'));
-    }
+it('does not remove already associated permissions when assigning new permissions', function () {
+    $this->testUser->givePermissionTo('edit-news');
 
-    /** @test */
-    public function it_does_not_throw_an_exception_when_assigning_a_permission_that_is_already_assigned()
-    {
-        $this->testUser->givePermissionTo('edit-news');
+    $this->testUser->givePermissionTo('edit-articles');
 
-        $this->testUser->givePermissionTo('edit-news');
+    expect($this->testUser->fresh()->hasDirectPermission('edit-news'))->toBeTrue();
+});
 
-        $this->assertTrue($this->testUser->fresh()->hasDirectPermission('edit-news'));
-    }
+it('does not throw an exception when assigning a permission that is already assigned', function () {
+    $this->testUser->givePermissionTo('edit-news');
 
-    /** @test */
-    public function it_can_sync_permissions_to_a_model_that_is_not_persisted()
-    {
-        $user = new User(['email' => 'test@user.com']);
-        $user->syncPermissions('edit-articles');
-        $user->save();
+    $this->testUser->givePermissionTo('edit-news');
 
-        $this->assertTrue($user->hasPermissionTo('edit-articles'));
+    expect($this->testUser->fresh()->hasDirectPermission('edit-news'))->toBeTrue();
+});
 
-        $user->syncPermissions('edit-articles');
-        $this->assertTrue($user->hasPermissionTo('edit-articles'));
-        $this->assertTrue($user->fresh()->hasPermissionTo('edit-articles'));
-    }
+it('can sync permissions to a model that is not persisted', function () {
+    $user = new User(['email' => 'test@user.com']);
+    $user->syncPermissions('edit-articles');
+    $user->save();
 
-    /** @test */
-    public function calling_givePermissionTo_before_saving_object_doesnt_interfere_with_other_objects()
-    {
-        $user = new User(['email' => 'test@user.com']);
-        $user->givePermissionTo('edit-news');
-        $user->save();
+    expect($user->hasPermissionTo('edit-articles'))->toBeTrue();
 
-        $user2 = new User(['email' => 'test2@user.com']);
-        $user2->givePermissionTo('edit-articles');
+    $user->syncPermissions('edit-articles');
+    expect($user->hasPermissionTo('edit-articles'))->toBeTrue()
+        ->and($user->fresh()->hasPermissionTo('edit-articles'))->toBeTrue();
+});
 
-        DB::enableQueryLog();
-        $user2->save();
-        DB::disableQueryLog();
+it('calling givePermissionTo before saving object doesnt interfere with other objects', function () {
+    $user = new User(['email' => 'test@user.com']);
+    $user->givePermissionTo('edit-news');
+    $user->save();
 
-        $this->assertTrue($user->fresh()->hasPermissionTo('edit-news'));
-        $this->assertFalse($user->fresh()->hasPermissionTo('edit-articles'));
+    $user2 = new User(['email' => 'test2@user.com']);
+    $user2->givePermissionTo('edit-articles');
 
-        $this->assertTrue($user2->fresh()->hasPermissionTo('edit-articles'));
-        $this->assertFalse($user2->fresh()->hasPermissionTo('edit-news'));
-        $this->assertSame(4, count(DB::getQueryLog())); //avoid unnecessary sync
-    }
+    DB::enableQueryLog();
+    $user2->save();
+    DB::disableQueryLog();
 
-    /** @test */
-    public function calling_syncPermissions_before_saving_object_doesnt_interfere_with_other_objects()
-    {
-        $user = new User(['email' => 'test@user.com']);
-        $user->syncPermissions('edit-news');
-        $user->save();
+    expect($user->fresh()->hasPermissionTo('edit-news'))->toBeTrue()
+        ->and($user->fresh()->hasPermissionTo('edit-articles'))->toBeFalse()
+        ->and($user2->fresh()->hasPermissionTo('edit-articles'))->toBeTrue()
+        ->and($user2->fresh()->hasPermissionTo('edit-news'))->toBeFalse()
+        ->and(count(DB::getQueryLog()))->toBe(4); //avoid unnecessary sync
 
-        $user2 = new User(['email' => 'test2@user.com']);
-        $user2->syncPermissions('edit-articles');
+});
 
-        DB::enableQueryLog();
-        $user2->save();
-        DB::disableQueryLog();
+it('calling syncPermissions before saving object doesnt interfere with other objects', function () {
+    $user = new User(['email' => 'test@user.com']);
+    $user->syncPermissions('edit-news');
+    $user->save();
 
-        $this->assertTrue($user->fresh()->hasPermissionTo('edit-news'));
-        $this->assertFalse($user->fresh()->hasPermissionTo('edit-articles'));
+    $user2 = new User(['email' => 'test2@user.com']);
+    $user2->syncPermissions('edit-articles');
 
-        $this->assertTrue($user2->fresh()->hasPermissionTo('edit-articles'));
-        $this->assertFalse($user2->fresh()->hasPermissionTo('edit-news'));
-        $this->assertSame(4, count(DB::getQueryLog())); //avoid unnecessary sync
-    }
+    DB::enableQueryLog();
+    $user2->save();
+    DB::disableQueryLog();
 
-    /** @test */
-    public function it_can_retrieve_permission_names()
-    {
-        $this->testUser->givePermissionTo('edit-news', 'edit-articles');
-        $this->assertEquals(
-            collect(['edit-articles', 'edit-news']),
-            $this->testUser->getPermissionNames()->sort()->values()
-        );
-    }
+    expect($user->fresh()->hasPermissionTo('edit-news'))->toBeTrue()
+        ->and($user->fresh()->hasPermissionTo('edit-articles'))->toBeFalse()
+        ->and($user2->fresh()->hasPermissionTo('edit-articles'))->toBeTrue()
+        ->and($user2->fresh()->hasPermissionTo('edit-news'))->toBeFalse()
+        ->and(count(DB::getQueryLog()))->toBe(4); //avoid unnecessary sync
+});
 
-    /** @test */
-    public function it_can_check_many_direct_permissions()
-    {
-        $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
-        $this->assertTrue($this->testUser->hasAllDirectPermissions(['edit-news', 'edit-articles']));
-        $this->assertTrue($this->testUser->hasAllDirectPermissions('edit-news', 'edit-articles'));
-        $this->assertFalse($this->testUser->hasAllDirectPermissions(['edit-articles', 'edit-news', 'edit-blog']));
-        $this->assertFalse($this->testUser->hasAllDirectPermissions(['edit-articles', 'edit-news'], 'edit-blog'));
-    }
+it('can retrieve permission names', function () {
+    $this->testUser->givePermissionTo('edit-news', 'edit-articles');
+    expect($this->testUser->getPermissionNames()->sort()->values())->toEqual(collect(['edit-articles', 'edit-news']));
+});
 
-    /** @test */
-    public function it_can_check_if_there_is_any_of_the_direct_permissions_given()
-    {
-        $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
-        $this->assertTrue($this->testUser->hasAnyDirectPermission(['edit-news', 'edit-blog']));
-        $this->assertTrue($this->testUser->hasAnyDirectPermission('edit-news', 'edit-blog'));
-        $this->assertFalse($this->testUser->hasAnyDirectPermission('edit-blog', 'Edit News', ['Edit News']));
-    }
+it('can check many direct permissions', function () {
+    $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
+    expect($this->testUser->hasAllDirectPermissions(['edit-news', 'edit-articles']))->toBeTrue()
+        ->and($this->testUser->hasAllDirectPermissions('edit-news', 'edit-articles'))->toBeTrue()
+        ->and($this->testUser->hasAllDirectPermissions(['edit-articles', 'edit-news', 'edit-blog']))->toBeFalse()
+        ->and($this->testUser->hasAllDirectPermissions(['edit-articles', 'edit-news'], 'edit-blog'))->toBeFalse();
+});
 
-    /** @test */
-    public function it_can_check_permission_based_on_logged_in_user_guard()
-    {
-        $this->testUser->givePermissionTo(app(Permission::class)::create([
-            'name' => 'do_that',
-            'guard_name' => 'api',
-        ]));
-        $response = $this->actingAs($this->testUser, 'api')
-             ->json('GET', '/check-api-guard-permission');
-        $response->assertJson([
-            'status' => true,
-        ]);
-    }
+it('can check if there is any of the direct permissions given', function () {
+    $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
+    expect($this->testUser->hasAnyDirectPermission(['edit-news', 'edit-blog']))->toBeTrue()
+        ->and($this->testUser->hasAnyDirectPermission('edit-news', 'edit-blog'))->toBeTrue()
+        ->and($this->testUser->hasAnyDirectPermission('edit-blog', 'Edit News', ['Edit News']))->toBeFalse();
+});
 
-    /** @test */
-    public function it_can_reject_permission_based_on_logged_in_user_guard()
-    {
-        $unassignedPermission = app(Permission::class)::create([
-            'name' => 'do_that',
-            'guard_name' => 'api',
-        ]);
+it('can check permission based on logged in user guard', function () {
+    $this->testUser->givePermissionTo(app(Permission::class)::create([
+        'name' => 'do_that',
+        'guard_name' => 'api',
+    ]));
+    $response = $this->actingAs($this->testUser, 'api')
+         ->json('GET', '/check-api-guard-permission');
+    $response->assertJson([
+        'status' => true,
+    ]);
+});
 
-        $assignedPermission = app(Permission::class)::create([
-            'name' => 'do_that',
-            'guard_name' => 'web',
-        ]);
+it('can reject permission based on logged in user guard', function () {
+    $unassignedPermission = app(Permission::class)::create([
+        'name' => 'do_that',
+        'guard_name' => 'api',
+    ]);
 
-        $this->testUser->givePermissionTo($assignedPermission);
-        $response = $this->withExceptionHandling()
-             ->actingAs($this->testUser, 'api')
-             ->json('GET', '/check-api-guard-permission');
-        $response->assertJson([
-            'status' => false,
-        ]);
-    }
-}
+    $assignedPermission = app(Permission::class)::create([
+        'name' => 'do_that',
+        'guard_name' => 'web',
+    ]);
+
+    $this->testUser->givePermissionTo($assignedPermission);
+    $response = $this->withExceptionHandling()
+         ->actingAs($this->testUser, 'api')
+         ->json('GET', '/check-api-guard-permission');
+    $response->assertJson([
+        'status' => false,
+    ]);
+});

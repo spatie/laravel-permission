@@ -18,7 +18,7 @@ class CreatePermissionTablesWithNested extends CreatePermissionTables
         parent::up();
         $tableNames = config('permission.table_names');
 
-        Schema::create(\Spatie\Permission\Test\RoleWithNesting::HIERARCHY_TABLE,function(Blueprint $table) use ($tableNames){
+        Schema::create(\Spatie\Permission\Tests\TestModels\RoleWithNesting::HIERARCHY_TABLE,function(Blueprint $table) use ($tableNames){
             $table->id();
             $table->bigInteger("parent_id", false, true);
             $table->bigInteger("child_id", false, true);
@@ -35,6 +35,6 @@ class CreatePermissionTablesWithNested extends CreatePermissionTables
     public function down()
     {
         parent::down();
-        Schema::drop(\Spatie\Permission\Test\RoleWithNesting::HIERARCHY_TABLE);
+        Schema::drop(\Spatie\Permission\Tests\TestModels\RoleWithNesting::HIERARCHY_TABLE);
     }
 }

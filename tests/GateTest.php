@@ -1,70 +1,57 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
 use Illuminate\Contracts\Auth\Access\Gate;
 
-class GateTest extends TestCase
-{
-    /** @test */
-    public function it_can_determine_if_a_user_does_not_have_a_permission()
-    {
-        $this->assertFalse($this->testUser->can('edit-articles'));
-    }
+it('can determine if a user does not have a permission', function () {
+    expect($this->testUser->can('edit-articles'))->toBeFalse();
+});
 
-    /** @test */
-    public function it_allows_other_gate_before_callbacks_to_run_if_a_user_does_not_have_a_permission()
-    {
-        $this->assertFalse($this->testUser->can('edit-articles'));
+it('allows other gate before callbacks to run if a user does not have a permission', function () {
+    expect($this->testUser->can('edit-articles'))->toBeFalse();
 
-        app(Gate::class)->before(function () {
-            return true;
-        });
+    app(Gate::class)->before(function () {
+        return true;
+    });
 
-        $this->assertTrue($this->testUser->can('edit-articles'));
-    }
+    expect($this->testUser->can('edit-articles'))->toBeTrue();
+});
 
-    /** @test */
-    public function it_can_determine_if_a_user_has_a_direct_permission()
-    {
-        $this->testUser->givePermissionTo('edit-articles');
+it('can determine if a user has a direct permission', function () {
+    $this->testUser->givePermissionTo('edit-articles');
 
-        $this->assertTrue($this->testUser->can('edit-articles'));
+    expect($this->testUser->can('edit-articles'))->toBeTrue();
 
-        $this->assertFalse($this->testUser->can('non-existing-permission'));
+    expect($this->testUser->can('non-existing-permission'))->toBeFalse();
 
-        $this->assertFalse($this->testUser->can('admin-permission'));
-    }
+    expect($this->testUser->can('admin-permission'))->toBeFalse();
+});
 
-    /** @test */
-    public function it_can_determine_if_a_user_has_a_permission_through_roles()
-    {
-        $this->testUserRole->givePermissionTo($this->testUserPermission);
+it('can determine if a user has a permission through roles', function () {
+    $this->testUserRole->givePermissionTo($this->testUserPermission);
 
-        $this->testUser->assignRole($this->testUserRole);
+    $this->testUser->assignRole($this->testUserRole);
 
-        $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission));
+    expect($this->testUser->hasPermissionTo($this->testUserPermission))->toBeTrue();
 
-        $this->assertTrue($this->testUser->can('edit-articles'));
+    expect($this->testUser->can('edit-articles'))->toBeTrue();
 
-        $this->assertFalse($this->testUser->can('non-existing-permission'));
+    expect($this->testUser->can('non-existing-permission'))->toBeFalse();
 
-        $this->assertFalse($this->testUser->can('admin-permission'));
-    }
+    expect($this->testUser->can('admin-permission'))->toBeFalse();
+});
 
-    /** @test */
-    public function it_can_determine_if_a_user_with_a_different_guard_has_a_permission_when_using_roles()
-    {
-        $this->testAdminRole->givePermissionTo($this->testAdminPermission);
+it('can determine if a user with a different guard has a permission when using roles', function () {
+    $this->testAdminRole->givePermissionTo($this->testAdminPermission);
 
-        $this->testAdmin->assignRole($this->testAdminRole);
+    $this->testAdmin->assignRole($this->testAdminRole);
 
-        $this->assertTrue($this->testAdmin->hasPermissionTo($this->testAdminPermission));
+    expect($this->testAdmin->hasPermissionTo($this->testAdminPermission))->toBeTrue();
 
-        $this->assertTrue($this->testAdmin->can('admin-permission'));
+    expect($this->testAdmin->can('admin-permission'))->toBeTrue();
 
-        $this->assertFalse($this->testAdmin->can('non-existing-permission'));
+    expect($this->testAdmin->can('non-existing-permission'))->toBeFalse();
 
-        $this->assertFalse($this->testAdmin->can('edit-articles'));
-    }
-}
+    expect($this->testAdmin->can('edit-articles'))->toBeFalse();
+});

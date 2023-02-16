@@ -1,102 +1,78 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
 use Spatie\Permission\Models\Permission;
 
-class WildcardRoleTest extends TestCase
-{
-    public function setUp(): void
-    {
-        parent::setUp();
+beforeEach(function () {
+    app('config')->set('permission.enable_wildcard_permission', true);
 
-        app('config')->set('permission.enable_wildcard_permission', true);
+    Permission::create(['name' => 'other-permission']);
 
-        Permission::create(['name' => 'other-permission']);
+    Permission::create(['name' => 'wrong-guard-permission', 'guard_name' => 'admin']);
+});
 
-        Permission::create(['name' => 'wrong-guard-permission', 'guard_name' => 'admin']);
-    }
+it('can be given a permission', function () {
+    Permission::create(['name' => 'posts.*']);
+    $this->testUserRole->givePermissionTo('posts.*');
 
-    /** @test */
-    public function it_can_be_given_a_permission()
-    {
-        Permission::create(['name' => 'posts.*']);
-        $this->testUserRole->givePermissionTo('posts.*');
+    expect($this->testUserRole->hasPermissionTo('posts.create'))->toBeTrue();
+});
 
-        $this->assertTrue($this->testUserRole->hasPermissionTo('posts.create'));
-    }
+it('can be given multiple permissions using an array', function () {
+    Permission::create(['name' => 'posts.*']);
+    Permission::create(['name' => 'news.*']);
 
-    /** @test */
-    public function it_can_be_given_multiple_permissions_using_an_array()
-    {
-        Permission::create(['name' => 'posts.*']);
-        Permission::create(['name' => 'news.*']);
+    $this->testUserRole->givePermissionTo(['posts.*', 'news.*']);
 
-        $this->testUserRole->givePermissionTo(['posts.*', 'news.*']);
+    expect($this->testUserRole->hasPermissionTo('posts.create'))->toBeTrue();
+    expect($this->testUserRole->hasPermissionTo('news.create'))->toBeTrue();
+});
 
-        $this->assertTrue($this->testUserRole->hasPermissionTo('posts.create'));
-        $this->assertTrue($this->testUserRole->hasPermissionTo('news.create'));
-    }
+it('can be given multiple permissions using multiple arguments', function () {
+    Permission::create(['name' => 'posts.*']);
+    Permission::create(['name' => 'news.*']);
 
-    /** @test */
-    public function it_can_be_given_multiple_permissions_using_multiple_arguments()
-    {
-        Permission::create(['name' => 'posts.*']);
-        Permission::create(['name' => 'news.*']);
+    $this->testUserRole->givePermissionTo('posts.*', 'news.*');
 
-        $this->testUserRole->givePermissionTo('posts.*', 'news.*');
+    expect($this->testUserRole->hasPermissionTo('posts.edit.123'))->toBeTrue();
+    expect($this->testUserRole->hasPermissionTo('news.view.1'))->toBeTrue();
+});
 
-        $this->assertTrue($this->testUserRole->hasPermissionTo('posts.edit.123'));
-        $this->assertTrue($this->testUserRole->hasPermissionTo('news.view.1'));
-    }
+it('can be given a permission using objects', function () {
+    $this->testUserRole->givePermissionTo($this->testUserPermission);
 
-    /** @test */
-    public function it_can_be_given_a_permission_using_objects()
-    {
-        $this->testUserRole->givePermissionTo($this->testUserPermission);
+    expect($this->testUserRole->hasPermissionTo($this->testUserPermission))->toBeTrue();
+});
 
-        $this->assertTrue($this->testUserRole->hasPermissionTo($this->testUserPermission));
-    }
+it('returns false if it does not have the permission', function () {
+    expect($this->testUserRole->hasPermissionTo('other-permission'))->toBeFalse();
+});
 
-    /** @test */
-    public function it_returns_false_if_it_does_not_have_the_permission()
-    {
-        $this->assertFalse($this->testUserRole->hasPermissionTo('other-permission'));
-    }
+it('returns false if permission does not exists', function () {
+    expect($this->testUserRole->hasPermissionTo('doesnt-exist'))->toBeFalse();
+});
 
-    /** @test */
-    public function it_returns_false_if_permission_does_not_exists()
-    {
-        $this->assertFalse($this->testUserRole->hasPermissionTo('doesnt-exist'));
-    }
+it('returns false if it does not have a permission object', function () {
+    $permission = app(Permission::class)->findByName('other-permission');
 
-    /** @test */
-    public function it_returns_false_if_it_does_not_have_a_permission_object()
-    {
-        $permission = app(Permission::class)->findByName('other-permission');
+    expect($this->testUserRole->hasPermissionTo($permission))->toBeFalse();
+});
 
-        $this->assertFalse($this->testUserRole->hasPermissionTo($permission));
-    }
+it('creates permission object with findOrCreate if it does not have a permission object', function () {
+    $permission = app(Permission::class)->findOrCreate('another-permission');
 
-    /** @test */
-    public function it_creates_permission_object_with_findOrCreate_if_it_does_not_have_a_permission_object()
-    {
-        $permission = app(Permission::class)->findOrCreate('another-permission');
+    expect($this->testUserRole->hasPermissionTo($permission))->toBeFalse();
 
-        $this->assertFalse($this->testUserRole->hasPermissionTo($permission));
+    $this->testUserRole->givePermissionTo($permission);
 
-        $this->testUserRole->givePermissionTo($permission);
+    $this->testUserRole = $this->testUserRole->fresh();
 
-        $this->testUserRole = $this->testUserRole->fresh();
+    expect($this->testUserRole->hasPermissionTo('another-permission'))->toBeTrue();
+});
 
-        $this->assertTrue($this->testUserRole->hasPermissionTo('another-permission'));
-    }
+it('returns false when a permission of the wrong guard is passed in', function () {
+    $permission = app(Permission::class)->findByName('wrong-guard-permission', 'admin');
 
-    /** @test */
-    public function it_returns_false_when_a_permission_of_the_wrong_guard_is_passed_in()
-    {
-        $permission = app(Permission::class)->findByName('wrong-guard-permission', 'admin');
-
-        $this->assertFalse($this->testUserRole->hasPermissionTo($permission));
-    }
-}
+    expect($this->testUserRole->hasPermissionTo($permission))->toBeFalse();
+});

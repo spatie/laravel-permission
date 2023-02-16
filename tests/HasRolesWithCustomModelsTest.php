@@ -1,15 +1,22 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
-class HasRolesWithCustomModelsTest extends HasRolesTest
-{
-    /** @var bool */
-    protected $useCustomModels = true;
+use Spatie\Permission\Tests\TestModels\Role;
 
-    /** @test */
-    public function it_can_use_custom_model_role()
+include "HasRolesTest.php";
+
+trait SetupHasRolesWithCustomModelsTest {
+    protected function getEnvironmentSetUp($app)
     {
-        $this->assertSame(get_class($this->testUserRole), Role::class);
+        $this->useCustomModels = true;
+
+        parent::getEnvironmentSetUp($app);
     }
 }
+
+uses(SetupHasRolesWithCustomModelsTest::class);
+
+it('can_use_custom_model_role', function () {
+    expect(Role::class)->toBe(get_class($this->testUserRole));
+});

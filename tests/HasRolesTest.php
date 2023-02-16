@@ -1,585 +1,464 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
-use DB;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
+use Spatie\Permission\Tests\TestModels\Admin;
+use Spatie\Permission\Tests\TestModels\SoftDeletingUser;
+use Spatie\Permission\Tests\TestModels\User;
 
-class HasRolesTest extends TestCase
-{
-    /** @test */
-    public function it_can_determine_that_the_user_does_not_have_a_role()
-    {
-        $this->assertFalse($this->testUser->hasRole('testRole'));
+it('can determine that the user does not have a role', function () {
+    expect($this->testUser->hasRole('testRole'))->toBeFalse();
 
-        $role = app(Role::class)->findOrCreate('testRoleInWebGuard', 'web');
+    $role = app(Role::class)->findOrCreate('testRoleInWebGuard', 'web');
 
-        $this->assertFalse($this->testUser->hasRole($role));
+    expect($this->testUser->hasRole($role))->toBeFalse();
 
-        $this->testUser->assignRole($role);
-        $this->assertTrue($this->testUser->hasRole($role));
-        $this->assertTrue($this->testUser->hasRole($role->name));
-        $this->assertTrue($this->testUser->hasRole($role->name, $role->guard_name));
-        $this->assertTrue($this->testUser->hasRole([$role->name, 'fakeRole'], $role->guard_name));
-        $this->assertTrue($this->testUser->hasRole($role->getKey(), $role->guard_name));
-        $this->assertTrue($this->testUser->hasRole([$role->getKey(), 'fakeRole'], $role->guard_name));
+    $this->testUser->assignRole($role);
+    expect($this->testUser->hasRole($role))->toBeTrue()
+        ->and($this->testUser->hasRole($role->name))->toBeTrue()
+        ->and($this->testUser->hasRole($role->name, $role->guard_name))->toBeTrue()
+        ->and($this->testUser->hasRole([$role->name, 'fakeRole'], $role->guard_name))->toBeTrue()
+        ->and($this->testUser->hasRole($role->getKey(), $role->guard_name))->toBeTrue()
+        ->and($this->testUser->hasRole([$role->getKey(), 'fakeRole'], $role->guard_name))->toBeTrue()
+        ->and($this->testUser->hasRole($role->name, 'fakeGuard'))->toBeFalse()
+        ->and($this->testUser->hasRole([$role->name, 'fakeRole'], 'fakeGuard'))->toBeFalse()
+        ->and($this->testUser->hasRole($role->getKey(), 'fakeGuard'))->toBeFalse()
+        ->and($this->testUser->hasRole([$role->getKey(), 'fakeRole'], 'fakeGuard'))->toBeFalse();
 
-        $this->assertFalse($this->testUser->hasRole($role->name, 'fakeGuard'));
-        $this->assertFalse($this->testUser->hasRole([$role->name, 'fakeRole'], 'fakeGuard'));
-        $this->assertFalse($this->testUser->hasRole($role->getKey(), 'fakeGuard'));
-        $this->assertFalse($this->testUser->hasRole([$role->getKey(), 'fakeRole'], 'fakeGuard'));
+    $role = app(Role::class)->findOrCreate('testRoleInWebGuard2', 'web');
+    expect($this->testUser->hasRole($role))->toBeFalse();
+});
 
-        $role = app(Role::class)->findOrCreate('testRoleInWebGuard2', 'web');
-        $this->assertFalse($this->testUser->hasRole($role));
-    }
+it('can assign and remove a role', function () {
+    expect($this->testUser->hasRole('testRole'))->toBeFalse();
 
-    /** @test */
-    public function it_can_assign_and_remove_a_role()
-    {
-        $this->assertFalse($this->testUser->hasRole('testRole'));
+    $this->testUser->assignRole('testRole');
 
-        $this->testUser->assignRole('testRole');
+    expect($this->testUser->hasRole('testRole'))->toBeTrue();
 
-        $this->assertTrue($this->testUser->hasRole('testRole'));
+    $this->testUser->removeRole('testRole');
 
-        $this->testUser->removeRole('testRole');
+    expect($this->testUser->hasRole('testRole'))->toBeFalse();
+});
 
-        $this->assertFalse($this->testUser->hasRole('testRole'));
-    }
+it('removes a role and returns roles', function () {
+    $this->testUser->assignRole('testRole');
 
-    /** @test */
-    public function it_removes_a_role_and_returns_roles()
-    {
-        $this->testUser->assignRole('testRole');
+    $this->testUser->assignRole('testRole2');
 
-        $this->testUser->assignRole('testRole2');
+    expect($this->testUser->hasRole(['testRole', 'testRole2']))->toBeTrue();
 
-        $this->assertTrue($this->testUser->hasRole(['testRole', 'testRole2']));
+    $roles = $this->testUser->removeRole('testRole');
 
-        $roles = $this->testUser->removeRole('testRole');
+    expect($roles->hasRole('testRole'))->toBeFalse()
+        ->and($roles->hasRole('testRole2'))->toBeTrue();
+});
 
-        $this->assertFalse($roles->hasRole('testRole'));
+it('can assign and remove a role on a permission', function () {
+    $this->testUserPermission->assignRole('testRole');
 
-        $this->assertTrue($roles->hasRole('testRole2'));
-    }
+    expect($this->testUserPermission->hasRole('testRole'))->toBeTrue();
 
-    /** @test */
-    public function it_can_assign_and_remove_a_role_on_a_permission()
-    {
-        $this->testUserPermission->assignRole('testRole');
+    $this->testUserPermission->removeRole('testRole');
 
-        $this->assertTrue($this->testUserPermission->hasRole('testRole'));
+    expect($this->testUserPermission->hasRole('testRole'))->toBeFalse();
+});
 
-        $this->testUserPermission->removeRole('testRole');
+it('can assign a role using an object', function () {
+    $this->testUser->assignRole($this->testUserRole);
 
-        $this->assertFalse($this->testUserPermission->hasRole('testRole'));
-    }
+    expect($this->testUser->hasRole($this->testUserRole))->toBeTrue();
+});
 
-    /** @test */
-    public function it_can_assign_a_role_using_an_object()
-    {
-        $this->testUser->assignRole($this->testUserRole);
+it('can assign a role using an id', function () {
+    $this->testUser->assignRole($this->testUserRole->getKey());
 
-        $this->assertTrue($this->testUser->hasRole($this->testUserRole));
-    }
+    expect($this->testUser->hasRole($this->testUserRole))->toBeTrue();
+});
 
-    /** @test */
-    public function it_can_assign_a_role_using_an_id()
-    {
-        $this->testUser->assignRole($this->testUserRole->getKey());
+it('can assign multiple roles at once', function () {
+    $this->testUser->assignRole($this->testUserRole->getKey(), 'testRole2');
 
-        $this->assertTrue($this->testUser->hasRole($this->testUserRole));
-    }
+    expect($this->testUser->hasRole('testRole'))->toBeTrue()
+        ->and($this->testUser->hasRole('testRole2'))->toBeTrue();
+});
 
-    /** @test */
-    public function it_can_assign_multiple_roles_at_once()
-    {
-        $this->testUser->assignRole($this->testUserRole->getKey(), 'testRole2');
+it('can assign multiple roles using an array', function () {
+    $this->testUser->assignRole([$this->testUserRole->getKey(), 'testRole2']);
 
-        $this->assertTrue($this->testUser->hasRole('testRole'));
+    expect($this->testUser->hasRole('testRole'))->toBeTrue()
+        ->and($this->testUser->hasRole('testRole2'))->toBeTrue();
+});
 
-        $this->assertTrue($this->testUser->hasRole('testRole2'));
-    }
+it('does not remove already associated roles when assigning new roles', function () {
+    $this->testUser->assignRole($this->testUserRole->getKey());
 
-    /** @test */
-    public function it_can_assign_multiple_roles_using_an_array()
-    {
-        $this->testUser->assignRole([$this->testUserRole->getKey(), 'testRole2']);
+    $this->testUser->assignRole('testRole2');
 
-        $this->assertTrue($this->testUser->hasRole('testRole'));
+    expect($this->testUser->fresh()->hasRole('testRole'))->toBeTrue();
+});
 
-        $this->assertTrue($this->testUser->hasRole('testRole2'));
-    }
+it('does not throw an exception when assigning a role that is already assigned', function () {
+    $this->testUser->assignRole($this->testUserRole->getKey());
 
-    /** @test */
-    public function it_does_not_remove_already_associated_roles_when_assigning_new_roles()
-    {
-        $this->testUser->assignRole($this->testUserRole->getKey());
+    $this->testUser->assignRole($this->testUserRole->getKey());
 
-        $this->testUser->assignRole('testRole2');
+    expect($this->testUser->fresh()->hasRole('testRole'))->toBeTrue();
+});
 
-        $this->assertTrue($this->testUser->fresh()->hasRole('testRole'));
-    }
+it('throws an exception when assigning a role that does not exist', function () {
+    $this->testUser->assignRole('evil-emperor');
+})->throws(RoleDoesNotExist::class);
 
-    /** @test */
-    public function it_does_not_throw_an_exception_when_assigning_a_role_that_is_already_assigned()
-    {
-        $this->testUser->assignRole($this->testUserRole->getKey());
+it('can only assign roles from the correct guard', function () {
+    $this->testUser->assignRole('testAdminRole');
+})->throws(RoleDoesNotExist::class);
 
-        $this->testUser->assignRole($this->testUserRole->getKey());
+it('throws an exception when assigning a role from a different guard', function () {
+    $this->testUser->assignRole($this->testAdminRole);
+})->throws(GuardDoesNotMatch::class);
 
-        $this->assertTrue($this->testUser->fresh()->hasRole('testRole'));
-    }
+it('ignores null roles when syncing', function () {
+    $this->testUser->assignRole('testRole');
 
-    /** @test */
-    public function it_throws_an_exception_when_assigning_a_role_that_does_not_exist()
-    {
-        $this->expectException(RoleDoesNotExist::class);
+    $this->testUser->syncRoles('testRole2', null);
 
-        $this->testUser->assignRole('evil-emperor');
-    }
+    expect($this->testUser->hasRole('testRole'))->toBeFalse()
+        ->and($this->testUser->hasRole('testRole2'))->toBeTrue();
+});
 
-    /** @test */
-    public function it_can_only_assign_roles_from_the_correct_guard()
-    {
-        $this->expectException(RoleDoesNotExist::class);
+it('can sync roles from a string', function () {
+    $this->testUser->assignRole('testRole');
 
-        $this->testUser->assignRole('testAdminRole');
-    }
+    $this->testUser->syncRoles('testRole2');
 
-    /** @test */
-    public function it_throws_an_exception_when_assigning_a_role_from_a_different_guard()
-    {
-        $this->expectException(GuardDoesNotMatch::class);
+    expect($this->testUser->hasRole('testRole'))->toBeFalse()
+        ->and($this->testUser->hasRole('testRole2'))->toBeTrue();
+});
 
-        $this->testUser->assignRole($this->testAdminRole);
-    }
+it('can sync roles from a string on a permission', function () {
+    $this->testUserPermission->assignRole('testRole');
 
-    /** @test */
-    public function it_ignores_null_roles_when_syncing()
-    {
-        $this->testUser->assignRole('testRole');
+    $this->testUserPermission->syncRoles('testRole2');
 
-        $this->testUser->syncRoles('testRole2', null);
+    expect($this->testUserPermission->hasRole('testRole'))->toBeFalse()
+        ->and($this->testUserPermission->hasRole('testRole2'))->toBeTrue();
+});
 
-        $this->assertFalse($this->testUser->hasRole('testRole'));
+it('can sync multiple roles', function () {
+    $this->testUser->syncRoles('testRole', 'testRole2');
 
-        $this->assertTrue($this->testUser->hasRole('testRole2'));
-    }
+    expect($this->testUser->hasRole('testRole'))->toBeTrue()
+        ->and($this->testUser->hasRole('testRole2'))->toBeTrue();
+});
 
-    /** @test */
-    public function it_can_sync_roles_from_a_string()
-    {
-        $this->testUser->assignRole('testRole');
+it('can sync multiple roles from an array', function () {
+    $this->testUser->syncRoles(['testRole', 'testRole2']);
 
-        $this->testUser->syncRoles('testRole2');
+    expect($this->testUser->hasRole('testRole'))->toBeTrue()
+        ->and($this->testUser->hasRole('testRole2'))->toBeTrue();
+});
 
-        $this->assertFalse($this->testUser->hasRole('testRole'));
+it('will remove all roles when an empty array is passed to sync roles', function () {
+    $this->testUser->assignRole('testRole');
 
-        $this->assertTrue($this->testUser->hasRole('testRole2'));
-    }
+    $this->testUser->assignRole('testRole2');
 
-    /** @test */
-    public function it_can_sync_roles_from_a_string_on_a_permission()
-    {
-        $this->testUserPermission->assignRole('testRole');
+    $this->testUser->syncRoles([]);
 
-        $this->testUserPermission->syncRoles('testRole2');
+    expect($this->testUser->hasRole('testRole'))->toBeFalse()
+        ->and($this->testUser->hasRole('testRole2'))->toBeFalse();
+});
 
-        $this->assertFalse($this->testUserPermission->hasRole('testRole'));
+it('will sync roles to a model that is not persisted', function () {
+    $user = new User(['email' => 'test@user.com']);
+    $user->syncRoles([$this->testUserRole]);
+    $user->save();
 
-        $this->assertTrue($this->testUserPermission->hasRole('testRole2'));
-    }
+    expect($user->hasRole($this->testUserRole))->toBeTrue();
+});
 
-    /** @test */
-    public function it_can_sync_multiple_roles()
-    {
-        $this->testUser->syncRoles('testRole', 'testRole2');
+it('calling syncRoles before saving object doesnt interfere with other objects', function () {
+    $user = new User(['email' => 'test@user.com']);
+    $user->syncRoles('testRole');
+    $user->save();
 
-        $this->assertTrue($this->testUser->hasRole('testRole'));
+    $user2 = new User(['email' => 'admin@user.com']);
+    $user2->syncRoles('testRole2');
 
-        $this->assertTrue($this->testUser->hasRole('testRole2'));
-    }
+    DB::enableQueryLog();
+    $user2->save();
+    DB::disableQueryLog();
 
-    /** @test */
-    public function it_can_sync_multiple_roles_from_an_array()
-    {
-        $this->testUser->syncRoles(['testRole', 'testRole2']);
+    expect($user->fresh()->hasRole('testRole'))->toBeTrue()
+        ->and($user->fresh()->hasRole('testRole2'))->toBeFalse()
+        ->and($user2->fresh()->hasRole('testRole2'))->toBeTrue()
+        ->and($user2->fresh()->hasRole('testRole'))->toBeFalse()
+        ->and(count(DB::getQueryLog()))->toBe(4); //avoid unnecessary sync
+});
 
-        $this->assertTrue($this->testUser->hasRole('testRole'));
+it('calling assignRole before saving object doesnt interfere with other objects', function () {
+    $user = new User(['email' => 'test@user.com']);
+    $user->assignRole('testRole');
+    $user->save();
 
-        $this->assertTrue($this->testUser->hasRole('testRole2'));
-    }
+    $admin_user = new User(['email' => 'admin@user.com']);
+    $admin_user->assignRole('testRole2');
 
-    /** @test */
-    public function it_will_remove_all_roles_when_an_empty_array_is_passed_to_sync_roles()
-    {
-        $this->testUser->assignRole('testRole');
+    DB::enableQueryLog();
+    $admin_user->save();
+    DB::disableQueryLog();
 
-        $this->testUser->assignRole('testRole2');
+    expect($user->fresh()->hasRole('testRole'))->toBeTrue()
+        ->and($user->fresh()->hasRole('testRole2'))->toBeFalse()
+        ->and($admin_user->fresh()->hasRole('testRole2'))->toBeTrue()
+        ->and($admin_user->fresh()->hasRole('testRole'))->toBeFalse()
+        ->and(count(DB::getQueryLog()))->toBe(4); //avoid unnecessary sync
+});
 
-        $this->testUser->syncRoles([]);
+it('throws an exception when syncing a role from another guard', function () {
+    expect(fn () => $this->testUser->syncRoles('testRole', 'testAdminRole'))->toThrow(RoleDoesNotExist::class)
+        ->and(fn () => $this->testUser->syncRoles('testRole', $this->testAdminRole))->toThrow(GuardDoesNotMatch::class);
+});
 
-        $this->assertFalse($this->testUser->hasRole('testRole'));
+it('deletes pivot table entries when deleting models', function () {
+    $user = User::create(['email' => 'user@test.com']);
 
-        $this->assertFalse($this->testUser->hasRole('testRole2'));
-    }
+    $user->assignRole('testRole');
+    $user->givePermissionTo('edit-articles');
 
-    /** @test */
-    public function it_will_sync_roles_to_a_model_that_is_not_persisted()
-    {
-        $user = new User(['email' => 'test@user.com']);
-        $user->syncRoles([$this->testUserRole]);
-        $user->save();
+    $this->assertDatabaseHas('model_has_permissions', [config('permission.column_names.model_morph_key') => $user->id]);
+    $this->assertDatabaseHas('model_has_roles', [config('permission.column_names.model_morph_key') => $user->id]);
 
-        $this->assertTrue($user->hasRole($this->testUserRole));
-    }
+    $user->delete();
 
-    /** @test */
-    public function calling_syncRoles_before_saving_object_doesnt_interfere_with_other_objects()
-    {
-        $user = new User(['email' => 'test@user.com']);
-        $user->syncRoles('testRole');
-        $user->save();
+    $this->assertDatabaseMissing('model_has_permissions', [config('permission.column_names.model_morph_key') => $user->id]);
+    $this->assertDatabaseMissing('model_has_roles', [config('permission.column_names.model_morph_key') => $user->id]);
+});
 
-        $user2 = new User(['email' => 'admin@user.com']);
-        $user2->syncRoles('testRole2');
+it('can scope users using a string', function () {
+    $user1 = User::create(['email' => 'user1@test.com']);
+    $user2 = User::create(['email' => 'user2@test.com']);
+    $user1->assignRole('testRole');
+    $user2->assignRole('testRole2');
 
-        DB::enableQueryLog();
-        $user2->save();
-        DB::disableQueryLog();
+    $scopedUsers = User::role('testRole')->get();
 
-        $this->assertTrue($user->fresh()->hasRole('testRole'));
-        $this->assertFalse($user->fresh()->hasRole('testRole2'));
+    expect($scopedUsers->count())->toEqual(1);
+});
 
-        $this->assertTrue($user2->fresh()->hasRole('testRole2'));
-        $this->assertFalse($user2->fresh()->hasRole('testRole'));
-        $this->assertSame(4, count(DB::getQueryLog())); //avoid unnecessary sync
-    }
+it('can scope users using an array', function () {
+    $user1 = User::create(['email' => 'user1@test.com']);
+    $user2 = User::create(['email' => 'user2@test.com']);
+    $user1->assignRole($this->testUserRole);
+    $user2->assignRole('testRole2');
 
-    /** @test */
-    public function calling_assignRole_before_saving_object_doesnt_interfere_with_other_objects()
-    {
-        $user = new User(['email' => 'test@user.com']);
-        $user->assignRole('testRole');
-        $user->save();
+    $scopedUsers1 = User::role([$this->testUserRole])->get();
 
-        $admin_user = new User(['email' => 'admin@user.com']);
-        $admin_user->assignRole('testRole2');
+    $scopedUsers2 = User::role(['testRole', 'testRole2'])->get();
 
-        DB::enableQueryLog();
-        $admin_user->save();
-        DB::disableQueryLog();
+    expect($scopedUsers1->count())->toEqual(1)
+        ->and($scopedUsers2->count())->toEqual(2);
+});
 
-        $this->assertTrue($user->fresh()->hasRole('testRole'));
-        $this->assertFalse($user->fresh()->hasRole('testRole2'));
+it('can scope users using an array of ids and names', function () {
+    $user1 = User::create(['email' => 'user1@test.com']);
+    $user2 = User::create(['email' => 'user2@test.com']);
 
-        $this->assertTrue($admin_user->fresh()->hasRole('testRole2'));
-        $this->assertFalse($admin_user->fresh()->hasRole('testRole'));
-        $this->assertSame(4, count(DB::getQueryLog())); //avoid unnecessary sync
-    }
+    $user1->assignRole($this->testUserRole);
 
-    /** @test */
-    public function it_throws_an_exception_when_syncing_a_role_from_another_guard()
-    {
-        $this->expectException(RoleDoesNotExist::class);
+    $user2->assignRole('testRole2');
 
-        $this->testUser->syncRoles('testRole', 'testAdminRole');
+    $roleName = $this->testUserRole->name;
 
-        $this->expectException(GuardDoesNotMatch::class);
+    $otherRoleId = app(Role::class)->findByName('testRole2')->getKey();
 
-        $this->testUser->syncRoles('testRole', $this->testAdminRole);
-    }
+    $scopedUsers = User::role([$roleName, $otherRoleId])->get();
 
-    /** @test */
-    public function it_deletes_pivot_table_entries_when_deleting_models()
-    {
-        $user = User::create(['email' => 'user@test.com']);
+    expect($scopedUsers->count())->toEqual(2);
+});
 
-        $user->assignRole('testRole');
-        $user->givePermissionTo('edit-articles');
+it('can scope users using a collection', function () {
+    $user1 = User::create(['email' => 'user1@test.com']);
+    $user2 = User::create(['email' => 'user2@test.com']);
+    $user1->assignRole($this->testUserRole);
+    $user2->assignRole('testRole2');
 
-        $this->assertDatabaseHas('model_has_permissions', [config('permission.column_names.model_morph_key') => $user->id]);
-        $this->assertDatabaseHas('model_has_roles', [config('permission.column_names.model_morph_key') => $user->id]);
+    $scopedUsers1 = User::role([$this->testUserRole])->get();
+    $scopedUsers2 = User::role(collect(['testRole', 'testRole2']))->get();
 
-        $user->delete();
+    expect($scopedUsers1->count())->toEqual(1)
+        ->and($scopedUsers2->count())->toEqual(2);
+});
 
-        $this->assertDatabaseMissing('model_has_permissions', [config('permission.column_names.model_morph_key') => $user->id]);
-        $this->assertDatabaseMissing('model_has_roles', [config('permission.column_names.model_morph_key') => $user->id]);
-    }
+it('can scope users using an object', function () {
+    $user1 = User::create(['email' => 'user1@test.com']);
+    $user2 = User::create(['email' => 'user2@test.com']);
+    $user1->assignRole($this->testUserRole);
+    $user2->assignRole('testRole2');
 
-    /** @test */
-    public function it_can_scope_users_using_a_string()
-    {
-        $user1 = User::create(['email' => 'user1@test.com']);
-        $user2 = User::create(['email' => 'user2@test.com']);
-        $user1->assignRole('testRole');
-        $user2->assignRole('testRole2');
+    $scopedUsers1 = User::role($this->testUserRole)->get();
+    $scopedUsers2 = User::role([$this->testUserRole])->get();
+    $scopedUsers3 = User::role(collect([$this->testUserRole]))->get();
 
-        $scopedUsers = User::role('testRole')->get();
+    expect($scopedUsers1->count())->toEqual(1)
+        ->and($scopedUsers2->count())->toEqual(1)
+        ->and($scopedUsers3->count())->toEqual(1);
+});
 
-        $this->assertEquals(1, $scopedUsers->count());
-    }
+it('can scope against a specific guard', function () {
+    $user1 = User::create(['email' => 'user1@test.com']);
+    $user2 = User::create(['email' => 'user2@test.com']);
+    $user1->assignRole('testRole');
+    $user2->assignRole('testRole2');
 
-    /** @test */
-    public function it_can_scope_users_using_an_array()
-    {
-        $user1 = User::create(['email' => 'user1@test.com']);
-        $user2 = User::create(['email' => 'user2@test.com']);
-        $user1->assignRole($this->testUserRole);
-        $user2->assignRole('testRole2');
+    $scopedUsers1 = User::role('testRole', 'web')->get();
 
-        $scopedUsers1 = User::role([$this->testUserRole])->get();
+    expect($scopedUsers1->count())->toEqual(1);
 
-        $scopedUsers2 = User::role(['testRole', 'testRole2'])->get();
+    $user3 = Admin::create(['email' => 'user1@test.com']);
+    $user4 = Admin::create(['email' => 'user1@test.com']);
+    $user5 = Admin::create(['email' => 'user2@test.com']);
+    $testAdminRole2 = app(Role::class)->create(['name' => 'testAdminRole2', 'guard_name' => 'admin']);
+    $user3->assignRole($this->testAdminRole);
+    $user4->assignRole($this->testAdminRole);
+    $user5->assignRole($testAdminRole2);
+    $scopedUsers2 = Admin::role('testAdminRole', 'admin')->get();
+    $scopedUsers3 = Admin::role('testAdminRole2', 'admin')->get();
 
-        $this->assertEquals(1, $scopedUsers1->count());
-        $this->assertEquals(2, $scopedUsers2->count());
-    }
+    expect($scopedUsers2->count())->toEqual(2)
+        ->and($scopedUsers3->count())->toEqual(1);
+});
 
-    /** @test */
-    public function it_can_scope_users_using_an_array_of_ids_and_names()
-    {
-        $user1 = User::create(['email' => 'user1@test.com']);
-        $user2 = User::create(['email' => 'user2@test.com']);
+it('throws an exception when trying to scope a role from another guard', function () {
+    $this->expectException(RoleDoesNotExist::class);
 
-        $user1->assignRole($this->testUserRole);
+    User::role('testAdminRole')->get();
 
-        $user2->assignRole('testRole2');
+    $this->expectException(GuardDoesNotMatch::class);
 
-        $roleName = $this->testUserRole->name;
+    User::role($this->testAdminRole)->get();
+});
 
-        $otherRoleId = app(Role::class)->findByName('testRole2')->getKey();
+it('throws an exception when trying to scope a non existing role', function () {
+    User::role('role not defined')->get();
+})->throws(RoleDoesNotExist::class);
 
-        $scopedUsers = User::role([$roleName, $otherRoleId])->get();
+it('can determine that a user has one of the given roles', function () {
+    $roleModel = app(Role::class);
 
-        $this->assertEquals(2, $scopedUsers->count());
-    }
+    $roleModel->create(['name' => 'second role']);
 
-    /** @test */
-    public function it_can_scope_users_using_a_collection()
-    {
-        $user1 = User::create(['email' => 'user1@test.com']);
-        $user2 = User::create(['email' => 'user2@test.com']);
-        $user1->assignRole($this->testUserRole);
-        $user2->assignRole('testRole2');
+    expect($this->testUser->hasRole($roleModel->all()))->toBeFalse();
 
-        $scopedUsers1 = User::role([$this->testUserRole])->get();
-        $scopedUsers2 = User::role(collect(['testRole', 'testRole2']))->get();
+    $this->testUser->assignRole($this->testUserRole);
 
-        $this->assertEquals(1, $scopedUsers1->count());
-        $this->assertEquals(2, $scopedUsers2->count());
-    }
+    expect($this->testUser->hasRole($roleModel->all()))->toBeTrue()
+        ->and($this->testUser->hasAnyRole($roleModel->all()))->toBeTrue()
+        ->and($this->testUser->hasAnyRole('testRole'))->toBeTrue()
+        ->and($this->testUser->hasAnyRole('role does not exist'))->toBeFalse()
+        ->and($this->testUser->hasAnyRole(['testRole']))->toBeTrue()
+        ->and($this->testUser->hasAnyRole(['testRole', 'role does not exist']))->toBeTrue()
+        ->and($this->testUser->hasAnyRole(['role does not exist']))->toBeFalse()
+        ->and($this->testUser->hasAnyRole('testRole', 'role does not exist'))->toBeTrue();
 
-    /** @test */
-    public function it_can_scope_users_using_an_object()
-    {
-        $user1 = User::create(['email' => 'user1@test.com']);
-        $user2 = User::create(['email' => 'user2@test.com']);
-        $user1->assignRole($this->testUserRole);
-        $user2->assignRole('testRole2');
+});
 
-        $scopedUsers1 = User::role($this->testUserRole)->get();
-        $scopedUsers2 = User::role([$this->testUserRole])->get();
-        $scopedUsers3 = User::role(collect([$this->testUserRole]))->get();
+it('can determine that a user has all of the given roles', function () {
+    $roleModel = app(Role::class);
 
-        $this->assertEquals(1, $scopedUsers1->count());
-        $this->assertEquals(1, $scopedUsers2->count());
-        $this->assertEquals(1, $scopedUsers3->count());
-    }
+    expect($this->testUser->hasAllRoles($roleModel->first()))->toBeFalse()
+        ->and($this->testUser->hasAllRoles('testRole'))->toBeFalse()
+        ->and($this->testUser->hasAllRoles($roleModel->all()))->toBeFalse();
 
-    /** @test */
-    public function it_can_scope_against_a_specific_guard()
-    {
-        $user1 = User::create(['email' => 'user1@test.com']);
-        $user2 = User::create(['email' => 'user2@test.com']);
-        $user1->assignRole('testRole');
-        $user2->assignRole('testRole2');
+    $roleModel->create(['name' => 'second role']);
 
-        $scopedUsers1 = User::role('testRole', 'web')->get();
+    $this->testUser->assignRole($this->testUserRole);
 
-        $this->assertEquals(1, $scopedUsers1->count());
+    expect($this->testUser->hasAllRoles('testRole'))->toBeTrue()
+        ->and($this->testUser->hasAllRoles('testRole', 'web'))->toBeTrue()
+        ->and($this->testUser->hasAllRoles('testRole', 'fakeGuard'))->toBeFalse()
+        ->and($this->testUser->hasAllRoles(['testRole', 'second role']))->toBeFalse()
+        ->and($this->testUser->hasAllRoles(['testRole', 'second role'], 'web'))->toBeFalse();
 
-        $user3 = Admin::create(['email' => 'user1@test.com']);
-        $user4 = Admin::create(['email' => 'user1@test.com']);
-        $user5 = Admin::create(['email' => 'user2@test.com']);
-        $testAdminRole2 = app(Role::class)->create(['name' => 'testAdminRole2', 'guard_name' => 'admin']);
-        $user3->assignRole($this->testAdminRole);
-        $user4->assignRole($this->testAdminRole);
-        $user5->assignRole($testAdminRole2);
-        $scopedUsers2 = Admin::role('testAdminRole', 'admin')->get();
-        $scopedUsers3 = Admin::role('testAdminRole2', 'admin')->get();
+    $this->testUser->assignRole('second role');
 
-        $this->assertEquals(2, $scopedUsers2->count());
-        $this->assertEquals(1, $scopedUsers3->count());
-    }
+    expect($this->testUser->hasAllRoles(['testRole', 'second role']))->toBeTrue()
+        ->and($this->testUser->hasAllRoles(['testRole', 'second role'], 'web'))->toBeTrue()
+        ->and($this->testUser->hasAllRoles(['testRole', 'second role'], 'fakeGuard'))->toBeFalse();
+});
 
-    /** @test */
-    public function it_throws_an_exception_when_trying_to_scope_a_role_from_another_guard()
-    {
-        $this->expectException(RoleDoesNotExist::class);
+it('can determine that a user has exact all of the given roles', function () {
+    $roleModel = app(Role::class);
 
-        User::role('testAdminRole')->get();
+    expect($this->testUser->hasExactRoles($roleModel->first()))->toBeFalse()
+        ->and($this->testUser->hasExactRoles('testRole'))->toBeFalse()
+        ->and($this->testUser->hasExactRoles($roleModel->all()))->toBeFalse();
 
-        $this->expectException(GuardDoesNotMatch::class);
+    $roleModel->create(['name' => 'second role']);
 
-        User::role($this->testAdminRole)->get();
-    }
+    $this->testUser->assignRole($this->testUserRole);
 
-    /** @test */
-    public function it_throws_an_exception_when_trying_to_scope_a_non_existing_role()
-    {
-        $this->expectException(RoleDoesNotExist::class);
+    expect($this->testUser->hasExactRoles('testRole'))->toBeTrue()
+        ->and($this->testUser->hasExactRoles('testRole', 'web'))->toBeTrue()
+        ->and($this->testUser->hasExactRoles('testRole', 'fakeGuard'))->toBeFalse()
+        ->and($this->testUser->hasExactRoles(['testRole', 'second role']))->toBeFalse()
+        ->and($this->testUser->hasExactRoles(['testRole', 'second role'], 'web'))->toBeFalse();
 
-        User::role('role not defined')->get();
-    }
+    $this->testUser->assignRole('second role');
 
-    /** @test */
-    public function it_can_determine_that_a_user_has_one_of_the_given_roles()
-    {
-        $roleModel = app(Role::class);
+    expect($this->testUser->hasExactRoles(['testRole', 'second role']))->toBeTrue()
+        ->and($this->testUser->hasExactRoles(['testRole', 'second role'], 'web'))->toBeTrue()
+        ->and($this->testUser->hasExactRoles(['testRole', 'second role'], 'fakeGuard'))->toBeFalse();
 
-        $roleModel->create(['name' => 'second role']);
+    $roleModel->create(['name' => 'third role']);
+    $this->testUser->assignRole('third role');
 
-        $this->assertFalse($this->testUser->hasRole($roleModel->all()));
+    expect($this->testUser->hasExactRoles(['testRole', 'second role']))->toBeFalse()
+        ->and($this->testUser->hasExactRoles(['testRole', 'second role'], 'web'))->toBeFalse()
+        ->and($this->testUser->hasExactRoles(['testRole', 'second role'], 'fakeGuard'))->toBeFalse()
+        ->and($this->testUser->hasExactRoles(['testRole', 'second role', 'third role']))->toBeTrue()
+        ->and($this->testUser->hasExactRoles(['testRole', 'second role', 'third role'], 'web'))->toBeTrue()
+        ->and($this->testUser->hasExactRoles(['testRole', 'second role', 'third role'], 'fakeGuard'))->toBeFalse();
+});
 
-        $this->testUser->assignRole($this->testUserRole);
+it('can determine that a user does not have a role from another guard', function () {
+    expect($this->testUser->hasRole('testAdminRole'))->toBeFalse()
+        ->and($this->testUser->hasRole($this->testAdminRole))->toBeFalse();
 
-        $this->assertTrue($this->testUser->hasRole($roleModel->all()));
+    $this->testUser->assignRole('testRole');
 
-        $this->assertTrue($this->testUser->hasAnyRole($roleModel->all()));
+    expect($this->testUser->hasAnyRole(['testRole', 'testAdminRole']))->toBeTrue()
+        ->and($this->testUser->hasAnyRole('testAdminRole', $this->testAdminRole))->toBeFalse();
 
-        $this->assertTrue($this->testUser->hasAnyRole('testRole'));
+});
 
-        $this->assertFalse($this->testUser->hasAnyRole('role does not exist'));
+it('can check against any multiple roles using multiple arguments', function () {
+    $this->testUser->assignRole('testRole');
 
-        $this->assertTrue($this->testUser->hasAnyRole(['testRole']));
+    expect($this->testUser->hasAnyRole($this->testAdminRole, ['testRole'], 'This Role Does Not Even Exist'))->toBeTrue();
+});
 
-        $this->assertTrue($this->testUser->hasAnyRole(['testRole', 'role does not exist']));
+it('returns false instead of an exception when checking against any undefined roles using multiple arguments', function () {
+    expect($this->testUser->hasAnyRole('This Role Does Not Even Exist', $this->testAdminRole))->toBeFalse();
+});
 
-        $this->assertFalse($this->testUser->hasAnyRole(['role does not exist']));
+it('can retrieve role names', function () {
+    $this->testUser->assignRole('testRole', 'testRole2');
 
-        $this->assertTrue($this->testUser->hasAnyRole('testRole', 'role does not exist'));
-    }
+    expect($this->testUser->getRoleNames()->sort()->values())->toEqual(collect(['testRole', 'testRole2']));
+});
 
-    /** @test */
-    public function it_can_determine_that_a_user_has_all_of_the_given_roles()
-    {
-        $roleModel = app(Role::class);
+it('does not detach roles when soft deleting', function () {
+    $user = SoftDeletingUser::create(['email' => 'test@example.com']);
+    $user->assignRole('testRole');
+    $user->delete();
 
-        $this->assertFalse($this->testUser->hasAllRoles($roleModel->first()));
+    $user = SoftDeletingUser::withTrashed()->find($user->id);
 
-        $this->assertFalse($this->testUser->hasAllRoles('testRole'));
-
-        $this->assertFalse($this->testUser->hasAllRoles($roleModel->all()));
-
-        $roleModel->create(['name' => 'second role']);
-
-        $this->testUser->assignRole($this->testUserRole);
-
-        $this->assertTrue($this->testUser->hasAllRoles('testRole'));
-        $this->assertTrue($this->testUser->hasAllRoles('testRole', 'web'));
-        $this->assertFalse($this->testUser->hasAllRoles('testRole', 'fakeGuard'));
-
-        $this->assertFalse($this->testUser->hasAllRoles(['testRole', 'second role']));
-        $this->assertFalse($this->testUser->hasAllRoles(['testRole', 'second role'], 'web'));
-
-        $this->testUser->assignRole('second role');
-
-        $this->assertTrue($this->testUser->hasAllRoles(['testRole', 'second role']));
-        $this->assertTrue($this->testUser->hasAllRoles(['testRole', 'second role'], 'web'));
-        $this->assertFalse($this->testUser->hasAllRoles(['testRole', 'second role'], 'fakeGuard'));
-    }
-
-    /** @test */
-    public function it_can_determine_that_a_user_has_exact_all_of_the_given_roles()
-    {
-        $roleModel = app(Role::class);
-
-        $this->assertFalse($this->testUser->hasExactRoles($roleModel->first()));
-
-        $this->assertFalse($this->testUser->hasExactRoles('testRole'));
-
-        $this->assertFalse($this->testUser->hasExactRoles($roleModel->all()));
-
-        $roleModel->create(['name' => 'second role']);
-
-        $this->testUser->assignRole($this->testUserRole);
-
-        $this->assertTrue($this->testUser->hasExactRoles('testRole'));
-        $this->assertTrue($this->testUser->hasExactRoles('testRole', 'web'));
-        $this->assertFalse($this->testUser->hasExactRoles('testRole', 'fakeGuard'));
-
-        $this->assertFalse($this->testUser->hasExactRoles(['testRole', 'second role']));
-        $this->assertFalse($this->testUser->hasExactRoles(['testRole', 'second role'], 'web'));
-
-        $this->testUser->assignRole('second role');
-
-        $this->assertTrue($this->testUser->hasExactRoles(['testRole', 'second role']));
-        $this->assertTrue($this->testUser->hasExactRoles(['testRole', 'second role'], 'web'));
-        $this->assertFalse($this->testUser->hasExactRoles(['testRole', 'second role'], 'fakeGuard'));
-
-        $roleModel->create(['name' => 'third role']);
-        $this->testUser->assignRole('third role');
-
-        $this->assertFalse($this->testUser->hasExactRoles(['testRole', 'second role']));
-        $this->assertFalse($this->testUser->hasExactRoles(['testRole', 'second role'], 'web'));
-        $this->assertFalse($this->testUser->hasExactRoles(['testRole', 'second role'], 'fakeGuard'));
-        $this->assertTrue($this->testUser->hasExactRoles(['testRole', 'second role', 'third role']));
-        $this->assertTrue($this->testUser->hasExactRoles(['testRole', 'second role', 'third role'], 'web'));
-        $this->assertFalse($this->testUser->hasExactRoles(['testRole', 'second role', 'third role'], 'fakeGuard'));
-    }
-
-    /** @test */
-    public function it_can_determine_that_a_user_does_not_have_a_role_from_another_guard()
-    {
-        $this->assertFalse($this->testUser->hasRole('testAdminRole'));
-
-        $this->assertFalse($this->testUser->hasRole($this->testAdminRole));
-
-        $this->testUser->assignRole('testRole');
-
-        $this->assertTrue($this->testUser->hasAnyRole(['testRole', 'testAdminRole']));
-
-        $this->assertFalse($this->testUser->hasAnyRole('testAdminRole', $this->testAdminRole));
-    }
-
-    /** @test */
-    public function it_can_check_against_any_multiple_roles_using_multiple_arguments()
-    {
-        $this->testUser->assignRole('testRole');
-
-        $this->assertTrue($this->testUser->hasAnyRole($this->testAdminRole, ['testRole'], 'This Role Does Not Even Exist'));
-    }
-
-    /** @test */
-    public function it_returns_false_instead_of_an_exception_when_checking_against_any_undefined_roles_using_multiple_arguments()
-    {
-        $this->assertFalse($this->testUser->hasAnyRole('This Role Does Not Even Exist', $this->testAdminRole));
-    }
-
-    /** @test */
-    public function it_can_retrieve_role_names()
-    {
-        $this->testUser->assignRole('testRole', 'testRole2');
-
-        $this->assertEquals(
-            collect(['testRole', 'testRole2']),
-            $this->testUser->getRoleNames()->sort()->values()
-        );
-    }
-
-    /** @test */
-    public function it_does_not_detach_roles_when_soft_deleting()
-    {
-        $user = SoftDeletingUser::create(['email' => 'test@example.com']);
-        $user->assignRole('testRole');
-        $user->delete();
-
-        $user = SoftDeletingUser::withTrashed()->find($user->id);
-
-        $this->assertTrue($user->hasRole('testRole'));
-    }
-}
+    expect($user->hasRole('testRole'))->toBeTrue();
+});

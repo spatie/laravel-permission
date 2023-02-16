@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests\TestModels;
 
 class Permission extends \Spatie\Permission\Models\Permission
 {

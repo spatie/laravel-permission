@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -10,169 +10,106 @@ use InvalidArgumentException;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middlewares\RoleOrPermissionMiddleware;
 
-class RoleOrPermissionMiddlewareTest extends TestCase
-{
-    protected $roleOrPermissionMiddleware;
+beforeEach(function () {
+    $this->roleOrPermissionMiddleware = new RoleOrPermissionMiddleware();
+});
 
-    public function setUp(): void
-    {
-        parent::setUp();
+it('a guest cannot access a route protected by the role or permission middleware', function () {
+    expect(runMiddleware($this->roleOrPermissionMiddleware, 'testRole'))->toEqual(403);
+});
 
-        $this->roleOrPermissionMiddleware = new RoleOrPermissionMiddleware();
+it('a user can access a route protected by permission or role middleware if has this permission or role', function () {
+    Auth::login($this->testUser);
+
+    $this->testUser->assignRole('testRole');
+    $this->testUser->givePermissionTo('edit-articles');
+
+    expect(runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-news|edit-articles'))->toEqual(200);
+
+    $this->testUser->removeRole('testRole');
+
+    expect(runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles'))->toEqual(200);
+
+    $this->testUser->revokePermissionTo('edit-articles');
+    $this->testUser->assignRole('testRole');
+
+    expect(runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles'))->toEqual(200)
+        ->and(runMiddleware($this->roleOrPermissionMiddleware, ['testRole', 'edit-articles']))->toEqual(200);
+});
+
+it('a user can not access a route protected by permission or role middleware if have not this permission and role', function () {
+    Auth::login($this->testUser);
+
+    expect(runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles'))->toEqual(403)
+        ->and(runMiddleware($this->roleOrPermissionMiddleware, 'missingRole|missingPermission'))->toEqual(403);
+
+});
+
+it('use not existing custom guard in role or permission', function () {
+    $class = null;
+
+    try {
+        $this->roleOrPermissionMiddleware->handle(new Request(), function () {
+        return (new Response())->setContent('<html></html>');
+        }, 'testRole', 'xxx');
+    } catch (InvalidArgumentException $e) {
+        $class = get_class($e);
     }
 
-    /** @test */
-    public function a_guest_cannot_access_a_route_protected_by_the_role_or_permission_middleware()
-    {
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole')
-        );
+    expect($class)->toEqual(InvalidArgumentException::class);
+});
+
+it('user can not access permission or role with guard admin while login using default guard', function () {
+    Auth::login($this->testUser);
+
+    $this->testUser->assignRole('testRole');
+    $this->testUser->givePermissionTo('edit-articles');
+
+    expect(runMiddleware($this->roleOrPermissionMiddleware, 'edit-articles|testRole', 'admin'))->toEqual(403);
+});
+
+it('user can access permission or role with guard admin while login using admin guard', function () {
+    Auth::guard('admin')->login($this->testAdmin);
+
+    $this->testAdmin->assignRole('testAdminRole');
+    $this->testAdmin->givePermissionTo('admin-permission');
+
+    expect(runMiddleware($this->roleOrPermissionMiddleware, 'admin-permission|testAdminRole', 'admin'))->toEqual(200);
+});
+
+it('the required permissions or roles can be fetched from the exception', function () {
+    Auth::login($this->testUser);
+
+    $message = null;
+    $requiredRolesOrPermissions = [];
+
+    try {
+        $this->roleOrPermissionMiddleware->handle(new Request(), function () {
+        return (new Response())->setContent('<html></html>');
+        }, 'some-permission|some-role');
+    } catch (UnauthorizedException $e) {
+        $message = $e->getMessage();
+        $requiredRolesOrPermissions = $e->getRequiredPermissions();
     }
 
-    /** @test */
-    public function a_user_can_access_a_route_protected_by_permission_or_role_middleware_if_has_this_permission_or_role()
-    {
-        Auth::login($this->testUser);
+    expect($message)->toEqual('User does not have any of the necessary access rights.')
+        ->and($requiredRolesOrPermissions)->toEqual(['some-permission', 'some-role']);
+});
 
-        $this->testUser->assignRole('testRole');
-        $this->testUser->givePermissionTo('edit-articles');
+it('the required permissions or roles can be displayed in the exception', function () {
+    Auth::login($this->testUser);
+    Config::set(['permission.display_permission_in_exception' => true]);
+    Config::set(['permission.display_role_in_exception' => true]);
 
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-news|edit-articles')
-        );
+    $message = null;
 
-        $this->testUser->removeRole('testRole');
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles')
-        );
-
-        $this->testUser->revokePermissionTo('edit-articles');
-        $this->testUser->assignRole('testRole');
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles')
-        );
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, ['testRole', 'edit-articles'])
-        );
+    try {
+        $this->roleOrPermissionMiddleware->handle(new Request(), function () {
+        return (new Response())->setContent('<html></html>');
+        }, 'some-permission|some-role');
+    } catch (UnauthorizedException $e) {
+        $message = $e->getMessage();
     }
 
-    /** @test */
-    public function a_user_can_not_access_a_route_protected_by_permission_or_role_middleware_if_have_not_this_permission_and_role()
-    {
-        Auth::login($this->testUser);
-
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles')
-        );
-
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'missingRole|missingPermission')
-        );
-    }
-
-    /** @test */
-    public function use_not_existing_custom_guard_in_role_or_permission()
-    {
-        $class = null;
-
-        try {
-            $this->roleOrPermissionMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
-            }, 'testRole', 'xxx');
-        } catch (InvalidArgumentException $e) {
-            $class = get_class($e);
-        }
-
-        $this->assertEquals(InvalidArgumentException::class, $class);
-    }
-
-    /** @test */
-    public function user_can_not_access_permission_or_role_with_guard_admin_while_login_using_default_guard()
-    {
-        Auth::login($this->testUser);
-
-        $this->testUser->assignRole('testRole');
-        $this->testUser->givePermissionTo('edit-articles');
-
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'edit-articles|testRole', 'admin')
-        );
-    }
-
-    /** @test */
-    public function user_can_access_permission_or_role_with_guard_admin_while_login_using_admin_guard()
-    {
-        Auth::guard('admin')->login($this->testAdmin);
-
-        $this->testAdmin->assignRole('testAdminRole');
-        $this->testAdmin->givePermissionTo('admin-permission');
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'admin-permission|testAdminRole', 'admin')
-        );
-    }
-
-    /** @test */
-    public function the_required_permissions_or_roles_can_be_fetched_from_the_exception()
-    {
-        Auth::login($this->testUser);
-
-        $message = null;
-        $requiredRolesOrPermissions = [];
-
-        try {
-            $this->roleOrPermissionMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
-            }, 'some-permission|some-role');
-        } catch (UnauthorizedException $e) {
-            $message = $e->getMessage();
-            $requiredRolesOrPermissions = $e->getRequiredPermissions();
-        }
-
-        $this->assertEquals('User does not have any of the necessary access rights.', $message);
-        $this->assertEquals(['some-permission', 'some-role'], $requiredRolesOrPermissions);
-    }
-
-    /** @test */
-    public function the_required_permissions_or_roles_can_be_displayed_in_the_exception()
-    {
-        Auth::login($this->testUser);
-        Config::set(['permission.display_permission_in_exception' => true]);
-        Config::set(['permission.display_role_in_exception' => true]);
-
-        $message = null;
-
-        try {
-            $this->roleOrPermissionMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
-            }, 'some-permission|some-role');
-        } catch (UnauthorizedException $e) {
-            $message = $e->getMessage();
-        }
-
-        $this->assertStringEndsWith('Necessary roles or permissions are some-permission, some-role', $message);
-    }
-
-    protected function runMiddleware($middleware, $name, $guard = null)
-    {
-        try {
-            return $middleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
-            }, $name, $guard)->status();
-        } catch (UnauthorizedException $e) {
-            return $e->getStatusCode();
-        }
-    }
-}
+    expect($message)->toEndWith('Necessary roles or permissions are some-permission, some-role');
+});

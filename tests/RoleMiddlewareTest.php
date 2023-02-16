@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -10,195 +10,122 @@ use InvalidArgumentException;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middlewares\RoleMiddleware;
 
-class RoleMiddlewareTest extends TestCase
-{
-    protected $roleMiddleware;
+beforeEach(function () {
+    $this->roleMiddleware = new RoleMiddleware();
+});
 
-    public function setUp(): void
-    {
-        parent::setUp();
+it('a guest cannot access a route protected by rolemiddleware', function () {
+    expect(runMiddleware($this->roleMiddleware, 'testRole'))->toEqual(403);
+});
 
-        $this->roleMiddleware = new RoleMiddleware();
+it('a user cannot access a route protected by role middleware of another guard', function () {
+    Auth::login($this->testUser);
+
+    $this->testUser->assignRole('testRole');
+
+    expect(runMiddleware($this->roleMiddleware, 'testAdminRole'))->toEqual(403);
+});
+
+it('a user can access a route protected by role middleware if have this role', function () {
+    Auth::login($this->testUser);
+
+    $this->testUser->assignRole('testRole');
+
+    expect(runMiddleware($this->roleMiddleware, 'testRole'))->toEqual(200);
+});
+
+it('a user can access a route protected by this role middleware if have one of the roles', function () {
+    Auth::login($this->testUser);
+
+    $this->testUser->assignRole('testRole');
+
+    expect(runMiddleware($this->roleMiddleware, 'testRole|testRole2'))->toEqual(200);
+
+    expect(runMiddleware($this->roleMiddleware, ['testRole2', 'testRole']))->toEqual(200);
+});
+
+it('a user cannot access a route protected by the role middleware if have a different role', function () {
+    Auth::login($this->testUser);
+
+    $this->testUser->assignRole(['testRole']);
+
+    expect(runMiddleware($this->roleMiddleware, 'testRole2'))->toEqual(403);
+});
+
+it('a user cannot access a route protected by role middleware if have not roles', function () {
+    Auth::login($this->testUser);
+
+    expect(runMiddleware($this->roleMiddleware, 'testRole|testRole2'))->toEqual(403);
+});
+
+it('a user cannot access a route protected by role middleware if role is undefined', function () {
+    Auth::login($this->testUser);
+
+    expect(runMiddleware($this->roleMiddleware, ''))->toEqual(403);
+});
+
+it('the required roles can be fetched from the exception', function () {
+    Auth::login($this->testUser);
+
+    $message = null;
+    $requiredRoles = [];
+
+    try {
+        $this->roleMiddleware->handle(new Request(), function () {
+        return (new Response())->setContent('<html></html>');
+        }, 'some-role');
+    } catch (UnauthorizedException $e) {
+        $message = $e->getMessage();
+        $requiredRoles = $e->getRequiredRoles();
     }
 
-    /** @test */
-    public function a_guest_cannot_access_a_route_protected_by_rolemiddleware()
-    {
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleMiddleware, 'testRole')
-        );
+    expect($message)->toEqual('User does not have the right roles.');
+    expect($requiredRoles)->toEqual(['some-role']);
+});
+
+it('the required roles can be displayed in the exception', function () {
+    Auth::login($this->testUser);
+    Config::set(['permission.display_role_in_exception' => true]);
+
+    $message = null;
+
+    try {
+        $this->roleMiddleware->handle(new Request(), function () {
+        return (new Response())->setContent('<html></html>');
+        }, 'some-role');
+    } catch (UnauthorizedException $e) {
+        $message = $e->getMessage();
     }
 
-    /** @test */
-    public function a_user_cannot_access_a_route_protected_by_role_middleware_of_another_guard()
-    {
-        Auth::login($this->testUser);
+    expect($message)->toEndWith('Necessary roles are some-role');
+});
 
-        $this->testUser->assignRole('testRole');
+it('use not existing custom guard in role', function () {
+    $class = null;
 
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleMiddleware, 'testAdminRole')
-        );
+    try {
+        $this->roleMiddleware->handle(new Request(), function () {
+        return (new Response())->setContent('<html></html>');
+        }, 'testRole', 'xxx');
+    } catch (InvalidArgumentException $e) {
+        $class = get_class($e);
     }
 
-    /** @test */
-    public function a_user_can_access_a_route_protected_by_role_middleware_if_have_this_role()
-    {
-        Auth::login($this->testUser);
+    expect($class)->toEqual(InvalidArgumentException::class);
+});
 
-        $this->testUser->assignRole('testRole');
+it('user can not access role with guard admin while login using default guard', function () {
+    Auth::login($this->testUser);
 
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleMiddleware, 'testRole')
-        );
-    }
+    $this->testUser->assignRole('testRole');
 
-    /** @test */
-    public function a_user_can_access_a_route_protected_by_this_role_middleware_if_have_one_of_the_roles()
-    {
-        Auth::login($this->testUser);
+    expect(runMiddleware($this->roleMiddleware, 'testRole', 'admin'))->toEqual(403);
+});
 
-        $this->testUser->assignRole('testRole');
+it('user can access role with guard admin while login using admin guard', function () {
+    Auth::guard('admin')->login($this->testAdmin);
 
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleMiddleware, 'testRole|testRole2')
-        );
+    $this->testAdmin->assignRole('testAdminRole');
 
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleMiddleware, ['testRole2', 'testRole'])
-        );
-    }
-
-    /** @test */
-    public function a_user_cannot_access_a_route_protected_by_the_role_middleware_if_have_a_different_role()
-    {
-        Auth::login($this->testUser);
-
-        $this->testUser->assignRole(['testRole']);
-
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleMiddleware, 'testRole2')
-        );
-    }
-
-    /** @test */
-    public function a_user_cannot_access_a_route_protected_by_role_middleware_if_have_not_roles()
-    {
-        Auth::login($this->testUser);
-
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleMiddleware, 'testRole|testRole2')
-        );
-    }
-
-    /** @test */
-    public function a_user_cannot_access_a_route_protected_by_role_middleware_if_role_is_undefined()
-    {
-        Auth::login($this->testUser);
-
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleMiddleware, '')
-        );
-    }
-
-    /** @test */
-    public function the_required_roles_can_be_fetched_from_the_exception()
-    {
-        Auth::login($this->testUser);
-
-        $message = null;
-        $requiredRoles = [];
-
-        try {
-            $this->roleMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
-            }, 'some-role');
-        } catch (UnauthorizedException $e) {
-            $message = $e->getMessage();
-            $requiredRoles = $e->getRequiredRoles();
-        }
-
-        $this->assertEquals('User does not have the right roles.', $message);
-        $this->assertEquals(['some-role'], $requiredRoles);
-    }
-
-    /** @test */
-    public function the_required_roles_can_be_displayed_in_the_exception()
-    {
-        Auth::login($this->testUser);
-        Config::set(['permission.display_role_in_exception' => true]);
-
-        $message = null;
-
-        try {
-            $this->roleMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
-            }, 'some-role');
-        } catch (UnauthorizedException $e) {
-            $message = $e->getMessage();
-        }
-
-        $this->assertStringEndsWith('Necessary roles are some-role', $message);
-    }
-
-    /** @test */
-    public function use_not_existing_custom_guard_in_role()
-    {
-        $class = null;
-
-        try {
-            $this->roleMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
-            }, 'testRole', 'xxx');
-        } catch (InvalidArgumentException $e) {
-            $class = get_class($e);
-        }
-
-        $this->assertEquals(InvalidArgumentException::class, $class);
-    }
-
-    /** @test */
-    public function user_can_not_access_role_with_guard_admin_while_login_using_default_guard()
-    {
-        Auth::login($this->testUser);
-
-        $this->testUser->assignRole('testRole');
-
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleMiddleware, 'testRole', 'admin')
-        );
-    }
-
-    /** @test */
-    public function user_can_access_role_with_guard_admin_while_login_using_admin_guard()
-    {
-        Auth::guard('admin')->login($this->testAdmin);
-
-        $this->testAdmin->assignRole('testAdminRole');
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleMiddleware, 'testAdminRole', 'admin')
-        );
-    }
-
-    protected function runMiddleware($middleware, $roleName, $guard = null)
-    {
-        try {
-            return $middleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
-            }, $roleName, $guard)->status();
-        } catch (UnauthorizedException $e) {
-            return $e->getStatusCode();
-        }
-    }
-}
+    expect(runMiddleware($this->roleMiddleware, 'testAdminRole', 'admin'))->toEqual(200);
+});

@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests\TestModels;
 
 use Spatie\Permission\WildcardPermission as BaseWildcardPermission;
 

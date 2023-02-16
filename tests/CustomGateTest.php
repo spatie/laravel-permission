@@ -1,35 +1,32 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
 use Illuminate\Contracts\Auth\Access\Gate;
 
-class CustomGateTest extends TestCase
-{
+trait SetupCustomGateTest {
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
 
         $app['config']->set('permission.register_permission_check_method', false);
     }
-
-    /** @test */
-    public function it_doesnt_register_the_method_for_checking_permissions_on_the_gate()
-    {
-        $this->testUser->givePermissionTo('edit-articles');
-
-        $this->assertEmpty(app(Gate::class)->abilities());
-        $this->assertFalse($this->testUser->can('edit-articles'));
-    }
-
-    /** @test */
-    public function it_can_authorize_using_custom_method_for_checking_permissions()
-    {
-        app(Gate::class)->define('edit-articles', function () {
-            return true;
-        });
-
-        $this->assertArrayHasKey('edit-articles', app(Gate::class)->abilities());
-        $this->assertTrue($this->testUser->can('edit-articles'));
-    }
 }
+
+uses(SetupCustomGateTest::class);
+
+it('doesnt register the method for checking permissions on the gate', function () {
+    $this->testUser->givePermissionTo('edit-articles');
+
+    expect(app(Gate::class)->abilities())->toBeEmpty()
+        ->and($this->testUser->can('edit-articles'))->toBeFalse();
+});
+
+it('can authorize using custom method for checking permissions', function () {
+    app(Gate::class)->define('edit-articles', function () {
+        return true;
+    });
+
+    expect(app(Gate::class)->abilities())->toHaveKey('edit-articles');
+    expect($this->testUser->can('edit-articles'))->toBeTrue();
+});

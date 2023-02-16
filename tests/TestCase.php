@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
@@ -12,38 +12,40 @@ use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\PermissionServiceProvider;
+use Spatie\Permission\Tests\TestModels\Admin;
+use Spatie\Permission\Tests\TestModels\User;
 
-abstract class TestCase extends Orchestra
+class TestCase extends Orchestra
 {
-    /** @var \Spatie\Permission\Test\User */
-    protected $testUser;
+    /** @var \Spatie\Permission\Tests\TestModels\User */
+    public $testUser;
 
-    /** @var \Spatie\Permission\Test\Admin */
-    protected $testAdmin;
-
-    /** @var \Spatie\Permission\Models\Role */
-    protected $testUserRole;
+    /** @var \Spatie\Permission\Tests\TestModels\Admin */
+    public $testAdmin;
 
     /** @var \Spatie\Permission\Models\Role */
-    protected $testAdminRole;
+    public $testUserRole;
+
+    /** @var \Spatie\Permission\Models\Role */
+    public $testAdminRole;
 
     /** @var \Spatie\Permission\Models\Permission */
-    protected $testUserPermission;
+    public $testUserPermission;
 
     /** @var \Spatie\Permission\Models\Permission */
-    protected $testAdminPermission;
+    public $testAdminPermission;
 
     /** @var bool */
-    protected $useCustomModels = false;
+    public $useCustomModels = false;
 
     /** @var bool */
-    protected $hasTeams = false;
+    public $hasTeams = false;
 
-    protected static $migration;
+    public static $migration;
 
-    protected static $customMigration;
+    public static $customMigration;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -100,8 +102,8 @@ abstract class TestCase extends Orchestra
         $app['config']->set('auth.guards.admin', ['driver' => 'session', 'provider' => 'admins']);
         $app['config']->set('auth.providers.admins', ['driver' => 'eloquent', 'model' => Admin::class]);
         if ($this->useCustomModels) {
-            $app['config']->set('permission.models.permission', \Spatie\Permission\Test\Permission::class);
-            $app['config']->set('permission.models.role', \Spatie\Permission\Test\Role::class);
+            $app['config']->set('permission.models.permission', \Spatie\Permission\Tests\TestModels\Permission::class);
+            $app['config']->set('permission.models.role', \Spatie\Permission\Tests\TestModels\Role::class);
         }
         // Use test User model for users provider
         $app['config']->set('auth.providers.users.model', User::class);

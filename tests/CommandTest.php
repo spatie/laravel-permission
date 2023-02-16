@@ -1,183 +1,142 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
 use Illuminate\Support\Facades\Artisan;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-class CommandTest extends TestCase
-{
-    /** @test */
-    public function it_can_create_a_role()
-    {
-        Artisan::call('permission:create-role', ['name' => 'new-role']);
+it('can create a role', function () {
+    Artisan::call('permission:create-role', ['name' => 'new-role']);
 
-        $this->assertCount(1, Role::where('name', 'new-role')->get());
-        $this->assertCount(0, Role::where('name', 'new-role')->first()->permissions);
-    }
+    expect(Role::where('name', 'new-role')->get())->toHaveCount(1)
+        ->and(Role::where('name', 'new-role')->first()->permissions)->toHaveCount(0);
+});
 
-    /** @test */
-    public function it_can_create_a_role_with_a_specific_guard()
-    {
-        Artisan::call('permission:create-role', [
-            'name' => 'new-role',
-            'guard' => 'api',
-        ]);
+it('can create a role with a specific guard', function () {
+    Artisan::call('permission:create-role', [
+        'name' => 'new-role',
+        'guard' => 'api',
+    ]);
 
-        $this->assertCount(1, Role::where('name', 'new-role')
-            ->where('guard_name', 'api')
-            ->get());
-    }
+    expect(Role::where('name', 'new-role')
+        ->where('guard_name', 'api')
+        ->get())->toHaveCount(1);
+});
 
-    /** @test */
-    public function it_can_create_a_permission()
-    {
-        Artisan::call('permission:create-permission', ['name' => 'new-permission']);
+it('can create a permission', function () {
+    Artisan::call('permission:create-permission', ['name' => 'new-permission']);
 
-        $this->assertCount(1, Permission::where('name', 'new-permission')->get());
-    }
+    expect(Permission::where('name', 'new-permission')->get())->toHaveCount(1);
+});
 
-    /** @test */
-    public function it_can_create_a_permission_with_a_specific_guard()
-    {
-        Artisan::call('permission:create-permission', [
-            'name' => 'new-permission',
-            'guard' => 'api',
-        ]);
+it('can create a permission with a specific guard', function () {
+    Artisan::call('permission:create-permission', [
+        'name' => 'new-permission',
+        'guard' => 'api',
+    ]);
 
-        $this->assertCount(1, Permission::where('name', 'new-permission')
-            ->where('guard_name', 'api')
-            ->get());
-    }
+    expect(Permission::where('name', 'new-permission')
+        ->where('guard_name', 'api')
+        ->get())->toHaveCount(1);
+});
 
-    /** @test */
-    public function it_can_create_a_role_and_permissions_at_same_time()
-    {
-        Artisan::call('permission:create-role', [
-            'name' => 'new-role',
-            'permissions' => 'first permission | second permission',
-        ]);
+it('can create a role and permissions at same time', function () {
+    Artisan::call('permission:create-role', [
+        'name' => 'new-role',
+        'permissions' => 'first permission | second permission',
+    ]);
 
-        $role = Role::where('name', 'new-role')->first();
+    $role = Role::where('name', 'new-role')->first();
 
-        $this->assertTrue($role->hasPermissionTo('first permission'));
-        $this->assertTrue($role->hasPermissionTo('second permission'));
-    }
+    expect($role->hasPermissionTo('first permission'))->toBeTrue()
+        ->and($role->hasPermissionTo('second permission'))->toBeTrue();
+});
 
-    /** @test */
-    public function it_can_create_a_role_without_duplication()
-    {
-        Artisan::call('permission:create-role', ['name' => 'new-role']);
-        Artisan::call('permission:create-role', ['name' => 'new-role']);
+it('can create a role without duplication', function () {
+    Artisan::call('permission:create-role', ['name' => 'new-role']);
+    Artisan::call('permission:create-role', ['name' => 'new-role']);
 
-        $this->assertCount(1, Role::where('name', 'new-role')->get());
-        $this->assertCount(0, Role::where('name', 'new-role')->first()->permissions);
-    }
+    expect(Role::where('name', 'new-role')->get())->toHaveCount(1)
+        ->and(Role::where('name', 'new-role')->first()->permissions)->toHaveCount(0);
+});
 
-    /** @test */
-    public function it_can_create_a_permission_without_duplication()
-    {
-        Artisan::call('permission:create-permission', ['name' => 'new-permission']);
-        Artisan::call('permission:create-permission', ['name' => 'new-permission']);
+it('can create a permission without duplication', function () {
+    Artisan::call('permission:create-permission', ['name' => 'new-permission']);
+    Artisan::call('permission:create-permission', ['name' => 'new-permission']);
 
-        $this->assertCount(1, Permission::where('name', 'new-permission')->get());
-    }
+    expect(Permission::where('name', 'new-permission')->get())->toHaveCount(1);
+});
 
-    /** @test */
-    public function it_can_show_permission_tables()
-    {
-        Artisan::call('permission:show');
+it('can show permission tables', function () {
+    Artisan::call('permission:show');
 
-        $output = Artisan::output();
+    $output = Artisan::output();
 
-        $this->assertTrue(strpos($output, 'Guard: web') !== false);
-        $this->assertTrue(strpos($output, 'Guard: admin') !== false);
-
-        if (method_exists($this, 'assertMatchesRegularExpression')) {
-            // |               | testRole | testRole2 |
-            $this->assertMatchesRegularExpression('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|/', $output);
-
-            // | edit-articles |  ·       |  ·        |
-            $this->assertMatchesRegularExpression('/\|\s+edit-articles\s+\|\s+·\s+\|\s+·\s+\|/', $output);
-        } else { // phpUnit 9/8
-            $this->assertRegExp('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|/', $output);
-            $this->assertRegExp('/\|\s+edit-articles\s+\|\s+·\s+\|\s+·\s+\|/', $output);
-        }
-
-        Role::findByName('testRole')->givePermissionTo('edit-articles');
-        $this->reloadPermissions();
-
-        Artisan::call('permission:show');
-
-        $output = Artisan::output();
-
+    expect(strpos($output, 'Guard: web') !== false)->toBeTrue()
+        ->and(strpos($output, 'Guard: admin') !== false)->toBeTrue()
+        // |               | testRole | testRole2 |
+        ->and($output)->toMatch('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|/')
         // | edit-articles |  ·       |  ·        |
-        if (method_exists($this, 'assertMatchesRegularExpression')) {
-            $this->assertMatchesRegularExpression('/\|\s+edit-articles\s+\|\s+✔\s+\|\s+·\s+\|/', $output);
-        } else {
-            $this->assertRegExp('/\|\s+edit-articles\s+\|\s+✔\s+\|\s+·\s+\|/', $output);
-        }
+        ->and($output)->toMatch('/\|\s+edit-articles\s+\|\s+·\s+\|\s+·\s+\|/');
+
+    Role::findByName('testRole')->givePermissionTo('edit-articles');
+    $this->reloadPermissions();
+
+    Artisan::call('permission:show');
+
+    $output = Artisan::output();
+
+    // | edit-articles |  ·       |  ·    |
+    expect($output)->toMatch('/\|\s+edit-articles\s+\|\s+✔\s+\|\s+·\s+\|/');
+});
+
+it('can show permissions for guard', function () {
+    Artisan::call('permission:show', ['guard' => 'web']);
+
+    $output = Artisan::output();
+
+    expect(strpos($output, 'Guard: web') !== false)->toBeTrue()
+        ->and(strpos($output, 'Guard: admin') === false)->toBeTrue();
+});
+
+it('can setup teams upgrade', function () {
+    config()->set('permission.teams', true);
+
+    $this->artisan('permission:setup-teams')
+        ->expectsQuestion('Proceed with the migration creation?', 'yes')
+        ->assertExitCode(0);
+
+    $matchingFiles = glob(database_path('migrations/*_add_teams_fields.php'));
+    expect(count($matchingFiles) > 0)->toBeTrue();
+
+    include_once $matchingFiles[count($matchingFiles) - 1];
+    (new \AddTeamsFields())->up();
+    (new \AddTeamsFields())->up(); //test upgrade teams migration fresh
+
+    Role::create(['name' => 'new-role', 'team_test_id' => 1]);
+    $role = Role::where('name', 'new-role')->first();
+    expect($role)->not->toBeNull()
+        ->and((int)$role->team_test_id)->toBe(1);
+
+    // remove migration
+    foreach ($matchingFiles as $file) {
+        unlink($file);
     }
+});
 
-    /** @test */
-    public function it_can_show_permissions_for_guard()
-    {
-        Artisan::call('permission:show', ['guard' => 'web']);
+it('can show roles by teams', function () {
+    config()->set('permission.teams', true);
+    app(\Spatie\Permission\PermissionRegistrar::class)->initializeCache();
 
-        $output = Artisan::output();
+    Role::create(['name' => 'testRoleTeam', 'team_test_id' => 1]);
+    Role::create(['name' => 'testRoleTeam', 'team_test_id' => 2]); // same name different team
+    Artisan::call('permission:show');
 
-        $this->assertTrue(strpos($output, 'Guard: web') !== false);
-        $this->assertTrue(strpos($output, 'Guard: admin') === false);
-    }
+    $output = Artisan::output();
 
-    /** @test */
-    public function it_can_setup_teams_upgrade()
-    {
-        config()->set('permission.teams', true);
-
-        $this->artisan('permission:setup-teams')
-            ->expectsQuestion('Proceed with the migration creation?', 'yes')
-            ->assertExitCode(0);
-
-        $matchingFiles = glob(database_path('migrations/*_add_teams_fields.php'));
-        $this->assertTrue(count($matchingFiles) > 0);
-
-        include_once $matchingFiles[count($matchingFiles) - 1];
-        (new \AddTeamsFields())->up();
-        (new \AddTeamsFields())->up(); //test upgrade teams migration fresh
-
-        Role::create(['name' => 'new-role', 'team_test_id' => 1]);
-        $role = Role::where('name', 'new-role')->first();
-        $this->assertNotNull($role);
-        $this->assertSame(1, (int) $role->team_test_id);
-
-        // remove migration
-        foreach ($matchingFiles as $file) {
-            unlink($file);
-        }
-    }
-
-    /** @test */
-    public function it_can_show_roles_by_teams()
-    {
-        config()->set('permission.teams', true);
-        app(\Spatie\Permission\PermissionRegistrar::class)->initializeCache();
-
-        Role::create(['name' => 'testRoleTeam', 'team_test_id' => 1]);
-        Role::create(['name' => 'testRoleTeam', 'team_test_id' => 2]); // same name different team
-        Artisan::call('permission:show');
-
-        $output = Artisan::output();
-
-        // |    | Team ID: NULL        | Team ID: 1   | Team ID: 2   |
-        // |    | testRole | testRole2 | testRoleTeam | testRoleTeam |
-        if (method_exists($this, 'assertMatchesRegularExpression')) {
-            $this->assertMatchesRegularExpression('/\|\s+\|\s+Team ID: NULL\s+\|\s+Team ID: 1\s+\|\s+Team ID: 2\s+\|/', $output);
-            $this->assertMatchesRegularExpression('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|\s+testRoleTeam\s+\|\s+testRoleTeam\s+\|/', $output);
-        } else { // phpUnit 9/8
-            $this->assertRegExp('/\|\s+\|\s+Team ID: NULL\s+\|\s+Team ID: 1\s+\|\s+Team ID: 2\s+\|/', $output);
-            $this->assertRegExp('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|\s+testRoleTeam\s+\|\s+testRoleTeam\s+\|/', $output);
-        }
-    }
-}
+    // |    | Team ID: NULL    | Team ID: 1   | Team ID: 2   |
+    // |    | testRole | testRole2 | testRoleTeam | testRoleTeam |
+    expect($output)->toMatch('/\|\s+\|\s+Team ID: NULL\s+\|\s+Team ID: 1\s+\|\s+Team ID: 2\s+\|/')
+        ->and($output)->toMatch('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|\s+testRoleTeam\s+\|\s+testRoleTeam\s+\|/');
+});

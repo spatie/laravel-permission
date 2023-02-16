@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -11,228 +11,143 @@ use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
 
-class PermissionMiddlewareTest extends TestCase
-{
-    protected $permissionMiddleware;
+beforeEach(function () {
+    $this->permissionMiddleware = new PermissionMiddleware();
+});
 
-    public function setUp(): void
-    {
-        parent::setUp();
+it('a guest cannot access a route protected by the permission middleware', function () {
+    expect(runMiddleware($this->permissionMiddleware, 'edit-articles'))->toEqual(403);
+});
 
-        $this->permissionMiddleware = new PermissionMiddleware();
+it('a user cannot access a route protected by the permission middleware of a different guard', function () {
+    // These permissions are created fresh here in reverse order of guard being applied, so they are not "found first" in the db lookup when matching
+    app(Permission::class)->create(['name' => 'admin-permission2', 'guard_name' => 'web']);
+    $p1 = app(Permission::class)->create(['name' => 'admin-permission2', 'guard_name' => 'admin']);
+    app(Permission::class)->create(['name' => 'edit-articles2', 'guard_name' => 'admin']);
+    $p2 = app(Permission::class)->create(['name' => 'edit-articles2', 'guard_name' => 'web']);
+
+    Auth::guard('admin')->login($this->testAdmin);
+
+    $this->testAdmin->givePermissionTo($p1);
+
+    expect(runMiddleware($this->permissionMiddleware, 'admin-permission2', 'admin'))->toEqual(200);
+
+    expect(runMiddleware($this->permissionMiddleware, 'edit-articles2', 'admin'))->toEqual(403);
+
+    Auth::login($this->testUser);
+
+    $this->testUser->givePermissionTo($p2);
+
+    expect(runMiddleware($this->permissionMiddleware, 'edit-articles2', 'web'))->toEqual(200);
+
+    expect(runMiddleware($this->permissionMiddleware, 'admin-permission2', 'web'))->toEqual(403);
+});
+
+it('a user can access a route protected by permission middleware if have this permission', function () {
+    Auth::login($this->testUser);
+
+    $this->testUser->givePermissionTo('edit-articles');
+
+    expect(runMiddleware($this->permissionMiddleware, 'edit-articles'))->toEqual(200);
+});
+
+it('a user can access a route protected by this permission middleware if have one of the permissions', function () {
+    Auth::login($this->testUser);
+
+    $this->testUser->givePermissionTo('edit-articles');
+
+    expect(runMiddleware($this->permissionMiddleware, 'edit-news|edit-articles'))->toEqual(200);
+
+    expect(runMiddleware($this->permissionMiddleware, ['edit-news', 'edit-articles']))->toEqual(200);
+});
+
+it('a user cannot access a route protected by the permission middleware if have a different permission', function () {
+    Auth::login($this->testUser);
+
+    $this->testUser->givePermissionTo('edit-articles');
+
+    expect(runMiddleware($this->permissionMiddleware, 'edit-news'))->toEqual(403);
+});
+
+it('a user cannot access a route protected by permission middleware if have not permissions', function () {
+    Auth::login($this->testUser);
+
+    expect(runMiddleware($this->permissionMiddleware, 'edit-articles|edit-news'))->toEqual(403);
+});
+
+it('a user can access a route protected by permission middleware if has permission via role', function () {
+    Auth::login($this->testUser);
+
+    expect(runMiddleware($this->permissionMiddleware, 'edit-articles'))->toEqual(403);
+
+    $this->testUserRole->givePermissionTo('edit-articles');
+    $this->testUser->assignRole('testRole');
+
+    expect(runMiddleware($this->permissionMiddleware, 'edit-articles'))->toEqual(200);
+});
+
+it('the required permissions can be fetched from the exception', function () {
+    Auth::login($this->testUser);
+
+    $message = null;
+    $requiredPermissions = [];
+
+    try {
+        $this->permissionMiddleware->handle(new Request(), function () {
+        return (new Response())->setContent('<html></html>');
+        }, 'some-permission');
+    } catch (UnauthorizedException $e) {
+        $message = $e->getMessage();
+        $requiredPermissions = $e->getRequiredPermissions();
     }
 
-    /** @test */
-    public function a_guest_cannot_access_a_route_protected_by_the_permission_middleware()
-    {
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-articles')
-        );
+    expect($message)->toEqual('User does not have the right permissions.');
+    expect($requiredPermissions)->toEqual(['some-permission']);
+});
+
+it('the required permissions can be displayed in the exception', function () {
+    Auth::login($this->testUser);
+    Config::set(['permission.display_permission_in_exception' => true]);
+
+    $message = null;
+
+    try {
+        $this->permissionMiddleware->handle(new Request(), function () {
+        return (new Response())->setContent('<html></html>');
+        }, 'some-permission');
+    } catch (UnauthorizedException $e) {
+        $message = $e->getMessage();
     }
 
-    /** @test */
-    public function a_user_cannot_access_a_route_protected_by_the_permission_middleware_of_a_different_guard()
-    {
-        // These permissions are created fresh here in reverse order of guard being applied, so they are not "found first" in the db lookup when matching
-        app(Permission::class)->create(['name' => 'admin-permission2', 'guard_name' => 'web']);
-        $p1 = app(Permission::class)->create(['name' => 'admin-permission2', 'guard_name' => 'admin']);
-        app(Permission::class)->create(['name' => 'edit-articles2', 'guard_name' => 'admin']);
-        $p2 = app(Permission::class)->create(['name' => 'edit-articles2', 'guard_name' => 'web']);
+    expect($message)->toEndWith('Necessary permissions are some-permission');
+});
 
-        Auth::guard('admin')->login($this->testAdmin);
+it('use not existing custom guard in permission', function () {
+    $class = null;
 
-        $this->testAdmin->givePermissionTo($p1);
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->permissionMiddleware, 'admin-permission2', 'admin')
-        );
-
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-articles2', 'admin')
-        );
-
-        Auth::login($this->testUser);
-
-        $this->testUser->givePermissionTo($p2);
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-articles2', 'web')
-        );
-
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->permissionMiddleware, 'admin-permission2', 'web')
-        );
+    try {
+        $this->permissionMiddleware->handle(new Request(), function () {
+        return (new Response())->setContent('<html></html>');
+        }, 'edit-articles', 'xxx');
+    } catch (InvalidArgumentException $e) {
+        $class = get_class($e);
     }
 
-    /** @test */
-    public function a_user_can_access_a_route_protected_by_permission_middleware_if_have_this_permission()
-    {
-        Auth::login($this->testUser);
+    expect($class)->toEqual(InvalidArgumentException::class);
+});
 
-        $this->testUser->givePermissionTo('edit-articles');
+it('user can not access permission with guard admin while login using default guard', function () {
+    Auth::login($this->testUser);
 
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-articles')
-        );
-    }
+    $this->testUser->givePermissionTo('edit-articles');
 
-    /** @test */
-    public function a_user_can_access_a_route_protected_by_this_permission_middleware_if_have_one_of_the_permissions()
-    {
-        Auth::login($this->testUser);
+    expect(runMiddleware($this->permissionMiddleware, 'edit-articles', 'admin'))->toEqual(403);
+});
 
-        $this->testUser->givePermissionTo('edit-articles');
+it('user can access permission with guard admin while login using admin guard', function () {
+    Auth::guard('admin')->login($this->testAdmin);
 
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-news|edit-articles')
-        );
+    $this->testAdmin->givePermissionTo('admin-permission');
 
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->permissionMiddleware, ['edit-news', 'edit-articles'])
-        );
-    }
-
-    /** @test */
-    public function a_user_cannot_access_a_route_protected_by_the_permission_middleware_if_have_a_different_permission()
-    {
-        Auth::login($this->testUser);
-
-        $this->testUser->givePermissionTo('edit-articles');
-
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-news')
-        );
-    }
-
-    /** @test */
-    public function a_user_cannot_access_a_route_protected_by_permission_middleware_if_have_not_permissions()
-    {
-        Auth::login($this->testUser);
-
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-articles|edit-news')
-        );
-    }
-
-    /** @test */
-    public function a_user_can_access_a_route_protected_by_permission_middleware_if_has_permission_via_role()
-    {
-        Auth::login($this->testUser);
-
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-articles')
-        );
-
-        $this->testUserRole->givePermissionTo('edit-articles');
-        $this->testUser->assignRole('testRole');
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-articles')
-        );
-    }
-
-    /** @test */
-    public function the_required_permissions_can_be_fetched_from_the_exception()
-    {
-        Auth::login($this->testUser);
-
-        $message = null;
-        $requiredPermissions = [];
-
-        try {
-            $this->permissionMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
-            }, 'some-permission');
-        } catch (UnauthorizedException $e) {
-            $message = $e->getMessage();
-            $requiredPermissions = $e->getRequiredPermissions();
-        }
-
-        $this->assertEquals('User does not have the right permissions.', $message);
-        $this->assertEquals(['some-permission'], $requiredPermissions);
-    }
-
-    /** @test */
-    public function the_required_permissions_can_be_displayed_in_the_exception()
-    {
-        Auth::login($this->testUser);
-        Config::set(['permission.display_permission_in_exception' => true]);
-
-        $message = null;
-
-        try {
-            $this->permissionMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
-            }, 'some-permission');
-        } catch (UnauthorizedException $e) {
-            $message = $e->getMessage();
-        }
-
-        $this->assertStringEndsWith('Necessary permissions are some-permission', $message);
-    }
-
-    /** @test */
-    public function use_not_existing_custom_guard_in_permission()
-    {
-        $class = null;
-
-        try {
-            $this->permissionMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
-            }, 'edit-articles', 'xxx');
-        } catch (InvalidArgumentException $e) {
-            $class = get_class($e);
-        }
-
-        $this->assertEquals(InvalidArgumentException::class, $class);
-    }
-
-    /** @test */
-    public function user_can_not_access_permission_with_guard_admin_while_login_using_default_guard()
-    {
-        Auth::login($this->testUser);
-
-        $this->testUser->givePermissionTo('edit-articles');
-
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-articles', 'admin')
-        );
-    }
-
-    /** @test */
-    public function user_can_access_permission_with_guard_admin_while_login_using_admin_guard()
-    {
-        Auth::guard('admin')->login($this->testAdmin);
-
-        $this->testAdmin->givePermissionTo('admin-permission');
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->permissionMiddleware, 'admin-permission', 'admin')
-        );
-    }
-
-    protected function runMiddleware($middleware, $permission, $guard = null)
-    {
-        try {
-            return $middleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
-            }, $permission, $guard)->status();
-        } catch (UnauthorizedException $e) {
-            return $e->getStatusCode();
-        }
-    }
-}
+    expect(runMiddleware($this->permissionMiddleware, 'admin-permission', 'admin'))->toEqual(200);
+});
