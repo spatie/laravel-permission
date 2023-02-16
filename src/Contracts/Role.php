@@ -39,10 +39,11 @@ interface Role
      * Find or create a role by its name and guard name.
      *
      * @param  string  $name
-     * @param  string|null  $guardName
+     * @param string|null $guardName
+     * @param string|null $description
      * @return \Spatie\Permission\Contracts\Role
      */
-    public static function findOrCreate(string $name, $guardName): self;
+    public static function findOrCreate(string $name, ?string $guardName, ?string $description): self;
 
     /**
      * Determine if the user may perform the given permission.
