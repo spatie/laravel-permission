@@ -28,6 +28,13 @@ $role = Role::create(['name' => 'writer']);
 $permission = Permission::create(['name' => 'edit articles']);
 ```
 
+Also, you can add descriptions to roles and permissions:
+
+```php
+$role = Role::create(['name' => 'writer', 'description' => 'A writer can write articles']);
+$permission = Permission::create(['name' => 'edit articles', 'description' => 'A user can edit articles']);
+```
+
 
 A permission can be assigned to a role using 1 of these methods:
 
