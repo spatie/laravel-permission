@@ -21,8 +21,11 @@ it('throws an exception when assigning a permission that does not exist', functi
 })->throws(PermissionDoesNotExist::class);
 
 it('throws an exception when assigning a permission to a user from a different guard', function () {
-    expect(fn () => $this->testUser->givePermissionTo($this->testAdminPermission))->toThrow(GuardDoesNotMatch::class)
-        ->and(fn () => $this->testUser->givePermissionTo('admin-permission'))->toThrow(PermissionDoesNotExist::class);
+    expect(function () {
+        $this->testUser->givePermissionTo($this->testAdminPermission);
+    })->toThrow(GuardDoesNotMatch::class)->and(function () {
+        $this->testUser->givePermissionTo('admin-permission');
+    })->toThrow(PermissionDoesNotExist::class);
 });
 
 it('can revoke a permission from a user', function () {
@@ -61,7 +64,9 @@ it('can scope users using a int', function () {
 
     expect($scopedUsers1->count())->toEqual(2)
         ->and($scopedUsers2->count())->toEqual(1);
-})->skip(fn () => $this->useCustomModels);
+})->skip(function () {
+    return $this->useCustomModels;
+});
 
 it('can scope users using an array', function () {
     $user1 = User::create(['email' => 'user1@test.com']);

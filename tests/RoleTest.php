@@ -59,8 +59,11 @@ it('throws an exception when given a permission that does not exist', function (
 })->throws(PermissionDoesNotExist::class);
 
 it('throws an exception when given a permission that belongs to another guard', function () {
-    expect(fn () => $this->testUserRole->givePermissionTo('admin-permission'))->toThrow(PermissionDoesNotExist::class)
-        ->and(fn () => $this->testUserRole->givePermissionTo($this->testAdminPermission))->toThrow(GuardDoesNotMatch::class);
+    expect(function () {
+        $this->testUserRole->givePermissionTo('admin-permission');
+    })->toThrow(PermissionDoesNotExist::class)->and(function () {
+        $this->testUserRole->givePermissionTo($this->testAdminPermission);
+    })->toThrow(GuardDoesNotMatch::class);
 });
 
 it('can be given multiple permissions using an array', function () {
@@ -95,8 +98,11 @@ it('throws an exception when syncing permissions that do not exist', function ()
 it('throws an exception when syncing permissions that belong to a different guard', function () {
     $this->testUserRole->givePermissionTo('edit-articles');
 
-    expect(fn () => $this->testUserRole->syncPermissions('admin-permission'))->toThrow(PermissionDoesNotExist::class)
-        ->and(fn () => $this->testUserRole->syncPermissions($this->testAdminPermission))->toThrow(GuardDoesNotMatch::class);
+    expect(function () {
+        $this->testUserRole->syncPermissions('admin-permission');
+    })->toThrow(PermissionDoesNotExist::class)->and(function () {
+        $this->testUserRole->syncPermissions($this->testAdminPermission);
+    })->toThrow(GuardDoesNotMatch::class);
 });
 
 it('will remove all permissions when passing an empty array to sync permissions', function () {
@@ -155,7 +161,9 @@ it('creates permission object with findOrCreate if it does not have a permission
 });
 
 it('creates a role with findOrCreate if the named role does not exist', function () {
-    expect(fn () => app(Role::class)->findByName('non-existing-role'))->toThrow(RoleDoesNotExist::class);
+    expect(function () {
+        app(Role::class)->findByName('non-existing-role');
+    })->toThrow(RoleDoesNotExist::class);
 
     $role2 = app(Role::class)->findOrCreate('yet-another-role');
 

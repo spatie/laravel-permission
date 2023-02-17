@@ -221,8 +221,11 @@ it('calling assignRole before saving object doesnt interfere with other objects'
 });
 
 it('throws an exception when syncing a role from another guard', function () {
-    expect(fn () => $this->testUser->syncRoles('testRole', 'testAdminRole'))->toThrow(RoleDoesNotExist::class)
-        ->and(fn () => $this->testUser->syncRoles('testRole', $this->testAdminRole))->toThrow(GuardDoesNotMatch::class);
+    expect(function () {
+        $this->testUser->syncRoles('testRole', 'testAdminRole');
+    })->toThrow(RoleDoesNotExist::class)->and(function () {
+        $this->testUser->syncRoles('testRole', $this->testAdminRole);
+    })->toThrow(GuardDoesNotMatch::class);
 });
 
 it('deletes pivot table entries when deleting models', function () {
