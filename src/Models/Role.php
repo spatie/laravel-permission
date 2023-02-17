@@ -41,7 +41,7 @@ class Role extends Model implements RoleContract
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? Guard::getDefaultName(static::class);
 
-        $params = ['name' => $attributes['name'], 'guard_name' => $attributes['guard_name']];
+        $params = ['name' => $attributes['name'], 'guard_name' => $attributes['guard_name'], 'description' => $attributes['description']];
         if (app(PermissionRegistrar::class)->teams) {
             $teamsKey = app(PermissionRegistrar::class)->teamsKey;
 
@@ -131,17 +131,18 @@ class Role extends Model implements RoleContract
      * Find or create role by its name (and optionally guardName).
      *
      * @param  string  $name
-     * @param  string|null  $guardName
+     * @param string|null $guardName
+     * @param string|null $description
      * @return \Spatie\Permission\Contracts\Role|\Spatie\Permission\Models\Role
      */
-    public static function findOrCreate(string $name, $guardName = null): RoleContract
+    public static function findOrCreate(string $name, ?string $guardName = null, ?string $description = null): RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
         $role = static::findByParam(['name' => $name, 'guard_name' => $guardName]);
 
         if (! $role) {
-            return static::query()->create(['name' => $name, 'guard_name' => $guardName] + (app(PermissionRegistrar::class)->teams ? [app(PermissionRegistrar::class)->teamsKey => getPermissionsTeamId()] : []));
+            return static::query()->create(['name' => $name, 'guard_name' => $guardName, 'description' => $description] + (app(PermissionRegistrar::class)->teams ? [app(PermissionRegistrar::class)->teamsKey => getPermissionsTeamId()] : []));
         }
 
         return $role;
