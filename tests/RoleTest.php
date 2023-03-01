@@ -156,6 +156,18 @@ class RoleTest extends TestCase
     }
 
     /** @test */
+    public function sync_permission_error_does_not_detach_permissions()
+    {
+        $this->testUserRole->givePermissionTo('edit-news');
+
+        $this->expectException(PermissionDoesNotExist::class);
+
+        $this->testUserRole->syncPermissions('edit-articles', 'permission-that-does-not-exist');
+
+        $this->assertTrue($this->testUserRole->fresh()->hasDirectPermission('edit-news'));
+    }
+
+    /** @test */
     public function it_can_revoke_a_permission()
     {
         $this->testUserRole->givePermissionTo('edit-articles');
