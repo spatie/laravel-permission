@@ -134,6 +134,14 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_throws_an_exception_when_determining_with_invalid_argument()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->testUser->hasRole(new class {});
+    }
+
+    /** @test */
     public function it_throws_an_exception_when_assigning_a_role_that_does_not_exist()
     {
         $this->expectException(RoleDoesNotExist::class);

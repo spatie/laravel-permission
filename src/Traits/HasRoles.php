@@ -224,7 +224,11 @@ trait HasRoles
             return false;
         }
 
-        return $roles->intersect($guard ? $this->roles->where('guard_name', $guard) : $this->roles)->isNotEmpty();
+        if ($roles instanceof Collection) {
+            return $roles->intersect($guard ? $this->roles->where('guard_name', $guard) : $this->roles)->isNotEmpty();
+        }
+
+        throw new \InvalidArgumentException();
     }
 
     /**
