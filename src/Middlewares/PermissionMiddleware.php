@@ -7,6 +7,9 @@ use Spatie\Permission\Exceptions\UnauthorizedException;
 
 class PermissionMiddleware
 {
+    /**
+     * @throws UnauthorizedException
+     */
     public function handle($request, Closure $next, $permission, $guard = null)
     {
         $authGuard = app('auth')->guard($guard);

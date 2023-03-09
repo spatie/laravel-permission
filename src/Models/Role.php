@@ -89,12 +89,12 @@ class Role extends Model implements RoleContract
      * Find a role by its name and guard name.
      *
      * @param  string  $name
-     * @param  string|null  $guardName
-     * @return \Spatie\Permission\Contracts\Role|\Spatie\Permission\Models\Role
+     * @param string|null $guardName
+     * @return RoleContract|Role
      *
-     * @throws \Spatie\Permission\Exceptions\RoleDoesNotExist
+     * @throws RoleDoesNotExist
      */
-    public static function findByName(string $name, $guardName = null): RoleContract
+    public static function findByName(string $name, ?string $guardName = null): RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
@@ -111,10 +111,10 @@ class Role extends Model implements RoleContract
      * Find a role by its id (and optionally guardName).
      *
      * @param  int|string  $id
-     * @param  string|null  $guardName
-     * @return \Spatie\Permission\Contracts\Role|\Spatie\Permission\Models\Role
+     * @param string|null $guardName
+     * @return RoleContract|Role
      */
-    public static function findById($id, $guardName = null): RoleContract
+    public static function findById($id, ?string $guardName = null): RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
@@ -131,10 +131,10 @@ class Role extends Model implements RoleContract
      * Find or create role by its name (and optionally guardName).
      *
      * @param  string  $name
-     * @param  string|null  $guardName
-     * @return \Spatie\Permission\Contracts\Role|\Spatie\Permission\Models\Role
+     * @param string|null $guardName
+     * @return RoleContract|Role
      */
-    public static function findOrCreate(string $name, $guardName = null): RoleContract
+    public static function findOrCreate(string $name, ?string $guardName = null): RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
@@ -174,7 +174,7 @@ class Role extends Model implements RoleContract
      * @param  string|Permission  $permission
      * @return bool
      *
-     * @throws \Spatie\Permission\Exceptions\GuardDoesNotMatch
+     * @throws GuardDoesNotMatch
      */
     public function hasPermissionTo($permission): bool
     {

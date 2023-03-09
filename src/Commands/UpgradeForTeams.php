@@ -60,7 +60,7 @@ class UpgradeForTeams extends Command
      *
      * @return bool
      */
-    protected function createMigration()
+    protected function createMigration(): bool
     {
         try {
             $migrationStub = __DIR__."/../../database/migrations/{$this->migrationSuffix}.stub";
@@ -81,7 +81,7 @@ class UpgradeForTeams extends Command
      * @param  array  $existingMigrations
      * @return string
      */
-    protected function getExistingMigrationsWarning(array $existingMigrations)
+    protected function getExistingMigrationsWarning(array $existingMigrations): string
     {
         if (count($existingMigrations) > 1) {
             $base = "Setup teams migrations already exist.\nFollowing files were found: ";
@@ -100,7 +100,7 @@ class UpgradeForTeams extends Command
      *
      * @return array
      */
-    protected function alreadyExistingMigrations()
+    protected function alreadyExistingMigrations(): array
     {
         $matchingFiles = glob($this->getMigrationPath('*'));
 
@@ -115,10 +115,10 @@ class UpgradeForTeams extends Command
      * The date parameter is optional for ability
      * to provide a custom value or a wildcard.
      *
-     * @param  string|null  $date
+     * @param string|null $date
      * @return string
      */
-    protected function getMigrationPath($date = null)
+    protected function getMigrationPath(string $date = null): string
     {
         $date = $date ?: date('Y_m_d_His');
 
