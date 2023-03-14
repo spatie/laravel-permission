@@ -3,6 +3,7 @@
 namespace Spatie\Permission;
 
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Routing\Route;
@@ -12,6 +13,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 use Spatie\Permission\Contracts\Role as RoleContract;
+use Spatie\Permission\Listeners\OctaneReloadPermissions;
 
 class PermissionServiceProvider extends ServiceProvider
 {
@@ -24,6 +26,8 @@ class PermissionServiceProvider extends ServiceProvider
         $this->registerCommands();
 
         $this->registerModelBindings();
+
+        $this->registerOctaneListener();
 
         $this->callAfterResolving(Gate::class, function (Gate $gate, Application $app) {
             if ($this->app['config']->get('permission.register_permission_check_method')) {
@@ -44,8 +48,7 @@ class PermissionServiceProvider extends ServiceProvider
             'permission'
         );
 
-        $this->callAfterResolving('blade.compiler', fn (BladeCompiler $bladeCompiler) => $this->registerBladeExtensions($bladeCompiler)
-        );
+        $this->callAfterResolving('blade.compiler', fn (BladeCompiler $bladeCompiler) => $this->registerBladeExtensions($bladeCompiler));
     }
 
     protected function offerPublishing(): void
@@ -84,6 +87,21 @@ class PermissionServiceProvider extends ServiceProvider
             Commands\Show::class,
             Commands\UpgradeForTeams::class,
         ]);
+    }
+
+    protected function registerOctaneListener(): void
+    {
+        if ($this->app->runningInConsole() || ! $this->app['config']->get('permission.register_octane_reset_listener')) {
+            return;
+        }
+
+        if (! $this->app['config']->get('octane.listeners')) {
+            return;
+        }
+
+        $dispatcher = $this->app[Dispatcher::class];
+        // @phpstan-ignore-next-line
+        $dispatcher->listen(\Laravel\Octane\Events\OperationTerminated::class, OctaneReloadPermissions::class);
     }
 
     protected function registerModelBindings(): void

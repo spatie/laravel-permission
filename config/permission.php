@@ -104,6 +104,13 @@ return [
     'register_permission_check_method' => true,
 
     /*
+     * When set to true, the Spatie\Permission\Listeners\OctaneReloadPermissions listener will be registered
+     * on the Laravel\Octane\Events\OperationTerminated event, this will refresh permissions on every
+     * TickTerminated, TaskTerminated and RequestTerminated
+     */
+    'register_octane_reset_listener' => false,
+
+    /*
      * When set to true the package implements teams using the 'team_foreign_key'. If you want
      * the migrations to register the 'team_foreign_key', you must set this to true
      * before doing the migration. If you already did the migration then you must make a new
