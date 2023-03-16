@@ -96,14 +96,13 @@ trait HasRoles
     }
 
     /**
-     * Assign the given role to the model.
+     * Returns roles ids as array keys
      *
-     * @param  array|string|int|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection  ...$roles
-     * @return $this
+     * @param  array|string|int|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection  $roles
      */
-    public function assignRole(...$roles)
+    private function collectRoles(...$roles): array
     {
-        $roles = collect($roles)
+        return collect($roles)
             ->flatten()
             ->reduce(function ($array, $role) {
                 if (empty($role)) {
@@ -122,6 +121,17 @@ trait HasRoles
 
                 return $array;
             }, []);
+    }
+
+    /**
+     * Assign the given role to the model.
+     *
+     * @param  array|string|int|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection  ...$roles
+     * @return $this
+     */
+    public function assignRole(...$roles)
+    {
+        $roles = $this->collectRoles($roles);
 
         $model = $this->getModel();
 
@@ -175,6 +185,8 @@ trait HasRoles
      */
     public function syncRoles(...$roles)
     {
+        $this->collectRoles($roles);
+
         $this->roles()->detach();
 
         return $this->assignRole($roles);

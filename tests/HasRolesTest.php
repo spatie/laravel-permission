@@ -228,6 +228,18 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function sync_roles_error_does_not_detach_roles()
+    {
+        $this->testUser->assignRole('testRole');
+
+        $this->expectException(RoleDoesNotExist::class);
+
+        $this->testUser->syncRoles('testRole2', 'role-that-does-not-exist');
+
+        $this->assertTrue($this->testUser->fresh()->hasRole('testRole'));
+    }
+
+    /** @test */
     public function it_will_sync_roles_to_a_model_that_is_not_persisted()
     {
         $user = new User(['email' => 'test@user.com']);

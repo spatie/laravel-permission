@@ -343,9 +343,8 @@ trait HasPermissions
      * Returns permissions ids as array keys
      *
      * @param  string|int|array|\Spatie\Permission\Contracts\Permission|\Illuminate\Support\Collection  $permissions
-     * @return array
      */
-    public function collectPermissions(...$permissions)
+    private function collectPermissions(...$permissions): array
     {
         return collect($permissions)
             ->flatten()
@@ -376,7 +375,7 @@ trait HasPermissions
      */
     public function givePermissionTo(...$permissions)
     {
-        $permissions = $this->collectPermissions(...$permissions);
+        $permissions = $this->collectPermissions($permissions);
 
         $model = $this->getModel();
 
@@ -412,6 +411,8 @@ trait HasPermissions
      */
     public function syncPermissions(...$permissions)
     {
+        $this->collectPermissions($permissions);
+
         $this->permissions()->detach();
 
         return $this->givePermissionTo($permissions);

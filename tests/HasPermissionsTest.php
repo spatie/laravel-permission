@@ -477,6 +477,18 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    public function sync_permission_error_does_not_detach_permissions()
+    {
+        $this->testUser->givePermissionTo('edit-news');
+
+        $this->expectException(PermissionDoesNotExist::class);
+
+        $this->testUser->syncPermissions('edit-articles', 'permission-that-does-not-exist');
+
+        $this->assertTrue($this->testUser->fresh()->hasDirectPermission('edit-news'));
+    }
+
+    /** @test */
     public function it_does_not_remove_already_associated_permissions_when_assigning_new_permissions()
     {
         $this->testUser->givePermissionTo('edit-news');
