@@ -8,17 +8,13 @@ interface Permission
 {
     /**
      * A permission can be applied to roles.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function roles(): BelongsToMany;
 
     /**
      * Find a permission by its name.
      *
-     * @param  string  $name
      * @param  string|null  $guardName
-     * @return Permission
      *
      * @throws \Spatie\Permission\Exceptions\PermissionDoesNotExist
      */
@@ -27,9 +23,7 @@ interface Permission
     /**
      * Find a permission by its id.
      *
-     * @param  int  $id
      * @param  string|null  $guardName
-     * @return Permission
      *
      * @throws \Spatie\Permission\Exceptions\PermissionDoesNotExist
      */
@@ -38,9 +32,7 @@ interface Permission
     /**
      * Find or Create a permission by its name and guard name.
      *
-     * @param  string  $name
      * @param  string|null  $guardName
-     * @return Permission
      */
     public static function findOrCreate(string $name, $guardName): self;
 }

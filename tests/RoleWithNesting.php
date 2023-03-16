@@ -25,9 +25,6 @@ class RoleWithNesting extends \Spatie\Permission\Models\Role
             'parent_id');
     }
 
-    /**
-     * @return BelongsToMany
-     */
     public function children(): BelongsToMany
     {
         return $this->belongsToMany(
