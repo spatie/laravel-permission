@@ -23,8 +23,8 @@ Also, if you want to use a custom foreign key for teams you must change in the p
 
 ## Working with Teams Permissions
 
-After implements on login a solution for select a team on authentication (for example set `team_id` of the current selected team on **session**: `session(['team_id' => $team->team_id]);` ), 
-we can set global `team_id` from anywhere, but works better if you create a `Middleware`, example:
+After implementing a solution for selecting a team on the authentication process (for example, setting the `team_id` of the currently selected team on the **session**: `session(['team_id' => $team->team_id]);` ), 
+we can set global `team_id` from anywhere, but works better if you create a `Middleware`. Example:
 
 ```php
 namespace App\Http\Middleware;
