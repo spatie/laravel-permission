@@ -5,13 +5,11 @@ weight: 3
 
 When enabled, teams permissions offers you flexible control for a variety of scenarios. The idea behind teams permissions is inspired by the default permission implementation of [Laratrust](https://laratrust.santigarcor.me/).
 
-
 ## Enabling Teams Permissions Feature
 
 NOTE: These configuration changes must be made **before** performing the migration when first installing the package.
 
 If you have already run the migration and want to upgrade your implementation, you can run the artisan console command `php artisan spatie-permission:setup-teams`, to create a new migration file named [xxxx_xx_xx_xx_add_teams_fields.php](https://github.com/spatie/laravel-permission/blob/main/database/migrations/add_teams_fields.php.stub) and then run `php artisan migrate` to upgrade your database tables.
-
 
 Teams permissions can be enabled in the permission config file:
 
@@ -28,7 +26,8 @@ Also, if you want to use a custom foreign key for teams you set it in the permis
 
 ## Working with Teams Permissions
 
-After implementing a solution for selecting a team on the authentication process (for example, setting the `team_id` of the currently selected team on the **session**: `session(['team_id' => $team->team_id]);` ), 
+After implementing a solution for selecting a team on the authentication process 
+(for example, setting the `team_id` of the currently selected team on the **session**: `session(['team_id' => $team->team_id]);` ), 
 we can set global `team_id` from anywhere, but works better if you create a `Middleware`. 
 
 Example Team Middleware:
@@ -72,11 +71,11 @@ Role::create(['name' => 'reviewer']);
 
 ## Roles/Permissions Assignment & Removal
 
-The role/permission assignment and removal for teams are the same as without teams, but they take the global `team_id` set on login for sync.
+The role/permission assignment and removal for teams are the same as without teams, but they take the global `team_id` which is set on login.
 
 ## Defining a Super-Admin on Teams
 
-Global roles can be assigned to different teams, and `team_id` as the primary key of the relationships is always required. 
+Global roles can be assigned to different teams, and `team_id` (which is the primary key of the relationships) is always required. 
 
 If you want a "Super Admin" global role for a user, when you create a new team you must assign it to your user. Example:
 
