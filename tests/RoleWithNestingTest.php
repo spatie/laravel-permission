@@ -4,63 +4,58 @@ namespace Spatie\Permission\Test;
 
 class RoleWithNestingTest extends TestCase
 {
-    private static $old_migration;
+    /** @var bool */
+    protected $useCustomModels = true;
 
-    /**
-     * @var RoleWithNesting[]
-     */
+    /** @var Role[] */
     protected $parent_roles = [];
 
-    /**
-     * @var RoleWithNesting[]
-     */
+    /** @var Role[] */
     protected $child_roles = [];
 
-    public static function setUpBeforeClass(): void
-    {
-        parent::setUpBeforeClass();
-        self::$old_migration = self::$migration;
-        self::$migration = self::getMigration();
-    }
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->parent_roles = [];
-        $this->child_roles = [];
-        $this->parent_roles['has_no_children'] = RoleWithNesting::create(['name' => 'has_no_children']);
-        $this->parent_roles['has_1_child'] = RoleWithNesting::create(['name' => 'has_1_child']);
-        $this->parent_roles['has_3_children'] = RoleWithNesting::create(['name' => 'has_3_children']);
 
-        $this->child_roles['has_no_parents'] = RoleWithNesting::create(['name' => 'has_no_parents']);
-        $this->child_roles['has_1_parent'] = RoleWithNesting::create(['name' => 'has_1_parent']);
-        $this->child_roles['has_2_parents'] = RoleWithNesting::create(['name' => 'has_2_parents']);
-        $this->child_roles['third_child'] = RoleWithNesting::create(['name' => 'third_child']);
+        $this->parent_roles = [
+            'has_no_children'   => Role::create(['name' => 'has_no_children']),
+            'has_1_child'       => Role::create(['name' => 'has_1_child']),
+            'has_3_children'    => Role::create(['name' => 'has_3_children']),
+        ];
+        $this->child_roles = [
+            'has_no_parents'    => Role::create(['name' => 'has_no_parents']),
+            'has_1_parent'      => Role::create(['name' => 'has_1_parent']),
+            'has_2_parents'     => Role::create(['name' => 'has_2_parents']),
+            'third_child'       => Role::create(['name' => 'third_child']),
+        ];
 
         $this->parent_roles['has_1_child']->children()->attach($this->child_roles['has_2_parents']);
-        $this->parent_roles['has_3_children']->children()->attach($this->child_roles['has_2_parents']);
-        $this->parent_roles['has_3_children']->children()->attach($this->child_roles['has_1_parent']);
-        $this->parent_roles['has_3_children']->children()->attach($this->child_roles['third_child']);
+        $this->parent_roles['has_3_children']->children()->attach([
+            $this->child_roles['has_2_parents']->getKey(),
+            $this->child_roles['has_1_parent']->getKey(),
+            $this->child_roles['third_child']->getKey()
+        ]);
     }
 
-    public static function tearDownAfterClass(): void
+    /**
+     * Set up the database.
+     *
+     * @param  \Illuminate\Foundation\Application  $app
+     */
+    protected function setUpDatabase($app)
     {
-        parent::tearDownAfterClass();
-        self::$migration = self::$old_migration;
-    }
+        parent::setUpDatabase($app);
 
-    protected function getEnvironmentSetUp($app)
-    {
-        parent::getEnvironmentSetUp($app);
-        $app['config']->set('permission.models.role', RoleWithNesting::class);
-        $app['config']->set('permission.table_names.roles', 'nesting_role');
-    }
+        $tableRoles = $app['config']->get('permission.table_names.roles');
 
-    protected static function getMigration()
-    {
-        require_once __DIR__.'/customMigrations/roles_with_nesting_migration.php.stub';
-
-        return new \CreatePermissionTablesWithNested();
+        $app['db']->connection()->getSchemaBuilder()->create(Role::HIERARCHY_TABLE, function ($table) use ($tableRoles) {
+            $table->id();
+            $table->uuid("parent_id");
+            $table->uuid("child_id");
+            $table->foreign("parent_id")->references("role_test_id")->on($tableRoles);
+            $table->foreign("child_id")->references("role_test_id")->on($tableRoles);
+        });
     }
 
     /** @test
@@ -71,7 +66,7 @@ class RoleWithNestingTest extends TestCase
         $role = $this->$role_group[$index];
         $count_field_name = sprintf('%s_count', $relation);
 
-        $actualCount = intval(RoleWithNesting::query()->withCount($relation)->find($role->id)->$count_field_name);
+        $actualCount = intval(Role::withCount($relation)->find($role->getKey())->$count_field_name);
 
         $this->assertSame(
             $expectedCount,

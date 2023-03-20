@@ -34,11 +34,7 @@ class Permission extends Model implements PermissionContract
         parent::__construct($attributes);
 
         $this->guarded[] = $this->primaryKey;
-    }
-
-    public function getTable()
-    {
-        return config('permission.table_names.permissions', parent::getTable());
+        $this->table = config('permission.table_names.permissions') ?: parent::getTable();
     }
 
     public static function create(array $attributes = [])

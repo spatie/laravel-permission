@@ -11,6 +11,32 @@ class Role extends \Spatie\Permission\Models\Role
         'name',
     ];
 
+    const HIERARCHY_TABLE = 'roles_hierarchy';
+
+    /**
+     * @return BelongsToMany
+     */
+    public function parents()
+    {
+        return $this->belongsToMany(
+            static::class,
+            static::HIERARCHY_TABLE,
+            'child_id',
+            'parent_id');
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function children()
+    {
+        return $this->belongsToMany(
+            static::class,
+            static::HIERARCHY_TABLE,
+            'parent_id',
+            'child_id');
+    }
+
     protected static function boot()
     {
         parent::boot();
