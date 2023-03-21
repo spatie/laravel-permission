@@ -32,6 +32,10 @@ trait HasPermissions
                 return;
             }
 
+            if (is_a($model, Permission::class)) {
+                return;
+            }
+
             $teams = app(PermissionRegistrar::class)->teams;
             app(PermissionRegistrar::class)->teams = false;
             $model->permissions()->detach();

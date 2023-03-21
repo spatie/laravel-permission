@@ -217,7 +217,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_doesnt_detach_permissions_when_soft_deleting()
+    public function it_doesnt_detach_permissions_when_user_soft_deleting()
     {
         $user = SoftDeletingUser::create(['email' => 'test@example.com']);
         $user->givePermissionTo(['edit-news']);

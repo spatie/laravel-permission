@@ -584,7 +584,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_does_not_detach_roles_when_soft_deleting()
+    public function it_does_not_detach_roles_when_user_soft_deleting()
     {
         $user = SoftDeletingUser::create(['email' => 'test@example.com']);
         $user->assignRole('testRole');

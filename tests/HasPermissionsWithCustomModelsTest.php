@@ -63,4 +63,54 @@ class HasPermissionsWithCustomModelsTest extends HasPermissionsTest
         $this->assertEquals(2, $scopedUsers1->count());
         $this->assertEquals(1, $scopedUsers2->count());
     }
+
+    /** @test */
+    public function it_doesnt_detach_roles_when_soft_deleting()
+    {
+        $this->testUserRole->givePermissionTo($this->testUserPermission);
+
+        DB::enableQueryLog();
+        $this->testUserPermission->delete();
+        DB::disableQueryLog();
+
+        $this->assertSame(1, count(DB::getQueryLog()));
+
+        $permission = Permission::onlyTrashed()->find($this->testUserPermission->getKey());
+
+        $this->assertEquals(1, DB::table(config('permission.table_names.role_has_permissions'))->where('permission_test_id', $this->testUserPermission->getKey())->count());
+    }
+
+    /** @test */
+    public function it_doesnt_detach_users_when_soft_deleting()
+    {
+        $this->testUser->givePermissionTo($this->testUserPermission);
+
+        DB::enableQueryLog();
+        $this->testUserPermission->delete();
+        DB::disableQueryLog();
+
+        $this->assertSame(1, count(DB::getQueryLog()));
+
+        $permission = Permission::onlyTrashed()->find($this->testUserPermission->getKey());
+        $permission->restore();
+
+        $this->assertEquals(1, DB::table(config('permission.table_names.model_has_permissions'))->where('permission_test_id', $this->testUserPermission->getKey())->count());
+    }
+
+    /** @test */
+    public function it_does_detach_roles_when_force_deleting()
+    {
+        $this->testUserRole->givePermissionTo($this->testUserPermission);
+
+        DB::enableQueryLog();
+        $this->testUserPermission->forceDelete();
+        DB::disableQueryLog();
+
+        $this->assertSame(2, count(DB::getQueryLog())); //avoid detach permissions on permissions
+
+        $permission = Permission::withTrashed()->find($this->testUserPermission->getKey());
+
+        $this->assertNull($permission);
+        $this->assertEquals(0, DB::table(config('permission.table_names.role_has_permissions'))->where('permission_test_id', $this->testUserPermission->getKey())->count());
+    }
 }
