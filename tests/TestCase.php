@@ -116,13 +116,15 @@ abstract class TestCase extends Orchestra
      */
     protected function setUpDatabase($app)
     {
-        $app['db']->connection()->getSchemaBuilder()->create('users', function (Blueprint $table) {
+        $schema = $app['db']->connection()->getSchemaBuilder();
+
+        $schema->create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
             $table->softDeletes();
         });
 
-        $app['db']->connection()->getSchemaBuilder()->create('admins', function (Blueprint $table) {
+        $schema->create('admins', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
         });
@@ -136,6 +138,13 @@ abstract class TestCase extends Orchestra
             self::$migration->up();
         } else {
             self::$customMigration->up();
+
+            $schema->table(config('permission.table_names.roles'), function (Blueprint $table) {
+                $table->softDeletes();
+            });
+            $schema->table(config('permission.table_names.permissions'), function (Blueprint $table) {
+                $table->softDeletes();
+            });
         }
 
         $this->testUser = User::create(['email' => 'test@user.com']);
