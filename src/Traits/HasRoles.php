@@ -34,7 +34,7 @@ trait HasRoles
         });
     }
 
-    public function getRoleClass()
+    public function getRoleClass(): string
     {
         if (! $this->roleClass) {
             $this->roleClass = app(PermissionRegistrar::class)->getRoleClass();
@@ -86,7 +86,7 @@ trait HasRoles
 
             $method = is_numeric($role) || PermissionRegistrar::isUid($role) ? 'findById' : 'findByName';
 
-            return $this->getRoleClass()->{$method}($role, $guard ?: $this->getDefaultGuardName());
+            return $this->getRoleClass()::{$method}($role, $guard ?: $this->getDefaultGuardName());
         }, Arr::wrap($roles));
 
         return $query->whereHas('roles', function (Builder $subQuery) use ($roles) {
@@ -153,7 +153,7 @@ trait HasRoles
             );
         }
 
-        if (is_a($this, get_class($this->getPermissionClass()))) {
+        if (is_a($this, Permission::class)) {
             $this->forgetCachedPermissions();
         }
 
@@ -171,7 +171,7 @@ trait HasRoles
 
         $this->load('roles');
 
-        if (is_a($this, get_class($this->getPermissionClass()))) {
+        if (is_a($this, Permission::class)) {
             $this->forgetCachedPermissions();
         }
 
@@ -329,14 +329,12 @@ trait HasRoles
 
     protected function getStoredRole($role): Role
     {
-        $roleClass = $this->getRoleClass();
-
         if (is_numeric($role) || PermissionRegistrar::isUid($role)) {
-            return $roleClass->findById($role, $this->getDefaultGuardName());
+            return $this->getRoleClass()::findById($role, $this->getDefaultGuardName());
         }
 
         if (is_string($role)) {
-            return $roleClass->findByName($role, $this->getDefaultGuardName());
+            return $this->getRoleClass()::findByName($role, $this->getDefaultGuardName());
         }
 
         return $role;

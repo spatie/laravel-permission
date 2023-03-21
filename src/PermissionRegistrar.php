@@ -227,12 +227,9 @@ class PermissionRegistrar
         return $permissions;
     }
 
-    /**
-     * Get an instance of the permission class.
-     */
-    public function getPermissionClass(): Permission
+    public function getPermissionClass(): string
     {
-        return app($this->permissionClass);
+        return $this->permissionClass;
     }
 
     public function setPermissionClass($permissionClass)
@@ -244,12 +241,9 @@ class PermissionRegistrar
         return $this;
     }
 
-    /**
-     * Get an instance of the role class.
-     */
-    public function getRoleClass(): Role
+    public function getRoleClass(): string
     {
-        return app($this->roleClass);
+        return $this->roleClass;
     }
 
     public function setRoleClass($roleClass)
@@ -273,7 +267,7 @@ class PermissionRegistrar
 
     protected function getPermissionsWithRoles(): Collection
     {
-        return $this->getPermissionClass()->select()->with('roles')->get();
+        return $this->permissionClass::select()->with('roles')->get();
     }
 
     /**
