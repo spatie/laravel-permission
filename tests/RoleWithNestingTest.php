@@ -13,28 +13,27 @@ class RoleWithNestingTest extends TestCase
     /** @var Role[] */
     protected $child_roles = [];
 
-
     public function setUp(): void
     {
         parent::setUp();
 
         $this->parent_roles = [
-            'has_no_children'   => Role::create(['name' => 'has_no_children']),
-            'has_1_child'       => Role::create(['name' => 'has_1_child']),
-            'has_3_children'    => Role::create(['name' => 'has_3_children']),
+            'has_no_children' => Role::create(['name' => 'has_no_children']),
+            'has_1_child' => Role::create(['name' => 'has_1_child']),
+            'has_3_children' => Role::create(['name' => 'has_3_children']),
         ];
         $this->child_roles = [
-            'has_no_parents'    => Role::create(['name' => 'has_no_parents']),
-            'has_1_parent'      => Role::create(['name' => 'has_1_parent']),
-            'has_2_parents'     => Role::create(['name' => 'has_2_parents']),
-            'third_child'       => Role::create(['name' => 'third_child']),
+            'has_no_parents' => Role::create(['name' => 'has_no_parents']),
+            'has_1_parent' => Role::create(['name' => 'has_1_parent']),
+            'has_2_parents' => Role::create(['name' => 'has_2_parents']),
+            'third_child' => Role::create(['name' => 'third_child']),
         ];
 
         $this->parent_roles['has_1_child']->children()->attach($this->child_roles['has_2_parents']);
         $this->parent_roles['has_3_children']->children()->attach([
             $this->child_roles['has_2_parents']->getKey(),
             $this->child_roles['has_1_parent']->getKey(),
-            $this->child_roles['third_child']->getKey()
+            $this->child_roles['third_child']->getKey(),
         ]);
     }
 
@@ -51,10 +50,10 @@ class RoleWithNestingTest extends TestCase
 
         $app['db']->connection()->getSchemaBuilder()->create(Role::HIERARCHY_TABLE, function ($table) use ($tableRoles) {
             $table->id();
-            $table->uuid("parent_id");
-            $table->uuid("child_id");
-            $table->foreign("parent_id")->references("role_test_id")->on($tableRoles);
-            $table->foreign("child_id")->references("role_test_id")->on($tableRoles);
+            $table->uuid('parent_id');
+            $table->uuid('child_id');
+            $table->foreign('parent_id')->references('role_test_id')->on($tableRoles);
+            $table->foreign('child_id')->references('role_test_id')->on($tableRoles);
         });
     }
 
