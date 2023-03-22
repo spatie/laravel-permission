@@ -29,7 +29,7 @@ class PermissionServiceProvider extends ServiceProvider
             if ($this->app->config['permission.register_permission_check_method']) {
                 /** @var PermissionRegistrar $permissionLoader */
                 $permissionLoader = $app->get(PermissionRegistrar::class);
-                $permissionLoader->clearClassPermissions();
+                $permissionLoader->clearPermissionsCollection();
                 $permissionLoader->registerPermissions($gate);
             }
         });

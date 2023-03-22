@@ -7,6 +7,21 @@ use Spatie\Permission\PermissionRegistrar;
 class PermissionRegistarTest extends TestCase
 {
     /** @test */
+    public function it_can_clear_loaded_permissions_collection() {
+        $reflectedClass = new \ReflectionClass(app(PermissionRegistrar::class));
+        $reflectedProperty = $reflectedClass->getProperty('permissions');
+        $reflectedProperty->setAccessible(true);
+
+        app(PermissionRegistrar::class)->getPermissions();
+
+        $this->assertNotNull($reflectedProperty->getValue(app(PermissionRegistrar::class)));
+
+        app(PermissionRegistrar::class)->clearPermissionsCollection();
+
+        $this->assertNull($reflectedProperty->getValue(app(PermissionRegistrar::class)));
+    }
+
+    /** @test */
     public function it_can_check_uids()
     {
         $uids = [

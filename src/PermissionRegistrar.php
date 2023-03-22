@@ -151,13 +151,22 @@ class PermissionRegistrar
     }
 
     /**
-     * Clear class permissions.
+     * Clear already loaded permissions collection.
      * This is only intended to be called by the PermissionServiceProvider on boot,
      * so that long-running instances like Swoole don't keep old data in memory.
      */
-    public function clearClassPermissions()
+    public function clearPermissionsCollection(): void
     {
         $this->permissions = null;
+    }
+
+    /**
+     * @deprecated
+     * @alias of clearPermissionsCollection()
+     */
+    public function clearClassPermissions()
+    {
+        $this->clearPermissionsCollection();
     }
 
     /**
