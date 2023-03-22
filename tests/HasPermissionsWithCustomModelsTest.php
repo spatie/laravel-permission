@@ -77,7 +77,7 @@ class HasPermissionsWithCustomModelsTest extends HasPermissionsTest
 
         $permission = Permission::onlyTrashed()->find($this->testUserPermission->getKey());
 
-        $this->assertEquals(1, DB::table(config('permission.table_names.role_has_permissions'))->where('permission_test_id', $this->testUserPermission->getKey())->count());
+        $this->assertEquals(1, DB::table(config('permission.table_names.role_has_permissions'))->where('permission_test_id', $permission->getKey())->count());
     }
 
     /** @test */
@@ -92,25 +92,27 @@ class HasPermissionsWithCustomModelsTest extends HasPermissionsTest
         $this->assertSame(1, count(DB::getQueryLog()));
 
         $permission = Permission::onlyTrashed()->find($this->testUserPermission->getKey());
-        $permission->restore();
 
-        $this->assertEquals(1, DB::table(config('permission.table_names.model_has_permissions'))->where('permission_test_id', $this->testUserPermission->getKey())->count());
+        $this->assertEquals(1, DB::table(config('permission.table_names.model_has_permissions'))->where('permission_test_id', $permission->getKey())->count());
     }
 
     /** @test */
-    public function it_does_detach_roles_when_force_deleting()
+    public function it_does_detach_roles_and_users_when_force_deleting()
     {
-        $this->testUserRole->givePermissionTo($this->testUserPermission);
+        $permission_id = $this->testUserPermission->getKey();
+        $this->testUserRole->givePermissionTo($permission_id);
+        $this->testUser->givePermissionTo($permission_id);
 
         DB::enableQueryLog();
         $this->testUserPermission->forceDelete();
         DB::disableQueryLog();
 
-        $this->assertSame(2, count(DB::getQueryLog())); //avoid detach permissions on permissions
+        $this->assertSame(3, count(DB::getQueryLog())); //avoid detach permissions on permissions
 
-        $permission = Permission::withTrashed()->find($this->testUserPermission->getKey());
+        $permission = Permission::withTrashed()->find($permission_id);
 
         $this->assertNull($permission);
-        $this->assertEquals(0, DB::table(config('permission.table_names.role_has_permissions'))->where('permission_test_id', $this->testUserPermission->getKey())->count());
+        $this->assertEquals(0, DB::table(config('permission.table_names.role_has_permissions'))->where('permission_test_id', $permission_id)->count());
+        $this->assertEquals(0, DB::table(config('permission.table_names.model_has_permissions'))->where('permission_test_id', $permission_id)->count());
     }
 }
