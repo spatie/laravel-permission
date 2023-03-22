@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 5.10.0 - 2023-03-22
+
+ ### What's Changed
+
+ - Fix delete permissions on Permissions Model by @erikn69 in https://github.com/spatie/laravel-permission/pull/2366
+
 ## 5.9.1 - 2023-02-06
 
 Apologies for the break caused by 5.9.0 !
