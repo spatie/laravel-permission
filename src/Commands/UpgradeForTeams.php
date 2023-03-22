@@ -78,7 +78,6 @@ class UpgradeForTeams extends Command
      * Build a warning regarding possible duplication
      * due to already existing migrations.
      *
-     * @param  array  $existingMigrations
      * @return string
      */
     protected function getExistingMigrationsWarning(array $existingMigrations)
