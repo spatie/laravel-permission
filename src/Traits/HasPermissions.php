@@ -32,20 +32,21 @@ trait HasPermissions
                 return;
             }
 
-            if (is_a($model, Permission::class)) {
-                return;
-            }
-
             $teams = app(PermissionRegistrar::class)->teams;
             app(PermissionRegistrar::class)->teams = false;
-            $model->permissions()->detach();
+            if (! is_a($model, Permission::class)) {
+                $model->permissions()->detach();
+            }
+            if (is_a($model, Role::class)) {
+                $model->users()->detach();
+            }
             app(PermissionRegistrar::class)->teams = $teams;
         });
     }
 
     public function getPermissionClass()
     {
-        if (! isset($this->permissionClass)) {
+        if (! $this->permissionClass) {
             $this->permissionClass = app(PermissionRegistrar::class)->getPermissionClass();
         }
 

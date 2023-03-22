@@ -27,13 +27,16 @@ trait HasRoles
             $teams = app(PermissionRegistrar::class)->teams;
             app(PermissionRegistrar::class)->teams = false;
             $model->roles()->detach();
+            if (is_a($model, Permission::class)) {
+                $model->users()->detach();
+            }
             app(PermissionRegistrar::class)->teams = $teams;
         });
     }
 
     public function getRoleClass()
     {
-        if (! isset($this->roleClass)) {
+        if (! $this->roleClass) {
             $this->roleClass = app(PermissionRegistrar::class)->getRoleClass();
         }
 
