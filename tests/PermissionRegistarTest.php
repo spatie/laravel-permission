@@ -7,7 +7,8 @@ use Spatie\Permission\PermissionRegistrar;
 class PermissionRegistarTest extends TestCase
 {
     /** @test */
-    public function it_can_clear_loaded_permissions_collection() {
+    public function it_can_clear_loaded_permissions_collection()
+    {
         $reflectedClass = new \ReflectionClass(app(PermissionRegistrar::class));
         $reflectedProperty = $reflectedClass->getProperty('permissions');
         $reflectedProperty->setAccessible(true);

@@ -162,6 +162,7 @@ class PermissionRegistrar
 
     /**
      * @deprecated
+     *
      * @alias of clearPermissionsCollection()
      */
     public function clearClassPermissions()
