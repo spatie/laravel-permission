@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -19,7 +19,7 @@ class WildcardMiddlewareTest extends TestCase
 
     protected $roleOrPermissionMiddleware;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -154,16 +154,5 @@ class WildcardMiddlewareTest extends TestCase
         }
 
         $this->assertEquals(['permission.some'], $requiredPermissions);
-    }
-
-    protected function runMiddleware($middleware, $parameter)
-    {
-        try {
-            return $middleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
-            }, $parameter)->status();
-        } catch (UnauthorizedException $e) {
-            return $e->getStatusCode();
-        }
     }
 }

@@ -1,24 +1,28 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
+use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\PermissionServiceProvider;
+use Spatie\Permission\Tests\TestModels\Admin;
+use Spatie\Permission\Tests\TestModels\User;
 
 abstract class TestCase extends Orchestra
 {
-    /** @var \Spatie\Permission\Test\User */
+    /** @var \Spatie\Permission\Tests\User */
     protected $testUser;
 
-    /** @var \Spatie\Permission\Test\Admin */
+    /** @var \Spatie\Permission\Tests\Admin */
     protected $testAdmin;
 
     /** @var \Spatie\Permission\Models\Role */
@@ -43,7 +47,7 @@ abstract class TestCase extends Orchestra
 
     protected static $customMigration;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -100,8 +104,8 @@ abstract class TestCase extends Orchestra
         $app['config']->set('auth.guards.admin', ['driver' => 'session', 'provider' => 'admins']);
         $app['config']->set('auth.providers.admins', ['driver' => 'eloquent', 'model' => Admin::class]);
         if ($this->useCustomModels) {
-            $app['config']->set('permission.models.permission', \Spatie\Permission\Test\Permission::class);
-            $app['config']->set('permission.models.role', \Spatie\Permission\Test\Role::class);
+            $app['config']->set('permission.models.permission', \Spatie\Permission\Tests\TestModels\Permission::class);
+            $app['config']->set('permission.models.role', \Spatie\Permission\Tests\TestModels\Role::class);
         }
         // Use test User model for users provider
         $app['config']->set('auth.providers.users.model', User::class);
@@ -219,4 +223,33 @@ abstract class TestCase extends Orchestra
             ];
         });
     }
+
+    ////// TEST HELPERS
+    public function runMiddleware($middleware, $permission, $guard = null)
+    {
+        try {
+            return $middleware->handle(new Request(), function () {
+                return (new Response())->setContent('<html></html>');
+            }, $permission, $guard)->status();
+        } catch (UnauthorizedException $e) {
+            return $e->getStatusCode();
+        }
+    }
+
+    public function getLastRouteMiddlewareFromRouter($router)
+    {
+        return last($router->getRoutes()->get())->middleware();
+    }
+
+     public function getRouter()
+     {
+         return app('router');
+     }
+
+     public function getRouteResponse()
+     {
+         return function () {
+             return (new Response())->setContent('<html></html>');
+         };
+     }
 }

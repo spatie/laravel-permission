@@ -1,6 +1,8 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
+
+use Spatie\Permission\Tests\TestModels\User;
 
 class TeamHasPermissionsTest extends HasPermissionsTest
 {

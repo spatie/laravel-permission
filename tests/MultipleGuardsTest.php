@@ -1,10 +1,11 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Tests\TestModels\Manager;
 
 class MultipleGuardsTest extends TestCase
 {

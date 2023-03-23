@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -14,7 +14,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
 {
     protected $roleOrPermissionMiddleware;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -163,16 +163,5 @@ class RoleOrPermissionMiddlewareTest extends TestCase
         }
 
         $this->assertStringEndsWith('Necessary roles or permissions are some-permission, some-role', $message);
-    }
-
-    protected function runMiddleware($middleware, $name, $guard = null)
-    {
-        try {
-            return $middleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
-            }, $name, $guard)->status();
-        } catch (UnauthorizedException $e) {
-            return $e->getStatusCode();
-        }
     }
 }

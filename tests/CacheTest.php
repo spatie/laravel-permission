@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -8,6 +8,7 @@ use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\PermissionRegistrar;
+use Spatie\Permission\Tests\TestModels\User;
 
 class CacheTest extends TestCase
 {
@@ -21,7 +22,7 @@ class CacheTest extends TestCase
 
     protected $registrar;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
