@@ -10,8 +10,8 @@ use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Tests\TestModels\Admin;
-use Spatie\Permission\Tests\TestModels\User;
 use Spatie\Permission\Tests\TestModels\RuntimeRole;
+use Spatie\Permission\Tests\TestModels\User;
 
 class RoleTest extends TestCase
 {

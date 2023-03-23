@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
+use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\PermissionServiceProvider;
-use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Tests\TestModels\Admin;
 use Spatie\Permission\Tests\TestModels\User;
 
@@ -224,7 +224,6 @@ abstract class TestCase extends Orchestra
         });
     }
 
-
     ////// TEST HELPERS
     public function runMiddleware($middleware, $permission, $guard = null)
     {
@@ -238,9 +237,9 @@ abstract class TestCase extends Orchestra
     }
 
     public function getLastRouteMiddlewareFromRouter($router)
-     {
-         return last($router->getRoutes()->get())->middleware();
-     }
+    {
+        return last($router->getRoutes()->get())->middleware();
+    }
 
      public function getRouter()
      {
