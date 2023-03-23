@@ -1,9 +1,10 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\PermissionAlreadyExists;
+use Spatie\Permission\Tests\TestModels\User;
 
 class PermissionTest extends TestCase
 {

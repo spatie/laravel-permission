@@ -1,8 +1,6 @@
 <?php
 
-namespace Spatie\Permission\Test;
-
-use Illuminate\Http\Response;
+namespace Spatie\Permission\Tests;
 
 class WildcardRouteTest extends TestCase
 {
@@ -39,22 +37,5 @@ class WildcardRouteTest extends TestCase
             ],
             $this->getLastRouteMiddlewareFromRouter($router)
         );
-    }
-
-    protected function getLastRouteMiddlewareFromRouter($router)
-    {
-        return last($router->getRoutes()->get())->middleware();
-    }
-
-    protected function getRouter()
-    {
-        return app('router');
-    }
-
-    protected function getRouteResponse()
-    {
-        return function () {
-            return (new Response())->setContent('<html></html>');
-        };
     }
 }

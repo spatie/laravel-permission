@@ -1,12 +1,14 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
 use DB;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
+use Spatie\Permission\Tests\TestModels\SoftDeletingUser;
+use Spatie\Permission\Tests\TestModels\User;
 
 class HasPermissionsTest extends TestCase
 {

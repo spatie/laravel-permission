@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -15,7 +15,7 @@ class PermissionMiddlewareTest extends TestCase
 {
     protected $permissionMiddleware;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -223,16 +223,5 @@ class PermissionMiddlewareTest extends TestCase
             200,
             $this->runMiddleware($this->permissionMiddleware, 'admin-permission', 'admin')
         );
-    }
-
-    protected function runMiddleware($middleware, $permission, $guard = null)
-    {
-        try {
-            return $middleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
-            }, $permission, $guard)->status();
-        } catch (UnauthorizedException $e) {
-            return $e->getStatusCode();
-        }
     }
 }

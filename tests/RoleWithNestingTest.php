@@ -1,6 +1,8 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
+
+use Spatie\Permission\Tests\TestModels\Role;
 
 class RoleWithNestingTest extends TestCase
 {
@@ -13,7 +15,7 @@ class RoleWithNestingTest extends TestCase
     /** @var Role[] */
     protected $child_roles = [];
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -14,7 +14,7 @@ class RoleMiddlewareTest extends TestCase
 {
     protected $roleMiddleware;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -189,16 +189,5 @@ class RoleMiddlewareTest extends TestCase
             200,
             $this->runMiddleware($this->roleMiddleware, 'testAdminRole', 'admin')
         );
-    }
-
-    protected function runMiddleware($middleware, $roleName, $guard = null)
-    {
-        try {
-            return $middleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
-            }, $roleName, $guard)->status();
-        } catch (UnauthorizedException $e) {
-            return $e->getStatusCode();
-        }
     }
 }

@@ -1,9 +1,11 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
-use DB;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\PermissionRegistrar;
+use Spatie\Permission\Tests\TestModels\Permission;
+use Spatie\Permission\Tests\TestModels\User;
 
 class HasPermissionsWithCustomModelsTest extends HasPermissionsTest
 {
