@@ -143,9 +143,9 @@ class CommandTest extends TestCase
         $matchingFiles = glob(database_path('migrations/*_add_teams_fields.php'));
         $this->assertTrue(count($matchingFiles) > 0);
 
-        include_once $matchingFiles[count($matchingFiles) - 1];
-        (new \AddTeamsFields())->up();
-        (new \AddTeamsFields())->up(); //test upgrade teams migration fresh
+        $AddTeamsFields = require($matchingFiles[count($matchingFiles) - 1]);
+        $AddTeamsFields->up();
+        $AddTeamsFields->up(); //test upgrade teams migration fresh
 
         Role::create(['name' => 'new-role', 'team_test_id' => 1]);
         $role = Role::where('name', 'new-role')->first();

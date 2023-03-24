@@ -167,7 +167,6 @@ abstract class TestCase extends Orchestra
     {
         $migration = str_replace(
             [
-                'CreatePermissionTables',
                 '(\'id\'); // permission id',
                 '(\'id\'); // role id',
                 'references(\'id\') // permission id',
@@ -177,7 +176,6 @@ abstract class TestCase extends Orchestra
                 'unsignedBigInteger($pivotPermission)',
             ],
             [
-                'CreatePermissionCustomTables',
                 '(\'permission_test_id\');',
                 '(\'role_test_id\');',
                 'references(\'permission_test_id\')',
@@ -190,12 +188,10 @@ abstract class TestCase extends Orchestra
         );
 
         file_put_contents(__DIR__.'/CreatePermissionCustomTables.php', $migration);
-
-        include_once __DIR__.'/../database/migrations/create_permission_tables.php.stub';
-        self::$migration = new \CreatePermissionTables();
-
-        include_once __DIR__.'/CreatePermissionCustomTables.php';
-        self::$customMigration = new \CreatePermissionCustomTables();
+        
+        self::$migration = require(__DIR__.'/../database/migrations/create_permission_tables.php.stub');
+        
+        self::$customMigration = require(__DIR__.'/CreatePermissionCustomTables.php');
     }
 
     protected function reloadPermissions()
