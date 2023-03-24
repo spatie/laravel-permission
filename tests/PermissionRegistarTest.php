@@ -2,7 +2,13 @@
 
 namespace Spatie\Permission\Tests;
 
+use Spatie\Permission\Contracts\Permission as PermissionContract;
+use Spatie\Permission\Contracts\Role as RoleContract;
+use Spatie\Permission\Models\Permission as SpatiePermission;
+use Spatie\Permission\Models\Role as SpatieRole;
 use Spatie\Permission\PermissionRegistrar;
+use Spatie\Permission\Tests\TestModels\Permission as TestPermission;
+use Spatie\Permission\Tests\TestModels\Role as TestRole;
 
 class PermissionRegistarTest extends TestCase
 {
@@ -63,5 +69,52 @@ class PermissionRegistarTest extends TestCase
         foreach ($not_uids as $not_uid) {
             $this->assertFalse(PermissionRegistrar::isUid($not_uid));
         }
+    }
+
+    /** @test */
+    public function it_can_get_permission_class() {
+        $this->assertSame(SpatiePermission::class, app(PermissionRegistrar::class)->getPermissionClass());
+        $this->assertSame(SpatiePermission::class, get_class(app(PermissionContract::class)));
+    }
+
+    /** @test */
+    public function it_can_change_permission_class() {
+        $this->assertSame(SpatiePermission::class, config('permission.models.permission'));
+        $this->assertSame(SpatiePermission::class, app(PermissionRegistrar::class)->getPermissionClass());
+        $this->assertSame(SpatiePermission::class, get_class(app(PermissionContract::class)));
+        
+        app(PermissionRegistrar::class)->setPermissionClass(TestPermission::class);
+
+        $this->assertSame(TestPermission::class, config('permission.models.permission'));
+        $this->assertSame(TestPermission::class, app(PermissionRegistrar::class)->getPermissionClass());
+        $this->assertSame(TestPermission::class, get_class(app(PermissionContract::class)));
+    }
+
+    /** @test */
+    public function it_can_get_role_class() {
+        $this->assertSame(SpatieRole::class, app(PermissionRegistrar::class)->getRoleClass());
+        $this->assertSame(SpatieRole::class, get_class(app(RoleContract::class)));
+    }
+
+    /** @test */
+    public function it_can_change_role_class() {
+        $this->assertSame(SpatieRole::class, config('permission.models.role'));
+        $this->assertSame(SpatieRole::class, app(PermissionRegistrar::class)->getRoleClass());
+        $this->assertSame(SpatieRole::class, get_class(app(RoleContract::class)));
+
+        app(PermissionRegistrar::class)->setRoleClass(TestRole::class);
+
+        $this->assertSame(TestRole::class, config('permission.models.role'));
+        $this->assertSame(TestRole::class, app(PermissionRegistrar::class)->getRoleClass());
+        $this->assertSame(TestRole::class, get_class(app(RoleContract::class)));
+    }
+
+    /** @test */
+    public function it_can_change_team_id() {
+        $team_id = '00000000-0000-0000-0000-000000000000';
+
+        app(PermissionRegistrar::class)->setPermissionsTeamId($team_id);
+
+        $this->assertSame($team_id, app(PermissionRegistrar::class)->getPermissionsTeamId());
     }
 }

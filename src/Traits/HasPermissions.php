@@ -44,7 +44,7 @@ trait HasPermissions
         });
     }
 
-    public function getPermissionClass()
+    public function getPermissionClass(): string
     {
         if (! $this->permissionClass) {
             $this->permissionClass = app(PermissionRegistrar::class)->getPermissionClass();
@@ -138,7 +138,7 @@ trait HasPermissions
             }
             $method = is_string($permission) && ! PermissionRegistrar::isUid($permission) ? 'findByName' : 'findById';
 
-            return $this->getPermissionClass()->{$method}($permission, $this->getDefaultGuardName());
+            return $this->getPermissionClass()::{$method}($permission, $this->getDefaultGuardName());
         }, Arr::wrap($permissions));
     }
 
@@ -152,17 +152,15 @@ trait HasPermissions
      */
     public function filterPermission($permission, $guardName = null)
     {
-        $permissionClass = $this->getPermissionClass();
-
         if (is_string($permission) && ! PermissionRegistrar::isUid($permission)) {
-            $permission = $permissionClass->findByName(
+            $permission = $this->getPermissionClass()::findByName(
                 $permission,
                 $guardName ?? $this->getDefaultGuardName()
             );
         }
 
         if (is_int($permission) || is_string($permission)) {
-            $permission = $permissionClass->findById(
+            $permission = $this->getPermissionClass()::findById(
                 $permission,
                 $guardName ?? $this->getDefaultGuardName()
             );
@@ -205,7 +203,7 @@ trait HasPermissions
         $guardName = $guardName ?? $this->getDefaultGuardName();
 
         if (is_int($permission) || PermissionRegistrar::isUid($permission)) {
-            $permission = $this->getPermissionClass()->findById($permission, $guardName);
+            $permission = $this->getPermissionClass()::findById($permission, $guardName);
         }
 
         if ($permission instanceof Permission) {
@@ -389,7 +387,7 @@ trait HasPermissions
             );
         }
 
-        if (is_a($this, get_class(app(PermissionRegistrar::class)->getRoleClass()))) {
+        if (is_a($this, Role::class)) {
             $this->forgetCachedPermissions();
         }
 
@@ -421,7 +419,7 @@ trait HasPermissions
     {
         $this->permissions()->detach($this->getStoredPermission($permission));
 
-        if (is_a($this, get_class(app(PermissionRegistrar::class)->getRoleClass()))) {
+        if (is_a($this, Role::class)) {
             $this->forgetCachedPermissions();
         }
 
@@ -441,23 +439,20 @@ trait HasPermissions
      */
     protected function getStoredPermission($permissions)
     {
-        $permissionClass = $this->getPermissionClass();
-
         if (is_numeric($permissions) || PermissionRegistrar::isUid($permissions)) {
-            return $permissionClass->findById($permissions, $this->getDefaultGuardName());
+            return $this->getPermissionClass()::findById($permissions, $this->getDefaultGuardName());
         }
 
         if (is_string($permissions)) {
-            return $permissionClass->findByName($permissions, $this->getDefaultGuardName());
+            return $this->getPermissionClass()::findByName($permissions, $this->getDefaultGuardName());
         }
 
         if (is_array($permissions)) {
-            $permissions = array_map(function ($permission) use ($permissionClass) {
-                return is_a($permission, get_class($permissionClass)) ? $permission->name : $permission;
+            $permissions = array_map(function ($permission) {
+                return is_a($permission, Permission::class) ? $permission->name : $permission;
             }, $permissions);
 
-            return $permissionClass
-                ->whereIn('name', $permissions)
+            return $this->getPermissionClass()::whereIn('name', $permissions)
                 ->whereIn('guard_name', $this->getGuardNames())
                 ->get();
         }

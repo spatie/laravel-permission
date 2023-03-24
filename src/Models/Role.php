@@ -179,14 +179,12 @@ class Role extends Model implements RoleContract
             return $this->hasWildcardPermission($permission, $this->getDefaultGuardName());
         }
 
-        $permissionClass = $this->getPermissionClass();
-
         if (is_string($permission)) {
-            $permission = $permissionClass->findByName($permission, $this->getDefaultGuardName());
+            $permission = $this->getPermissionClass()::findByName($permission, $this->getDefaultGuardName());
         }
 
         if (is_int($permission)) {
-            $permission = $permissionClass->findById($permission, $this->getDefaultGuardName());
+            $permission = $this->getPermissionClass()::findById($permission, $this->getDefaultGuardName());
         }
 
         if (! $this->getGuardNames()->contains($permission->guard_name)) {
