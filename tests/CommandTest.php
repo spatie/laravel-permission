@@ -143,7 +143,7 @@ class CommandTest extends TestCase
         $matchingFiles = glob(database_path('migrations/*_add_teams_fields.php'));
         $this->assertTrue(count($matchingFiles) > 0);
 
-        $AddTeamsFields = require($matchingFiles[count($matchingFiles) - 1]);
+        $AddTeamsFields = require $matchingFiles[count($matchingFiles) - 1];
         $AddTeamsFields->up();
         $AddTeamsFields->up(); //test upgrade teams migration fresh
 

@@ -188,10 +188,10 @@ abstract class TestCase extends Orchestra
         );
 
         file_put_contents(__DIR__.'/CreatePermissionCustomTables.php', $migration);
-        
-        self::$migration = require(__DIR__.'/../database/migrations/create_permission_tables.php.stub');
-        
-        self::$customMigration = require(__DIR__.'/CreatePermissionCustomTables.php');
+
+        self::$migration = require __DIR__.'/../database/migrations/create_permission_tables.php.stub';
+
+        self::$customMigration = require __DIR__.'/CreatePermissionCustomTables.php';
     }
 
     protected function reloadPermissions()
