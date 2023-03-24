@@ -72,17 +72,19 @@ class PermissionRegistarTest extends TestCase
     }
 
     /** @test */
-    public function it_can_get_permission_class() {
+    public function it_can_get_permission_class()
+    {
         $this->assertSame(SpatiePermission::class, app(PermissionRegistrar::class)->getPermissionClass());
         $this->assertSame(SpatiePermission::class, get_class(app(PermissionContract::class)));
     }
 
     /** @test */
-    public function it_can_change_permission_class() {
+    public function it_can_change_permission_class()
+    {
         $this->assertSame(SpatiePermission::class, config('permission.models.permission'));
         $this->assertSame(SpatiePermission::class, app(PermissionRegistrar::class)->getPermissionClass());
         $this->assertSame(SpatiePermission::class, get_class(app(PermissionContract::class)));
-        
+
         app(PermissionRegistrar::class)->setPermissionClass(TestPermission::class);
 
         $this->assertSame(TestPermission::class, config('permission.models.permission'));
@@ -91,13 +93,15 @@ class PermissionRegistarTest extends TestCase
     }
 
     /** @test */
-    public function it_can_get_role_class() {
+    public function it_can_get_role_class()
+    {
         $this->assertSame(SpatieRole::class, app(PermissionRegistrar::class)->getRoleClass());
         $this->assertSame(SpatieRole::class, get_class(app(RoleContract::class)));
     }
 
     /** @test */
-    public function it_can_change_role_class() {
+    public function it_can_change_role_class()
+    {
         $this->assertSame(SpatieRole::class, config('permission.models.role'));
         $this->assertSame(SpatieRole::class, app(PermissionRegistrar::class)->getRoleClass());
         $this->assertSame(SpatieRole::class, get_class(app(RoleContract::class)));
@@ -110,7 +114,8 @@ class PermissionRegistarTest extends TestCase
     }
 
     /** @test */
-    public function it_can_change_team_id() {
+    public function it_can_change_team_id()
+    {
         $team_id = '00000000-0000-0000-0000-000000000000';
 
         app(PermissionRegistrar::class)->setPermissionsTeamId($team_id);
