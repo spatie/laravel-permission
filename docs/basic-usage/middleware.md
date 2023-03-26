@@ -17,8 +17,20 @@ Route::group(['middleware' => ['can:publish articles']], function () {
 
 This package comes with `RoleMiddleware`, `PermissionMiddleware` and `RoleOrPermissionMiddleware` middleware. You can add them inside your `app/Http/Kernel.php` file.
 
+Note the differences between Laravel 10 and older versions of Laravel is the name of the `protected` property:
+
+### Laravel 9 (and older) 
 ```php
 protected $routeMiddleware = [
+    // ...
+    'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
+    'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
+    'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
+];
+```
+### Laravel 10
+```php
+protected $middlewareAliases = [
     // ...
     'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
     'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
