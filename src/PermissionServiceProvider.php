@@ -51,12 +51,12 @@ class PermissionServiceProvider extends ServiceProvider
 
     protected function offerPublishing()
     {
-        if (! function_exists('config_path')) {
-            // function not available and 'publish' not relevant in Lumen
+        if (! $this->app->runningInConsole()) {
             return;
         }
 
-        if (! $this->app->runningInConsole()) {
+        if (! function_exists('config_path')) {
+            // function not available and 'publish' not relevant in Lumen
             return;
         }
 
@@ -156,7 +156,7 @@ class PermissionServiceProvider extends ServiceProvider
         Route::macro('role', function ($roles = []) {
             $roles = implode('|', Arr::wrap($roles));
 
-            /** @var \Illuminate\Routing\Route $this */
+            /** @var Route $this */
             $this->middleware("role:$roles");
 
             return $this;
@@ -165,7 +165,7 @@ class PermissionServiceProvider extends ServiceProvider
         Route::macro('permission', function ($permissions = []) {
             $permissions = implode('|', Arr::wrap($permissions));
 
-            /** @var \Illuminate\Routing\Route $this */
+            /** @var Route $this */
             $this->middleware("permission:$permissions");
 
             return $this;

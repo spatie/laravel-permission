@@ -13,10 +13,10 @@ use Spatie\Permission\Contracts\Role;
 
 class PermissionRegistrar
 {
-    /** @var \Illuminate\Contracts\Cache\Repository */
+    /** @var Repository */
     protected $cache;
 
-    /** @var \Illuminate\Cache\CacheManager */
+    /** @var CacheManager */
     protected $cacheManager;
 
     /** @var string */
@@ -25,7 +25,7 @@ class PermissionRegistrar
     /** @var string */
     protected $roleClass;
 
-    /** @var \Illuminate\Database\Eloquent\Collection */
+    /** @var Collection|null */
     protected $permissions;
 
     /** @var string */
