@@ -56,6 +56,10 @@ class PermissionServiceProvider extends ServiceProvider
             return;
         }
 
+        if (! $this->app->runningInConsole()) {
+            return;
+        }
+
         $this->publishes([
             __DIR__.'/../config/permission.php' => config_path('permission.php'),
         ], 'permission-config');
