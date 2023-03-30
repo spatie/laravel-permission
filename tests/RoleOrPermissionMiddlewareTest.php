@@ -72,7 +72,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
         Auth::login($this->testUser);
 
         Gate::before(function ($user, $ability) {
-            return $user->getKey() ===  $this->testUser->getKey() ? true : null;
+            return $user->getKey() === $this->testUser->getKey() ? true : null;
         });
 
         $this->assertEquals(
