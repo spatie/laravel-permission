@@ -17,6 +17,9 @@ ALL upgrades of this package should follow these steps:
 
 5. Apply any version-specific special updates as outlined below...
 
+6. Review the changelog, which details all the changes: https://github.com/spatie/laravel-permission/blob/main/CHANGELOG.md
+
+
 ### Upgrading to v6
 If you have overridden the `getPermissionClass()` or `getRoleClass()` methods or have custom Models, you will need to revisit those customizations. See PR #2368 for details. 
 eg: if you have a custom model you will need to make changes, including accessing the model using `$this->permissionClass::` syntax (eg: using `::` instead of `->`) in all the overridden methods that make use of the models.
