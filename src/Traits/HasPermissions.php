@@ -22,7 +22,7 @@ trait HasPermissions
     /** @var string */
     private $permissionClass;
 
-    /** @var string */
+    /** @var string|false|null */
     private $wildcardClass;
 
     public static function bootHasPermissions()
@@ -61,7 +61,7 @@ trait HasPermissions
 
         $this->wildcardClass = false;
 
-        if (config('permission.enable_wildcard_permission', false)) {
+        if (config('permission.enable_wildcard_permission')) {
             $this->wildcardClass = config('permission.wildcard_permission', WildcardPermission::class);
 
             if (! is_subclass_of($this->wildcardClass, Wildcard::class)) {
@@ -101,7 +101,7 @@ trait HasPermissions
     {
         $permissions = $this->convertToPermissionModels($permissions);
 
-        $rolesWithPermissions = array_unique(array_reduce($permissions, function ($result, $permission) {
+        $rolesWithPermissions = is_a($this, Role::class) ? []: array_unique(array_reduce($permissions, function ($result, $permission) {
             return array_merge($result, $permission->roles->all());
         }, []));
 
@@ -111,7 +111,7 @@ trait HasPermissions
                 $key = (new $permissionClass())->getKeyName();
                 $subQuery->whereIn(config('permission.table_names.permissions').".$key", \array_column($permissions, $key));
             });
-            if (count($rolesWithPermissions) > 0) {
+            if (count($rolesWithPermissions) > 0 && ! is_a($this, Role::class)) {
                 $query->orWhereHas('roles', function (Builder $subQuery) use ($rolesWithPermissions) {
                     $roleClass = $this->getRoleClass();
                     $key = (new $roleClass())->getKeyName();
@@ -287,6 +287,10 @@ trait HasPermissions
      */
     protected function hasPermissionViaRole(Permission $permission): bool
     {
+        if (is_a($this, Role::class)) {
+            return false;
+        }
+
         return $this->hasRole($permission->roles);
     }
 
@@ -309,6 +313,10 @@ trait HasPermissions
      */
     public function getPermissionsViaRoles(): Collection
     {
+        if (is_a($this, Role::class) || is_a($this, Permission::class)) {
+            return collect();
+        }
+
         return $this->loadMissing('roles', 'roles.permissions')
             ->roles->flatMap(function ($role) {
                 return $role->permissions;
