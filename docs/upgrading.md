@@ -27,7 +27,9 @@ Be sure to compare your custom models with originals to see what else may have c
 
 2. If you have a custom Role model and (in the rare case that you might) have overridden the `hasPermissionTo()` method in it, you will need to update its method signature to `hasPermissionTo($permission, $guardName = null):bool`. See PR #2380.
 
-3. Also note that the migrations have been updated to anonymous-class syntax that was introduced in Laravel 8. You may optionally update your original migration files accordingly. 
+3. Also note that the migrations have been updated to anonymous-class syntax that was introduced in Laravel 8. You may optionally update your original migration files accordingly.
+
+4. NOTE: For consistency with the `PermissionMiddleware`, the `RoleOrPermissionMiddleware` has switched from only checking permissions provided by this package to using `canAny()` to check against any abilities registered by your application. This may have the effect of granting those other abilities (such as Super Admin) when using the `RoleOrPermissionMiddleware`, which previously would have failed silently.
 
 ### Upgrading from v1 to v2
 If you're upgrading from v1 to v2, there's no built-in automatic migration/conversion of your data to the new structure. 
