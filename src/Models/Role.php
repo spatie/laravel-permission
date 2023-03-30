@@ -173,22 +173,16 @@ class Role extends Model implements RoleContract
      *
      * @throws \Spatie\Permission\Exceptions\GuardDoesNotMatch
      */
-    public function hasPermissionTo($permission): bool
+    public function hasPermissionTo($permission, $guardName = null): bool
     {
-        if (config('permission.enable_wildcard_permission', false)) {
-            return $this->hasWildcardPermission($permission, $this->getDefaultGuardName());
+        if ($this->getWildcardClass()) {
+            return $this->hasWildcardPermission($permission, $guardName);
         }
-
-        if (is_string($permission)) {
-            $permission = $this->getPermissionClass()::findByName($permission, $this->getDefaultGuardName());
-        }
-
-        if (is_int($permission)) {
-            $permission = $this->getPermissionClass()::findById($permission, $this->getDefaultGuardName());
-        }
+        
+        $permission = $this->filterPermission($permission, $guardName);
 
         if (! $this->getGuardNames()->contains($permission->guard_name)) {
-            throw GuardDoesNotMatch::create($permission->guard_name, $this->getGuardNames());
+            throw GuardDoesNotMatch::create($permission->guard_name, $guardName ?? $this->getGuardNames());
         }
 
         return $this->permissions->contains($permission->getKeyName(), $permission->getKey());
