@@ -58,15 +58,15 @@ class Show extends Command
             }
 
             $this->table(
-                array_merge([
-                    config('permission.teams') ? $teams->prepend('')->toArray() : [],
+                array_merge(
+                    isset($teams) ? $teams->prepend(new TableCell(''))->toArray() : [],
                     $roles->keys()->map(function ($val) {
                         $name = explode('_', $val);
 
                         return $name[0];
                     })
                     ->prepend('')->toArray(),
-                ]),
+                ),
                 $body->toArray(),
                 $style
             );

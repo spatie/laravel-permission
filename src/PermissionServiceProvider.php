@@ -26,7 +26,7 @@ class PermissionServiceProvider extends ServiceProvider
         $this->registerModelBindings();
 
         $this->callAfterResolving(Gate::class, function (Gate $gate, Application $app) {
-            if ($this->app->config['permission.register_permission_check_method']) {
+            if ($this->app['config']->get('permission.register_permission_check_method')) {
                 /** @var PermissionRegistrar $permissionLoader */
                 $permissionLoader = $app->get(PermissionRegistrar::class);
                 $permissionLoader->clearPermissionsCollection();
@@ -156,6 +156,7 @@ class PermissionServiceProvider extends ServiceProvider
         Route::macro('role', function ($roles = []) {
             $roles = implode('|', Arr::wrap($roles));
 
+            /** @var \Illuminate\Routing\Route $this */
             $this->middleware("role:$roles");
 
             return $this;
@@ -164,6 +165,7 @@ class PermissionServiceProvider extends ServiceProvider
         Route::macro('permission', function ($permissions = []) {
             $permissions = implode('|', Arr::wrap($permissions));
 
+            /** @var \Illuminate\Routing\Route $this */
             $this->middleware("permission:$permissions");
 
             return $this;
@@ -173,13 +175,13 @@ class PermissionServiceProvider extends ServiceProvider
     /**
      * Returns existing migration file if found, else uses the current timestamp.
      */
-    protected function getMigrationFileName($migrationFileName): string
+    protected function getMigrationFileName(string $migrationFileName): string
     {
         $timestamp = date('Y_m_d_His');
 
         $filesystem = $this->app->make(Filesystem::class);
 
-        return Collection::make($this->app->databasePath().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR)
+        return Collection::make([$this->app->databasePath().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR])
             ->flatMap(function ($path) use ($filesystem, $migrationFileName) {
                 return $filesystem->glob($path.'*_'.$migrationFileName);
             })
