@@ -101,7 +101,7 @@ trait HasPermissions
     {
         $permissions = $this->convertToPermissionModels($permissions);
 
-        $rolesWithPermissions = is_a($this, Role::class) ? []: array_unique(array_reduce($permissions, function ($result, $permission) {
+        $rolesWithPermissions = is_a($this, Role::class) ? [] : array_unique(array_reduce($permissions, function ($result, $permission) {
             return array_merge($result, $permission->roles->all());
         }, []));
 
