@@ -178,7 +178,7 @@ class Role extends Model implements RoleContract
         if ($this->getWildcardClass()) {
             return $this->hasWildcardPermission($permission, $guardName);
         }
-        
+
         $permission = $this->filterPermission($permission, $guardName);
 
         if (! $this->getGuardNames()->contains($permission->guard_name)) {
