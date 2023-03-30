@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property int $id
  * @property string $name
  * @property string $guard_name
+ *
  * @mixin \Spatie\Permission\Models\Role
  */
 interface Role
