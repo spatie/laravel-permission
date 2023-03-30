@@ -6,10 +6,12 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Gate;
 use InvalidArgumentException;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
+use Spatie\Permission\Tests\TestModels\UserWithoutHasRoles;
 
 class PermissionMiddlewareTest extends TestCase
 {
@@ -70,6 +72,21 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    public function a_super_admin_user_can_access_a_route_protected_by_permission_middleware()
+    {
+        Auth::login($this->testUser);
+
+        Gate::before(function ($user, $ability) {
+            return $user->getKey() ===  $this->testUser->getKey() ? true : null;
+        });
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->permissionMiddleware, 'edit-articles')
+        );
+    }
+
+    /** @test */
     public function a_user_can_access_a_route_protected_by_permission_middleware_if_have_this_permission()
     {
         Auth::login($this->testUser);
@@ -97,6 +114,19 @@ class PermissionMiddlewareTest extends TestCase
         $this->assertEquals(
             200,
             $this->runMiddleware($this->permissionMiddleware, ['edit-news', 'edit-articles'])
+        );
+    }
+
+    /** @test */
+    public function a_user_cannot_access_a_route_protected_by_the_permission_middleware_if_have_not_has_roles_trait()
+    {
+        $userWithoutHasRoles = UserWithoutHasRoles::create(['email' => 'test_not_has_roles@user.com']);
+
+        Auth::login($userWithoutHasRoles);
+
+        $this->assertEquals(
+            403,
+            $this->runMiddleware($this->permissionMiddleware, 'edit-news')
         );
     }
 

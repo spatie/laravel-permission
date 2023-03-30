@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Exceptions;
 
+use Illuminate\Contracts\Auth\Access\Authorizable;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class UnauthorizedException extends HttpException
@@ -50,6 +51,13 @@ class UnauthorizedException extends HttpException
         $exception->requiredPermissions = $rolesOrPermissions;
 
         return $exception;
+    }
+
+    public static function missingTraitHasRoles(Authorizable $user): self
+    {
+        $class = get_class($user);
+
+        return new static(403, "Authorizable class `{$class}` must use Spatie\Permission\Traits\HasRoles trait.", null, []);
     }
 
     public static function notLoggedIn(): self
