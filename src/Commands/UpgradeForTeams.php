@@ -35,7 +35,7 @@ class UpgradeForTeams extends Command
 
         $this->line('');
 
-        if (! $this->confirm('Proceed with the migration creation?', 'yes')) {
+        if (! $this->confirm('Proceed with the migration creation?', true)) {
             return;
         }
 
