@@ -14,9 +14,6 @@ use Spatie\Permission\Traits\HasRoles;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
 
 /**
- * @property int $id
- * @property string $name
- * @property string $guard_name
  * @property ?\Illuminate\Support\Carbon $created_at
  * @property ?\Illuminate\Support\Carbon $updated_at
  */
@@ -82,7 +79,7 @@ class Permission extends Model implements PermissionContract
      *
      * @param  string|null  $guardName
      *
-     * @throws \Spatie\Permission\Exceptions\PermissionDoesNotExist
+     * @throws PermissionDoesNotExist
      */
     public static function findByName(string $name, $guardName = null): PermissionContract
     {
@@ -101,7 +98,7 @@ class Permission extends Model implements PermissionContract
      * @param  int|string  $id
      * @param  string|null  $guardName
      *
-     * @throws \Spatie\Permission\Exceptions\PermissionDoesNotExist
+     * @throws PermissionDoesNotExist
      */
     public static function findById($id, $guardName = null): PermissionContract
     {
@@ -145,7 +142,7 @@ class Permission extends Model implements PermissionContract
     /**
      * Get the current cached first permission.
      *
-     * @return \Spatie\Permission\Contracts\Permission
+     * @return PermissionContract
      */
     protected static function getPermission(array $params = []): ?PermissionContract
     {

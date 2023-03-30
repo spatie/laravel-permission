@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Permission\Contracts\Role as RoleContract;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
+use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Exceptions\RoleAlreadyExists;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Guard;
@@ -14,9 +15,6 @@ use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
 
 /**
- * @property int $id
- * @property string $name
- * @property string $guard_name
  * @property ?\Illuminate\Support\Carbon $created_at
  * @property ?\Illuminate\Support\Carbon $updated_at
  */
@@ -89,9 +87,9 @@ class Role extends Model implements RoleContract
      * Find a role by its name and guard name.
      *
      * @param  string|null  $guardName
-     * @return \Spatie\Permission\Contracts\Role|\Spatie\Permission\Models\Role
+     * @return RoleContract|Role
      *
-     * @throws \Spatie\Permission\Exceptions\RoleDoesNotExist
+     * @throws RoleDoesNotExist
      */
     public static function findByName(string $name, $guardName = null): RoleContract
     {
@@ -111,7 +109,7 @@ class Role extends Model implements RoleContract
      *
      * @param  int|string  $id
      * @param  string|null  $guardName
-     * @return \Spatie\Permission\Contracts\Role|\Spatie\Permission\Models\Role
+     * @return RoleContract|Role
      */
     public static function findById($id, $guardName = null): RoleContract
     {
@@ -130,7 +128,7 @@ class Role extends Model implements RoleContract
      * Find or create role by its name (and optionally guardName).
      *
      * @param  string|null  $guardName
-     * @return \Spatie\Permission\Contracts\Role|\Spatie\Permission\Models\Role
+     * @return RoleContract|Role
      */
     public static function findOrCreate(string $name, $guardName = null): RoleContract
     {
@@ -167,11 +165,12 @@ class Role extends Model implements RoleContract
     }
 
     /**
-     * Determine if the user may perform the given permission.
+     * Determine if the role may perform the given permission.
      *
-     * @param  string|Permission  $permission
+     * @param  string|int|Permission  $permission
+     * @param  string|null  $guardName
      *
-     * @throws \Spatie\Permission\Exceptions\GuardDoesNotMatch
+     * @throws PermissionDoesNotExist|GuardDoesNotMatch
      */
     public function hasPermissionTo($permission, $guardName = null): bool
     {

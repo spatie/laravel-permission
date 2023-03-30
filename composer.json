@@ -63,6 +63,8 @@
         }
     },
     "scripts": {
-        "test": "phpunit"
+        "test": "phpunit",
+        "format": "php-cs-fixer fix --allow-risky=yes",
+        "analyse": "phpstan analyse"
     }
 }
