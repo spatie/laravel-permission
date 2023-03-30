@@ -51,17 +51,12 @@ class PermissionServiceProvider extends ServiceProvider
 
     protected function offerPublishing()
     {
-        if (! function_exists('config_path')) {
-            // function not available and 'publish' not relevant in Lumen
-            return;
-        }
-
         if (! $this->app->runningInConsole()) {
             return;
         }
 
         $this->publishes([
-            __DIR__.'/../config/permission.php' => config_path('permission.php'),
+            __DIR__.'/../config/permission.php' => base_path('config/permission.php'),
         ], 'permission-config');
 
         $this->publishes([
