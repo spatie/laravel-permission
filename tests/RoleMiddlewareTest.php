@@ -6,9 +6,11 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Gate;
 use InvalidArgumentException;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middlewares\RoleMiddleware;
+use Spatie\Permission\Tests\TestModels\UserWithoutHasRoles;
 
 class RoleMiddlewareTest extends TestCase
 {
@@ -71,6 +73,19 @@ class RoleMiddlewareTest extends TestCase
         $this->assertEquals(
             200,
             $this->runMiddleware($this->roleMiddleware, ['testRole2', 'testRole'])
+        );
+    }
+
+    /** @test */
+    public function a_user_cannot_access_a_route_protected_by_the_role_middleware_if_have_not_has_roles_trait()
+    {
+        $userWithoutHasRoles = UserWithoutHasRoles::create(['email' => 'test_not_has_roles@user.com']);
+
+        Auth::login($userWithoutHasRoles);
+
+        $this->assertEquals(
+            403,
+            $this->runMiddleware($this->roleMiddleware, 'testRole')
         );
     }
 
