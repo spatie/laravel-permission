@@ -21,11 +21,13 @@ ALL upgrades of this package should follow these steps:
 
 
 ### Upgrading to v6
-If you have overridden the `getPermissionClass()` or `getRoleClass()` methods or have custom Models, you will need to revisit those customizations. See PR #2368 for details. 
+1. If you have overridden the `getPermissionClass()` or `getRoleClass()` methods or have custom Models, you will need to revisit those customizations. See PR #2368 for details. 
 eg: if you have a custom model you will need to make changes, including accessing the model using `$this->permissionClass::` syntax (eg: using `::` instead of `->`) in all the overridden methods that make use of the models.
 Be sure to compare your custom models with originals to see what else may have changed.
 
-Also note that the migrations have been updated to anonymous-class syntax that was introduced in Laravel 8. You may optionally update your original migration files accordingly. 
+2. If you have a custom Role model and (in the rare case that you might) have overridden the `hasPermissionTo()` method in it, you will need to update its method signature to `hasPermissionTo($permission, $guardName = null):bool`. See PR #2380.
+
+3. Also note that the migrations have been updated to anonymous-class syntax that was introduced in Laravel 8. You may optionally update your original migration files accordingly. 
 
 ### Upgrading from v1 to v2
 If you're upgrading from v1 to v2, there's no built-in automatic migration/conversion of your data to the new structure. 
