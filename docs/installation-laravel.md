@@ -10,9 +10,9 @@ This package can be used with Laravel 6.0 or higher.
 Package Version | Laravel Version
 ----------------|-----------
     ^6.0        |  8,9,10
-    ^5.8        | 7,8,9,10
+    ^5.8        |  7,8,9,10
     ^5.7        |  7,8,9
-  ^5.4-^5.6     |   7,8
+  ^5.4-^5.6     |  7,8
    5.0-5.3      |  6,7,8
      ^4         |  6,7,8
      ^3         |  5.8
@@ -43,8 +43,8 @@ Package Version | Laravel Version
     php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
     ```
 
-6. NOTE: If you are using UUIDs, see the Advanced section of the docs on UUID steps, before you continue. It explains some changes you may want to make to the migrations and config file before continuing. It also mentions important considerations after extending this package's models for UUID capability.
-    If you are going to use teams feature, you have to update your [`config/permission.php` config file](https://github.com/spatie/laravel-permission/blob/main/config/permission.php) and set `'teams' => true,`, if you want to use a custom foreign key for teams you must change `team_foreign_key`.
+6. NOTE: **If you are using UUIDs**, see the Advanced section of the docs on UUID steps, before you continue. It explains some changes you may want to make to the migrations and config file before continuing. It also mentions important considerations after extending this package's models for UUID capability.
+    **If you are going to use the TEAMS features**, you must update your [`config/permission.php` config file](https://github.com/spatie/laravel-permission/blob/main/config/permission.php) and set `'teams' => true,`; and in your database if you want to use a custom foreign key for teams you must change `team_foreign_key`.
 
 7. NOTE: If you are using MySQL 8, look at the migration files for notes about MySQL 8 to set/limit the index key length, and edit accordingly.
 
