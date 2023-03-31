@@ -44,6 +44,7 @@ Package Version | Laravel Version
     ```
 
 6. NOTE: **If you are using UUIDs**, see the Advanced section of the docs on UUID steps, before you continue. It explains some changes you may want to make to the migrations and config file before continuing. It also mentions important considerations after extending this package's models for UUID capability.
+
     **If you are going to use the TEAMS features**, you must update your [`config/permission.php` config file](https://github.com/spatie/laravel-permission/blob/main/config/permission.php) and set `'teams' => true,`; and in your database if you want to use a custom foreign key for teams you must change `team_foreign_key`.
 
 7. NOTE: If you are using MySQL 8, look at the migration files for notes about MySQL 8 to set/limit the index key length, and edit accordingly.
