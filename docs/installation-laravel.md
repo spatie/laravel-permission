@@ -7,15 +7,15 @@ weight: 4
 
 This package can be used with Laravel 6.0 or higher.
 
-Package | Laravel Version
---------|-----------
-  ^6.0   |  8,9,10
-  ^5.8   | 7,8,9,10
-  ^5.7   |  7,8,9
-^5.4-^5.6 |   7,8
- 5.0-5.3 |  6,7,8
-   ^4    |  6,7,8
-   ^3    |  5.8
+Package Version | Laravel Version
+----------------|-----------
+    ^6.0        |  8,9,10
+    ^5.8        | 7,8,9,10
+    ^5.7        |  7,8,9
+  ^5.4-^5.6     |   7,8
+   5.0-5.3      |  6,7,8
+     ^4         |  6,7,8
+     ^3         |  5.8
    
 
 ## Installing
