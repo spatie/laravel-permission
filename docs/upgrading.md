@@ -18,6 +18,7 @@ ALL upgrades of this package should follow these steps:
 5. Apply any version-specific special updates as outlined below...
 
 6. Review the changelog, which details all the changes: https://github.com/spatie/laravel-permission/blob/main/CHANGELOG.md
+and/or consult the [Release Notes](https://github.com/spatie/laravel-permission/releases)
 
 
 ### Upgrading to v6
