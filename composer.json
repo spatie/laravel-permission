@@ -22,7 +22,7 @@
     ],
     "homepage": "https://github.com/spatie/laravel-permission",
     "require": {
-        "php": "^7.3|^8.0",
+        "php": "^7.4|^8.0",
         "illuminate/auth": "^8.0|^9.0|^10.0",
         "illuminate/container": "^8.0|^9.0|^10.0",
         "illuminate/contracts": "^8.0|^9.0|^10.0",
@@ -30,8 +30,7 @@
     },
     "require-dev": {
         "orchestra/testbench": "^6.0|^7.0|^8.0",
-        "phpunit/phpunit": "^9.4",
-        "predis/predis": "^1.1"
+        "phpunit/phpunit": "^9.4"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
