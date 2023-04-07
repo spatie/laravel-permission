@@ -33,7 +33,21 @@ Event::listen(MigrationsEnded::class, function () {
 
 Note that `PermissionRegistrar::forgetCachedPermissions()` is called AFTER seeding. This is to prevent a caching issue that can occur when the database is set up after permissions have already been registered and cached. 
 
-## Factories
+
+## Bypassing Cache When Testing
+
+The caching infrastructure for this package is "always on", but when running your test suite you may wish to reduce its impact.
+
+Two things you might wish to explore include:
+
+- Change the cache driver to `array`. **Very often you will have already done this in your `phpunit.xml` configuration.**
+
+- Shorten cache lifetime to 1 second, by setting the config (not necessary if cache driver is set to `array`) in your test suite TestCase:
+
+   `'permission.cache.expiration_time' = \DateInterval::createFromDateString('1 seconds')`
+
+
+## Testing Using Factories
 
 Many applications do not require using factories to create fake roles/permissions for testing, because they use a Seeder to create specific roles and permissions that the application uses; thus tests are performed using the declared roles and permissions.
 
