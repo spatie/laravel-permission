@@ -29,28 +29,28 @@ $permission = Permission::create(['name' => 'edit articles']);
 ```
 
 
-A permission can be assigned to a role using 1 of these methods:
+A permission can be assigned to a role using either of these methods:
 
 ```php
 $role->givePermissionTo($permission);
 $permission->assignRole($role);
 ```
 
-Multiple permissions can be synced to a role using 1 of these methods:
+Multiple permissions can be synced to a role using either of these methods:
 
 ```php
 $role->syncPermissions($permissions);
 $permission->syncRoles($roles);
 ```
 
-A permission can be removed from a role using 1 of these methods:
+A permission can be removed from a role using either of these methods:
 
 ```php
 $role->revokePermissionTo($permission);
 $permission->removeRole($role);
 ```
 
-If you're using multiple guards the `guard_name` attribute needs to be set as well. Read about it in the [using multiple guards](./multiple-guards) section of the readme.
+If you're using multiple guards then the `guard_name` attribute must be set as well. Read about it in the [using multiple guards](./multiple-guards) section of the readme.
 
 The `HasRoles` trait adds Eloquent relationships to your models, which can be accessed directly or used as a base query:
 
