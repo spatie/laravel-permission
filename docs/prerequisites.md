@@ -5,7 +5,7 @@ weight: 3
 
 ## Laravel Version
 
-This package can be used in Laravel 6 or higher.
+This package can be used in Laravel 6 or higher. Check the "Installing on Laravel" page for package versions compatible with various Laravel versions.
 
 ## User Model / Contract/Interface
 
