@@ -3,11 +3,13 @@ title: Upgrading
 weight: 6
 ---
 
+# Upgrade Essentials
+
 ALL upgrades of this package should follow these steps:
 
 1. Upgrading between major versions of this package always require the usual Composer steps:
-   > 1. Update your `composer.json` to specify the new major version, such as `^6.0`
-   > 2. Then run `composer update`. 
+   - Update your `composer.json` to specify the new major version, such as `^6.0`
+   - Then run `composer update`. 
 
 2. Compare the `migration` file stubs in the NEW version of this package against the migrations you've already run inside your app. If necessary, create a new migration (by hand) to apply any new changes.
 
@@ -21,7 +23,7 @@ ALL upgrades of this package should follow these steps:
 and/or consult the [Release Notes](https://github.com/spatie/laravel-permission/releases)
 
 
-### Upgrading to v6
+# Upgrading to v6
 1. If you have overridden the `getPermissionClass()` or `getRoleClass()` methods or have custom Models, you will need to revisit those customizations. See PR #2368 for details. 
 eg: if you have a custom model you will need to make changes, including accessing the model using `$this->permissionClass::` syntax (eg: using `::` instead of `->`) in all the overridden methods that make use of the models.
 Be sure to compare your custom models with originals to see what else may have changed.
@@ -35,7 +37,7 @@ Be sure to compare your custom models with originals to see what else may have c
 5. Test suites. If you have tests which manually clear the permission cache and re-register permissions, you no longer need to call `\Spatie\Permission\PermissionRegistrar::class)->registerPermissions();`. Such calls can be deleted from your tests.
 
 
-### Upgrading from v1 to v2
+# Upgrading from v1 to v2
 If you're upgrading from v1 to v2, there's no built-in automatic migration/conversion of your data to the new structure. 
 You will need to carefully adapt your code and your data manually.
 
