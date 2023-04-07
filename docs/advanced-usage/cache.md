@@ -53,7 +53,7 @@ If you wish to alter the expiration time you may do so in the `config/permission
 ### Cache Key
 
 The default cache key is `spatie.permission.cache`.
-We recommend not changing the cache "key" name. Usually changing it is a bad idea. More likely setting the cache `prefix` is better, as mentioned above.
+We recommend not changing the cache "key" name. Usually changing it is a bad idea. More likely setting the cache `prefix` is better, as mentioned below.
 
 
 ### Cache Identifier / Prefix
