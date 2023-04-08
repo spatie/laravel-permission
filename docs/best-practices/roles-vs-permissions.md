@@ -14,7 +14,7 @@ The more granular/detailed your permission-names (such as separate permissions l
 
 When designed this way, all the sections of your application can check for specific permissions needed to access certain features or perform certain actions AND this way you can always **use the native Laravel `@can` and `can()` directives everywhere** in your app, which allows Laravel's Gate layer to do all the heavy lifting.  
 
-Example: it's safer to have your Views test `$user->can('view member addresses')` or `$user->can('edit document')`, INSTEAD of testing for `$user->hasRole('Editor')`. It's easier to control displaying a "section" of content vs edit/delete buttons if you have "view document" and "edit document" permissions defined. And then Writer role would get both "view" and "edit" assigned to it. And then the user would get the Writer role.
+Example: it's safer to have your Views test `@can('view member addresses')` or `@can('edit document')`, INSTEAD of testing for `$user->hasRole('Editor')`. It's easier to control displaying a "section" of content vs edit/delete buttons if you have "view document" and "edit document" permissions defined. And then Writer role would get both "view" and "edit" assigned to it. And then the user would get the Writer role.
 
 This also allows you to treat permission names as static (only editable by developers), and then your application (almost) never needs to know anything about role names, so you could (almost) change role names at will.
 
