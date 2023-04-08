@@ -17,19 +17,12 @@ Route::group(['middleware' => ['can:publish articles']], function () {
 
 This package comes with `RoleMiddleware`, `PermissionMiddleware` and `RoleOrPermissionMiddleware` middleware. You can add them inside your `app/Http/Kernel.php` file.
 
-Note the differences between Laravel 10 and older versions of Laravel is the name of the `protected` property:
+Note the property name difference between Laravel 10 and older versions of Laravel:
 
-### Laravel 9 (and older) 
 ```php
-protected $routeMiddleware = [
-    // ...
-    'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
-    'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
-    'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
-];
-```
-### Laravel 10
-```php
+// Laravel 9 uses $routeMiddleware = [
+//protected $routeMiddleware = [
+// Laravel 10+ uses $middlewareAliases = [
 protected $middlewareAliases = [
     // ...
     'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
@@ -37,6 +30,8 @@ protected $middlewareAliases = [
     'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
 ];
 ```
+
+## Middleware via Routes
 
 Then you can protect your routes using middleware rules:
 
@@ -74,6 +69,8 @@ Route::group(['middleware' => ['role_or_permission:super-admin|edit articles']],
 });
 ```
 
+## Middleware with Controllers
+
 You can protect your controllers similarly, by setting desired middleware in the constructor:
 
 ```php
@@ -89,3 +86,5 @@ public function __construct()
     $this->middleware(['role_or_permission:super-admin|edit articles']);
 }
 ```
+
+(You can use Laravel's Model Policy feature with your controller methods. See the Model Policies section of these docs.)
