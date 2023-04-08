@@ -96,3 +96,5 @@ foreach ($permissionIdsByRole as $role => $permissionIds) {
         );
 }
 ```
+
+**CAUTION**: ANY TIME YOU DIRECTLY RUN DB QUERIES you are bypassing cache-control features. So you will need to manually flush the package cache AFTER running direct DB queries, even in a seeder.
