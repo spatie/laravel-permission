@@ -157,16 +157,13 @@ trait HasPermissions
      */
     public function filterPermission($permission, $guardName = null)
     {
+        if ($permission instanceof \BackedEnum) {
+            $permission = $permission->value;
+        }
+
         if (is_string($permission) && ! PermissionRegistrar::isUid($permission)) {
             $permission = $this->getPermissionClass()::findByName(
                 $permission,
-                $guardName ?? $this->getDefaultGuardName()
-            );
-        }
-
-        if ($permission instanceof \BackedEnum) {
-            $permission = $this->getPermissionClass()::findByName(
-                $permission->value,
                 $guardName ?? $this->getDefaultGuardName()
             );
         }
@@ -463,16 +460,16 @@ trait HasPermissions
      */
     protected function getStoredPermission($permissions)
     {
+        if ($permissions instanceof \BackedEnum) {
+            $permissions = $permissions->value;
+        }
+
         if (is_numeric($permissions) || PermissionRegistrar::isUid($permissions)) {
             return $this->getPermissionClass()::findById($permissions, $this->getDefaultGuardName());
         }
 
         if (is_string($permissions)) {
             return $this->getPermissionClass()::findByName($permissions, $this->getDefaultGuardName());
-        }
-
-        if ($permissions instanceof \BackedEnum) {
-            return $this->getPermissionClass()::findByName($permissions->value, $this->getDefaultGuardName());
         }
 
         if (is_array($permissions)) {
