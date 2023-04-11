@@ -206,16 +206,14 @@ trait HasRoles
             $roles = $this->convertPipeToArray($roles);
         }
 
+        if ($roles instanceof \BackedEnum) {
+            $roles = $roles->value;
+        }
+
         if (is_string($roles) && ! PermissionRegistrar::isUid($roles)) {
             return $guard
                 ? $this->roles->where('guard_name', $guard)->contains('name', $roles)
                 : $this->roles->contains('name', $roles);
-        }
-
-        if ($roles instanceof \BackedEnum) {
-            return $guard
-                ? $this->roles->where('guard_name', $guard)->contains('name', $roles->value)
-                : $this->roles->contains('name', $roles->value);
         }
 
         if (is_int($roles) || is_string($roles)) {
@@ -269,6 +267,10 @@ trait HasRoles
     {
         $this->loadMissing('roles');
 
+        if ($roles instanceof \BackedEnum) {
+            $roles = $roles->value;
+        }
+
         if (is_string($roles) && false !== strpos($roles, '|')) {
             $roles = $this->convertPipeToArray($roles);
         }
@@ -277,12 +279,6 @@ trait HasRoles
             return $guard
                 ? $this->roles->where('guard_name', $guard)->contains('name', $roles)
                 : $this->roles->contains('name', $roles);
-        }
-
-        if ($roles instanceof \BackedEnum) {
-            return $guard
-                ? $this->roles->where('guard_name', $guard)->contains('name', $roles->value)
-                : $this->roles->contains('name', $roles->value);
         }
 
         if ($roles instanceof Role) {
@@ -349,16 +345,16 @@ trait HasRoles
 
     protected function getStoredRole($role): Role
     {
+        if ($role instanceof \BackedEnum) {
+            $role = $role->value;
+        }
+
         if (is_numeric($role) || PermissionRegistrar::isUid($role)) {
             return $this->getRoleClass()::findById($role, $this->getDefaultGuardName());
         }
 
         if (is_string($role)) {
             return $this->getRoleClass()::findByName($role, $this->getDefaultGuardName());
-        }
-
-        if ($role instanceof \BackedEnum) {
-            return $this->getRoleClass()::findByName($role->value, $this->getDefaultGuardName());
         }
 
         return $role;
