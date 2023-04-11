@@ -38,6 +38,38 @@ class HasRolesTest extends TestCase
         $this->assertFalse($this->testUser->hasRole($role));
     }
 
+    /**
+     * @test
+     *
+     * @requires PHP >= 8.1
+     */
+    public function it_can_assign_and_remove_a_role_using_enums()
+    {
+        $enum1 = TestModels\TestRolePermissionsEnum::USERMANAGER;
+        $enum2 = TestModels\TestRolePermissionsEnum::WRITER;
+
+        app(Role::class)->findOrCreate($enum1->value, 'web');
+        app(Role::class)->findOrCreate($enum2->value, 'web');
+
+        $this->assertFalse($this->testUser->hasRole($enum1));
+        $this->assertFalse($this->testUser->hasRole($enum2));
+
+        $this->testUser->assignRole($enum1);
+        $this->testUser->assignRole($enum2);
+
+        $this->assertTrue($this->testUser->hasRole($enum1));
+        $this->assertTrue($this->testUser->hasRole($enum2));
+
+        $this->assertTrue($this->testUser->hasAllRoles([$enum1, $enum2]));
+        $this->assertFalse($this->testUser->hasAllRoles([$enum1, $enum2, 'not exist']));
+
+        $this->assertTrue($this->testUser->hasExactRoles([$enum2, $enum1]));
+
+        $this->testUser->removeRole($enum1);
+
+        $this->assertFalse($this->testUser->hasRole($enum1));
+    }
+
     /** @test */
     public function it_can_assign_and_remove_a_role()
     {
@@ -574,6 +606,16 @@ class HasRolesTest extends TestCase
     {
         $this->assertFalse($this->testUser->hasAnyRole('This Role Does Not Even Exist', $this->testAdminRole));
     }
+
+     /** @test */
+     public function it_throws_an_exception_if_an_unsupported_type_is_passed_to_hasRoles()
+     {
+         $this->expectException(\TypeError::class);
+
+         $this->testUser->hasRole(new class
+         {
+         });
+     }
 
     /** @test */
     public function it_can_retrieve_role_names()

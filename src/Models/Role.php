@@ -167,7 +167,7 @@ class Role extends Model implements RoleContract
     /**
      * Determine if the role may perform the given permission.
      *
-     * @param  string|int|Permission  $permission
+     * @param  string|int|Permission|\BackedEnum  $permission
      * @param  string|null  $guardName
      *
      * @throws PermissionDoesNotExist|GuardDoesNotMatch

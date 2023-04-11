@@ -196,7 +196,7 @@ trait HasRoles
     /**
      * Determine if the model has (one of) the given role(s).
      *
-     * @param  string|int|array|Role|Collection  $roles
+     * @param  string|int|array|Role|Collection|\BackedEnum  $roles
      */
     public function hasRole($roles, string $guard = null): bool
     {
@@ -210,6 +210,12 @@ trait HasRoles
             return $guard
                 ? $this->roles->where('guard_name', $guard)->contains('name', $roles)
                 : $this->roles->contains('name', $roles);
+        }
+
+        if ($roles instanceof \BackedEnum) {
+            return $guard
+                ? $this->roles->where('guard_name', $guard)->contains('name', $roles->value)
+                : $this->roles->contains('name', $roles->value);
         }
 
         if (is_int($roles) || is_string($roles)) {
@@ -235,7 +241,11 @@ trait HasRoles
             return false;
         }
 
-        return $roles->intersect($guard ? $this->roles->where('guard_name', $guard) : $this->roles)->isNotEmpty();
+        if ($roles instanceof Collection) {
+            return $roles->intersect($guard ? $this->roles->where('guard_name', $guard) : $this->roles)->isNotEmpty();
+        }
+
+        throw new \TypeError('Unsupported type for $roles parameter to hasRole().');
     }
 
     /**
@@ -253,7 +263,7 @@ trait HasRoles
     /**
      * Determine if the model has all of the given role(s).
      *
-     * @param  string|array|Role|Collection  $roles
+     * @param  string|array|Role|Collection|\BackedEnum  $roles
      */
     public function hasAllRoles($roles, string $guard = null): bool
     {
@@ -269,11 +279,21 @@ trait HasRoles
                 : $this->roles->contains('name', $roles);
         }
 
+        if ($roles instanceof \BackedEnum) {
+            return $guard
+                ? $this->roles->where('guard_name', $guard)->contains('name', $roles->value)
+                : $this->roles->contains('name', $roles->value);
+        }
+
         if ($roles instanceof Role) {
             return $this->roles->contains($roles->getKeyName(), $roles->getKey());
         }
 
         $roles = collect()->make($roles)->map(function ($role) {
+            if ($role instanceof \BackedEnum) {
+                return $role->value;
+            }
+
             return $role instanceof Role ? $role->name : $role;
         });
 
@@ -335,6 +355,10 @@ trait HasRoles
 
         if (is_string($role)) {
             return $this->getRoleClass()::findByName($role, $this->getDefaultGuardName());
+        }
+
+        if ($role instanceof \BackedEnum) {
+            return $this->getRoleClass()::findByName($role->value, $this->getDefaultGuardName());
         }
 
         return $role;

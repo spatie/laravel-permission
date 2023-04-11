@@ -31,6 +31,47 @@ class WildcardHasPermissionsTest extends TestCase
         $this->assertFalse($user1->hasPermissionTo('projects.view'));
     }
 
+    /**
+     * @test
+     *
+     * @requires PHP >= 8.1
+     */
+    public function it_can_assign_wildcard_permissions_using_enums()
+    {
+        app('config')->set('permission.enable_wildcard_permission', true);
+
+        $user1 = User::create(['email' => 'user1@test.com']);
+
+        $articlesCreator = TestModels\TestRolePermissionsEnum::WildcardArticlesCreator;
+        $newsEverything = TestModels\TestRolePermissionsEnum::WildcardNewsEverything;
+        $postsEverything = TestModels\TestRolePermissionsEnum::WildcardPostsEverything;
+        $postsCreate = TestModels\TestRolePermissionsEnum::WildcardPostsCreate;
+
+        $permission1 = app(Permission::class)->findOrCreate($articlesCreator->value, 'web');
+        $permission2 = app(Permission::class)->findOrCreate($newsEverything->value, 'web');
+        $permission3 = app(Permission::class)->findOrCreate($postsEverything->value, 'web');
+
+        $user1->givePermissionTo([$permission1, $permission2, $permission3]);
+
+        $this->assertTrue($user1->hasPermissionTo($postsCreate));
+        $this->assertTrue($user1->hasPermissionTo($postsCreate->value.'.123'));
+        $this->assertTrue($user1->hasPermissionTo($postsEverything));
+
+        $this->assertTrue($user1->hasPermissionTo(TestModels\TestRolePermissionsEnum::WildcardArticlesView));
+        $this->assertTrue($user1->hasAnyPermission(TestModels\TestRolePermissionsEnum::WildcardArticlesView));
+
+        $this->assertFalse($user1->hasPermissionTo(TestModels\TestRolePermissionsEnum::WildcardProjectsView));
+
+        $user1->revokePermissionTo([$permission1, $permission2, $permission3]);
+
+        $this->assertFalse($user1->hasPermissionTo(TestModels\TestRolePermissionsEnum::WildcardPostsCreate));
+        $this->assertFalse($user1->hasPermissionTo($postsCreate->value.'.123'));
+        $this->assertFalse($user1->hasPermissionTo(TestModels\TestRolePermissionsEnum::WildcardPostsEverything));
+
+        $this->assertFalse($user1->hasPermissionTo(TestModels\TestRolePermissionsEnum::WildcardArticlesView));
+        $this->assertFalse($user1->hasAnyPermission(TestModels\TestRolePermissionsEnum::WildcardArticlesView));
+    }
+
     /** @test */
     public function it_can_check_wildcard_permissions_via_roles()
     {
