@@ -22,7 +22,7 @@ trait HasPermissions
     /** @var string */
     private $permissionClass;
 
-    /** @var string|false|null */
+    /** @var string|null */
     private $wildcardClass;
 
     public static function bootHasPermissions()
@@ -59,7 +59,7 @@ trait HasPermissions
             return $this->wildcardClass;
         }
 
-        $this->wildcardClass = false;
+        $this->wildcardClass = '';
 
         if (config('permission.enable_wildcard_permission')) {
             $this->wildcardClass = config('permission.wildcard_permission', WildcardPermission::class);
@@ -101,9 +101,9 @@ trait HasPermissions
     {
         $permissions = $this->convertToPermissionModels($permissions);
 
-        $rolesWithPermissions = is_a($this, Role::class) ? [] : array_unique(array_reduce($permissions, function ($result, $permission) {
-            return array_merge($result, $permission->roles->all());
-        }, []));
+        $rolesWithPermissions = is_a($this, Role::class) ? [] : array_unique(array_reduce($permissions, fn ($result, $permission) =>
+            array_merge($result, $permission->roles->all())
+        , []));
 
         return $query->where(function (Builder $query) use ($permissions, $rolesWithPermissions) {
             $query->whereHas('permissions', function (Builder $subQuery) use ($permissions) {
@@ -331,9 +331,8 @@ trait HasPermissions
         }
 
         return $this->loadMissing('roles', 'roles.permissions')
-            ->roles->flatMap(function ($role) {
-                return $role->permissions;
-            })->sort()->values();
+            ->roles->flatMap(fn ($role) => $role->permissions)
+            ->sort()->values();
     }
 
     /**

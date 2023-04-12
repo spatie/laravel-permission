@@ -44,9 +44,9 @@ class PermissionServiceProvider extends ServiceProvider
             'permission'
         );
 
-        $this->callAfterResolving('blade.compiler', function (BladeCompiler $bladeCompiler) {
-            $this->registerBladeExtensions($bladeCompiler);
-        });
+        $this->callAfterResolving('blade.compiler', fn (BladeCompiler $bladeCompiler) =>
+            $this->registerBladeExtensions($bladeCompiler)
+        );
     }
 
     protected function offerPublishing()
@@ -82,16 +82,12 @@ class PermissionServiceProvider extends ServiceProvider
 
     protected function registerModelBindings()
     {
-        $this->app->bind(PermissionContract::class, function ($app) {
-            $config = $app->config['permission.models'];
-
-            return $app->make($config['permission']);
-        });
-        $this->app->bind(RoleContract::class, function ($app) {
-            $config = $app->config['permission.models'];
-
-            return $app->make($config['role']);
-        });
+        $this->app->bind(PermissionContract::class, fn ($app) =>
+            $app->make($app->config['permission.models.permission'])
+        );
+        $this->app->bind(RoleContract::class, fn ($app) =>
+            $app->make($app->config['permission.models.role'])
+        );
     }
 
     public static function bladeMethodWrapper($method, $role, $guard = null)
@@ -101,50 +97,26 @@ class PermissionServiceProvider extends ServiceProvider
 
     protected function registerBladeExtensions($bladeCompiler)
     {
-        $bladeCompiler->directive('role', function ($arguments) {
-            return "<?php if(\\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper('hasRole', {$arguments})): ?>";
-        });
-        $bladeCompiler->directive('elserole', function ($arguments) {
-            return "<?php elseif(\\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper('hasRole', {$arguments})): ?>";
-        });
-        $bladeCompiler->directive('endrole', function () {
-            return '<?php endif; ?>';
-        });
+        $bladeMethodWrapper = '\\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper';
 
-        $bladeCompiler->directive('hasrole', function ($arguments) {
-            return "<?php if(\\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper('hasRole', {$arguments})): ?>";
-        });
-        $bladeCompiler->directive('endhasrole', function () {
-            return '<?php endif; ?>';
-        });
+        $bladeCompiler->directive('role', fn ($args) => "<?php if({$bladeMethodWrapper}('hasRole', {$args})): ?>");
+        $bladeCompiler->directive('elserole', fn ($args) => "<?php elseif({$bladeMethodWrapper}('hasRole', {$args})): ?>");
+        $bladeCompiler->directive('endrole', fn () => '<?php endif; ?>');
 
-        $bladeCompiler->directive('hasanyrole', function ($arguments) {
-            return "<?php if(\\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper('hasAnyRole', {$arguments})): ?>";
-        });
-        $bladeCompiler->directive('endhasanyrole', function () {
-            return '<?php endif; ?>';
-        });
+        $bladeCompiler->directive('hasrole', fn ($args) => "<?php if({$bladeMethodWrapper}('hasRole', {$args})): ?>");
+        $bladeCompiler->directive('endhasrole', fn () => '<?php endif; ?>');
 
-        $bladeCompiler->directive('hasallroles', function ($arguments) {
-            return "<?php if(\\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper('hasAllRoles', {$arguments})): ?>";
-        });
-        $bladeCompiler->directive('endhasallroles', function () {
-            return '<?php endif; ?>';
-        });
+        $bladeCompiler->directive('hasanyrole', fn ($args) => "<?php if({$bladeMethodWrapper}('hasAnyRole', {$args})): ?>");
+        $bladeCompiler->directive('endhasanyrole', fn () => '<?php endif; ?>');
 
-        $bladeCompiler->directive('unlessrole', function ($arguments) {
-            return "<?php if(! \\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper('hasRole', {$arguments})): ?>";
-        });
-        $bladeCompiler->directive('endunlessrole', function () {
-            return '<?php endif; ?>';
-        });
+        $bladeCompiler->directive('hasallroles', fn ($args) => "<?php if({$bladeMethodWrapper}('hasAllRoles', {$args})): ?>");
+        $bladeCompiler->directive('endhasallroles', fn () => '<?php endif; ?>' );
 
-        $bladeCompiler->directive('hasexactroles', function ($arguments) {
-            return "<?php if(\\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper('hasExactRoles', {$arguments})): ?>";
-        });
-        $bladeCompiler->directive('endhasexactroles', function () {
-            return '<?php endif; ?>';
-        });
+        $bladeCompiler->directive('unlessrole', fn ($args) => "<?php if(! {$bladeMethodWrapper}('hasRole', {$args})): ?>");
+        $bladeCompiler->directive('endunlessrole', fn () => '<?php endif; ?>');
+
+        $bladeCompiler->directive('hasexactroles', fn ($args) => "<?php if({$bladeMethodWrapper}('hasExactRoles', {$args})): ?>");
+        $bladeCompiler->directive('endhasexactroles', fn () => '<?php endif; ?>');
     }
 
     protected function registerMacroHelpers()
@@ -154,21 +126,13 @@ class PermissionServiceProvider extends ServiceProvider
         }
 
         Route::macro('role', function ($roles = []) {
-            $roles = implode('|', Arr::wrap($roles));
-
             /** @var Route $this */
-            $this->middleware("role:$roles");
-
-            return $this;
+            return $this->middleware("role:" . implode('|', Arr::wrap($roles)));
         });
 
         Route::macro('permission', function ($permissions = []) {
-            $permissions = implode('|', Arr::wrap($permissions));
-
             /** @var Route $this */
-            $this->middleware("permission:$permissions");
-
-            return $this;
+            return $this->middleware("permission:" . implode('|', Arr::wrap($permissions)));
         });
     }
 
@@ -182,9 +146,7 @@ class PermissionServiceProvider extends ServiceProvider
         $filesystem = $this->app->make(Filesystem::class);
 
         return Collection::make([$this->app->databasePath().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR])
-            ->flatMap(function ($path) use ($filesystem, $migrationFileName) {
-                return $filesystem->glob($path.'*_'.$migrationFileName);
-            })
+            ->flatMap(fn ($path) => $filesystem->glob($path.'*_'.$migrationFileName))
             ->push($this->app->databasePath()."/migrations/{$timestamp}_{$migrationFileName}")
             ->first();
     }
