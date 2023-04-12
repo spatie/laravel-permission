@@ -52,6 +52,54 @@ class HasPermissionsTest extends TestCase
         $this->assertFalse($this->testUser->hasPermissionTo($this->testUserPermission));
     }
 
+    /**
+     * @test
+     *
+     * @requires PHP >= 8.1
+     */
+    public function it_can_assign_and_remove_a_permission_using_enums()
+    {
+        $enum = TestModels\TestRolePermissionsEnum::VIEWARTICLES;
+
+        $permission = app(Permission::class)->findOrCreate($enum->value, 'web');
+
+        $this->testUser->givePermissionTo($enum);
+
+        $this->assertTrue($this->testUser->hasPermissionTo($enum));
+        $this->assertTrue($this->testUser->hasAnyPermission($enum));
+        $this->assertTrue($this->testUser->hasDirectPermission($enum));
+
+        $this->testUser->revokePermissionTo($enum);
+
+        $this->assertFalse($this->testUser->hasPermissionTo($enum));
+        $this->assertFalse($this->testUser->hasAnyPermission($enum));
+        $this->assertFalse($this->testUser->hasDirectPermission($enum));
+    }
+
+    /**
+     * @test
+     *
+     * @requires PHP >= 8.1
+     */
+    public function it_can_scope_users_using_enums()
+    {
+        $enum1 = TestModels\TestRolePermissionsEnum::VIEWARTICLES;
+        $enum2 = TestModels\TestRolePermissionsEnum::EDITARTICLES;
+        $permission1 = app(Permission::class)->findOrCreate($enum1->value, 'web');
+        $permission2 = app(Permission::class)->findOrCreate($enum2->value, 'web');
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1->givePermissionTo([$enum1, $enum2]);
+        $this->testUserRole->givePermissionTo($enum2);
+        $user2->assignRole('testRole');
+
+        $scopedUsers1 = User::permission($enum2)->get();
+        $scopedUsers2 = User::permission([$enum1])->get();
+
+        $this->assertEquals(2, $scopedUsers1->count());
+        $this->assertEquals(1, $scopedUsers2->count());
+    }
+
     /** @test */
     public function it_can_scope_users_using_a_string()
     {

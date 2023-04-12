@@ -196,7 +196,7 @@ trait HasRoles
     /**
      * Determine if the model has (one of) the given role(s).
      *
-     * @param  string|int|array|Role|Collection  $roles
+     * @param  string|int|array|Role|Collection|\BackedEnum  $roles
      */
     public function hasRole($roles, string $guard = null): bool
     {
@@ -204,6 +204,10 @@ trait HasRoles
 
         if (is_string($roles) && false !== strpos($roles, '|')) {
             $roles = $this->convertPipeToArray($roles);
+        }
+
+        if ($roles instanceof \BackedEnum) {
+            $roles = $roles->value;
         }
 
         if (is_string($roles) && ! PermissionRegistrar::isUid($roles)) {
@@ -235,7 +239,11 @@ trait HasRoles
             return false;
         }
 
-        return $roles->intersect($guard ? $this->roles->where('guard_name', $guard) : $this->roles)->isNotEmpty();
+        if ($roles instanceof Collection) {
+            return $roles->intersect($guard ? $this->roles->where('guard_name', $guard) : $this->roles)->isNotEmpty();
+        }
+
+        throw new \TypeError('Unsupported type for $roles parameter to hasRole().');
     }
 
     /**
@@ -253,11 +261,15 @@ trait HasRoles
     /**
      * Determine if the model has all of the given role(s).
      *
-     * @param  string|array|Role|Collection  $roles
+     * @param  string|array|Role|Collection|\BackedEnum  $roles
      */
     public function hasAllRoles($roles, string $guard = null): bool
     {
         $this->loadMissing('roles');
+
+        if ($roles instanceof \BackedEnum) {
+            $roles = $roles->value;
+        }
 
         if (is_string($roles) && false !== strpos($roles, '|')) {
             $roles = $this->convertPipeToArray($roles);
@@ -274,6 +286,10 @@ trait HasRoles
         }
 
         $roles = collect()->make($roles)->map(function ($role) {
+            if ($role instanceof \BackedEnum) {
+                return $role->value;
+            }
+
             return $role instanceof Role ? $role->name : $role;
         });
 
@@ -329,6 +345,10 @@ trait HasRoles
 
     protected function getStoredRole($role): Role
     {
+        if ($role instanceof \BackedEnum) {
+            $role = $role->value;
+        }
+
         if (is_numeric($role) || PermissionRegistrar::isUid($role)) {
             return $this->getRoleClass()::findById($role, $this->getDefaultGuardName());
         }

@@ -3,6 +3,7 @@
 namespace Spatie\Permission\Tests;
 
 use Illuminate\Contracts\Auth\Access\Gate;
+use Spatie\Permission\Contracts\Permission;
 
 class GateTest extends TestCase
 {
@@ -34,6 +35,28 @@ class GateTest extends TestCase
         $this->assertFalse($this->testUser->can('non-existing-permission'));
 
         $this->assertFalse($this->testUser->can('admin-permission'));
+    }
+
+    /**
+     * @test
+     *
+     * @requires PHP >= 8.1
+     */
+    public function it_can_determine_if_a_user_has_a_direct_permission_using_enums()
+    {
+        $enum = TestModels\TestRolePermissionsEnum::VIEWARTICLES;
+
+        $permission = app(Permission::class)->findOrCreate($enum->value, 'web');
+
+        $this->assertFalse($this->testUser->can($enum->value));
+        $this->assertFalse($this->testUser->canAny([$enum->value, 'some other permission']));
+
+        $this->testUser->givePermissionTo($enum);
+
+        $this->assertTrue($this->testUser->hasPermissionTo($enum));
+
+        $this->assertTrue($this->testUser->can($enum->value));
+        $this->assertTrue($this->testUser->canAny([$enum->value, 'some other permission']));
     }
 
     /** @test */
