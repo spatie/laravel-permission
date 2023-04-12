@@ -87,6 +87,9 @@ class CommandTest extends TestCase
     /** @test */
     public function it_can_show_permission_tables()
     {
+        Role::where('name', 'testRole2')->delete();
+        Role::create(['name' => 'testRole_2']);
+
         Artisan::call('permission:show');
 
         $output = Artisan::output();
@@ -94,14 +97,13 @@ class CommandTest extends TestCase
         $this->assertTrue(strpos($output, 'Guard: web') !== false);
         $this->assertTrue(strpos($output, 'Guard: admin') !== false);
 
+        // |               | testRole | testRole_2 |
+        // | edit-articles |  ·       |  ·         |
         if (method_exists($this, 'assertMatchesRegularExpression')) {
-            // |               | testRole | testRole2 |
-            $this->assertMatchesRegularExpression('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|/', $output);
-
-            // | edit-articles |  ·       |  ·        |
+            $this->assertMatchesRegularExpression('/\|\s+\|\s+testRole\s+\|\s+testRole_2\s+\|/', $output);
             $this->assertMatchesRegularExpression('/\|\s+edit-articles\s+\|\s+·\s+\|\s+·\s+\|/', $output);
         } else { // phpUnit 9/8
-            $this->assertRegExp('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|/', $output);
+            $this->assertRegExp('/\|\s+\|\s+testRole\s+\|\s+testRole_2\s+\|/', $output);
             $this->assertRegExp('/\|\s+edit-articles\s+\|\s+·\s+\|\s+·\s+\|/', $output);
         }
 
@@ -164,20 +166,22 @@ class CommandTest extends TestCase
         config()->set('permission.teams', true);
         app(\Spatie\Permission\PermissionRegistrar::class)->initializeCache();
 
-        Role::create(['name' => 'testRoleTeam', 'team_test_id' => 1]);
-        Role::create(['name' => 'testRoleTeam', 'team_test_id' => 2]); // same name different team
+        Role::where('name', 'testRole2')->delete();
+        Role::create(['name' => 'testRole_2']);
+        Role::create(['name' => 'testRole_Team', 'team_test_id' => 1]);
+        Role::create(['name' => 'testRole_Team', 'team_test_id' => 2]); // same name different team
         Artisan::call('permission:show');
 
         $output = Artisan::output();
 
-        // |    | Team ID: NULL        | Team ID: 1   | Team ID: 2   |
-        // |    | testRole | testRole2 | testRoleTeam | testRoleTeam |
+        // |    | Team ID: NULL         | Team ID: 1    | Team ID: 2    |
+        // |    | testRole | testRole_2 | testRole_Team | testRole_Team |
         if (method_exists($this, 'assertMatchesRegularExpression')) {
             $this->assertMatchesRegularExpression('/\|\s+\|\s+Team ID: NULL\s+\|\s+Team ID: 1\s+\|\s+Team ID: 2\s+\|/', $output);
-            $this->assertMatchesRegularExpression('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|\s+testRoleTeam\s+\|\s+testRoleTeam\s+\|/', $output);
+            $this->assertMatchesRegularExpression('/\|\s+\|\s+testRole\s+\|\s+testRole_2\s+\|\s+testRole_Team\s+\|\s+testRole_Team\s+\|/', $output);
         } else { // phpUnit 9/8
             $this->assertRegExp('/\|\s+\|\s+Team ID: NULL\s+\|\s+Team ID: 1\s+\|\s+Team ID: 2\s+\|/', $output);
-            $this->assertRegExp('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|\s+testRoleTeam\s+\|\s+testRoleTeam\s+\|/', $output);
+            $this->assertRegExp('/\|\s+\|\s+testRole\s+\|\s+testRole_2\s+\|\s+testRole_Team\s+\|\s+testRole_Team\s+\|/', $output);
         }
     }
 }

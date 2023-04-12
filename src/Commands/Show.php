@@ -62,8 +62,9 @@ class Show extends Command
                     isset($teams) ? $teams->prepend(new TableCell(''))->toArray() : [],
                     $roles->keys()->map(function ($val) {
                         $name = explode('_', $val);
+                        array_pop($name);
 
-                        return $name[0];
+                        return implode('_', $name);
                     })
                     ->prepend('')->toArray(),
                 ),
