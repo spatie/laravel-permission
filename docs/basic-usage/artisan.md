@@ -1,6 +1,6 @@
 ---
 title: Using artisan commands
-weight: 7
+weight: 10
 ---
 
 ## Creating roles and permissions with Artisan Commands

@@ -1,6 +1,6 @@
 ---
 title: Defining a Super-Admin
-weight: 5
+weight: 8
 ---
 
 We strongly recommend that a Super-Admin be handled by setting a global `Gate::before` or `Gate::after` rule which checks for the desired role. 

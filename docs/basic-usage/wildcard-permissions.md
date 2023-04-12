@@ -1,6 +1,6 @@
 ---
 title: Wildcard permissions
-weight: 3
+weight: 6
 ---
 
 Wildcard permissions can be enabled in the permission config file:

@@ -1,6 +1,6 @@
 ---
 title: Blade directives
-weight: 4
+weight: 7
 ---
 
 ## Permissions

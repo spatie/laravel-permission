@@ -1,11 +1,11 @@
 ---
 title: Enums
-weight: 3
+weight: 4
 ---
 
 # Enum Prerequisites
 
-Must be using PHP 8.1 or higher.
+Requires PHP 8.1 or higher.
 
 If you are using PHP 8.1+ you can implement Enums as native types. 
 

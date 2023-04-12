@@ -1,6 +1,6 @@
 ---
 title: Using a middleware
-weight: 7
+weight: 11
 ---
 
 ## Default Middleware
