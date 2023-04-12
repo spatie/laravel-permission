@@ -10,7 +10,7 @@ In your application's tests, if you are not seeding roles and permissions as par
 In your tests simply add a `setUp()` instruction to re-register the permissions, like this:
 
 ```php
-    public function setUp(): void
+    protected function setUp(): void
     {
         // first include all the normal setUp operations
         parent::setUp();
@@ -19,6 +19,8 @@ In your tests simply add a `setUp()` instruction to re-register the permissions,
         $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->registerPermissions();
     }
 ```
+
+## Clear Cache When Using Seeders
 
 If you are using Laravel's `LazilyRefreshDatabase` trait, you most likely want to avoid seeding permissions before every test, because that would negate the use of the `LazilyRefreshDatabase` trait. To overcome this, you should wrap your seeder in an event listener for the `MigrationsEnded` event:
 
@@ -29,7 +31,21 @@ Event::listen(MigrationsEnded::class, function () {
 });
 ```
 
-Note that we call `PermissionRegistrar::forgetCachedPermissions` after seeding. This is to prevent a caching issue that can occur when the database is set up after permissions have already been registered and cached. 
+Note that `PermissionRegistrar::forgetCachedPermissions()` is called AFTER seeding. This is to prevent a caching issue that can occur when the database is set up after permissions have already been registered and cached. 
+
+
+## Bypassing Cache When Testing
+
+The caching infrastructure for this package is "always on", but when running your test suite you may wish to reduce its impact.
+
+Two things you might wish to explore include:
+
+- Change the cache driver to `array`. **Very often you will have already done this in your `phpunit.xml` configuration.**
+
+- Shorten cache lifetime to 1 second, by setting the config (not necessary if cache driver is set to `array`) in your test suite TestCase:
+
+   `'permission.cache.expiration_time' = \DateInterval::createFromDateString('1 seconds')`
+
 
 ## Factories
 

@@ -3,6 +3,8 @@ title: Upgrading
 weight: 6
 ---
 
+## Upgrade Essentials
+
 ALL upgrades of this package should follow these steps:
 
 1. Upgrading between major versions of this package always require the usual Composer steps:
@@ -18,7 +20,7 @@ ALL upgrades of this package should follow these steps:
 5. Apply any version-specific special updates as outlined below...
 
 
-### Upgrading from v1 to v2
+## Upgrading from v1 to v2
 If you're upgrading from v1 to v2, there's no built-in automatic migration/conversion of your data to the new structure. 
 You will need to carefully adapt your code and your data manually.
 

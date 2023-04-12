@@ -3,6 +3,16 @@ title: Direct Permissions
 weight: 2
 ---
 
+## Best Practice
+
+It's better to assign permissions to Roles, and then assign Roles to Users.
+
+See https://spatie.be/docs/laravel-permission/best-practices/roles-vs-permissions for a deeper explanation.
+
+HOWEVER, If you have reason to directly assign individual permissions to specific users (instead of to roles assigned to those users), you can do that as described below:
+
+## Direct Permissions to Users
+
 A permission can be given to any user:
 
 ```php
@@ -59,8 +69,7 @@ You may also pass integers to lookup by permission id
 $user->hasAnyPermission(['edit articles', 1, 5]);
 ```
 
-Saved permissions will be registered with the `Illuminate\Auth\Access\Gate` class for the default guard. So you can
-check if a user has a permission with Laravel's default `can` function:
+Like all permissions assigned via roles, you can check if a user has a permission by using Laravel's default `can` function:
 
 ```php
 $user->can('edit articles');

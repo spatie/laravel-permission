@@ -38,6 +38,8 @@ protected $middlewareAliases = [
 ];
 ```
 
+## Middleware via Routes
+
 Then you can protect your routes using middleware rules:
 
 ```php
@@ -74,6 +76,8 @@ Route::group(['middleware' => ['role_or_permission:super-admin|edit articles']],
 });
 ```
 
+## Middleware with Controllers
+
 You can protect your controllers similarly, by setting desired middleware in the constructor:
 
 ```php
@@ -89,3 +93,5 @@ public function __construct()
     $this->middleware(['role_or_permission:super-admin|edit articles']);
 }
 ```
+
+(You can use Laravel's Model Policy feature with your controller methods. See the Model Policies section of these docs.)
