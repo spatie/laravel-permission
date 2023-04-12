@@ -111,6 +111,11 @@ abstract class TestCase extends Orchestra
         $app['config']->set('auth.providers.users.model', User::class);
 
         $app['config']->set('cache.prefix', 'spatie_tests---');
+
+        // FOR MANUAL TESTING OF ALTERNATE CACHE STORES:
+        // $app['config']->set('cache.default', 'array');
+        //Laravel supports: array, database, file
+        //requires extensions: apc, memcached, redis, dynamodb, octane
     }
 
     /**
