@@ -141,11 +141,10 @@ class Permission extends Model implements PermissionContract
 
     /**
      * Get the current cached first permission.
-     *
-     * @return PermissionContract
      */
     protected static function getPermission(array $params = []): ?PermissionContract
     {
+        /** @var PermissionContract|null */
         return static::getPermissions($params, true)->first();
     }
 }

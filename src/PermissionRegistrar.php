@@ -25,7 +25,7 @@ class PermissionRegistrar
     /** @var string */
     protected $roleClass;
 
-    /** @var Collection|null */
+    /** @var Collection|array|null */
     protected $permissions;
 
     /** @var string */
