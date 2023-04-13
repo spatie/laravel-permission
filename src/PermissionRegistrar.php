@@ -346,11 +346,9 @@ class PermissionRegistrar
         $permissionInstance = new $permissionClass();
 
         return Collection::make(
-            array_map(fn ($item) =>
-                $permissionInstance
+            array_map(fn ($item) => $permissionInstance
                     ->newFromBuilder($this->aliasedArray(array_diff_key($item, ['r' => 0])))
-                    ->setRelation('roles', $this->getHydratedRoleCollection($item['r'] ?? []))
-            , $this->permissions['permissions'])
+                    ->setRelation('roles', $this->getHydratedRoleCollection($item['r'] ?? [])), $this->permissions['permissions'])
         );
     }
 

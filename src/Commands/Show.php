@@ -37,21 +37,17 @@ class Show extends Command
             $roles = $roleClass::whereGuardName($guard)
                 ->with('permissions')
                 ->when(config('permission.teams'), fn ($q) => $q->orderBy($team_key))
-                ->orderBy('name')->get()->mapWithKeys(fn ($role) =>
-                    [$role->name.'_'.($role->$team_key ?: '') => ['permissions' => $role->permissions->pluck('id'), $team_key => $role->$team_key]]
+                ->orderBy('name')->get()->mapWithKeys(fn ($role) => [$role->name.'_'.($role->$team_key ?: '') => ['permissions' => $role->permissions->pluck('id'), $team_key => $role->$team_key]]
                 );
 
             $permissions = $permissionClass::whereGuardName($guard)->orderBy('name')->pluck('name', 'id');
 
-            $body = $permissions->map(fn ($permission, $id) =>
-                $roles->map(fn (array $role_data) =>
-                    $role_data['permissions']->contains($id) ? ' ✔' : ' ·'
+            $body = $permissions->map(fn ($permission, $id) => $roles->map(fn (array $role_data) => $role_data['permissions']->contains($id) ? ' ✔' : ' ·'
                 )->prepend($permission)
             );
 
             if (config('permission.teams')) {
-                $teams = $roles->groupBy($team_key)->values()->map(fn ($group, $id) =>
-                    new TableCell('Team ID: '.($id ?: 'NULL'), ['colspan' => $group->count()])
+                $teams = $roles->groupBy($team_key)->values()->map(fn ($group, $id) => new TableCell('Team ID: '.($id ?: 'NULL'), ['colspan' => $group->count()])
                 );
             }
 

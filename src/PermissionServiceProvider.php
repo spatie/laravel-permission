@@ -44,8 +44,7 @@ class PermissionServiceProvider extends ServiceProvider
             'permission'
         );
 
-        $this->callAfterResolving('blade.compiler', fn (BladeCompiler $bladeCompiler) =>
-            $this->registerBladeExtensions($bladeCompiler)
+        $this->callAfterResolving('blade.compiler', fn (BladeCompiler $bladeCompiler) => $this->registerBladeExtensions($bladeCompiler)
         );
     }
 
@@ -82,11 +81,9 @@ class PermissionServiceProvider extends ServiceProvider
 
     protected function registerModelBindings()
     {
-        $this->app->bind(PermissionContract::class, fn ($app) =>
-            $app->make($app->config['permission.models.permission'])
+        $this->app->bind(PermissionContract::class, fn ($app) => $app->make($app->config['permission.models.permission'])
         );
-        $this->app->bind(RoleContract::class, fn ($app) =>
-            $app->make($app->config['permission.models.role'])
+        $this->app->bind(RoleContract::class, fn ($app) => $app->make($app->config['permission.models.role'])
         );
     }
 
@@ -110,7 +107,7 @@ class PermissionServiceProvider extends ServiceProvider
         $bladeCompiler->directive('endhasanyrole', fn () => '<?php endif; ?>');
 
         $bladeCompiler->directive('hasallroles', fn ($args) => "<?php if({$bladeMethodWrapper}('hasAllRoles', {$args})): ?>");
-        $bladeCompiler->directive('endhasallroles', fn () => '<?php endif; ?>' );
+        $bladeCompiler->directive('endhasallroles', fn () => '<?php endif; ?>');
 
         $bladeCompiler->directive('unlessrole', fn ($args) => "<?php if(! {$bladeMethodWrapper}('hasRole', {$args})): ?>");
         $bladeCompiler->directive('endunlessrole', fn () => '<?php endif; ?>');
@@ -127,12 +124,12 @@ class PermissionServiceProvider extends ServiceProvider
 
         Route::macro('role', function ($roles = []) {
             /** @var Route $this */
-            return $this->middleware("role:" . implode('|', Arr::wrap($roles)));
+            return $this->middleware('role:'.implode('|', Arr::wrap($roles)));
         });
 
         Route::macro('permission', function ($permissions = []) {
             /** @var Route $this */
-            return $this->middleware("permission:" . implode('|', Arr::wrap($permissions)));
+            return $this->middleware('permission:'.implode('|', Arr::wrap($permissions)));
         });
     }
 

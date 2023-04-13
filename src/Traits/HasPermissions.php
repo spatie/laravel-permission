@@ -101,9 +101,7 @@ trait HasPermissions
     {
         $permissions = $this->convertToPermissionModels($permissions);
 
-        $rolesWithPermissions = is_a($this, Role::class) ? [] : array_unique(array_reduce($permissions, fn ($result, $permission) =>
-            array_merge($result, $permission->roles->all())
-        , []));
+        $rolesWithPermissions = is_a($this, Role::class) ? [] : array_unique(array_reduce($permissions, fn ($result, $permission) => array_merge($result, $permission->roles->all()), []));
 
         return $query->where(function (Builder $query) use ($permissions, $rolesWithPermissions) {
             $query->whereHas('permissions', function (Builder $subQuery) use ($permissions) {
