@@ -10,7 +10,7 @@ By default Laravel does this in `\App\Models\User` by extending `Illuminate\Foun
 
 If you are creating your own User models and wish Authorization features to be available, you need to implement `Illuminate\Contracts\Auth\Access\Authorizable` in one of those ways as well.
 
-#### Child User Models
+## Child User Models
 
 Due to the nature of polymorphism and Eloquent's hard-coded mapping of model names in the database, setting relationships for child models that inherit permissions of the parent can be difficult (even near impossible depending on app requirements, especially when attempting to do inverse mappings). However, one thing you might consider if you need the child model to never have its own permissions/roles but to only use its parent's permissions/roles, is to [override the `getMorphClass` method on the model](https://github.com/laravel/framework/issues/17830#issuecomment-345619085).
 

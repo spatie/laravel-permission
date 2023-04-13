@@ -3,7 +3,12 @@ title: Custom Permission Check
 weight: 6
 ---
 
+## Default Permission Check Functionality
 By default, this package registers a `Gate::before()` method call on [Laravel's gate](https://laravel.com/docs/authorization). This method is responsible for checking if the user has the required permission or not, for calls to `can()` helpers and most `model policies`. Whether a user has a permission or not is determined by checking the user's permissions stored in the database.
+
+In the permission config file, `register_permission_check_method` is set to `true`, which means this package operates using the default behavior described above. Only set this to `false` if you want to bypass the default operation and implement your own custom logic for checking permissions, as described below.
+
+## Using Custom Permission Check Functionality
 
 However, in some cases, you might want to implement custom logic for checking if the user has a permission or not.
 
@@ -24,7 +29,3 @@ public function boot()
 ```
 Here `hasTokenPermission` is a **custom method you need to implement yourself**.
 
-### Register Permission Check Method
-By default, `register_permission_check_method` is set to `true`, which means this package operates using the default behavior described earlier.
-
-Only set this to false if you want to bypass the default operation and implement your own custom logic for checking permissions.

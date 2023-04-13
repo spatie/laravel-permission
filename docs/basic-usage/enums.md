@@ -3,7 +3,7 @@ title: Enums
 weight: 4
 ---
 
-# Enum Prerequisites
+## Enum Prerequisites
 
 Requires PHP 8.1 or higher.
 
@@ -12,7 +12,7 @@ If you are using PHP 8.1+ you can implement Enums as native types.
 Internally, Enums implicitly implement `\BackedEnum`, which is how this package recognizes that you're passing an Enum.
 
 
-# Code Requirements
+## Code Requirements
 
 You can create your Enum object for use with Roles and/or Permissions. You will probably create separate Enums for Roles and for Permissions, although if your application needs are simple you might choose a single Enum for both.
 
@@ -43,9 +43,7 @@ enum RolesEnum: string
 }
 ```
 
-# Using Enum names and values
-
-## Creating Roles/Permissions
+## Creating Roles/Permissions using Enums
 
 When creating roles/permissions, you cannot pass a Enum name directly, because Eloquent expects a string for the name.
 
@@ -58,7 +56,7 @@ eg: use `RolesEnum::WRITER->value` when specifying the role/permission name
 ```
 Same with creating Permissions.
 
-## Authorizing using Enums
+### Authorizing using Enums
 
 In your application code, when checking for authorization using features of this package, you can use `MyEnum::NAME` directly in most cases, without passing `->value` to convert to a string.
 
@@ -79,7 +77,7 @@ $model->can(PermissionsEnum::VIEWPOSTS->value);
 ```
 
 
-# Package methods supporting BackedEnums:
+## Package methods supporting BackedEnums:
 The following methods of this package support passing `BackedEnum` parameters directly:
 
 ```php

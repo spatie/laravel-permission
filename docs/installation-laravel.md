@@ -69,7 +69,7 @@ Package Version | Laravel Version
 .
 
 
-### Default config file contents
+## Default config file contents
 
 You can view the default config file contents at:
 

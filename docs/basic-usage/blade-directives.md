@@ -31,7 +31,7 @@ If you actually need to test for Roles, this package offers some Blade directive
 
 Optionally you can pass in the `guard` that the check will be performed on as a second argument.
 
-#### Blade and Roles
+## Blade and Roles
 Check for a specific role:
 ```php
 @role('writer')
