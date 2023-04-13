@@ -1,2 +1,7 @@
 parameters:
 	ignoreErrors:
+		-
+			# PHPStan can't understand what's going on in context of Role class using Builder `when`
+			message: "#^Call to an undefined method Spatie\\\\Permission\\\\Models\\\\Role::getRoleClass\\(\\).$#"
+			count: 1
+			path: src\Traits\HasPermissions.php

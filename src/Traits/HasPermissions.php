@@ -19,11 +19,9 @@ use Spatie\Permission\WildcardPermission;
 
 trait HasPermissions
 {
-    /** @var string */
-    private $permissionClass;
+    private ?string $permissionClass = null;
 
-    /** @var string|null */
-    private $wildcardClass;
+    private ?string $wildcardClass = null;
 
     public static function bootHasPermissions()
     {
@@ -101,22 +99,24 @@ trait HasPermissions
     {
         $permissions = $this->convertToPermissionModels($permissions);
 
-        $rolesWithPermissions = is_a($this, Role::class) ? [] : array_unique(array_reduce($permissions, fn ($result, $permission) => array_merge($result, $permission->roles->all()), []));
+        $rolesWithPermissions = is_a($this, Role::class) ? [] : array_unique(
+            array_reduce($permissions, fn ($result, $permission) => array_merge($result, $permission->roles->all()), [])
+        );
 
-        return $query->where(function (Builder $query) use ($permissions, $rolesWithPermissions) {
-            $query->whereHas('permissions', function (Builder $subQuery) use ($permissions) {
+        return $query->where(fn (Builder $query) => $query
+            ->whereHas('permissions', function (Builder $subQuery) use ($permissions) {
                 $permissionClass = $this->getPermissionClass();
                 $key = (new $permissionClass())->getKeyName();
                 $subQuery->whereIn(config('permission.table_names.permissions').".$key", \array_column($permissions, $key));
-            });
-            if (count($rolesWithPermissions) > 0 && ! is_a($this, Role::class)) {
-                $query->orWhereHas('roles', function (Builder $subQuery) use ($rolesWithPermissions) {
+            })
+            ->when(count($rolesWithPermissions) > 0, fn ($subQuery) => $subQuery
+                ->orWhereHas('roles', function (Builder $subQuery) use ($rolesWithPermissions) {
                     $roleClass = $this->getRoleClass();
                     $key = (new $roleClass())->getKeyName();
                     $subQuery->whereIn(config('permission.table_names.roles').".$key", \array_column($rolesWithPermissions, $key));
-                });
-            }
-        });
+                })
+            )
+        );
     }
 
     /**

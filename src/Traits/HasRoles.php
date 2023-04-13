@@ -14,8 +14,7 @@ trait HasRoles
 {
     use HasPermissions;
 
-    /** @var string */
-    private $roleClass;
+    private ?string $roleClass = null;
 
     public static function bootHasRoles()
     {
@@ -60,11 +59,10 @@ trait HasRoles
             return $relation;
         }
 
+        $teamField = config('permission.table_names.roles').'.'.app(PermissionRegistrar::class)->teamsKey;
+
         return $relation->wherePivot(app(PermissionRegistrar::class)->teamsKey, getPermissionsTeamId())
-            ->where(function ($q) {
-                $teamField = config('permission.table_names.roles').'.'.app(PermissionRegistrar::class)->teamsKey;
-                $q->whereNull($teamField)->orWhere($teamField, getPermissionsTeamId());
-            });
+            ->where(fn ($q) => $q->whereNull($teamField)->orWhere($teamField, getPermissionsTeamId()));
     }
 
     /**
@@ -89,11 +87,12 @@ trait HasRoles
             return $this->getRoleClass()::{$method}($role, $guard ?: $this->getDefaultGuardName());
         }, Arr::wrap($roles));
 
-        return $query->whereHas('roles', function (Builder $subQuery) use ($roles) {
-            $roleClass = $this->getRoleClass();
-            $key = (new $roleClass())->getKeyName();
-            $subQuery->whereIn(config('permission.table_names.roles').".$key", \array_column($roles, $key));
-        });
+        $roleClass = $this->getRoleClass();
+        $key = (new $roleClass())->getKeyName();
+
+        return $query->whereHas('roles', fn (Builder $subQuery) => $subQuery
+            ->whereIn(config('permission.table_names.roles').".$key", \array_column($roles, $key))
+        );
     }
 
     /**

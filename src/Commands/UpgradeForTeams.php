@@ -88,9 +88,7 @@ class UpgradeForTeams extends Command
             $base = "Setup teams migration already exists.\nFollowing file was found: ";
         }
 
-        return $base.array_reduce($existingMigrations, function ($carry, $fileName) {
-            return $carry."\n - ".$fileName;
-        });
+        return $base.array_reduce($existingMigrations, fn ($carry, $fileName) => $carry."\n - ".$fileName);
     }
 
     /**

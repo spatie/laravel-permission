@@ -13,50 +13,38 @@ use Spatie\Permission\Contracts\Role;
 
 class PermissionRegistrar
 {
-    /** @var Repository */
-    protected $cache;
+    protected Repository $cache;
 
-    /** @var CacheManager */
-    protected $cacheManager;
+    protected CacheManager $cacheManager;
 
-    /** @var string */
-    protected $permissionClass;
+    protected string $permissionClass;
 
-    /** @var string */
-    protected $roleClass;
+    protected string $roleClass;
 
     /** @var Collection|array|null */
     protected $permissions;
 
-    /** @var string */
-    public $pivotRole;
+    public string $pivotRole;
 
-    /** @var string */
-    public $pivotPermission;
+    public string $pivotPermission;
 
     /** @var \DateInterval|int */
     public $cacheExpirationTime;
 
-    /** @var bool */
-    public $teams;
+    public bool $teams;
 
-    /** @var string */
-    public $teamsKey;
+    public string $teamsKey;
 
     /** @var int|string */
     protected $teamId = null;
 
-    /** @var string */
-    public $cacheKey;
+    public string $cacheKey;
 
-    /** @var array */
-    private $cachedRoles = [];
+    private array $cachedRoles = [];
 
-    /** @var array */
-    private $alias = [];
+    private array $alias = [];
 
-    /** @var array */
-    private $except = [];
+    private array $except = [];
 
     /**
      * PermissionRegistrar constructor.
@@ -180,9 +168,9 @@ class PermissionRegistrar
             return;
         }
 
-        $this->permissions = $this->cache->remember($this->cacheKey, $this->cacheExpirationTime, function () {
-            return $this->getSerializedPermissionsForCache();
-        });
+        $this->permissions = $this->cache->remember(
+            $this->cacheKey, $this->cacheExpirationTime, fn () => $this->getSerializedPermissionsForCache()
+        );
 
         // fallback for old cache method, must be removed on next mayor version
         if (! isset($this->permissions['alias'])) {
@@ -345,11 +333,12 @@ class PermissionRegistrar
         $permissionClass = $this->getPermissionClass();
         $permissionInstance = new $permissionClass();
 
-        return Collection::make(
-            array_map(fn ($item) => $permissionInstance
-                    ->newFromBuilder($this->aliasedArray(array_diff_key($item, ['r' => 0])))
-                    ->setRelation('roles', $this->getHydratedRoleCollection($item['r'] ?? [])), $this->permissions['permissions'])
-        );
+        return Collection::make(array_map(
+            fn ($item) => $permissionInstance
+                ->newFromBuilder($this->aliasedArray(array_diff_key($item, ['r' => 0])))
+                ->setRelation('roles', $this->getHydratedRoleCollection($item['r'] ?? [])),
+            $this->permissions['permissions']
+        ));
     }
 
     private function getHydratedRoleCollection(array $roles): Collection
