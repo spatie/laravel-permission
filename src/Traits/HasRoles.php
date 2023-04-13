@@ -321,9 +321,9 @@ trait HasRoles
             $roles = [$roles->name];
         }
 
-        $roles = collect()->make($roles)->map(function ($role) {
-            return $role instanceof Role ? $role->name : $role;
-        });
+        $roles = collect()->make($roles)->map(fn ($role) =>
+            $role instanceof Role ? $role->name : $role
+        );
 
         return $this->roles->count() == $roles->count() && $this->hasAllRoles($roles, $guard);
     }
@@ -365,7 +365,7 @@ trait HasRoles
         $pipeString = trim($pipeString);
 
         if (strlen($pipeString) <= 2) {
-            return $pipeString;
+            return [str_replace('|', '', $pipeString)];
         }
 
         $quoteCharacter = substr($pipeString, 0, 1);

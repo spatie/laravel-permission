@@ -48,16 +48,10 @@ class Guard
     protected static function getConfigAuthGuards(string $class): Collection
     {
         return collect(config('auth.guards'))
-            ->map(function ($guard) {
-                if (! isset($guard['provider'])) {
-                    return null;
-                }
-
-                return config("auth.providers.{$guard['provider']}.model");
-            })
-            ->filter(function ($model) use ($class) {
-                return $class === $model;
-            })
+            ->map(fn ($guard) =>
+                isset($guard['provider']) ? config("auth.providers.{$guard['provider']}.model") : null
+            )
+            ->filter(fn ($model) => $class === $model)
             ->keys();
     }
 

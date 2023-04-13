@@ -103,9 +103,7 @@ class UpgradeForTeams extends Command
     {
         $matchingFiles = glob($this->getMigrationPath('*'));
 
-        return array_map(function ($path) {
-            return basename($path);
-        }, $matchingFiles);
+        return array_map(fn ($path) => basename($path), $matchingFiles);
     }
 
     /**

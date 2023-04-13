@@ -70,7 +70,7 @@ class PermissionRegistrar
         $this->initializeCache();
     }
 
-    public function initializeCache()
+    public function initializeCache(): void
     {
         $this->cacheExpirationTime = config('permission.cache.expiration_time') ?: \DateInterval::createFromDateString('24 hours');
 
@@ -109,7 +109,7 @@ class PermissionRegistrar
      *
      * @param  int|string|\Illuminate\Database\Eloquent\Model  $id
      */
-    public function setPermissionsTeamId($id)
+    public function setPermissionsTeamId($id): void
     {
         if ($id instanceof \Illuminate\Database\Eloquent\Model) {
             $id = $id->getKey();
@@ -174,7 +174,7 @@ class PermissionRegistrar
      * Load permissions from cache
      * This get cache and turns array into \Illuminate\Database\Eloquent\Collection
      */
-    private function loadPermissions()
+    private function loadPermissions(): void
     {
         if ($this->permissions) {
             return;
@@ -276,9 +276,8 @@ class PermissionRegistrar
     private function aliasedArray($model): array
     {
         return collect(is_array($model) ? $model : $model->getAttributes())->except($this->except)
-            ->keyBy(function ($value, $key) {
-                return $this->alias[$key] ?? $key;
-            })->all();
+            ->keyBy(fn ($value, $key) => $this->alias[$key] ?? $key)
+            ->all();
     }
 
     /**
@@ -301,7 +300,7 @@ class PermissionRegistrar
     /*
      * Make the cache smaller using an array with only required fields
      */
-    private function getSerializedPermissionsForCache()
+    private function getSerializedPermissionsForCache(): array
     {
         $this->except = config('permission.cache.column_names_except', ['created_at', 'updated_at', 'deleted_at']);
 
@@ -319,7 +318,7 @@ class PermissionRegistrar
         return ['alias' => array_flip($this->alias)] + compact('permissions', 'roles');
     }
 
-    private function getSerializedRoleRelation($permission)
+    private function getSerializedRoleRelation($permission): array
     {
         if (! $permission->roles->count()) {
             return [];
@@ -341,28 +340,28 @@ class PermissionRegistrar
         ];
     }
 
-    private function getHydratedPermissionCollection()
+    private function getHydratedPermissionCollection(): Collection
     {
         $permissionClass = $this->getPermissionClass();
         $permissionInstance = new $permissionClass();
 
         return Collection::make(
-            array_map(function ($item) use ($permissionInstance) {
-                return $permissionInstance
+            array_map(fn ($item) =>
+                $permissionInstance
                     ->newFromBuilder($this->aliasedArray(array_diff_key($item, ['r' => 0])))
-                    ->setRelation('roles', $this->getHydratedRoleCollection($item['r'] ?? []));
-            }, $this->permissions['permissions'])
+                    ->setRelation('roles', $this->getHydratedRoleCollection($item['r'] ?? []))
+            , $this->permissions['permissions'])
         );
     }
 
-    private function getHydratedRoleCollection(array $roles)
+    private function getHydratedRoleCollection(array $roles): Collection
     {
         return Collection::make(array_values(
             array_intersect_key($this->cachedRoles, array_flip($roles))
         ));
     }
 
-    private function hydrateRolesCache()
+    private function hydrateRolesCache(): void
     {
         $roleClass = $this->getRoleClass();
         $roleInstance = new $roleClass();
@@ -375,7 +374,7 @@ class PermissionRegistrar
         $this->permissions['roles'] = [];
     }
 
-    public static function isUid($value)
+    public static function isUid($value): bool
     {
         if (! is_string($value) || empty(trim($value))) {
             return false;

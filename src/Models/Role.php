@@ -150,10 +150,10 @@ class Role extends Model implements RoleContract
         if (app(PermissionRegistrar::class)->teams) {
             $teamsKey = app(PermissionRegistrar::class)->teamsKey;
 
-            $query->where(function ($q) use ($params, $teamsKey) {
+            $query->where(fn ($q) =>
                 $q->whereNull($teamsKey)
-                    ->orWhere($teamsKey, $params[$teamsKey] ?? getPermissionsTeamId());
-            });
+                    ->orWhere($teamsKey, $params[$teamsKey] ?? getPermissionsTeamId())
+            );
             unset($params[$teamsKey]);
         }
 
