@@ -82,7 +82,7 @@ trait HasRoles
                 return $role;
             }
 
-            $method = is_numeric($role) || PermissionRegistrar::isUid($role) ? 'findById' : 'findByName';
+            $method = is_int($role) || PermissionRegistrar::isUid($role) ? 'findById' : 'findByName';
 
             return $this->getRoleClass()::{$method}($role, $guard ?: $this->getDefaultGuardName());
         }, Arr::wrap($roles));
@@ -209,19 +209,19 @@ trait HasRoles
             $roles = $roles->value;
         }
 
-        if (is_string($roles) && ! PermissionRegistrar::isUid($roles)) {
-            return $guard
-                ? $this->roles->where('guard_name', $guard)->contains('name', $roles)
-                : $this->roles->contains('name', $roles);
-        }
-
-        if (is_int($roles) || is_string($roles)) {
+        if (is_int($roles) || PermissionRegistrar::isUid($roles)) {
             $roleClass = $this->getRoleClass();
             $key = (new $roleClass())->getKeyName();
 
             return $guard
                 ? $this->roles->where('guard_name', $guard)->contains($key, $roles)
                 : $this->roles->contains($key, $roles);
+        }
+
+        if (is_string($roles)) {
+            return $guard
+                ? $this->roles->where('guard_name', $guard)->contains('name', $roles)
+                : $this->roles->contains('name', $roles);
         }
 
         if ($roles instanceof Role) {
@@ -347,7 +347,7 @@ trait HasRoles
             $role = $role->value;
         }
 
-        if (is_numeric($role) || PermissionRegistrar::isUid($role)) {
+        if (is_int($role) || PermissionRegistrar::isUid($role)) {
             return $this->getRoleClass()::findById($role, $this->getDefaultGuardName());
         }
 

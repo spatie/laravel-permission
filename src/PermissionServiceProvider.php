@@ -81,10 +81,8 @@ class PermissionServiceProvider extends ServiceProvider
 
     protected function registerModelBindings()
     {
-        $this->app->bind(PermissionContract::class, fn ($app) => $app->make($app->config['permission.models.permission'])
-        );
-        $this->app->bind(RoleContract::class, fn ($app) => $app->make($app->config['permission.models.role'])
-        );
+        $this->app->bind(PermissionContract::class, fn ($app) => $app->make($app->config['permission.models.permission']));
+        $this->app->bind(RoleContract::class, fn ($app) => $app->make($app->config['permission.models.role']));
     }
 
     public static function bladeMethodWrapper($method, $role, $guard = null)
