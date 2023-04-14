@@ -99,22 +99,23 @@ trait HasPermissions
     {
         $permissions = $this->convertToPermissionModels($permissions);
 
+        $permissionClass = $this->getPermissionClass();
+        $permissionKey = (new $permissionClass())->getKeyName();
+        $roleClass = $this->getRoleClass();
+        $roleKey = (new $roleClass())->getKeyName();
+
         $rolesWithPermissions = is_a($this, Role::class) ? [] : array_unique(
             array_reduce($permissions, fn ($result, $permission) => array_merge($result, $permission->roles->all()), [])
         );
 
         return $query->where(fn (Builder $query) => $query
-            ->whereHas('permissions', function (Builder $subQuery) use ($permissions) {
-                $permissionClass = $this->getPermissionClass();
-                $key = (new $permissionClass())->getKeyName();
-                $subQuery->whereIn(config('permission.table_names.permissions').".$key", \array_column($permissions, $key));
-            })
-            ->when(count($rolesWithPermissions) > 0, fn ($subQuery) => $subQuery
-                ->orWhereHas('roles', function (Builder $subQuery) use ($rolesWithPermissions) {
-                    $roleClass = $this->getRoleClass();
-                    $key = (new $roleClass())->getKeyName();
-                    $subQuery->whereIn(config('permission.table_names.roles').".$key", \array_column($rolesWithPermissions, $key));
-                })
+            ->whereHas('permissions', fn (Builder $subQuery) => $subQuery
+                ->whereIn(config('permission.table_names.permissions').".$permissionKey", \array_column($permissions, $permissionKey))
+            )
+            ->when(count($rolesWithPermissions), fn ($whenQuery) => $whenQuery
+                ->orWhereHas('roles', fn (Builder $subQuery) => $subQuery
+                    ->whereIn(config('permission.table_names.roles').".$roleKey", \array_column($rolesWithPermissions, $roleKey))
+                )
             )
         );
     }
@@ -139,7 +140,7 @@ trait HasPermissions
                 $permission = $permission->value;
             }
 
-            $method = is_string($permission) && ! PermissionRegistrar::isUid($permission) ? 'findByName' : 'findById';
+            $method = is_int($permission) || PermissionRegistrar::isUid($permission) ? 'findById' : 'findByName';
 
             return $this->getPermissionClass()::{$method}($permission, $this->getDefaultGuardName());
         }, Arr::wrap($permissions));
@@ -159,15 +160,15 @@ trait HasPermissions
             $permission = $permission->value;
         }
 
-        if (is_string($permission) && ! PermissionRegistrar::isUid($permission)) {
-            $permission = $this->getPermissionClass()::findByName(
+        if (is_int($permission) || PermissionRegistrar::isUid($permission)) {
+            $permission = $this->getPermissionClass()::findById(
                 $permission,
                 $guardName ?? $this->getDefaultGuardName()
             );
         }
 
-        if (is_int($permission) || is_string($permission)) {
-            $permission = $this->getPermissionClass()::findById(
+        if (is_string($permission)) {
+            $permission = $this->getPermissionClass()::findByName(
                 $permission,
                 $guardName ?? $this->getDefaultGuardName()
             );
@@ -209,16 +210,16 @@ trait HasPermissions
     {
         $guardName = $guardName ?? $this->getDefaultGuardName();
 
+        if ($permission instanceof \BackedEnum) {
+            $permission = $permission->value;
+        }
+
         if (is_int($permission) || PermissionRegistrar::isUid($permission)) {
             $permission = $this->getPermissionClass()::findById($permission, $guardName);
         }
 
         if ($permission instanceof Permission) {
             $permission = $permission->name;
-        }
-
-        if ($permission instanceof \BackedEnum) {
-            $permission = $permission->value;
         }
 
         if (! is_string($permission)) {
@@ -461,7 +462,7 @@ trait HasPermissions
             $permissions = $permissions->value;
         }
 
-        if (is_numeric($permissions) || PermissionRegistrar::isUid($permissions)) {
+        if (is_int($permissions) || PermissionRegistrar::isUid($permissions)) {
             return $this->getPermissionClass()::findById($permissions, $this->getDefaultGuardName());
         }
 
