@@ -48,7 +48,7 @@ class PermissionServiceProvider extends ServiceProvider
         );
     }
 
-    protected function offerPublishing()
+    protected function offerPublishing(): void
     {
         if (! $this->app->runningInConsole()) {
             return;
@@ -68,10 +68,17 @@ class PermissionServiceProvider extends ServiceProvider
         ], 'permission-migrations');
     }
 
-    protected function registerCommands()
+    protected function registerCommands(): void
     {
         $this->commands([
             Commands\CacheReset::class,
+        ]);
+
+        if (! $this->app->runningInConsole()) {
+            return;
+        }
+
+        $this->commands([
             Commands\CreateRole::class,
             Commands\CreatePermission::class,
             Commands\Show::class,
@@ -79,7 +86,7 @@ class PermissionServiceProvider extends ServiceProvider
         ]);
     }
 
-    protected function registerModelBindings()
+    protected function registerModelBindings(): void
     {
         $this->app->bind(PermissionContract::class, fn ($app) => $app->make($app->config['permission.models.permission'])
         );
@@ -87,12 +94,12 @@ class PermissionServiceProvider extends ServiceProvider
         );
     }
 
-    public static function bladeMethodWrapper($method, $role, $guard = null)
+    public static function bladeMethodWrapper($method, $role, $guard = null): bool
     {
         return auth($guard)->check() && auth($guard)->user()->{$method}($role);
     }
 
-    protected function registerBladeExtensions($bladeCompiler)
+    protected function registerBladeExtensions($bladeCompiler): void
     {
         $bladeMethodWrapper = '\\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper';
 
@@ -116,7 +123,7 @@ class PermissionServiceProvider extends ServiceProvider
         $bladeCompiler->directive('endhasexactroles', fn () => '<?php endif; ?>');
     }
 
-    protected function registerMacroHelpers()
+    protected function registerMacroHelpers(): void
     {
         if (! method_exists(Route::class, 'macro')) { // Lumen
             return;
