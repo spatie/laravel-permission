@@ -49,19 +49,19 @@ We invest a lot of resources into creating [best in class open source packages](
 
 We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
 
-### Testing
-
-``` bash
-composer test
-```
-
-### Changelog
+## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
 
 ## Contributing
 
 Please see [CONTRIBUTING](https://github.com/spatie/.github/blob/main/CONTRIBUTING.md) for details.
+
+### Testing
+
+``` bash
+composer test
+```
 
 ### Security
 
@@ -92,8 +92,8 @@ And a special thanks to [Caneco](https://twitter.com/caneco) for the logo ✨
 ## Alternatives
 
 - [Povilas Korop](https://twitter.com/@povilaskorop) did an excellent job listing the alternatives [in an article on Laravel News](https://laravel-news.com/two-best-roles-permissions-packages). In that same article, he compares laravel-permission to [Joseph Silber](https://github.com/JosephSilber)'s [Bouncer]((https://github.com/JosephSilber/bouncer)), which in our book is also an excellent package.
-- [ultraware/roles](https://github.com/ultraware/roles) takes a slightly different approach to its features.
 - [santigarcor/laratrust](https://github.com/santigarcor/laratrust) implements team support
+- [ultraware/roles](https://github.com/ultraware/roles) (archived) takes a slightly different approach to its features.
 - [zizaco/entrust](https://github.com/zizaco/entrust) offers some wildcard pattern matching
 
 ## License
