@@ -391,7 +391,7 @@ trait HasPermissions
 
         if ($model->exists) {
             $this->permissions()->sync($permissions, false);
-            $model->load('permissions');
+            $model->loadMissing('permissions');
         } else {
             $class = \get_class($model);
 
@@ -401,7 +401,7 @@ trait HasPermissions
                         return;
                     }
                     $model->permissions()->sync($permissions, false);
-                    $model->load('permissions');
+                    $model->loadMissing('permissions');
                 }
             );
         }
@@ -442,7 +442,7 @@ trait HasPermissions
             $this->forgetCachedPermissions();
         }
 
-        $this->load('permissions');
+        $this->loadMissing('permissions');
 
         return $this;
     }
