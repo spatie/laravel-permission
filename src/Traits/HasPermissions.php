@@ -101,7 +101,7 @@ trait HasPermissions
 
         $permissionClass = $this->getPermissionClass();
         $permissionKey = (new $permissionClass())->getKeyName();
-        $roleClass = $this->getRoleClass();
+        $roleClass = is_a($this, Role::class) ? static::class : $this->getRoleClass();
         $roleKey = (new $roleClass())->getKeyName();
 
         $rolesWithPermissions = is_a($this, Role::class) ? [] : array_unique(
