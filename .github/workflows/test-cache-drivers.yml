@@ -1,0 +1,67 @@
+name: "Run Tests - Cache Drivers"
+
+on: [push, pull_request]
+
+jobs:
+  cache:
+
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379/tcp
+        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    strategy:
+      fail-fast: false
+
+    name: Cache Drivers
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: curl, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, iconv, memcache
+          coverage: none
+
+      - name: Install dependencies
+        run: |
+          composer require "predis/predis" --no-interaction --no-update
+          composer update --prefer-stable --prefer-dist --no-interaction
+
+      - name: Execute tests - memcached cache driver
+        run: |
+          vendor/bin/phpunit
+        env:
+          CACHE_DRIVER: memcached
+
+      - name: Execute tests - redis cache driver
+        run: |
+          vendor/bin/phpunit
+        env:
+          CACHE_DRIVER: redis
+          REDIS_PORT: ${{ job.services.redis.ports['6379'] }}
+
+      - name: Execute tests - database cache driver
+        run: |
+          vendor/bin/phpunit
+        env:
+          CACHE_DRIVER: database
+
+      - name: Execute tests - file cache driver
+        run: |
+          vendor/bin/phpunit
+        env:
+          CACHE_DRIVER: file
+
+      - name: Execute tests - array cache driver
+        run: |
+          vendor/bin/phpunit
+        env:
+          CACHE_DRIVER: array
