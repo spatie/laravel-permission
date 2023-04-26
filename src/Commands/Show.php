@@ -44,8 +44,8 @@ class Show extends Command
             $permissions = $permissionClass::whereGuardName($guard)->orderBy('name')->pluck('name', 'id');
 
             $body = $permissions->map(fn ($permission, $id) => $roles->map(
-                    fn (array $role_data) => $role_data['permissions']->contains($id) ? ' ✔' : ' ·'
-                )->prepend($permission)
+                fn (array $role_data) => $role_data['permissions']->contains($id) ? ' ✔' : ' ·'
+            )->prepend($permission)
             );
 
             if (config('permission.teams')) {
@@ -63,7 +63,7 @@ class Show extends Command
 
                         return implode('_', $name);
                     })
-                    ->prepend('')->toArray(),
+                        ->prepend('')->toArray(),
                 ),
                 $body->toArray(),
                 $style
