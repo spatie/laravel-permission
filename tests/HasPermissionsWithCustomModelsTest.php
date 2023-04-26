@@ -12,6 +12,18 @@ class HasPermissionsWithCustomModelsTest extends HasPermissionsTest
     /** @var bool */
     protected $useCustomModels = true;
 
+    /** @var int */
+    protected $resetDatabaseQuery = 0;
+
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        if ($app['config']->get('cache.default') == 'database') {
+            $this->resetDatabaseQuery = 1;
+        }
+    }
+
     /** @test */
     public function it_can_use_custom_model_permission()
     {
@@ -75,7 +87,7 @@ class HasPermissionsWithCustomModelsTest extends HasPermissionsTest
         $this->testUserPermission->delete();
         DB::disableQueryLog();
 
-        $this->assertSame(1, count(DB::getQueryLog()));
+        $this->assertSame(1 + $this->resetDatabaseQuery, count(DB::getQueryLog()));
 
         $permission = Permission::onlyTrashed()->find($this->testUserPermission->getKey());
 
@@ -91,7 +103,7 @@ class HasPermissionsWithCustomModelsTest extends HasPermissionsTest
         $this->testUserPermission->delete();
         DB::disableQueryLog();
 
-        $this->assertSame(1, count(DB::getQueryLog()));
+        $this->assertSame(1 + $this->resetDatabaseQuery, count(DB::getQueryLog()));
 
         $permission = Permission::onlyTrashed()->find($this->testUserPermission->getKey());
 
@@ -109,7 +121,7 @@ class HasPermissionsWithCustomModelsTest extends HasPermissionsTest
         $this->testUserPermission->forceDelete();
         DB::disableQueryLog();
 
-        $this->assertSame(3, count(DB::getQueryLog())); //avoid detach permissions on permissions
+        $this->assertSame(3 + $this->resetDatabaseQuery, count(DB::getQueryLog())); //avoid detach permissions on permissions
 
         $permission = Permission::withTrashed()->find($permission_id);
 

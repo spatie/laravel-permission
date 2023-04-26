@@ -10,6 +10,18 @@ class HasRolesWithCustomModelsTest extends HasRolesTest
     /** @var bool */
     protected $useCustomModels = true;
 
+    /** @var int */
+    protected $resetDatabaseQuery = 0;
+
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        if ($app['config']->get('cache.default') == 'database') {
+            $this->resetDatabaseQuery = 1;
+        }
+    }
+
     /** @test */
     public function it_can_use_custom_model_role()
     {
@@ -25,7 +37,7 @@ class HasRolesWithCustomModelsTest extends HasRolesTest
         $this->testUserRole->delete();
         DB::disableQueryLog();
 
-        $this->assertSame(1, count(DB::getQueryLog()));
+        $this->assertSame(1 + $this->resetDatabaseQuery, count(DB::getQueryLog()));
 
         $role = Role::onlyTrashed()->find($this->testUserRole->getKey());
 
@@ -41,7 +53,7 @@ class HasRolesWithCustomModelsTest extends HasRolesTest
         $this->testUserRole->delete();
         DB::disableQueryLog();
 
-        $this->assertSame(1, count(DB::getQueryLog()));
+        $this->assertSame(1 + $this->resetDatabaseQuery, count(DB::getQueryLog()));
 
         $role = Role::onlyTrashed()->find($this->testUserRole->getKey());
 
@@ -59,7 +71,7 @@ class HasRolesWithCustomModelsTest extends HasRolesTest
         $this->testUserRole->forceDelete();
         DB::disableQueryLog();
 
-        $this->assertSame(3, count(DB::getQueryLog()));
+        $this->assertSame(3 + $this->resetDatabaseQuery, count(DB::getQueryLog()));
 
         $role = Role::withTrashed()->find($role_id);
 
