@@ -18,8 +18,6 @@ class CacheTest extends TestCase
 
     protected $cache_run_count = 2; // roles lookup, permissions lookup
 
-    protected $cache_relations_count = 1;
-
     protected $registrar;
 
     protected function setUp(): void
@@ -199,10 +197,11 @@ class CacheTest extends TestCase
     {
         $this->testUserRole->givePermissionTo(['edit-articles', 'edit-news', 'Edit News']);
         $this->testUser->assignRole('testRole');
+        $this->testUser->loadMissing('roles', 'permissions'); // load relations
 
         $this->resetQueryCount();
         $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
-        $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count + $this->cache_relations_count);
+        $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
 
         $this->resetQueryCount();
         $this->assertTrue($this->testUser->hasPermissionTo('edit-news'));
@@ -224,10 +223,11 @@ class CacheTest extends TestCase
 
         $this->testUserRole->givePermissionTo(['edit-articles', 'web']);
         $this->testUser->assignRole('testRole');
+        $this->testUser->loadMissing('roles', 'permissions'); // load relations
 
         $this->resetQueryCount();
         $this->assertTrue($this->testUser->hasPermissionTo('edit-articles', 'web'));
-        $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count + $this->cache_relations_count);
+        $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
 
         $this->resetQueryCount();
         $this->assertFalse($this->testUser->hasPermissionTo('edit-articles', 'admin'));
@@ -239,6 +239,7 @@ class CacheTest extends TestCase
     {
         $this->testUserRole->givePermissionTo($expected = ['edit-articles', 'edit-news']);
         $this->testUser->assignRole('testRole');
+        $this->testUser->loadMissing('roles.permissions', 'permissions'); // load relations
 
         $this->resetQueryCount();
         $this->registrar->getPermissions();
@@ -248,7 +249,7 @@ class CacheTest extends TestCase
         $actual = $this->testUser->getAllPermissions()->pluck('name')->sort()->values();
         $this->assertEquals($actual, collect($expected));
 
-        $this->assertQueryCount(2);
+        $this->assertQueryCount(0);
     }
 
     /** @test */

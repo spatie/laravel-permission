@@ -303,7 +303,7 @@ class HasRolesTest extends TestCase
 
         $this->assertTrue($user2->fresh()->hasRole('testRole2'));
         $this->assertFalse($user2->fresh()->hasRole('testRole'));
-        $this->assertSame(4, count(DB::getQueryLog())); //avoid unnecessary sync
+        $this->assertSame(3, count(DB::getQueryLog())); //avoid unnecessary sync
     }
 
     /** @test */
@@ -325,7 +325,7 @@ class HasRolesTest extends TestCase
 
         $this->assertTrue($admin_user->fresh()->hasRole('testRole2'));
         $this->assertFalse($admin_user->fresh()->hasRole('testRole'));
-        $this->assertSame(4, count(DB::getQueryLog())); //avoid unnecessary sync
+        $this->assertSame(3, count(DB::getQueryLog())); //avoid unnecessary sync
     }
 
     /** @test */

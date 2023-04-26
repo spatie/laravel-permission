@@ -13,11 +13,9 @@ class TeamHasPermissionsTest extends HasPermissionsTest
     public function it_can_assign_same_and_different_permission_on_same_user_on_different_teams()
     {
         setPermissionsTeamId(1);
-        $this->testUser->load('permissions');
         $this->testUser->givePermissionTo('edit-articles', 'edit-news');
 
         setPermissionsTeamId(2);
-        $this->testUser->load('permissions');
         $this->testUser->givePermissionTo('edit-articles', 'edit-blog');
 
         setPermissionsTeamId(1);
@@ -45,18 +43,15 @@ class TeamHasPermissionsTest extends HasPermissionsTest
         $this->testUserRole->givePermissionTo('edit-articles');
 
         setPermissionsTeamId(1);
-        $this->testUser->load('permissions');
         $this->testUser->assignRole('testRole');
         $this->testUser->givePermissionTo('edit-news');
 
         setPermissionsTeamId(2);
-        $this->testUser->load('permissions');
         $this->testUser->assignRole('testRole');
         $this->testUser->givePermissionTo('edit-blog');
 
         setPermissionsTeamId(1);
-        $this->testUser->load('roles');
-        $this->testUser->load('permissions');
+        $this->testUser->load('roles', 'permissions');
 
         $this->assertEquals(
             collect(['edit-articles', 'edit-news']),
@@ -64,8 +59,7 @@ class TeamHasPermissionsTest extends HasPermissionsTest
         );
 
         setPermissionsTeamId(2);
-        $this->testUser->load('roles');
-        $this->testUser->load('permissions');
+        $this->testUser->load('roles', 'permissions');
 
         $this->assertEquals(
             collect(['edit-articles', 'edit-blog']),
@@ -77,11 +71,9 @@ class TeamHasPermissionsTest extends HasPermissionsTest
     public function it_can_sync_or_remove_permission_without_detach_on_different_teams()
     {
         setPermissionsTeamId(1);
-        $this->testUser->load('permissions');
         $this->testUser->syncPermissions('edit-articles', 'edit-news');
 
         setPermissionsTeamId(2);
-        $this->testUser->load('permissions');
         $this->testUser->syncPermissions('edit-articles', 'edit-blog');
 
         setPermissionsTeamId(1);
