@@ -50,15 +50,15 @@ class TeamHasRolesTest extends HasRolesTest
         $this->assertNotNull($testRole4NoTeam);
 
         setPermissionsTeamId(1);
-        $this->testUser->load('roles');
+        $this->testUser->loadMissing('roles');
         $this->testUser->assignRole('testRole', 'testRole2');
 
         setPermissionsTeamId(2);
-        $this->testUser->load('roles');
+        $this->testUser->loadMissing('roles');
         $this->testUser->assignRole('testRole', 'testRole3');
 
         setPermissionsTeamId(1);
-        $this->testUser->load('roles');
+        $this->testUser->loadMissing('roles');
 
         $this->assertEquals(
             collect(['testRole', 'testRole2']),
@@ -72,7 +72,7 @@ class TeamHasRolesTest extends HasRolesTest
         $this->assertTrue($this->testUser->hasRole($testRole4NoTeam)); // global role team=null
 
         setPermissionsTeamId(2);
-        $this->testUser->load('roles');
+        $this->testUser->loadMissing('roles');
 
         $this->assertEquals(
             collect(['testRole', 'testRole3']),
@@ -91,15 +91,15 @@ class TeamHasRolesTest extends HasRolesTest
         app(Role::class)->create(['name' => 'testRole3', 'team_test_id' => 2]);
 
         setPermissionsTeamId(1);
-        $this->testUser->load('roles');
+        $this->testUser->loadMissing('roles');
         $this->testUser->syncRoles('testRole', 'testRole2');
 
         setPermissionsTeamId(2);
-        $this->testUser->load('roles');
+        $this->testUser->loadMissing('roles');
         $this->testUser->syncRoles('testRole', 'testRole3');
 
         setPermissionsTeamId(1);
-        $this->testUser->load('roles');
+        $this->testUser->loadMissing('roles');
 
         $this->assertEquals(
             collect(['testRole', 'testRole2']),
