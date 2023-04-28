@@ -5,6 +5,8 @@ weight: 4
 
 ## Enum Prerequisites
 
+Requires `version 6` of this package.
+
 Requires PHP 8.1 or higher.
 
 If you are using PHP 8.1+ you can implement Enums as native types. 
