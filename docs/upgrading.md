@@ -32,11 +32,11 @@ Be sure to compare your custom models with originals to see what else may have c
 
 3. Migrations. If you have old migrations you might get the following error: 
 
-    Error: Access to undeclared static property Spatie\Permission\PermissionRegistrar::$pivotPermission
+    `Error: Access to undeclared static property Spatie\Permission\PermissionRegistrar::$pivotPermission`
 
-To fix this, update your migration file associated with this package. 
+  To fix this, update your migration file associated with this package. 
 
-Also note that the migrations have been updated to anonymous-class syntax that was introduced in Laravel 8. 
+  Also note that the migrations have been updated to anonymous-class syntax that was introduced in Laravel 8. 
 
 4. NOTE: For consistency with the `PermissionMiddleware`, the `RoleOrPermissionMiddleware` has switched from only checking permissions provided by this package to using `canAny()` to check against any abilities registered by your application. This may have the effect of granting those other abilities (such as Super Admin) when using the `RoleOrPermissionMiddleware`, which previously would have failed silently.
 
