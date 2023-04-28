@@ -7,6 +7,8 @@ NOTE: Lumen is **not** officially supported by this package. However, the follow
 
 Lumen installation instructions can be found in the [Lumen documentation](https://lumen.laravel.com/docs/main).
 
+## Installing
+
 Install the permissions package via Composer:
 
 ``` bash
@@ -61,15 +63,15 @@ php artisan migrate
 ```
 
 ---
-### User Model
+## User Model
 NOTE: Remember that Laravel's authorization layer requires that your `User` model implement the `Illuminate\Contracts\Auth\Access\Authorizable` contract. In Lumen you will then also need to use the `Laravel\Lumen\Auth\Authorizable` trait.
 
 ---
-### User Table
+## User Table
 NOTE: If you are working with a fresh install of Lumen, then you probably also need a migration file for your Users table. You can create your own, or you can copy a basic one from Laravel:
 
 [https://github.com/laravel/laravel/blob/master/database/migrations/2014_10_12_000000_create_users_table.php](https://github.com/laravel/laravel/blob/master/database/migrations/2014_10_12_000000_create_users_table.php)
 
 (You will need to run `php artisan migrate` after adding this file.)
 
-Remember to update your UserFactory.php to match the fields in the migration you create/copy.
+Remember to update your `UserFactory.php` to match the fields in the migration you create/copy.

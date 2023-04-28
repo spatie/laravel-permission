@@ -1,7 +1,13 @@
 ---
 title: Wildcard permissions
-weight: 3
+weight: 6
 ---
+
+When enabled, wildcard permissions offers you a flexible representation for a variety of permission schemes. The idea
+ behind wildcard permissions is inspired by the default permission implementation of 
+ [Apache Shiro](https://shiro.apache.org/permissions.html).
+
+## Enabling Wildcard Feature
 
 Wildcard permissions can be enabled in the permission config file:
 
@@ -10,9 +16,7 @@ Wildcard permissions can be enabled in the permission config file:
 'enable_wildcard_permission' => true,
 ```
 
-When enabled, wildcard permissions offers you a flexible representation for a variety of permission schemes. The idea
- behind wildcard permissions is inspired by the default permission implementation of 
- [Apache Shiro](https://shiro.apache.org/permissions.html).
+## Wildcard Syntax
 
 A wildcard permission string is made of one or more parts separated by dots (.).
 
@@ -29,7 +33,7 @@ this is the common use-case, representing {resource}.{action}.{target}.
 
 > NOTE: You must create any wildcard permission patterns (eg: `posts.create.*`) before you can assign them or check for them.
 
-### Using Wildcards
+## Using Wildcards
 
 > ALERT: The `*` means "ALL". It does **not** mean "ANY".
 
@@ -53,14 +57,14 @@ $user->can('posts.edit');
 $user->can('posts.delete');
 ``` 
 
-### Meaning of the `*` Asterisk
+## Meaning of the `*` Asterisk
 
 The `*` means "ALL". It does **not** mean "ANY".
 
 Thus `can('post.*')` will only pass if the user has been assigned `post.*` explicitly.
 
 
-### Subparts
+## Subparts
 
 Besides the use of parts and wildcards, subparts can also be used. Subparts are divided with commas (,). This is a 
 powerful feature that lets you create complex permission schemes.

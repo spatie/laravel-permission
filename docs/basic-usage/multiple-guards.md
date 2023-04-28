@@ -1,20 +1,20 @@
 ---
 title: Using multiple guards
-weight: 6
+weight: 9
 ---
 
 When using the default Laravel auth configuration all of the core methods of this package will work out of the box, no extra configuration required.
 
 However, when using multiple guards they will act like namespaces for your permissions and roles. Meaning every guard has its own set of permissions and roles that can be assigned to their user model.
 
-### The Downside To Multiple Guards
+## The Downside To Multiple Guards
 
 Note that this package requires you to register a permission name for each guard you want to authenticate with. So, "edit-article" would have to be created multiple times for each guard your app uses. An exception will be thrown if you try to authenticate against a non-existing permission+guard combination. Same for roles.
 
 > **Tip**: If your app uses only a single guard, but is not `web` (Laravel's default, which shows "first" in the auth config file) then change the order of your listed guards in your `config/auth.php` to list your primary guard as the default and as the first in the list of defined guards. While you're editing that file, best to remove any guards you don't use, too.
 
 
-### Using permissions and roles with multiple guards
+## Using permissions and roles with multiple guards
 
 When creating new permissions and roles, if no guard is specified, then the **first** defined guard in `auth.guards` config array will be used. 
 
@@ -42,12 +42,12 @@ $user->hasPermissionTo('publish articles', 'admin');
 - then the `auth.defaults.guard` config (which is the user's guard if they are logged in, else the default in the file).
 
 
-### Assigning permissions and roles to guard users
+## Assigning permissions and roles to guard users
 
 You can use the same core methods to assign permissions and roles to users; just make sure the `guard_name` on the permission or role matches the guard of the user, otherwise a `GuardDoesNotMatch` or `Role/PermissionDoesNotExist` exception will be thrown.
 
 
-### Using blade directives with multiple guards
+## Using blade directives with multiple guards
 
 You can use all of the blade directives offered by this package by passing in the guard you wish to use as the second argument to the directive:
 

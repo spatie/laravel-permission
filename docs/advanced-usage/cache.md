@@ -5,7 +5,7 @@ weight: 5
 
 Role and Permission data are cached to speed up performance.
 
-### Automatic Cache Refresh Using Built-In Functions
+## Automatic Cache Refresh Using Built-In Functions
 
 When you **use the built-in functions** for manipulating roles and permissions, the cache is automatically reset for you, and relations are automatically reloaded for the current model record:
 
@@ -31,7 +31,7 @@ $user->removeRole('writer');
 $user->syncRoles(params);
 ```
 
-### Manual cache reset
+## Manual cache reset
 To manually reset the cache for this package, you can run the following in your app code:
 ```php
 app()->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
@@ -43,6 +43,7 @@ php artisan permission:cache-reset
 ```
 (This command is effectively an alias for `artisan cache:forget spatie.permission.cache` but respects the package config as well.)
 
+## Cache Configuration Settings
 
 ### Cache Expiration Time
 
@@ -71,7 +72,7 @@ You can configure the package to use any of the Cache Stores you've configured i
 
 In `config/permission.php` set `cache.store` to the name of any one of the `config/cache.php` stores you've defined.
 
-#### Disabling Cache
+## Disabling Cache
 
 Setting `'cache.store' => 'array'` in `config/permission.php` will effectively disable caching by this package between requests (it will only cache in-memory until the current request is completed processing, never persisting it).
 

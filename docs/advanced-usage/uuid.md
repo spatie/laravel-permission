@@ -10,7 +10,7 @@ If you're using UUIDs or GUIDs for your User models there are a few consideratio
 Since each UUID implementation approach is different, some of these may or may not benefit you. As always, your implementation may vary.
 
 
-### Migrations
+## Migrations
 You will probably want to update the `create_permission_tables.php` migration:
 
 If your User models are using `uuid` instead of `unsignedBigInteger` then you'll need to reflect the change in the migration provided by this package. Something like this would be typical, for both `model_has_permissions` and `model_has_roles` tables:
@@ -61,7 +61,7 @@ OPTIONAL: If you also want the roles and permissions to use a UUID for their `id
 ```
 
 
-### Configuration (OPTIONAL)
+## Configuration (OPTIONAL)
 You might want to change the pivot table field name from `model_id` to `model_uuid`, just for semantic purposes.
 For this, in the configuration file edit `column_names.model_morph_key`:
 
@@ -79,7 +79,7 @@ For this, in the configuration file edit `column_names.model_morph_key`:
         ],
 - If you extend the models into your app, be sure to list those models in your configuration file. See the Extending section of the documentation and the Models section below.
 
-### Models
+## Models
 If you want all the role/permission objects to have a UUID instead of an integer, you will need to Extend the default Role and Permission models into your own namespace in order to set some specific properties. (See the Extending section of the docs, where it explains requirements of Extending, as well as the configuration settings you need to update.)
 
 - You likely want to set `protected $keyType = 'string';` so Laravel handles joins as strings and doesn't cast to integer.
@@ -119,7 +119,7 @@ It is common to use a trait to handle the $keyType and $incrementing settings, a
 ```
 
 
-### User Models
+## User Models
 > Troubleshooting tip: In the ***Prerequisites*** section of the docs we remind you that your User model must implement the `Illuminate\Contracts\Auth\Access\Authorizable` contract so that the Gate features are made available to the User object.
 In the default User model provided with Laravel, this is done by extending another model (aliased to `Authenticatable`), which extends the base Eloquent model. 
 However, your app's UUID implementation may need to override that in order to set some of the properties mentioned in the Models section above. 
@@ -127,7 +127,7 @@ However, your app's UUID implementation may need to override that in order to se
 If you are running into difficulties, you may want to double-check whether your User model is doing UUIDs consistent with other parts of your app.
 
 
-## REMINDER:
+# REMINDER:
 
 > THIS IS NOT A FULL LESSON ON HOW TO IMPLEMENT UUIDs IN YOUR APP.
 
@@ -135,7 +135,7 @@ Again, since each UUID implementation approach is different, some of these may o
 
 
 
-### Packages
+## Packages
 There are many packages offering UUID features for Eloquent models. You may want to explore whether these are of value to you in your study of implementing UUID in your applications:
 
 https://github.com/JamesHemery/laravel-uuid

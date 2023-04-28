@@ -8,8 +8,8 @@ weight: 6
 ALL upgrades of this package should follow these steps:
 
 1. Upgrading between major versions of this package always require the usual Composer steps:
-   > 1. Update your `composer.json` to specify the new major version, such as `^5.0`
-   > 2. Then run `composer update`. 
+   - Update your `composer.json` to specify the new major version, such as `^5.0`
+   - Then run `composer update`. 
 
 2. Compare the `migration` file stubs in the NEW version of this package against the migrations you've already run inside your app. If necessary, create a new migration (by hand) to apply any new changes.
 

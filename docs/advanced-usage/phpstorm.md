@@ -3,7 +3,7 @@ title: PhpStorm Interaction
 weight: 8
 ---
 
-# Extending PhpStorm 
+## Extending PhpStorm 
 
 > **Note**
 > When using Laravel Idea plugin all directives are automatically added.

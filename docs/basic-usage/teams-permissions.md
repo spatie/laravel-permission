@@ -1,6 +1,6 @@
 ---
 title: Teams permissions
-weight: 3
+weight: 5
 ---
 
 When enabled, teams permissions offers you flexible control for a variety of scenarios. The idea behind teams permissions is inspired by the default permission implementation of [Laratrust](https://laratrust.santigarcor.me/).
@@ -9,7 +9,7 @@ When enabled, teams permissions offers you flexible control for a variety of sce
 
 NOTE: These configuration changes must be made **before** performing the migration when first installing the package.
 
-If you have already run the migration and want to upgrade your implementation, you can run the artisan console command `php artisan spatie-permission:setup-teams`, to create a new migration file named [xxxx_xx_xx_xx_add_teams_fields.php](https://github.com/spatie/laravel-permission/blob/main/database/migrations/add_teams_fields.php.stub) and then run `php artisan migrate` to upgrade your database tables.
+If you have already run the migration and want to upgrade your implementation, you can run the artisan console command `php artisan permission:setup-teams`, to create a new migration file named [xxxx_xx_xx_xx_add_teams_fields.php](https://github.com/spatie/laravel-permission/blob/main/database/migrations/add_teams_fields.php.stub) and then run `php artisan migrate` to upgrade your database tables.
 
 Teams permissions can be enabled in the permission config file:
 

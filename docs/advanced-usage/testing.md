@@ -47,7 +47,7 @@ Two things you might wish to explore include:
    `'permission.cache.expiration_time' = \DateInterval::createFromDateString('1 seconds')`
 
 
-## Factories
+## Testing Using Factories
 
 Many applications do not require using factories to create fake roles/permissions for testing, because they use a Seeder to create specific roles and permissions that the application uses; thus tests are performed using the declared roles and permissions.
 
