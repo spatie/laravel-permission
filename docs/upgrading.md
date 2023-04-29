@@ -34,10 +34,7 @@ Be sure to compare your custom models with originals to see what else may have c
 
 2. If you have a custom Role model and (in the rare case that you might) have overridden the `hasPermissionTo()` method in it, you will need to update its method signature to `hasPermissionTo($permission, $guardName = null):bool`. See PR #2380.
 
-3. Migrations have changed in a few ways:
-  1. The migrations have been updated to anonymous-class syntax that was introduced in Laravel 8.
-  2. Some structural coding changes in the registrar class changed the way we extracted configuration settings in the migration files.
-  3. THEREFORE: you will need to upgrade your migrations, especially if you get the following error: 
+3. Migrations will need to be upgraded. (They have been updated to anonymous-class syntax that was introduced in Laravel 8, AND some structural coding changes in the registrar class changed the way we extracted configuration settings in the migration files.) If you had not customized it from the original then replacing the contents of the file should be straightforward. Usually the only customization is if you've switched to UUIDs or customized MySQL index name lengths. If you get the following error, it means your migration file needs upgrading:
 
       `Error: Access to undeclared static property Spatie\Permission\PermissionRegistrar::$pivotPermission`
 
