@@ -8,7 +8,7 @@ weight: 6
 ALL upgrades of this package should follow these steps:
 
 1. Upgrading between major versions of this package always require the usual Composer steps:
-   - Update your `composer.json` to specify the new major version, such as `^5.0`
+   - Update your `composer.json` to specify the new major version, such as `^6.0`
    - Then run `composer update`. 
 
 2. Compare the `migration` file stubs in the NEW version of this package against the migrations you've already run inside your app. If necessary, create a new migration (by hand) to apply any new changes.
@@ -19,8 +19,26 @@ ALL upgrades of this package should follow these steps:
 
 5. Apply any version-specific special updates as outlined below...
 
+6. Review the changelog, which details all the changes: https://github.com/spatie/laravel-permission/blob/main/CHANGELOG.md
+and/or consult the [Release Notes](https://github.com/spatie/laravel-permission/releases)
+
+
+## Upgrading from v4 to v5
+
+Follow the instructions described in "Essentials" above.
+
+## Upgrading from v3 to v4
+
+Update `composer.json` as described in "Essentials" above.
+
+## Upgrading from v2 to v3
+
+Update `composer.json` as described in "Essentials" above.
+
 
 ## Upgrading from v1 to v2
+There were significant database and code changes between v1 to v2.
+
 If you're upgrading from v1 to v2, there's no built-in automatic migration/conversion of your data to the new structure. 
 You will need to carefully adapt your code and your data manually.
 
