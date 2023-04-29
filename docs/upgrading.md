@@ -25,8 +25,8 @@ ALL upgrades of this package should follow these steps:
 and/or consult the [Release Notes](https://github.com/spatie/laravel-permission/releases)
 
 
-## Upgrading to v6
-There are a few breaking-changes when upgrading to v6. 
+## Upgrading from v5 to v6
+There are a few breaking-changes when upgrading to v6, but most of them won't affect you unless you have been customizing things.
 
 1. If you have overridden the `getPermissionClass()` or `getRoleClass()` methods or have custom Models, you will need to revisit those customizations. See PR #2368 for details. 
 eg: if you have a custom model you will need to make changes, including accessing the model using `$this->permissionClass::` syntax (eg: using `::` instead of `->`) in all the overridden methods that make use of the models.
@@ -34,9 +34,8 @@ Be sure to compare your custom models with originals to see what else may have c
 
 2. If you have a custom Role model and (in the rare case that you might) have overridden the `hasPermissionTo()` method in it, you will need to update its method signature to `hasPermissionTo($permission, $guardName = null):bool`. See PR #2380.
 
-3. Migrations will need to be upgraded. (They have been updated to anonymous-class syntax that was introduced in Laravel 8, AND some structural coding changes in the registrar class changed the way we extracted configuration settings in the migration files.) If you had not customized it from the original then replacing the contents of the file should be straightforward. Usually the only customization is if you've switched to UUIDs or customized MySQL index name lengths. If you get the following error, it means your migration file needs upgrading:
-
-      `Error: Access to undeclared static property Spatie\Permission\PermissionRegistrar::$pivotPermission`
+3. Migrations will need to be upgraded. (They have been updated to anonymous-class syntax that was introduced in Laravel 8, AND some structural coding changes in the registrar class changed the way we extracted configuration settings in the migration files.) If you had not customized it from the original then replacing the contents of the file should be straightforward. Usually the only customization is if you've switched to UUIDs or customized MySQL index name lengths. 
+If you get the following error, it means your migration file needs upgrading: `Error: Access to undeclared static property Spatie\Permission\PermissionRegistrar::$pivotPermission`
 
 4. NOTE: For consistency with `PermissionMiddleware`, the `RoleOrPermissionMiddleware` has switched from only checking permissions provided by this package to using `canAny()` to check against any abilities registered by your application. This may have the effect of granting those other abilities (such as Super Admin) when using the `RoleOrPermissionMiddleware`, which previously would have failed silently.
 
