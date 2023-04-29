@@ -7,19 +7,21 @@ weight: 6
 
 ALL upgrades of this package should follow these steps:
 
-1. Upgrading between major versions of this package always require the usual Composer steps:
+1. Composer. Upgrading between major versions of this package always require the usual Composer steps:
    - Update your `composer.json` to specify the new major version, such as `^6.0`
    - Then run `composer update`. 
 
-2. Compare the `migration` file stubs in the NEW version of this package against the migrations you've already run inside your app. If necessary, create a new migration (by hand) to apply any new changes.
+2. Migrations. Compare the `migration` file stubs in the NEW version of this package against the migrations you've already run inside your app. If necessary, create a new migration (by hand) to apply any new database changes.
 
-3. If you have made any custom Models from this package into your own app, compare the old and new models and apply any relevant updates to your custom models.
+3. Config file. Incorporate any changes to the permission.php config file, updating your existing file. (It may be easiest to make a backup copy of your existing file, re-publish it from this package, and then re-make your customizations to it.)
 
-4. If you have overridden any methods from this package's Traits, compare the old and new traits, and apply any relevant updates to your overridden methods.
+3. Models. If you have made any custom Models from this package into your own app, compare the old and new models and apply any relevant updates to your custom models.
+
+4. Custom Methods/Traits. If you have overridden any methods from this package's Traits, compare the old and new traits, and apply any relevant updates to your overridden methods.
 
 5. Apply any version-specific special updates as outlined below...
 
-6. Review the changelog, which details all the changes: https://github.com/spatie/laravel-permission/blob/main/CHANGELOG.md
+6. Review the changelog, which details all the changes: [CHANGELOG](https://github.com/spatie/laravel-permission/blob/main/CHANGELOG.md)
 and/or consult the [Release Notes](https://github.com/spatie/laravel-permission/releases)
 
 
@@ -30,13 +32,13 @@ Be sure to compare your custom models with originals to see what else may have c
 
 2. If you have a custom Role model and (in the rare case that you might) have overridden the `hasPermissionTo()` method in it, you will need to update its method signature to `hasPermissionTo($permission, $guardName = null):bool`. See PR #2380.
 
-3. Migrations. If you have old migrations you might get the following error: 
+3. Migrations. Migrations have changed in 2 ways:
+  - The migrations have been updated to anonymous-class syntax that was introduced in Laravel 8.
+  - Some structural coding changes in the registrar class changed the way we extracted configuration settings in the migration files.
+  - THEREFORE: you will need to upgrade your migrations, especially if you get the following error: 
 
-  `Error: Access to undeclared static property Spatie\Permission\PermissionRegistrar::$pivotPermission`
+      `Error: Access to undeclared static property Spatie\Permission\PermissionRegistrar::$pivotPermission`
 
-  To fix this, update your migration file associated with this package. 
-
-  Also note that the migrations have been updated to anonymous-class syntax that was introduced in Laravel 8. 
 
 4. NOTE: For consistency with `PermissionMiddleware`, the `RoleOrPermissionMiddleware` has switched from only checking permissions provided by this package to using `canAny()` to check against any abilities registered by your application. This may have the effect of granting those other abilities (such as Super Admin) when using the `RoleOrPermissionMiddleware`, which previously would have failed silently.
 
