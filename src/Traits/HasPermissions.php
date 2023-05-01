@@ -370,8 +370,7 @@ trait HasPermissions
 
                 $this->ensureModelSharesGuard($permission);
 
-                $array[$permission->getKey()] = app(PermissionRegistrar::class)->teams && ! is_a($this, Role::class) ?
-                    [app(PermissionRegistrar::class)->teamsKey => getPermissionsTeamId()] : [];
+                $array[] = $permission->getKey();
 
                 return $array;
             }, []);
@@ -388,19 +387,23 @@ trait HasPermissions
         $permissions = $this->collectPermissions($permissions);
 
         $model = $this->getModel();
+        $teamPivot = app(PermissionRegistrar::class)->teams && ! is_a($this, Role::class) ?
+            [app(PermissionRegistrar::class)->teamsKey => getPermissionsTeamId()] : [];
 
         if ($model->exists) {
-            $this->permissions()->sync($permissions, false);
+            $currentPermissions = $this->permissions()->get()->map(fn ($permission) => $permission->getKey())->toArray();
+
+            $this->permissions()->attach(array_diff($permissions, $currentPermissions), $teamPivot);
             $model->unsetRelation('permissions');
         } else {
             $class = \get_class($model);
 
             $class::saved(
-                function ($object) use ($permissions, $model) {
+                function ($object) use ($permissions, $model, $teamPivot) {
                     if ($model->getKey() != $object->getKey()) {
                         return;
                     }
-                    $model->permissions()->sync($permissions, false);
+                    $model->permissions()->attach($permissions, $teamPivot);
                     $model->unsetRelation('permissions');
                 }
             );

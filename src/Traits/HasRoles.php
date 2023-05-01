@@ -116,8 +116,7 @@ trait HasRoles
 
                 $this->ensureModelSharesGuard($role);
 
-                $array[$role->getKey()] = app(PermissionRegistrar::class)->teams && ! is_a($this, Permission::class) ?
-                    [app(PermissionRegistrar::class)->teamsKey => getPermissionsTeamId()] : [];
+                $array[] = $role->getKey();
 
                 return $array;
             }, []);
@@ -134,19 +133,23 @@ trait HasRoles
         $roles = $this->collectRoles($roles);
 
         $model = $this->getModel();
+        $teamPivot = app(PermissionRegistrar::class)->teams && ! is_a($this, Permission::class) ?
+            [app(PermissionRegistrar::class)->teamsKey => getPermissionsTeamId()] : [];
 
         if ($model->exists) {
-            $this->roles()->sync($roles, false);
+            $currentRoles = $this->roles()->get()->map(fn ($role) => $role->getKey())->toArray();
+
+            $this->roles()->attach(array_diff($roles, $currentRoles), $teamPivot);
             $model->unsetRelation('roles');
         } else {
             $class = \get_class($model);
 
             $class::saved(
-                function ($object) use ($roles, $model) {
+                function ($object) use ($roles, $model, $teamPivot) {
                     if ($model->getKey() != $object->getKey()) {
                         return;
                     }
-                    $model->roles()->sync($roles, false);
+                    $model->roles()->attach($roles, $teamPivot);
                     $model->unsetRelation('roles');
                 }
             );
