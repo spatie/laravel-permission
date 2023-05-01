@@ -44,8 +44,7 @@ class PermissionServiceProvider extends ServiceProvider
             'permission'
         );
 
-        $this->callAfterResolving('blade.compiler', fn (BladeCompiler $bladeCompiler) => $this->registerBladeExtensions($bladeCompiler)
-        );
+        $this->callAfterResolving('blade.compiler', fn (BladeCompiler $bladeCompiler) => $this->registerBladeExtensions($bladeCompiler));
     }
 
     protected function offerPublishing(): void
