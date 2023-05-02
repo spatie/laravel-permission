@@ -137,7 +137,7 @@ trait HasRoles
             [app(PermissionRegistrar::class)->teamsKey => getPermissionsTeamId()] : [];
 
         if ($model->exists) {
-            $currentRoles = $this->roles()->get()->map(fn ($role) => $role->getKey())->toArray();
+            $currentRoles = $this->roles->map(fn ($role) => $role->getKey())->toArray();
 
             $this->roles()->attach(array_diff($roles, $currentRoles), $teamPivot);
             $model->unsetRelation('roles');
@@ -188,9 +188,11 @@ trait HasRoles
      */
     public function syncRoles(...$roles)
     {
-        $this->collectRoles($roles);
-
-        $this->roles()->detach();
+        if ($this->getModel()->exists) {
+            $this->collectRoles($roles);
+            $this->roles()->detach();
+            $this->setRelation('roles', collect());
+        }
 
         return $this->assignRole($roles);
     }

@@ -391,7 +391,7 @@ trait HasPermissions
             [app(PermissionRegistrar::class)->teamsKey => getPermissionsTeamId()] : [];
 
         if ($model->exists) {
-            $currentPermissions = $this->permissions()->get()->map(fn ($permission) => $permission->getKey())->toArray();
+            $currentPermissions = $this->permissions->map(fn ($permission) => $permission->getKey())->toArray();
 
             $this->permissions()->attach(array_diff($permissions, $currentPermissions), $teamPivot);
             $model->unsetRelation('permissions');
@@ -424,9 +424,11 @@ trait HasPermissions
      */
     public function syncPermissions(...$permissions)
     {
-        $this->collectPermissions($permissions);
-
-        $this->permissions()->detach();
+        if ($this->getModel()->exists) {
+            $this->collectPermissions($permissions);
+            $this->permissions()->detach();
+            $this->setRelation('permissions', collect());
+        }
 
         return $this->givePermissionTo($permissions);
     }
