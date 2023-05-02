@@ -2,8 +2,10 @@
 
 namespace Spatie\Permission\Tests;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\PermissionRegistrar;
+use Spatie\Permission\Tests\TestModels\Admin;
 use Spatie\Permission\Tests\TestModels\Permission;
 use Spatie\Permission\Tests\TestModels\User;
 
@@ -128,5 +130,24 @@ class HasPermissionsWithCustomModelsTest extends HasPermissionsTest
         $this->assertNull($permission);
         $this->assertEquals(0, DB::table(config('permission.table_names.role_has_permissions'))->where('permission_test_id', $permission_id)->count());
         $this->assertEquals(0, DB::table(config('permission.table_names.model_has_permissions'))->where('permission_test_id', $permission_id)->count());
+    }
+
+    /** @test */
+    public function it_should_touch_when_assigning_new_permissions()
+    {
+        Carbon::setTestNow('2021-07-19 10:13:14');
+
+        $user = Admin::create(['email' => 'user1@test.com']);
+        $permission1 = Permission::create(['name' => 'edit-news', 'guard_name' => 'admin']);
+        $permission2 = Permission::create(['name' => 'edit-blog', 'guard_name' => 'admin']);
+
+        $this->assertSame('2021-07-19 10:13:14', $permission1->updated_at->format('Y-m-d H:i:s'));
+
+        Carbon::setTestNow('2021-07-20 19:13:14');
+
+        $user->syncPermissions([$permission1->getKey(), $permission2->getKey()]);
+
+        $this->assertSame('2021-07-20 19:13:14', $permission1->refresh()->updated_at->format('Y-m-d H:i:s'));
+        $this->assertSame('2021-07-20 19:13:14', $permission2->refresh()->updated_at->format('Y-m-d H:i:s'));
     }
 }

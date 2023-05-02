@@ -573,6 +573,18 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    public function it_does_not_run_unnecessary_sqls_when_assigning_new_permissions()
+    {
+        $permission2 = app(Permission::class)->where('name', ['edit-news'])->first();
+
+        DB::enableQueryLog();
+        $this->testUser->syncPermissions($this->testUserPermission, $permission2);
+        DB::disableQueryLog();
+
+        $this->assertSame(3, count(DB::getQueryLog())); //avoid unnecessary sqls
+    }
+
+    /** @test */
     public function calling_givePermissionTo_before_saving_object_doesnt_interfere_with_other_objects()
     {
         $user = new User(['email' => 'test@user.com']);
@@ -591,7 +603,7 @@ class HasPermissionsTest extends TestCase
 
         $this->assertTrue($user2->fresh()->hasPermissionTo('edit-articles'));
         $this->assertFalse($user2->fresh()->hasPermissionTo('edit-news'));
-        $this->assertSame(3, count(DB::getQueryLog())); //avoid unnecessary sync
+        $this->assertSame(2, count(DB::getQueryLog())); //avoid unnecessary sync
     }
 
     /** @test */
@@ -613,7 +625,7 @@ class HasPermissionsTest extends TestCase
 
         $this->assertTrue($user2->fresh()->hasPermissionTo('edit-articles'));
         $this->assertFalse($user2->fresh()->hasPermissionTo('edit-news'));
-        $this->assertSame(3, count(DB::getQueryLog())); //avoid unnecessary sync
+        $this->assertSame(2, count(DB::getQueryLog())); //avoid unnecessary sync
     }
 
     /** @test */
