@@ -194,4 +194,21 @@ class RoleOrPermissionMiddlewareTest extends TestCase
 
         $this->assertStringEndsWith('Necessary roles or permissions are some-permission, some-role', $message);
     }
+
+    /** @test */
+    public function the_middleware_can_be_created_with_static_using_method()
+    {
+        $this->assertSame(
+            'Spatie\Permission\Middlewares\RoleOrPermissionMiddleware:edit-articles',
+            RoleOrPermissionMiddleware::using('edit-articles')
+        );
+        $this->assertEquals(
+            'Spatie\Permission\Middlewares\RoleOrPermissionMiddleware:edit-articles,my-guard',
+            RoleOrPermissionMiddleware::using('edit-articles', 'my-guard')
+        );
+        $this->assertEquals(
+            'Spatie\Permission\Middlewares\RoleOrPermissionMiddleware:edit-articles|testAdminRole',
+            RoleOrPermissionMiddleware::using(['edit-articles', 'testAdminRole'])
+        );
+    }
 }

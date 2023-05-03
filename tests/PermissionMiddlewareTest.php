@@ -254,4 +254,21 @@ class PermissionMiddlewareTest extends TestCase
             $this->runMiddleware($this->permissionMiddleware, 'admin-permission', 'admin')
         );
     }
+
+    /** @test */
+    public function the_middleware_can_be_created_with_static_using_method()
+    {
+        $this->assertSame(
+            'Spatie\Permission\Middlewares\PermissionMiddleware:edit-articles',
+            PermissionMiddleware::using('edit-articles')
+        );
+        $this->assertEquals(
+            'Spatie\Permission\Middlewares\PermissionMiddleware:edit-articles,my-guard',
+            PermissionMiddleware::using('edit-articles', 'my-guard')
+        );
+        $this->assertEquals(
+            'Spatie\Permission\Middlewares\PermissionMiddleware:edit-articles|edit-news',
+            PermissionMiddleware::using(['edit-articles', 'edit-news'])
+        );
+    }
 }
