@@ -32,4 +32,19 @@ class RoleMiddleware
 
         return $next($request);
     }
+
+    /**
+     * Specify the role and guard for the middleware.
+     *
+     * @param  array|string  $role
+     * @param  string|null  $guard
+     * @return string
+     */
+    public static function using($role, $guard = null)
+    {
+        $roleString = is_string($role) ? $role : implode('|', $role);
+        $args = is_null($guard) ? $roleString : "$roleString,$guard";
+
+        return static::class.':'.$args;
+    }
 }
