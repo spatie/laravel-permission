@@ -13,9 +13,18 @@ Route::group(['middleware' => ['can:publish articles']], function () {
 });
 ```
 
+In Laravel v10.9 and up, you can also call this middleware with a static method.
+
+```php
+Route::group(['middleware' => [\Illuminate\Auth\Middleware\Authorize::using('publish articles')]], function () {
+    //
+});
+```
+
 ## Package Middleware
 
-This package comes with `RoleMiddleware`, `PermissionMiddleware` and `RoleOrPermissionMiddleware` middleware. You can add them inside your `app/Http/Kernel.php` file.
+This package comes with `RoleMiddleware`, `PermissionMiddleware` and `RoleOrPermissionMiddleware` middleware.
+You can add them inside your `app/Http/Kernel.php` file to be able to use them through aliases.
 
 Note the property name difference between Laravel 10 and older versions of Laravel:
 
@@ -88,3 +97,22 @@ public function __construct()
 ```
 
 (You can use Laravel's Model Policy feature with your controller methods. See the Model Policies section of these docs.)
+
+## Use middleware static methods
+
+All of the middlewares can also be applied by calling the static `using` method,
+which accepts either a `|`-separated string or an array as input.
+
+```php
+Route::group(['middleware' => [\Spatie\Permission\Middlewares\RoleMiddleware::using('super-admin')]], function () {
+    //
+});
+
+Route::group(['middleware' => [\Spatie\Permission\Middlewares\PermissionMiddleware::using('publish articles|edit articles')]], function () {
+    //
+});
+
+Route::group(['middleware' => [\Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::using(['super-admin', 'edit articles'])]], function () {
+    //
+});
+```
