@@ -11,10 +11,10 @@ class WildcardPermission implements Wildcard
     /** @var string */
     public const WILDCARD_TOKEN = '*';
 
-    /** @var string */
+    /** @var non-empty-string */
     public const PART_DELIMITER = '.';
 
-    /** @var string */
+    /** @var non-empty-string */
     public const SUBPART_DELIMITER = ',';
 
     /** @var string */
