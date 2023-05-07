@@ -32,4 +32,19 @@ class PermissionMiddleware
 
         return $next($request);
     }
+
+    /**
+     * Specify the permission and guard for the middleware.
+     *
+     * @param  array|string  $permission
+     * @param  string|null  $guard
+     * @return string
+     */
+    public static function using($permission, $guard = null)
+    {
+        $permissionString = is_string($permission) ? $permission : implode('|', $permission);
+        $args = is_null($guard) ? $permissionString : "$permissionString,$guard";
+
+        return static::class.':'.$args;
+    }
 }

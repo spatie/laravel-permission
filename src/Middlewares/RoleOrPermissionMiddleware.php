@@ -31,4 +31,19 @@ class RoleOrPermissionMiddleware
 
         return $next($request);
     }
+
+    /**
+     * Specify the role or permission and guard for the middleware.
+     *
+     * @param  array|string  $roleOrPermission
+     * @param  string|null  $guard
+     * @return string
+     */
+    public static function using($roleOrPermission, $guard = null)
+    {
+        $roleOrPermissionString = is_string($roleOrPermission) ? $roleOrPermission : implode('|', $roleOrPermission);
+        $args = is_null($guard) ? $roleOrPermissionString : "$roleOrPermissionString,$guard";
+
+        return static::class.':'.$args;
+    }
 }

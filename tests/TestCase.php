@@ -243,15 +243,15 @@ abstract class TestCase extends Orchestra
         return last($router->getRoutes()->get())->middleware();
     }
 
-     public function getRouter()
-     {
-         return app('router');
-     }
+    public function getRouter()
+    {
+        return app('router');
+    }
 
-     public function getRouteResponse()
-     {
-         return function () {
-             return (new Response())->setContent('<html></html>');
-         };
-     }
+    public function getRouteResponse()
+    {
+        return function () {
+            return (new Response())->setContent('<html></html>');
+        };
+    }
 }
