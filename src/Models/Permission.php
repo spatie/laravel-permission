@@ -34,6 +34,11 @@ class Permission extends Model implements PermissionContract
         $this->table = config('permission.table_names.permissions') ?: parent::getTable();
     }
 
+    /**
+     * @return PermissionContract|Permission
+     *
+     * @throws PermissionAlreadyExists
+     */
     public static function create(array $attributes = [])
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? Guard::getDefaultName(static::class);
@@ -78,6 +83,7 @@ class Permission extends Model implements PermissionContract
      * Find a permission by its name (and optionally guardName).
      *
      * @param  string|null  $guardName
+     * @return PermissionContract|Permission
      *
      * @throws PermissionDoesNotExist
      */
@@ -97,6 +103,7 @@ class Permission extends Model implements PermissionContract
      *
      * @param  int|string  $id
      * @param  string|null  $guardName
+     * @return PermissionContract|Permission
      *
      * @throws PermissionDoesNotExist
      */
@@ -116,6 +123,7 @@ class Permission extends Model implements PermissionContract
      * Find or create permission by its name (and optionally guardName).
      *
      * @param  string|null  $guardName
+     * @return PermissionContract|Permission
      */
     public static function findOrCreate(string $name, $guardName = null): PermissionContract
     {
@@ -141,6 +149,8 @@ class Permission extends Model implements PermissionContract
 
     /**
      * Get the current cached first permission.
+     *
+     * @return PermissionContract|Permission|null
      */
     protected static function getPermission(array $params = []): ?PermissionContract
     {
