@@ -35,6 +35,11 @@ class Role extends Model implements RoleContract
         $this->table = config('permission.table_names.roles') ?: parent::getTable();
     }
 
+    /**
+     * @return RoleContract|Role
+     *
+     * @throws RoleAlreadyExists
+     */
     public static function create(array $attributes = [])
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? Guard::getDefaultName(static::class);
@@ -143,7 +148,12 @@ class Role extends Model implements RoleContract
         return $role;
     }
 
-    protected static function findByParam(array $params = [])
+    /**
+     * Finds a role based on an array of parameters.
+     *
+     * @return RoleContract|Role|null
+     */
+    protected static function findByParam(array $params = []): ?RoleContract
     {
         $query = static::query();
 
