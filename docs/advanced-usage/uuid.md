@@ -24,40 +24,50 @@ OPTIONAL: If you also want the roles and permissions to use a UUID for their `id
 
 ```diff
     Schema::create($tableNames['permissions'], function (Blueprint $table) {
--        $table->bigIncrements('id');
-+        $table->uuid('id');
+-        $table->bigIncrements('id'); // permission id
++        $table->uuid('id')->primary()->unique(); // permission id
         $table->string('name');
         $table->string('guard_name');
         $table->timestamps();
 
-+        $table->primary('id');
+        $table->unique(['name', 'guard_name']);
     });
 
     Schema::create($tableNames['roles'], function (Blueprint $table) {
--        $table->bigIncrements('id');
-+        $table->uuid('id');
-        $table->string('name');
-        $table->string('guard_name');
+-        $table->bigIncrements('id'); // role id
++        $table->uuid('id')->primary()->unique(); // role id
+        if ($teams || config('permission.testing')) { // permission.testing is a fix for sqlite testing
+            $table->unsignedBigInteger($columnNames['team_foreign_key'])->nullable();
+            $table->index($columnNames['team_foreign_key'], 'roles_team_foreign_key_index');
+        }
+        $table->string('name');       // For MySQL 8.0 use string('name', 125);
+        $table->string('guard_name'); // For MySQL 8.0 use string('guard_name', 125);
         $table->timestamps();
-
-+        $table->primary('id');
-    });
+        if ($teams || config('permission.testing')) {
+            $table->unique([$columnNames['team_foreign_key'], 'name', 'guard_name']);
+        } else {
+            $table->unique(['name', 'guard_name']);
+        }
+});
 
     Schema::create($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames, $columnNames) {
--        $table->bigIncrements('permission_id');
-+        $table->uuid('permission_id');
+-        $table->unsignedBigInteger(PermissionRegistrar::$pivotPermission);
++        $table->uuid(PermissionRegistrar::$pivotPermission);
     ...
 
     Schema::create($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames, $columnNames) {
--        $table->bigIncrements('role_id');
-+        $table->uuid('role_id');
+-        $table->unsignedBigInteger(PermissionRegistrar::$pivotRole);
++        $table->uuid(PermissionRegistrar::$pivotRole);
+        $table->string('model_type');
+-       $table->unsignedBigInteger($columnNames['model_morph_key']);
++       $table->uuid($columnNames['model_morph_key']);
     ...
 
     Schema::create($tableNames['role_has_permissions'], function (Blueprint $table) use ($tableNames) {
--        $table->bigIncrements('permission_id');
--        $table->bigIncrements('role_id');
-+        $table->uuid('permission_id');
-+        $table->uuid('role_id');
+-        $table->unsignedBigInteger(PermissionRegistrar::$pivotPermission);
+-        $table->unsignedBigInteger(PermissionRegistrar::$pivotRole);
++        $table->uuid(PermissionRegistrar::$pivotPermission);
++        $table->uuid(PermissionRegistrar::$pivotRole);
 ```
 
 
@@ -66,17 +76,25 @@ You might want to change the pivot table field name from `model_id` to `model_uu
 For this, in the configuration file edit `column_names.model_morph_key`:
 
 - OPTIONAL: Change to `model_uuid` instead of the default `model_id`. (The default of `model_id` is shown in this snippet below. Change it to match your needs.)
-
+```diff
         'column_names' => [    
-            /*
-             * Change this if you want to name the related model primary key other than
-             * `model_id`.
-             *
-             * For example, this would be nice if your primary keys are all UUIDs. In
-             * that case, name this `model_uuid`.
-             */
-            'model_morph_key' => 'model_id',
+        /*
+         * Change this if you want to name the related pivots other than defaults
+         */
+        'role_pivot_key' => null, //default 'role_id',
+        'permission_pivot_key' => null, //default 'permission_id',
+
+        /*
+         * Change this if you want to name the related model primary key other than
+         * `model_id`.
+         *
+         * For example, this would be nice if your primary keys are all UUIDs. In
+         * that case, name this `model_uuid`.
+         */
+-            'model_morph_key' => 'model_id',
++            'model_morph_key' => 'model_uuid',
         ],
+```
 - If you extend the models into your app, be sure to list those models in your configuration file. See the Extending section of the documentation and the Models section below.
 
 ## Models
@@ -85,6 +103,83 @@ If you want all the role/permission objects to have a UUID instead of an integer
 - You likely want to set `protected $keyType = 'string';` so Laravel handles joins as strings and doesn't cast to integer.
 - OPTIONAL: If you changed the field name in your migrations, you must set `protected $primaryKey = 'uuid';` to match.
 - Usually for UUID you will also set `public $incrementing = false;`. Remove it if it causes problems for you.
+
+Examples:
+
+Create new models:
+```bash
+php artisan make:model Role
+php artisan make:model Permission
+```
+
+`App\Model\Role.php`
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Permission\Models\Role as SpatieRole;
+
+class Role extends SpatieRole
+{
+    use HasFactory, HasUuids;
+    protected $primaryKey = 'id';
+    protected $keyType = 'string';
+    public $incrementing = false;
+}
+```
+
+`App\Model\Permission.php`
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Permission\Models\Permission as SpatiePermission;
+
+class Permission extends SpatiePermission
+{
+    use HasFactory, HasUuids;
+    protected $primaryKey = 'id';
+    protected $keyType = 'string';
+    public $incrementing = false;
+}
+```
+And edit `config/permission.php`
+```diff
+    'models' => [
+
+        /*
+         * When using the "HasPermissions" trait from this package, we need to know which
+         * Eloquent model should be used to retrieve your permissions. Of course, it
+         * is often just the "Permission" model but you may use whatever you like.
+         *
+         * The model you want to use as a Permission model needs to implement the
+         * `Spatie\Permission\Contracts\Permission` contract.
+         */
+
+-        'permission' => Spatie\Permission\Models\Permission::class
++        'permission' => App\Models\Permission::class,
+
+        /*
+         * When using the "HasRoles" trait from this package, we need to know which
+         * Eloquent model should be used to retrieve your roles. Of course, it
+         * is often just the "Role" model but you may use whatever you like.
+         *
+         * The model you want to use as a Role model needs to implement the
+         * `Spatie\Permission\Contracts\Role` contract.
+         */
+
+-        'role' => Spatie\Permission\Models\Role::class,
++        'role' => App\Models\Role::class,
+
+    ],
+```
+
 
 It is common to use a trait to handle the $keyType and $incrementing settings, as well as add a boot event trigger to ensure new records are assigned a uuid. You would `use` this trait in your User and extended Role/Permission models. An example `UuidTrait` is shown here for inspiration. Adjust to suit your needs.
 
