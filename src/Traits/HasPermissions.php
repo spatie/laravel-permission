@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Contracts\Wildcard;
@@ -13,6 +14,7 @@ use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Exceptions\WildcardPermissionInvalidArgument;
 use Spatie\Permission\Exceptions\WildcardPermissionNotImplementsContract;
+use Spatie\Permission\Exceptions\WildcardPermissionNotProperlyFormatted;
 use Spatie\Permission\Guard;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\WildcardPermission;
@@ -22,6 +24,8 @@ trait HasPermissions
     private ?string $permissionClass = null;
 
     private ?string $wildcardClass = null;
+
+    private array $wildcardPermissionsIndex;
 
     public static function bootHasPermissions()
     {
@@ -226,21 +230,92 @@ trait HasPermissions
             throw WildcardPermissionInvalidArgument::create();
         }
 
-        $WildcardPermissionClass = $this->getWildcardClass();
+        $index = $this->getWildcardPermissionsIndex();
 
-        foreach ($this->getAllPermissions() as $userPermission) {
-            if ($guardName !== $userPermission->guard_name) {
-                continue;
-            }
+        if (! array_key_exists($guardName, $index)) {
+            return false;
+        }
 
-            $userPermission = new $WildcardPermissionClass($userPermission->name);
+        $permission = explode(WildcardPermission::PART_DELIMITER, $permission);
 
-            if ($userPermission->implies($permission)) {
-                return true;
-            }
+        return $this->checkWildcardPermissionInIndex($permission, $index[$guardName]);
+    }
+
+    protected function checkWildcardPermissionInIndex(array $permission, array $index): bool
+    {
+        if (empty($permission)) {
+            return $index[null] ?? false;
+        }
+
+        $firstPermission = array_shift($permission);
+
+        if (array_key_exists($firstPermission, $index)) {
+            return $this->checkWildcardPermissionInIndex($permission, $index[$firstPermission]);
+        }
+
+        if (array_key_exists(WildcardPermission::WILDCARD_TOKEN, $index)) {
+            return $this->checkWildcardPermissionInIndex($permission, $index[WildcardPermission::WILDCARD_TOKEN]);
         }
 
         return false;
+    }
+
+    protected function getWildcardPermissionsIndex(): array
+    {
+        if (isset($this->wildcardPermissionsIndex)) {
+            return $this->wildcardPermissionsIndex;
+        }
+
+        $index = [];
+
+        foreach ($this->getAllPermissions() as $permission) {
+            $index[$permission->guard_name] = $this->buildWildcardPermissionIndex(
+                $index[$permission->guard_name] ?? [],
+                explode(WildcardPermission::PART_DELIMITER, $permission->name),
+                $permission->name,
+            );
+        }
+
+        return $this->wildcardPermissionsIndex = $index;
+    }
+
+    protected function buildWildcardPermissionIndex(array $index, array $parts, string $permission): array
+    {
+        if (empty($parts)) {
+            $index[null] = true;
+
+            return $index;
+        }
+
+        $part = array_shift($parts);
+
+        if (blank($part)) {
+            throw WildcardPermissionNotProperlyFormatted::create($permission);
+        }
+
+        if (! Str::contains($part, WildcardPermission::SUBPART_DELIMITER)) {
+            $index[$part] = $this->buildWildcardPermissionIndex(
+                $index[$part] ?? [],
+                $parts,
+                $permission,
+            );
+        }
+
+        $subParts = explode(WildcardPermission::SUBPART_DELIMITER, $part);
+
+        foreach ($subParts as $subPart) {
+            if (blank($subPart)) {
+                throw WildcardPermissionNotProperlyFormatted::create($permission);
+            }
+
+            $index[$subPart] = $this->buildWildcardPermissionIndex(
+                $index[$subPart] ?? [],
+                $parts,
+                $permission,
+            );
+        }
+
+        return $index;
     }
 
     /**
