@@ -8,8 +8,11 @@ use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
+use Spatie\Permission\Exceptions\WildcardPermissionNotProperlyFormatted;
 
 class PermissionRegistrar
 {
@@ -45,6 +48,8 @@ class PermissionRegistrar
     private array $alias = [];
 
     private array $except = [];
+
+    private array $wildcardPermissionsIndex = [];
 
     /**
      * PermissionRegistrar constructor.
@@ -134,8 +139,20 @@ class PermissionRegistrar
     public function forgetCachedPermissions()
     {
         $this->permissions = null;
+        $this->forgetWildcardPermissionIndex();
 
         return $this->cache->forget($this->cacheKey);
+    }
+
+    public function forgetWildcardPermissionIndex(?Model $record = null): void
+    {
+        if ($record) {
+            unset($this->wildcardPermissionsIndex[get_class($record)][$record->getKey()]);
+
+            return;
+        }
+
+        $this->wildcardPermissionsIndex = [];
     }
 
     /**
@@ -146,6 +163,15 @@ class PermissionRegistrar
     public function clearPermissionsCollection(): void
     {
         $this->permissions = null;
+    }
+
+    public function getWildcardPermissionIndex(Model $record): array
+    {
+        if (isset($this->wildcardPermissionsIndex[get_class($record)][$record->getKey()])) {
+            return $this->wildcardPermissionsIndex[get_class($record)][$record->getKey()];
+        }
+
+        return $this->wildcardPermissionsIndex[get_class($record)][$record->getKey()] = app($record->getWildcardClass(), ['record' => $record])->getIndex();
     }
 
     /**

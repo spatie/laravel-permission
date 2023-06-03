@@ -18,6 +18,7 @@ use Spatie\Permission\Exceptions\WildcardPermissionNotProperlyFormatted;
 use Spatie\Permission\Guard;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\WildcardPermission;
+use Spatie\Permission\WildcardPermissionIndexChecker;
 
 trait HasPermissions
 {
@@ -55,7 +56,7 @@ trait HasPermissions
         return $this->permissionClass;
     }
 
-    protected function getWildcardClass()
+    public function getWildcardClass()
     {
         if (! is_null($this->wildcardClass)) {
             return $this->wildcardClass;
@@ -230,101 +231,11 @@ trait HasPermissions
             throw WildcardPermissionInvalidArgument::create();
         }
 
-        $index = $this->getWildcardPermissionsIndex();
-
-        if (! array_key_exists($guardName, $index)) {
-            return false;
-        }
-
-        $permission = explode(WildcardPermission::PART_DELIMITER, $permission);
-
-        return $this->checkWildcardPermissionInIndex($permission, $index[$guardName]);
-    }
-
-    protected function checkWildcardPermissionInIndex(array $permission, array $index, ?string $parentPermission = null): bool
-    {
-        if (empty($permission)) {
-            return $index[null] ?? false;
-        }
-
-        $firstPermission = array_shift($permission);
-
-        if (array_key_exists($firstPermission, $index)) {
-            return $this->checkWildcardPermissionInIndex($permission, $index[$firstPermission], $firstPermission);
-        }
-
-        if (array_key_exists(WildcardPermission::WILDCARD_TOKEN, $index)) {
-            return $this->checkWildcardPermissionInIndex($permission, $index[WildcardPermission::WILDCARD_TOKEN], WildcardPermission::WILDCARD_TOKEN);
-        }
-
-        // Capture multiple parts of the permission in one wildcard if it falls last.
-        // For example, `foo.*` matches `foo.bar` and `foo.bar.baz`.
-        if (
-            ($parentPermission === WildcardPermission::WILDCARD_TOKEN) &&
-            empty($permission)
-        ) {
-            return $index[null] ?? false;
-        }
-
-        return false;
-    }
-
-    protected function getWildcardPermissionsIndex(): array
-    {
-        if (isset($this->wildcardPermissionsIndex)) {
-            return $this->wildcardPermissionsIndex;
-        }
-
-        $index = [];
-
-        foreach ($this->getAllPermissions() as $permission) {
-            $index[$permission->guard_name] = $this->buildWildcardPermissionIndex(
-                $index[$permission->guard_name] ?? [],
-                explode(WildcardPermission::PART_DELIMITER, $permission->name),
-                $permission->name,
-            );
-        }
-
-        return $this->wildcardPermissionsIndex = $index;
-    }
-
-    protected function buildWildcardPermissionIndex(array $index, array $parts, string $permission): array
-    {
-        if (empty($parts)) {
-            $index[null] = true;
-
-            return $index;
-        }
-
-        $part = array_shift($parts);
-
-        if (blank($part)) {
-            throw WildcardPermissionNotProperlyFormatted::create($permission);
-        }
-
-        if (! Str::contains($part, WildcardPermission::SUBPART_DELIMITER)) {
-            $index[$part] = $this->buildWildcardPermissionIndex(
-                $index[$part] ?? [],
-                $parts,
-                $permission,
-            );
-        }
-
-        $subParts = explode(WildcardPermission::SUBPART_DELIMITER, $part);
-
-        foreach ($subParts as $subPart) {
-            if (blank($subPart)) {
-                throw WildcardPermissionNotProperlyFormatted::create($permission);
-            }
-
-            $index[$subPart] = $this->buildWildcardPermissionIndex(
-                $index[$subPart] ?? [],
-                $parts,
-                $permission,
-            );
-        }
-
-        return $index;
+        return app($this->getWildcardClass(), ['record' => $this])->implies(
+            $permission,
+            $guardName,
+            app(PermissionRegistrar::class)->getWildcardPermissionIndex($this),
+        );
     }
 
     /**
@@ -497,7 +408,16 @@ trait HasPermissions
             $this->forgetCachedPermissions();
         }
 
+        $this->forgetWildcardPermissionIndex();
+
         return $this;
+    }
+
+    public function forgetWildcardPermissionIndex(): void
+    {
+        app(PermissionRegistrar::class)->forgetWildcardPermissionIndex(
+            is_a($this, Role::class) ? null : $this,
+        );
     }
 
     /**
@@ -530,6 +450,8 @@ trait HasPermissions
         if (is_a($this, Role::class)) {
             $this->forgetCachedPermissions();
         }
+
+        $this->forgetWildcardPermissionIndex();
 
         $this->unsetRelation('permissions');
 
