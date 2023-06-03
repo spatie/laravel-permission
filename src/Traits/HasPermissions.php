@@ -241,7 +241,7 @@ trait HasPermissions
         return $this->checkWildcardPermissionInIndex($permission, $index[$guardName]);
     }
 
-    protected function checkWildcardPermissionInIndex(array $permission, array $index): bool
+    protected function checkWildcardPermissionInIndex(array $permission, array $index, ?string $parentPermission = null): bool
     {
         if (empty($permission)) {
             return $index[null] ?? false;
@@ -250,11 +250,20 @@ trait HasPermissions
         $firstPermission = array_shift($permission);
 
         if (array_key_exists($firstPermission, $index)) {
-            return $this->checkWildcardPermissionInIndex($permission, $index[$firstPermission]);
+            return $this->checkWildcardPermissionInIndex($permission, $index[$firstPermission], $firstPermission);
         }
 
         if (array_key_exists(WildcardPermission::WILDCARD_TOKEN, $index)) {
-            return $this->checkWildcardPermissionInIndex($permission, $index[WildcardPermission::WILDCARD_TOKEN]);
+            return $this->checkWildcardPermissionInIndex($permission, $index[WildcardPermission::WILDCARD_TOKEN], WildcardPermission::WILDCARD_TOKEN);
+        }
+
+        // Capture multiple parts of the permission in one wildcard if it falls last.
+        // For example, `foo.*` matches `foo.bar` and `foo.bar.baz`.
+        if (
+            ($parentPermission === WildcardPermission::WILDCARD_TOKEN) &&
+            empty($permission)
+        ) {
+            return $index[null] ?? false;
         }
 
         return false;
