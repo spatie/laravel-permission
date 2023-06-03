@@ -93,7 +93,7 @@ class WildcardPermission implements Wildcard
 
     protected function checkIndex(array $permission, array $index): bool
     {
-        if (array_key_exists(null, $index)) {
+        if (array_key_exists(strval(null), $index)) {
             return true;
         }
 
