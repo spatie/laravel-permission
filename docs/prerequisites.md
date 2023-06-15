@@ -7,6 +7,10 @@ weight: 3
 
 This package can be used in Laravel 6 or higher. Check the "Installing on Laravel" page for package versions compatible with various Laravel versions.
 
+## Database with foreign-key relationship capability
+
+This package depends on cascading delete rules to enforce database integrity, so foreign-key support is required by your database engine.
+
 ## User Model / Contract/Interface
 
 This package uses Laravel's Gate layer to provide Authorization capabilities.
