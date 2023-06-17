@@ -7,10 +7,6 @@ weight: 3
 
 This package can be used in Laravel 6 or higher. Check the "Installing on Laravel" page for package versions compatible with various Laravel versions.
 
-## Database with foreign-key relationship capability
-
-This package depends on cascading delete rules to enforce database integrity, so foreign-key support is required by your database engine.
-
 ## User Model / Contract/Interface
 
 This package uses Laravel's Gate layer to provide Authorization capabilities.
@@ -55,3 +51,8 @@ Thus in your AppServiceProvider you will need to set `Schema::defaultStringLengt
 
 This package expects the primary key of your `User` model to be an auto-incrementing `int`. If it is not, you may need to modify the `create_permission_tables` migration and/or modify the default configuration. See [https://spatie.be/docs/laravel-permission/advanced-usage/uuid](https://spatie.be/docs/laravel-permission/advanced-usage/uuid) for more information. 
 
+## Database foreign-key relationship support
+
+To enforce database integrity, this package uses foreign-key relationships with cascading deletes. This prevents data mismatch situations if database records are manipulated outside of this package. If your database engine does not support foreign-key relationships, then you will have to alter the migration files accordingly.
+
+This package does its own detaching of pivot records when deletes are called using provided package methods, so if your database does not support foreign keys then as long as you only use method calls provided by this package for managing related records, there should not be data integrity issues.
