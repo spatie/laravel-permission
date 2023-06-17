@@ -9,10 +9,8 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
-use Spatie\Permission\Exceptions\WildcardPermissionNotProperlyFormatted;
 
 class PermissionRegistrar
 {
