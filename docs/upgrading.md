@@ -35,11 +35,13 @@ Be sure to compare your custom models with originals to see what else may have c
 2. If you have a custom Role model and (in the rare case that you might) have overridden the `hasPermissionTo()` method in it, you will need to update its method signature to `hasPermissionTo($permission, $guardName = null):bool`. See PR #2380.
 
 3. Migrations will need to be upgraded. (They have been updated to anonymous-class syntax that was introduced in Laravel 8, AND some structural coding changes in the registrar class changed the way we extracted configuration settings in the migration files.) If you had not customized it from the original then replacing the contents of the file should be straightforward. Usually the only customization is if you've switched to UUIDs or customized MySQL index name lengths. 
-If you get the following error, it means your migration file needs upgrading: `Error: Access to undeclared static property Spatie\Permission\PermissionRegistrar::$pivotPermission`
+**If you get the following error, it means your migration file needs upgrading: `Error: Access to undeclared static property Spatie\Permission\PermissionRegistrar::$pivotPermission`**
 
 4. NOTE: For consistency with `PermissionMiddleware`, the `RoleOrPermissionMiddleware` has switched from only checking permissions provided by this package to using `canAny()` to check against any abilities registered by your application. This may have the effect of granting those other abilities (such as Super Admin) when using the `RoleOrPermissionMiddleware`, which previously would have failed silently.
 
-5. Test suites. If you have tests which manually clear the permission cache and re-register permissions, you no longer need to call `\Spatie\Permission\PermissionRegistrar::class)->registerPermissions();`. Such calls MUST be deleted from your tests.
+5. In the unlikely event that you have customized the Wildcard Permissions feature by extending the `WildcardPermission` model, please note that the public interface has changed and you will need to update your extended model with the new method signatures.
+
+6. Test suites. If you have tests which manually clear the permission cache and re-register permissions, you no longer need to call `\Spatie\Permission\PermissionRegistrar::class)->registerPermissions();`. Such calls MUST be deleted from your tests.
 
 
 ## Upgrading from v4 to v5
