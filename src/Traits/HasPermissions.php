@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Contracts\Wildcard;
@@ -13,15 +14,19 @@ use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Exceptions\WildcardPermissionInvalidArgument;
 use Spatie\Permission\Exceptions\WildcardPermissionNotImplementsContract;
+use Spatie\Permission\Exceptions\WildcardPermissionNotProperlyFormatted;
 use Spatie\Permission\Guard;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\WildcardPermission;
+use Spatie\Permission\WildcardPermissionIndexChecker;
 
 trait HasPermissions
 {
     private ?string $permissionClass = null;
 
     private ?string $wildcardClass = null;
+
+    private array $wildcardPermissionsIndex;
 
     public static function bootHasPermissions()
     {
@@ -51,7 +56,7 @@ trait HasPermissions
         return $this->permissionClass;
     }
 
-    protected function getWildcardClass()
+    public function getWildcardClass()
     {
         if (! is_null($this->wildcardClass)) {
             return $this->wildcardClass;
@@ -226,21 +231,11 @@ trait HasPermissions
             throw WildcardPermissionInvalidArgument::create();
         }
 
-        $WildcardPermissionClass = $this->getWildcardClass();
-
-        foreach ($this->getAllPermissions() as $userPermission) {
-            if ($guardName !== $userPermission->guard_name) {
-                continue;
-            }
-
-            $userPermission = new $WildcardPermissionClass($userPermission->name);
-
-            if ($userPermission->implies($permission)) {
-                return true;
-            }
-        }
-
-        return false;
+        return app($this->getWildcardClass(), ['record' => $this])->implies(
+            $permission,
+            $guardName,
+            app(PermissionRegistrar::class)->getWildcardPermissionIndex($this),
+        );
     }
 
     /**
@@ -413,7 +408,16 @@ trait HasPermissions
             $this->forgetCachedPermissions();
         }
 
+        $this->forgetWildcardPermissionIndex();
+
         return $this;
+    }
+
+    public function forgetWildcardPermissionIndex(): void
+    {
+        app(PermissionRegistrar::class)->forgetWildcardPermissionIndex(
+            is_a($this, Role::class) ? null : $this,
+        );
     }
 
     /**
@@ -446,6 +450,8 @@ trait HasPermissions
         if (is_a($this, Role::class)) {
             $this->forgetCachedPermissions();
         }
+
+        $this->forgetWildcardPermissionIndex();
 
         $this->unsetRelation('permissions');
 
