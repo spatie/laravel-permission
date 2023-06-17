@@ -15,3 +15,6 @@ parameters:
 
     ignoreErrors:
         - '#Unsafe usage of new static#'
+        # wildcard permissions:
+        - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::getWildcardClass#'
+        - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::getAllPermissions#'
