@@ -153,16 +153,6 @@ class PermissionRegistrar
         $this->wildcardPermissionsIndex = [];
     }
 
-    /**
-     * Clear already loaded permissions collection.
-     * This is only intended to be called by the PermissionServiceProvider on boot,
-     * so that long-running instances like Swoole don't keep old data in memory.
-     */
-    public function clearPermissionsCollection(): void
-    {
-        $this->permissions = null;
-    }
-
     public function getWildcardPermissionIndex(Model $record): array
     {
         if (isset($this->wildcardPermissionsIndex[get_class($record)][$record->getKey()])) {
@@ -170,6 +160,16 @@ class PermissionRegistrar
         }
 
         return $this->wildcardPermissionsIndex[get_class($record)][$record->getKey()] = app($record->getWildcardClass(), ['record' => $record])->getIndex();
+    }
+
+    /**
+     * Clear already-loaded permissions collection.
+     * This is only intended to be called by the PermissionServiceProvider on boot,
+     * so that long-running instances like Octane or Swoole don't keep old data in memory.
+     */
+    public function clearPermissionsCollection(): void
+    {
+        $this->permissions = null;
     }
 
     /**
