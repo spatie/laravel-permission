@@ -1,12 +1,13 @@
 {
-    "name": "spatie/laravel-permission",
-    "description": "Permission handling for Laravel 8.0 and up",
+    "name": "msr/laravel-permission-block",
+    "description": "assign and block Permission handling for Laravel 8.0 and up",
     "license": "MIT",
     "keywords": [
-        "spatie",
+        "msr",
         "laravel",
         "permission",
         "permissions",
+        "block-permissions",
         "roles",
         "acl",
         "rbac",
@@ -14,13 +15,12 @@
     ],
     "authors": [
         {
-            "name": "Freek Van der Herten",
-            "email": "freek@spatie.be",
-            "homepage": "https://spatie.be",
+            "name": "Mahdi",
+            "email": "mahdi.msr4@gmail.com",
             "role": "Developer"
         }
     ],
-    "homepage": "https://github.com/spatie/laravel-permission",
+    "homepage": "https://github.com/mahdimsr/laravel-permission-block",
     "require": {
         "php": "^7.4|^8.0",
         "illuminate/auth": "^8.0|^9.0|^10.0",
