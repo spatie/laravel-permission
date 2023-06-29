@@ -46,6 +46,7 @@ abstract class TestCase extends Orchestra
     protected static $migration;
 
     protected static $customMigration;
+    protected static $blockedTableMigration;
 
     protected function setUp(): void
     {
@@ -144,6 +145,8 @@ abstract class TestCase extends Orchestra
             $this->createCacheTable();
         }
 
+        self::$blockedTableMigration->up();
+
         if (! $this->useCustomModels) {
             self::$migration->up();
         } else {
@@ -198,6 +201,7 @@ abstract class TestCase extends Orchestra
         self::$migration = require __DIR__.'/../database/migrations/create_permission_tables.php.stub';
 
         self::$customMigration = require __DIR__.'/CreatePermissionCustomTables.php';
+        self::$blockedTableMigration = require __DIR__.'/CreateModelHasBlockedPermissionsTable.php';
     }
 
     protected function reloadPermissions()
