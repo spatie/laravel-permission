@@ -8,10 +8,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        $columnNames = config('permission.column_names');
-        $pivotPermission = $columnNames['permission_pivot_key'] ?? 'permission_id';
+        $tableName = config('permission.table_names.model_has_blocked_permissions') ?? 'model_has_blocked_permissions';
 
-        Schema::create('model_has_blocked_permissions', function (Blueprint $table) use ($pivotPermission){
+        Schema::create($tableName, function (Blueprint $table) {
             $table->bigIncrements('permission_test_id');
             $table->morphs('model');
         });
@@ -19,6 +18,8 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::drop('model_has_blocked_permissions');
+        $tableName = config('permission.table_names.model_has_blocked_permissions') ?? 'model_has_blocked_permissions';
+
+        Schema::drop($tableName);
     }
 };
