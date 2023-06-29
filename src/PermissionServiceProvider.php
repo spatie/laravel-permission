@@ -64,6 +64,7 @@ class PermissionServiceProvider extends ServiceProvider
 
         $this->publishes([
             __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->getMigrationFileName('create_permission_tables.php'),
+            __DIR__.'/../database/migrations/create_blocked_permissions_tables.php.stub' => $this->getMigrationFileName('create_blocked_permissions_table.php'),
         ], 'permission-migrations');
     }
 
