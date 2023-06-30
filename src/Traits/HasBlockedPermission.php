@@ -24,7 +24,14 @@ trait HasBlockedPermission
     {
         $permissionsArray = $this->collectPermissions($permissions);
 
-        $this->blockedPermissions()->sync($permissionsArray);
+        $this->blockedPermissions()->attach($permissionsArray);
+    }
+
+    public function unblockFromPermission($permission): void
+    {
+        $this->blockedPermissions()->detach($this->getStoredPermission($permission));
+
+        $this->unsetRelation('blockedPermissions');
     }
 
     public function hasBlockFromPermission($permission): bool

@@ -43,4 +43,18 @@ class HasBlockedPermissionTest extends TestCase
 
         $this->assertTrue($this->testUser->hasBlockFromAnyPermission(['edit-articles', 'edit-news']));
     }
+
+    /**
+     * @test
+     */
+    public function it_unblock_user_from_permission()
+    {
+        $this->testUser->blockFromPermission($this->testUserPermission);
+
+        $this->assertTrue($this->testUser->hasBlockFromPermission($this->testUserPermission));
+
+        $this->testUser->unblockFromPermission($this->testUserPermission);
+
+        $this->assertFalse($this->testUser->hasBlockFromPermission($this->testUserPermission));
+    }
 }
