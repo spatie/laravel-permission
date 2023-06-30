@@ -54,7 +54,7 @@ trait HasBlockedPermission
         return false;
     }
 
-    public function checkPermissionBlocked($permission): bool
+    private function checkPermissionBlocked($permission): bool
     {
         try {
             return $this->hasBlockFromPermission($permission);
