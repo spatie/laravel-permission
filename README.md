@@ -9,10 +9,17 @@ In additional main package, this package allows you to block user from permissio
 Once installed you can do stuff like this:
 
 ```php
+$user->blockedPermissions // all permissions are blocked for user
+
 // Block user from permission
 $user->blockFromPermission('edit articles');
+$user->blockFromPermission(['edit articles','view post']);
 
 $user->hasBlockFromPermission('edit articles');
+
+$user->hasBlockFromAnyPermission(['edit article','view post']) // return true if any of passing permissions array are blocked
+
+$user->unblockFromPermission('view post')
 ```
 
 in main repo all permissions will be registered on [Laravel's gate](https://laravel.com/docs/authorization), you can check if a user has a permission with Laravel's default `can` function, but it not checking the blocked permissions.
