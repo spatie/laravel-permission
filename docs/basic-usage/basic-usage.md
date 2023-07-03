@@ -3,6 +3,7 @@ title: Basic Usage
 weight: 1
 ---
 
+## Add The Trait
 First, add the `Spatie\Permission\Traits\HasRoles` trait to your `User` model(s):
 
 ```php
@@ -17,6 +18,7 @@ class User extends Authenticatable
 }
 ```
 
+## Create A Permission
 This package allows for users to be associated with permissions and roles. Every role is associated with multiple permissions.
 A `Role` and a `Permission` are regular Eloquent models. They require a `name` and can be created like this:
 
@@ -28,7 +30,7 @@ $role = Role::create(['name' => 'writer']);
 $permission = Permission::create(['name' => 'edit articles']);
 ```
 
-
+## Assign A Permission To A Role
 A permission can be assigned to a role using either of these methods:
 
 ```php
@@ -36,6 +38,7 @@ $role->givePermissionTo($permission);
 $permission->assignRole($role);
 ```
 
+## Sync Permissions To A Role
 Multiple permissions can be synced to a role using either of these methods:
 
 ```php
@@ -43,6 +46,7 @@ $role->syncPermissions($permissions);
 $permission->syncRoles($roles);
 ```
 
+## Remove Permission From A Role
 A permission can be removed from a role using either of these methods:
 
 ```php
@@ -50,8 +54,10 @@ $role->revokePermissionTo($permission);
 $permission->removeRole($role);
 ```
 
+## Guard Name
 If you're using multiple guards then the `guard_name` attribute must be set as well. Read about it in the [using multiple guards](./multiple-guards) section of the readme.
 
+## Get Permissions For A User
 The `HasRoles` trait adds Eloquent relationships to your models, which can be accessed directly or used as a base query:
 
 ```php
@@ -68,6 +74,7 @@ $permissions = $user->getAllPermissions();
 $roles = $user->getRoleNames(); // Returns a collection
 ```
 
+## Scopes
 The `HasRoles` trait also adds a `role` scope to your models to scope the query to certain roles or permissions:
 
 ```php
@@ -85,7 +92,7 @@ $users = User::permission('edit articles')->get(); // Returns only users with th
 The scope can accept a string, a `\Spatie\Permission\Models\Permission` object or an `\Illuminate\Support\Collection` object.
 
 
-### Eloquent
+## Eloquent Calls
 Since Role and Permission models are extended from Eloquent models, basic Eloquent calls can be used as well:
 
 ```php
@@ -96,3 +103,10 @@ $users_without_any_roles = User::doesntHave('roles')->get();
 $all_roles_except_a_and_b = Role::whereNotIn('name', ['role A', 'role B'])->get();
 ```
 
+## Counting Users Having A Role
+One way to count all users who have a certain role is by filtering the collection of all Users with their Roles:
+```php
+$superAdminCount = User::with('roles')->get()->filter(
+    fn ($user) => $user->roles->where('name', 'Super Admin')->toArray()
+)->count();
+```
