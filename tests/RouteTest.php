@@ -12,8 +12,8 @@ class RouteTest extends TestCase
         $router = $this->getRouter();
 
         $router->get('role-test', $this->getRouteResponse())
-                ->name('role.test')
-                ->role('superadmin');
+            ->name('role.test')
+            ->role('superadmin');
 
         $this->assertEquals(['role:superadmin'], $this->getLastRouteMiddlewareFromRouter($router));
     }
@@ -24,8 +24,8 @@ class RouteTest extends TestCase
         $router = $this->getRouter();
 
         $router->get('permission-test', $this->getRouteResponse())
-                ->name('permission.test')
-                ->permission(['edit articles', 'save articles']);
+            ->name('permission.test')
+            ->permission(['edit articles', 'save articles']);
 
         $this->assertEquals(['permission:edit articles|save articles'], $this->getLastRouteMiddlewareFromRouter($router));
     }
@@ -36,9 +36,9 @@ class RouteTest extends TestCase
         $router = $this->getRouter();
 
         $router->get('role-permission-test', $this->getRouteResponse())
-                ->name('role-permission.test')
-                ->role('superadmin|admin')
-                ->permission('create user|edit user');
+            ->name('role-permission.test')
+            ->role('superadmin|admin')
+            ->permission('create user|edit user');
 
         $this->assertEquals(
             [

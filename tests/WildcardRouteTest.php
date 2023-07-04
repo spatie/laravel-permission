@@ -14,8 +14,8 @@ class WildcardRouteTest extends TestCase
         $router = $this->getRouter();
 
         $router->get('permission-test', $this->getRouteResponse())
-                ->name('permission.test')
-                ->permission(['articles.edit', 'articles.save']);
+            ->name('permission.test')
+            ->permission(['articles.edit', 'articles.save']);
 
         $this->assertEquals(['permission:articles.edit|articles.save'], $this->getLastRouteMiddlewareFromRouter($router));
     }
@@ -28,9 +28,9 @@ class WildcardRouteTest extends TestCase
         $router = $this->getRouter();
 
         $router->get('role-permission-test', $this->getRouteResponse())
-                ->name('role-permission.test')
-                ->role('superadmin|admin')
-                ->permission('user.create|user.edit');
+            ->name('role-permission.test')
+            ->role('superadmin|admin')
+            ->permission('user.create|user.edit');
 
         $this->assertEquals(
             [

@@ -70,7 +70,7 @@ class Show extends Command
 
                         return implode('_', $name);
                     })
-                    ->prepend('')->toArray(),
+                        ->prepend('')->toArray(),
                 ]),
                 $body->toArray(),
                 $style
