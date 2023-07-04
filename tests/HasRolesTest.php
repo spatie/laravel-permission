@@ -623,15 +623,15 @@ class HasRolesTest extends TestCase
         $this->assertFalse($this->testUser->hasAnyRole('This Role Does Not Even Exist', $this->testAdminRole));
     }
 
-     /** @test */
-     public function it_throws_an_exception_if_an_unsupported_type_is_passed_to_hasRoles()
-     {
-         $this->expectException(\TypeError::class);
+    /** @test */
+    public function it_throws_an_exception_if_an_unsupported_type_is_passed_to_hasRoles()
+    {
+        $this->expectException(\TypeError::class);
 
-         $this->testUser->hasRole(new class
-         {
-         });
-     }
+        $this->testUser->hasRole(new class
+        {
+        });
+    }
 
     /** @test */
     public function it_can_retrieve_role_names()
