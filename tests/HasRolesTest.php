@@ -395,7 +395,6 @@ class HasRolesTest extends TestCase
         $user2->assignRole('testRole2');
 
         $scopedUsers1 = User::role([$this->testUserRole])->get();
-
         $scopedUsers2 = User::role(['testRole', 'testRole2'])->get();
 
         $this->assertEquals(1, $scopedUsers1->count());
@@ -407,16 +406,13 @@ class HasRolesTest extends TestCase
     {
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
-
         $user1->assignRole($this->testUserRole);
-
         $user2->assignRole('testRole2');
 
-        $roleName = $this->testUserRole->name;
+        $firstAssignedRoleName = $this->testUserRole->name;
+        $secondAssignedRoleId = app(Role::class)->findByName('testRole2')->getKey();
 
-        $otherRoleId = app(Role::class)->findByName('testRole2')->getKey();
-
-        $scopedUsers = User::role([$roleName, $otherRoleId])->get();
+        $scopedUsers = User::role([$firstAssignedRoleName, $secondAssignedRoleId])->get();
 
         $this->assertEquals(2, $scopedUsers->count());
     }
@@ -465,9 +461,9 @@ class HasRolesTest extends TestCase
 
         $this->assertEquals(1, $scopedUsers1->count());
 
-        $user3 = Admin::create(['email' => 'user1@test.com']);
-        $user4 = Admin::create(['email' => 'user1@test.com']);
-        $user5 = Admin::create(['email' => 'user2@test.com']);
+        $user3 = Admin::create(['email' => 'user3@test.com']);
+        $user4 = Admin::create(['email' => 'user4@test.com']);
+        $user5 = Admin::create(['email' => 'user5@test.com']);
         $testAdminRole2 = app(Role::class)->create(['name' => 'testAdminRole2', 'guard_name' => 'admin']);
         $user3->assignRole($this->testAdminRole);
         $user4->assignRole($this->testAdminRole);
