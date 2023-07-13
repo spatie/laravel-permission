@@ -75,18 +75,20 @@ $roles = $user->getRoleNames(); // Returns a collection
 ```
 
 ## Scopes
-The `HasRoles` trait also adds a `role` scope to your models to scope the query to certain roles or permissions:
+The `HasRoles` trait also adds `role` and `withoutRole` scopes to your models to scope the query to certain roles or permissions:
 
 ```php
 $users = User::role('writer')->get(); // Returns only users with the role 'writer'
+$nonEditors = User::withoutRole('editor')->get(); // Returns only users without the role 'editor'
 ```
 
-The `role` scope can accept a string, a `\Spatie\Permission\Models\Role` object or an `\Illuminate\Support\Collection` object.
+The `role` and `withoutRole` scopes can accept a string, a `\Spatie\Permission\Models\Role` object or an `\Illuminate\Support\Collection` object.
 
-The same trait also adds a scope to only get users that have a certain permission.
+The same trait also adds scopes to only get users that have or don't have a certain permission.
 
 ```php
 $users = User::permission('edit articles')->get(); // Returns only users with the permission 'edit articles' (inherited or directly)
+$usersWhoCannotEditArticles = User::withoutPermission('edit articles')->get(); // Returns all users without the permission 'edit articles' (inherited or directly)
 ```
 
 The scope can accept a string, a `\Spatie\Permission\Models\Permission` object or an `\Illuminate\Support\Collection` object.
@@ -97,7 +99,7 @@ Since Role and Permission models are extended from Eloquent models, basic Eloque
 
 ```php
 $all_users_with_all_their_roles = User::with('roles')->get();
-$all_users_with_all_direct_permissions = User::with('permissions')->get();
+$all_users_with_all_their_direct_permissions = User::with('permissions')->get();
 $all_roles_in_database = Role::all()->pluck('name');
 $users_without_any_roles = User::doesntHave('roles')->get();
 $all_roles_except_a_and_b = Role::whereNotIn('name', ['role A', 'role B'])->get();
