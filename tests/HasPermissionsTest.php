@@ -88,7 +88,7 @@ class HasPermissionsTest extends TestCase
         $permission1 = app(Permission::class)->findOrCreate($enum1->value, 'web');
         $permission2 = app(Permission::class)->findOrCreate($enum2->value, 'web');
 
-        User::all()->each(fn($item) => $item->delete());
+        User::all()->each(fn ($item) => $item->delete());
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
         $user3 = User::create(['email' => 'user3@test.com']);
@@ -110,7 +110,7 @@ class HasPermissionsTest extends TestCase
     /** @test */
     public function it_can_scope_users_using_a_string()
     {
-        User::all()->each(fn($item) => $item->delete());
+        User::all()->each(fn ($item) => $item->delete());
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
         $user3 = User::create(['email' => 'user3@test.com']);
@@ -130,7 +130,7 @@ class HasPermissionsTest extends TestCase
     /** @test */
     public function it_can_scope_users_using_a_int()
     {
-        User::all()->each(fn($item) => $item->delete());
+        User::all()->each(fn ($item) => $item->delete());
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
         $user3 = User::create(['email' => 'user3@test.com']);
@@ -150,7 +150,7 @@ class HasPermissionsTest extends TestCase
     /** @test */
     public function it_can_scope_users_using_an_array()
     {
-        User::all()->each(fn($item) => $item->delete());
+        User::all()->each(fn ($item) => $item->delete());
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
         $user3 = User::create(['email' => 'user3@test.com']);
@@ -171,7 +171,7 @@ class HasPermissionsTest extends TestCase
     /** @test */
     public function it_can_scope_users_using_a_collection()
     {
-        User::all()->each(fn($item) => $item->delete());
+        User::all()->each(fn ($item) => $item->delete());
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
         $user3 = User::create(['email' => 'user3@test.com']);
@@ -192,7 +192,7 @@ class HasPermissionsTest extends TestCase
     /** @test */
     public function it_can_scope_users_using_an_object()
     {
-        User::all()->each(fn($item) => $item->delete());
+        User::all()->each(fn ($item) => $item->delete());
         $user1 = User::create(['email' => 'user1@test.com']);
         $user1->givePermissionTo($this->testUserPermission->name);
 
@@ -210,7 +210,7 @@ class HasPermissionsTest extends TestCase
     /** @test */
     public function it_can_scope_users_without_direct_permissions_only_role()
     {
-        User::all()->each(fn($item) => $item->delete());
+        User::all()->each(fn ($item) => $item->delete());
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
         $user3 = User::create(['email' => 'user3@test.com']);
@@ -229,7 +229,7 @@ class HasPermissionsTest extends TestCase
     /** @test */
     public function it_can_scope_users_with_only_direct_permission()
     {
-        User::all()->each(fn($item) => $item->delete());
+        User::all()->each(fn ($item) => $item->delete());
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
         $user3 = User::create(['email' => 'user3@test.com']);
