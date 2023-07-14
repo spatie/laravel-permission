@@ -20,6 +20,7 @@ class Show extends Command
     {
         $permissionClass = app(PermissionContract::class);
         $roleClass = app(RoleContract::class);
+        $teamsEnabled = config('permission.teams');
         $team_key = config('permission.column_names.team_foreign_key');
 
         $style = $this->argument('style') ?? 'default';
@@ -36,9 +37,12 @@ class Show extends Command
 
             $roles = $roleClass::whereGuardName($guard)
                 ->with('permissions')
-                ->when(config('permission.teams'), fn ($q) => $q->orderBy($team_key))
+                ->when($teamsEnabled, fn ($q) => $q->orderBy($team_key))
                 ->orderBy('name')->get()->mapWithKeys(fn ($role) => [
-                    $role->name.'_'.($role->$team_key ?: '') => ['permissions' => $role->permissions->pluck('id'), $team_key => $role->$team_key],
+                    $role->name.'_'.($teamsEnabled ? ($role->$team_key ?: '') : '') => [
+                        'permissions' => $role->permissions->pluck('id'),
+                        $team_key => $teamsEnabled ? $role->$team_key : null,
+                    ],
                 ]);
 
             $permissions = $permissionClass::whereGuardName($guard)->orderBy('name')->pluck('name', 'id');
@@ -48,7 +52,7 @@ class Show extends Command
             )->prepend($permission)
             );
 
-            if (config('permission.teams')) {
+            if ($teamsEnabled) {
                 $teams = $roles->groupBy($team_key)->values()->map(
                     fn ($group, $id) => new TableCell('Team ID: '.($id ?: 'NULL'), ['colspan' => $group->count()])
                 );

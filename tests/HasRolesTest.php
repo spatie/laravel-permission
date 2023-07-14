@@ -387,6 +387,21 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_withoutscope_users_using_a_string()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user3 = User::create(['email' => 'user3@test.com']);
+        $user1->assignRole('testRole');
+        $user2->assignRole('testRole2');
+        $user3->assignRole('testRole2');
+
+        $scopedUsers = User::withoutRole('testRole2')->get();
+
+        $this->assertEquals(1, $scopedUsers->count());
+    }
+
+    /** @test */
     public function it_can_scope_users_using_an_array()
     {
         $user1 = User::create(['email' => 'user1@test.com']);
@@ -395,7 +410,6 @@ class HasRolesTest extends TestCase
         $user2->assignRole('testRole2');
 
         $scopedUsers1 = User::role([$this->testUserRole])->get();
-
         $scopedUsers2 = User::role(['testRole', 'testRole2'])->get();
 
         $this->assertEquals(1, $scopedUsers1->count());
@@ -403,20 +417,54 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_withoutscope_users_using_an_array()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user3 = User::create(['email' => 'user3@test.com']);
+        $user1->assignRole($this->testUserRole);
+        $user2->assignRole('testRole2');
+        $user3->assignRole('testRole2');
+
+        $scopedUsers1 = User::withoutRole([$this->testUserRole])->get();
+        $scopedUsers2 = User::withoutRole([$this->testUserRole->name, 'testRole2'])->get();
+
+        $this->assertEquals(2, $scopedUsers1->count());
+        $this->assertEquals(0, $scopedUsers2->count());
+    }
+
+    /** @test */
     public function it_can_scope_users_using_an_array_of_ids_and_names()
     {
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
-
         $user1->assignRole($this->testUserRole);
-
         $user2->assignRole('testRole2');
 
-        $roleName = $this->testUserRole->name;
+        $firstAssignedRoleName = $this->testUserRole->name;
+        $secondAssignedRoleId = app(Role::class)->findByName('testRole2')->getKey();
 
-        $otherRoleId = app(Role::class)->findByName('testRole2')->getKey();
+        $scopedUsers = User::role([$firstAssignedRoleName, $secondAssignedRoleId])->get();
 
-        $scopedUsers = User::role([$roleName, $otherRoleId])->get();
+        $this->assertEquals(2, $scopedUsers->count());
+    }
+
+    /** @test */
+    public function it_can_withoutscope_users_using_an_array_of_ids_and_names()
+    {
+        app(Role::class)->create(['name' => 'testRole3']);
+
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user3 = User::create(['email' => 'user3@test.com']);
+        $user1->assignRole($this->testUserRole);
+        $user2->assignRole('testRole2');
+        $user3->assignRole('testRole2');
+
+        $firstAssignedRoleName = $this->testUserRole->name;
+        $unassignedRoleId = app(Role::class)->findByName('testRole3')->getKey();
+
+        $scopedUsers = User::withoutRole([$firstAssignedRoleName, $unassignedRoleId])->get();
 
         $this->assertEquals(2, $scopedUsers->count());
     }
@@ -437,6 +485,25 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_withoutscope_users_using_a_collection()
+    {
+        app(Role::class)->create(['name' => 'testRole3']);
+
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user3 = User::create(['email' => 'user3@test.com']);
+        $user1->assignRole($this->testUserRole);
+        $user2->assignRole('testRole');
+        $user3->assignRole('testRole2');
+
+        $scopedUsers1 = User::withoutRole([$this->testUserRole])->get();
+        $scopedUsers2 = User::withoutRole(collect(['testRole', 'testRole3']))->get();
+
+        $this->assertEquals(1, $scopedUsers1->count());
+        $this->assertEquals(1, $scopedUsers2->count());
+    }
+
+    /** @test */
     public function it_can_scope_users_using_an_object()
     {
         $user1 = User::create(['email' => 'user1@test.com']);
@@ -454,6 +521,25 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_withoutscope_users_using_an_object()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user3 = User::create(['email' => 'user3@test.com']);
+        $user1->assignRole($this->testUserRole);
+        $user2->assignRole('testRole2');
+        $user3->assignRole('testRole2');
+
+        $scopedUsers1 = User::withoutRole($this->testUserRole)->get();
+        $scopedUsers2 = User::withoutRole([$this->testUserRole])->get();
+        $scopedUsers3 = User::withoutRole(collect([$this->testUserRole]))->get();
+
+        $this->assertEquals(2, $scopedUsers1->count());
+        $this->assertEquals(2, $scopedUsers2->count());
+        $this->assertEquals(2, $scopedUsers3->count());
+    }
+
+    /** @test */
     public function it_can_scope_against_a_specific_guard()
     {
         $user1 = User::create(['email' => 'user1@test.com']);
@@ -465,9 +551,9 @@ class HasRolesTest extends TestCase
 
         $this->assertEquals(1, $scopedUsers1->count());
 
-        $user3 = Admin::create(['email' => 'user1@test.com']);
-        $user4 = Admin::create(['email' => 'user1@test.com']);
-        $user5 = Admin::create(['email' => 'user2@test.com']);
+        $user3 = Admin::create(['email' => 'user3@test.com']);
+        $user4 = Admin::create(['email' => 'user4@test.com']);
+        $user5 = Admin::create(['email' => 'user5@test.com']);
         $testAdminRole2 = app(Role::class)->create(['name' => 'testAdminRole2', 'guard_name' => 'admin']);
         $user3->assignRole($this->testAdminRole);
         $user4->assignRole($this->testAdminRole);
@@ -477,6 +563,34 @@ class HasRolesTest extends TestCase
 
         $this->assertEquals(2, $scopedUsers2->count());
         $this->assertEquals(1, $scopedUsers3->count());
+    }
+
+    /** @test */
+    public function it_can_withoutscope_against_a_specific_guard()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user3 = User::create(['email' => 'user3@test.com']);
+        $user1->assignRole('testRole');
+        $user2->assignRole('testRole2');
+        $user3->assignRole('testRole2');
+
+        $scopedUsers1 = User::withoutRole('testRole', 'web')->get();
+
+        $this->assertEquals(2, $scopedUsers1->count());
+
+        $user4 = Admin::create(['email' => 'user4@test.com']);
+        $user5 = Admin::create(['email' => 'user5@test.com']);
+        $user6 = Admin::create(['email' => 'user6@test.com']);
+        $testAdminRole2 = app(Role::class)->create(['name' => 'testAdminRole2', 'guard_name' => 'admin']);
+        $user4->assignRole($this->testAdminRole);
+        $user5->assignRole($this->testAdminRole);
+        $user6->assignRole($testAdminRole2);
+        $scopedUsers2 = Admin::withoutRole('testAdminRole', 'admin')->get();
+        $scopedUsers3 = Admin::withoutRole('testAdminRole2', 'admin')->get();
+
+        $this->assertEquals(1, $scopedUsers2->count());
+        $this->assertEquals(2, $scopedUsers3->count());
     }
 
     /** @test */
@@ -492,11 +606,31 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_throws_an_exception_when_trying_to_call_withoutscope_on_a_role_from_another_guard()
+    {
+        $this->expectException(RoleDoesNotExist::class);
+
+        User::withoutRole('testAdminRole')->get();
+
+        $this->expectException(GuardDoesNotMatch::class);
+
+        User::withoutRole($this->testAdminRole)->get();
+    }
+
+    /** @test */
     public function it_throws_an_exception_when_trying_to_scope_a_non_existing_role()
     {
         $this->expectException(RoleDoesNotExist::class);
 
         User::role('role not defined')->get();
+    }
+
+    /** @test */
+    public function it_throws_an_exception_when_trying_to_use_withoutscope_on_a_non_existing_role()
+    {
+        $this->expectException(RoleDoesNotExist::class);
+
+        User::withoutRole('role not defined')->get();
     }
 
     /** @test */
@@ -623,15 +757,15 @@ class HasRolesTest extends TestCase
         $this->assertFalse($this->testUser->hasAnyRole('This Role Does Not Even Exist', $this->testAdminRole));
     }
 
-     /** @test */
-     public function it_throws_an_exception_if_an_unsupported_type_is_passed_to_hasRoles()
-     {
-         $this->expectException(\TypeError::class);
+    /** @test */
+    public function it_throws_an_exception_if_an_unsupported_type_is_passed_to_hasRoles()
+    {
+        $this->expectException(\TypeError::class);
 
-         $this->testUser->hasRole(new class
-         {
-         });
-     }
+        $this->testUser->hasRole(new class
+        {
+        });
+    }
 
     /** @test */
     public function it_can_retrieve_role_names()

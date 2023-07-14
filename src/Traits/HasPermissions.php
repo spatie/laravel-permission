@@ -125,6 +125,37 @@ trait HasPermissions
     }
 
     /**
+     * Scope the model query to only those without certain permissions,
+     * whether indirectly by role or by direct permission.
+     *
+     * @param  string|int|array|Permission|Collection|\BackedEnum  $permissions
+     */
+    public function scopeWithoutPermission(Builder $query, $permissions, $debug = false): Builder
+    {
+        $permissions = $this->convertToPermissionModels($permissions);
+
+        $permissionClass = $this->getPermissionClass();
+        $permissionKey = (new $permissionClass())->getKeyName();
+        $roleClass = is_a($this, Role::class) ? static::class : $this->getRoleClass();
+        $roleKey = (new $roleClass())->getKeyName();
+
+        $rolesWithPermissions = is_a($this, Role::class) ? [] : array_unique(
+            array_reduce($permissions, fn ($result, $permission) => array_merge($result, $permission->roles->all()), [])
+        );
+
+        return $query->where(fn (Builder $query) => $query
+            ->whereDoesntHave('permissions', fn (Builder $subQuery) => $subQuery
+                ->whereIn(config('permission.table_names.permissions').".$permissionKey", \array_column($permissions, $permissionKey))
+            )
+            ->when(count($rolesWithPermissions), fn ($whenQuery) => $whenQuery
+                ->whereDoesntHave('roles', fn (Builder $subQuery) => $subQuery
+                    ->whereIn(config('permission.table_names.roles').".$roleKey", \array_column($rolesWithPermissions, $roleKey))
+                )
+            )
+        );
+    }
+
+    /**
      * @param  string|int|array|Permission|Collection|\BackedEnum  $permissions
      *
      * @throws PermissionDoesNotExist
