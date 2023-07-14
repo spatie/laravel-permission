@@ -8,7 +8,8 @@ use Spatie\Permission\PermissionRegistrar;
 
 trait HasBlockedPermission
 {
-    use HasPermissions;
+    abstract function collectPermissions(...$permissions);
+    abstract function filterPermission($permission, $guardName = null);
 
     public function blockedPermissions(): MorphToMany
     {

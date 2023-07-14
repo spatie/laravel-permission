@@ -19,6 +19,8 @@ use Spatie\Permission\WildcardPermission;
 
 trait HasPermissions
 {
+    use HasBlockedPermission;
+
     private ?string $permissionClass = null;
 
     private ?string $wildcardClass = null;
@@ -309,7 +311,7 @@ trait HasPermissions
     {
         $permission = $this->filterPermission($permission);
 
-        return $this->permissions->contains($permission->getKeyName(), $permission->getKey());
+        return $this->permissions->contains($permission->getKeyName(), $permission->getKey()) and !$this->hasBlockFromPermission($permission);
     }
 
     /**
