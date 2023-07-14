@@ -133,15 +133,19 @@ class TeamHasRolesTest extends HasRolesTest
         setPermissionsTeamId(2);
         $scopedUsers1Team1 = User::role($this->testUserRole)->get();
         $scopedUsers2Team1 = User::role(['testRole', 'testRole2'])->get();
+        $scopedUsers3Team1 = User::withoutRole('testRole')->get();
 
         $this->assertEquals(1, $scopedUsers1Team1->count());
         $this->assertEquals(2, $scopedUsers2Team1->count());
+        $this->assertEquals(1, $scopedUsers3Team1->count());
 
         setPermissionsTeamId(1);
         $scopedUsers1Team2 = User::role($this->testUserRole)->get();
         $scopedUsers2Team2 = User::role('testRole2')->get();
+        $scopedUsers3Team2 = User::withoutRole('testRole')->get();
 
         $this->assertEquals(1, $scopedUsers1Team2->count());
         $this->assertEquals(0, $scopedUsers2Team2->count());
+        $this->assertEquals(0, $scopedUsers3Team2->count());
     }
 }

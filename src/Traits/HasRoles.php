@@ -96,6 +96,36 @@ trait HasRoles
     }
 
     /**
+     * Scope the model query to only those without certain roles.
+     *
+     * @param  string|int|array|Role|Collection  $roles
+     * @param  string  $guard
+     */
+    public function scopeWithoutRole(Builder $query, $roles, $guard = null): Builder
+    {
+        if ($roles instanceof Collection) {
+            $roles = $roles->all();
+        }
+
+        $roles = array_map(function ($role) use ($guard) {
+            if ($role instanceof Role) {
+                return $role;
+            }
+
+            $method = is_int($role) || PermissionRegistrar::isUid($role) ? 'findById' : 'findByName';
+
+            return $this->getRoleClass()::{$method}($role, $guard ?: $this->getDefaultGuardName());
+        }, Arr::wrap($roles));
+
+        $roleClass = $this->getRoleClass();
+        $key = (new $roleClass())->getKeyName();
+
+        return $query->whereHas('roles', fn (Builder $subQuery) => $subQuery
+            ->whereNotIn(config('permission.table_names.roles').".$key", \array_column($roles, $key))
+        );
+    }
+
+    /**
      * Returns roles ids as array keys
      *
      * @param  array|string|int|Role|Collection  $roles
