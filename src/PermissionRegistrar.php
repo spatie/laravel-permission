@@ -8,6 +8,7 @@ use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 
@@ -45,6 +46,8 @@ class PermissionRegistrar
     private array $alias = [];
 
     private array $except = [];
+
+    private array $wildcardPermissionsIndex = [];
 
     /**
      * PermissionRegistrar constructor.
@@ -134,14 +137,35 @@ class PermissionRegistrar
     public function forgetCachedPermissions()
     {
         $this->permissions = null;
+        $this->forgetWildcardPermissionIndex();
 
         return $this->cache->forget($this->cacheKey);
     }
 
+    public function forgetWildcardPermissionIndex(Model $record = null): void
+    {
+        if ($record) {
+            unset($this->wildcardPermissionsIndex[get_class($record)][$record->getKey()]);
+
+            return;
+        }
+
+        $this->wildcardPermissionsIndex = [];
+    }
+
+    public function getWildcardPermissionIndex(Model $record): array
+    {
+        if (isset($this->wildcardPermissionsIndex[get_class($record)][$record->getKey()])) {
+            return $this->wildcardPermissionsIndex[get_class($record)][$record->getKey()];
+        }
+
+        return $this->wildcardPermissionsIndex[get_class($record)][$record->getKey()] = app($record->getWildcardClass(), ['record' => $record])->getIndex();
+    }
+
     /**
-     * Clear already loaded permissions collection.
+     * Clear already-loaded permissions collection.
      * This is only intended to be called by the PermissionServiceProvider on boot,
-     * so that long-running instances like Swoole don't keep old data in memory.
+     * so that long-running instances like Octane or Swoole don't keep old data in memory.
      */
     public function clearPermissionsCollection(): void
     {

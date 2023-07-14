@@ -204,4 +204,21 @@ class RoleMiddlewareTest extends TestCase
             $this->runMiddleware($this->roleMiddleware, 'testAdminRole', 'admin')
         );
     }
+
+    /** @test */
+    public function the_middleware_can_be_created_with_static_using_method()
+    {
+        $this->assertSame(
+            'Spatie\Permission\Middlewares\RoleMiddleware:testAdminRole',
+            RoleMiddleware::using('testAdminRole')
+        );
+        $this->assertEquals(
+            'Spatie\Permission\Middlewares\RoleMiddleware:testAdminRole,my-guard',
+            RoleMiddleware::using('testAdminRole', 'my-guard')
+        );
+        $this->assertEquals(
+            'Spatie\Permission\Middlewares\RoleMiddleware:testAdminRole|anotherRole',
+            RoleMiddleware::using(['testAdminRole', 'anotherRole'])
+        );
+    }
 }

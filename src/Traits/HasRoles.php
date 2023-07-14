@@ -96,6 +96,36 @@ trait HasRoles
     }
 
     /**
+     * Scope the model query to only those without certain roles.
+     *
+     * @param  string|int|array|Role|Collection  $roles
+     * @param  string  $guard
+     */
+    public function scopeWithoutRole(Builder $query, $roles, $guard = null): Builder
+    {
+        if ($roles instanceof Collection) {
+            $roles = $roles->all();
+        }
+
+        $roles = array_map(function ($role) use ($guard) {
+            if ($role instanceof Role) {
+                return $role;
+            }
+
+            $method = is_int($role) || PermissionRegistrar::isUid($role) ? 'findById' : 'findByName';
+
+            return $this->getRoleClass()::{$method}($role, $guard ?: $this->getDefaultGuardName());
+        }, Arr::wrap($roles));
+
+        $roleClass = $this->getRoleClass();
+        $key = (new $roleClass())->getKeyName();
+
+        return $query->whereHas('roles', fn (Builder $subQuery) => $subQuery
+            ->whereNotIn(config('permission.table_names.roles').".$key", \array_column($roles, $key))
+        );
+    }
+
+    /**
      * Returns roles ids as array keys
      *
      * @param  array|string|int|Role|Collection  $roles
@@ -116,8 +146,7 @@ trait HasRoles
 
                 $this->ensureModelSharesGuard($role);
 
-                $array[$role->getKey()] = app(PermissionRegistrar::class)->teams && ! is_a($this, Permission::class) ?
-                    [app(PermissionRegistrar::class)->teamsKey => getPermissionsTeamId()] : [];
+                $array[] = $role->getKey();
 
                 return $array;
             }, []);
@@ -134,20 +163,24 @@ trait HasRoles
         $roles = $this->collectRoles($roles);
 
         $model = $this->getModel();
+        $teamPivot = app(PermissionRegistrar::class)->teams && ! is_a($this, Permission::class) ?
+            [app(PermissionRegistrar::class)->teamsKey => getPermissionsTeamId()] : [];
 
         if ($model->exists) {
-            $this->roles()->sync($roles, false);
-            $model->load('roles');
+            $currentRoles = $this->roles->map(fn ($role) => $role->getKey())->toArray();
+
+            $this->roles()->attach(array_diff($roles, $currentRoles), $teamPivot);
+            $model->unsetRelation('roles');
         } else {
             $class = \get_class($model);
 
             $class::saved(
-                function ($object) use ($roles, $model) {
+                function ($object) use ($roles, $model, $teamPivot) {
                     if ($model->getKey() != $object->getKey()) {
                         return;
                     }
-                    $model->roles()->sync($roles, false);
-                    $model->load('roles');
+                    $model->roles()->attach($roles, $teamPivot);
+                    $model->unsetRelation('roles');
                 }
             );
         }
@@ -168,7 +201,7 @@ trait HasRoles
     {
         $this->roles()->detach($this->getStoredRole($role));
 
-        $this->load('roles');
+        $this->unsetRelation('roles');
 
         if (is_a($this, Permission::class)) {
             $this->forgetCachedPermissions();
@@ -185,9 +218,11 @@ trait HasRoles
      */
     public function syncRoles(...$roles)
     {
-        $this->collectRoles($roles);
-
-        $this->roles()->detach();
+        if ($this->getModel()->exists) {
+            $this->collectRoles($roles);
+            $this->roles()->detach();
+            $this->setRelation('roles', collect());
+        }
 
         return $this->assignRole($roles);
     }

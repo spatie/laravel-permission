@@ -29,13 +29,13 @@ class User extends Authenticatable
 }
 ```
 
-## Must not have a `role` or `roles` property, nor a `roles()` method
+## Must not have a [role] or [roles] property, nor a [roles()] method
 
-Additionally, your `User` model/object MUST NOT have a `role` or `roles` property (or field in the database), nor a `roles()` method on it. Those will interfere with the properties and methods added by the `HasRoles` trait provided by this package, thus causing unexpected outcomes when this package's methods are used to inspect roles and permissions.
+Your `User` model/object MUST NOT have a `role` or `roles` property (or field in the database by that name), nor a `roles()` method on it. Those will interfere with the properties and methods added by the `HasRoles` trait provided by this package, thus causing unexpected outcomes when this package's methods are used to inspect roles and permissions.
 
-## Must not have a `permission` or `permissions` property, nor a `permissions()` method
+## Must not have a [permission] or [permissions] property, nor a [permissions()] method
 
-Similarly, your `User` model/object MUST NOT have a `permission` or `permissions` property (or field in the database), nor a `permissions()` method on it. Those will interfere with the properties and methods added by the `HasPermissions` trait provided by this package (which is invoked via the `HasRoles` trait).
+Your `User` model/object MUST NOT have a `permission` or `permissions` property (or field in the database by that name), nor a `permissions()` method on it. Those will interfere with the properties and methods added by the `HasPermissions` trait provided by this package (which is invoked via the `HasRoles` trait).
 
 ## Config file
 
@@ -51,3 +51,8 @@ Thus in your AppServiceProvider you will need to set `Schema::defaultStringLengt
 
 This package expects the primary key of your `User` model to be an auto-incrementing `int`. If it is not, you may need to modify the `create_permission_tables` migration and/or modify the default configuration. See [https://spatie.be/docs/laravel-permission/advanced-usage/uuid](https://spatie.be/docs/laravel-permission/advanced-usage/uuid) for more information. 
 
+## Database foreign-key relationship support
+
+To enforce database integrity, this package uses foreign-key relationships with cascading deletes. This prevents data mismatch situations if database records are manipulated outside of this package. If your database engine does not support foreign-key relationships, then you will have to alter the migration files accordingly.
+
+This package does its own detaching of pivot records when deletes are called using provided package methods, so if your database does not support foreign keys then as long as you only use method calls provided by this package for managing related records, there should not be data integrity issues.
