@@ -70,6 +70,37 @@ class HasRolesTest extends TestCase
         $this->assertFalse($this->testUser->hasRole($enum1));
     }
 
+    /**
+     * @test
+     *
+     * @requires PHP >= 8.1
+     */
+    public function it_can_scope_a_role_using_enums()
+    {
+        $enum1 = TestModels\TestRolePermissionsEnum::USERMANAGER;
+        $enum2 = TestModels\TestRolePermissionsEnum::WRITER;
+        $role1 = app(Role::class)->findOrCreate($enum1->value, 'web');
+        $role2 = app(Role::class)->findOrCreate($enum2->value, 'web');
+
+        User::all()->each(fn ($item) => $item->delete());
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user3 = User::create(['email' => 'user3@test.com']);
+
+        // assign only one user to a role
+        $user2->assignRole($enum1);
+        $this->assertTrue($user2->hasRole($enum1));
+        $this->assertFalse($user2->hasRole($enum2));
+
+        $scopedUsers1 = User::role($enum1)->get();
+        $scopedUsers2 = User::role($enum2)->get();
+        $scopedUsers3 = User::withoutRole($enum2)->get();
+
+        $this->assertEquals(1, $scopedUsers1->count());
+        $this->assertEquals(0, $scopedUsers2->count());
+        $this->assertEquals(3, $scopedUsers3->count());
+    }
+
     /** @test */
     public function it_can_assign_and_remove_a_role()
     {

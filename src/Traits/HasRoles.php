@@ -68,7 +68,7 @@ trait HasRoles
     /**
      * Scope the model query to certain roles only.
      *
-     * @param  string|int|array|Role|Collection  $roles
+     * @param  string|int|array|Role|Collection|\BackedEnum  $roles
      * @param  string  $guard
      */
     public function scopeRole(Builder $query, $roles, $guard = null): Builder
@@ -80,6 +80,10 @@ trait HasRoles
         $roles = array_map(function ($role) use ($guard) {
             if ($role instanceof Role) {
                 return $role;
+            }
+
+            if ($role instanceof \BackedEnum) {
+                $role = $role->value;
             }
 
             $method = is_int($role) || PermissionRegistrar::isUid($role) ? 'findById' : 'findByName';
@@ -98,7 +102,7 @@ trait HasRoles
     /**
      * Scope the model query to only those without certain roles.
      *
-     * @param  string|int|array|Role|Collection  $roles
+     * @param  string|int|array|Role|Collection|\BackedEnum  $roles
      * @param  string  $guard
      */
     public function scopeWithoutRole(Builder $query, $roles, $guard = null): Builder
@@ -110,6 +114,10 @@ trait HasRoles
         $roles = array_map(function ($role) use ($guard) {
             if ($role instanceof Role) {
                 return $role;
+            }
+
+            if ($role instanceof \BackedEnum) {
+                $role = $role->value;
             }
 
             $method = is_int($role) || PermissionRegistrar::isUid($role) ? 'findById' : 'findByName';
@@ -128,7 +136,7 @@ trait HasRoles
     /**
      * Returns roles ids as array keys
      *
-     * @param  array|string|int|Role|Collection  $roles
+     * @param  array|string|int|Role|Collection|\BackedEnum  $roles
      */
     private function collectRoles(...$roles): array
     {
