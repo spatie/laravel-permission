@@ -120,6 +120,7 @@ class TeamHasRolesTest extends HasRolesTest
     /** @test */
     public function it_can_scope_users_on_different_teams()
     {
+        User::all()->each(fn ($item) => $item->delete());
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
 
@@ -146,6 +147,6 @@ class TeamHasRolesTest extends HasRolesTest
 
         $this->assertEquals(1, $scopedUsers1Team2->count());
         $this->assertEquals(0, $scopedUsers2Team2->count());
-        $this->assertEquals(0, $scopedUsers3Team2->count());
+        $this->assertEquals(1, $scopedUsers3Team2->count());
     }
 }

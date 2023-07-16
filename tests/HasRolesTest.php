@@ -389,6 +389,7 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_can_withoutscope_users_using_a_string()
     {
+        User::all()->each(fn ($item) => $item->delete());
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
         $user3 = User::create(['email' => 'user3@test.com']);
@@ -419,6 +420,7 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_can_withoutscope_users_using_an_array()
     {
+        User::all()->each(fn ($item) => $item->delete());
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
         $user3 = User::create(['email' => 'user3@test.com']);
@@ -454,6 +456,7 @@ class HasRolesTest extends TestCase
     {
         app(Role::class)->create(['name' => 'testRole3']);
 
+        User::all()->each(fn ($item) => $item->delete());
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
         $user3 = User::create(['email' => 'user3@test.com']);
@@ -489,6 +492,7 @@ class HasRolesTest extends TestCase
     {
         app(Role::class)->create(['name' => 'testRole3']);
 
+        User::all()->each(fn ($item) => $item->delete());
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
         $user3 = User::create(['email' => 'user3@test.com']);
@@ -523,6 +527,7 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_can_withoutscope_users_using_an_object()
     {
+        User::all()->each(fn ($item) => $item->delete());
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
         $user3 = User::create(['email' => 'user3@test.com']);
@@ -568,6 +573,7 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_can_withoutscope_against_a_specific_guard()
     {
+        User::all()->each(fn ($item) => $item->delete());
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
         $user3 = User::create(['email' => 'user3@test.com']);
@@ -579,6 +585,7 @@ class HasRolesTest extends TestCase
 
         $this->assertEquals(2, $scopedUsers1->count());
 
+        Admin::all()->each(fn ($item) => $item->delete());
         $user4 = Admin::create(['email' => 'user4@test.com']);
         $user5 = Admin::create(['email' => 'user5@test.com']);
         $user6 = Admin::create(['email' => 'user6@test.com']);

@@ -120,8 +120,8 @@ trait HasRoles
         $roleClass = $this->getRoleClass();
         $key = (new $roleClass())->getKeyName();
 
-        return $query->whereHas('roles', fn (Builder $subQuery) => $subQuery
-            ->whereNotIn(config('permission.table_names.roles').".$key", \array_column($roles, $key))
+        return $query->whereDoesntHave('roles', fn (Builder $subQuery) => $subQuery
+            ->whereIn(config('permission.table_names.roles').".$key", \array_column($roles, $key))
         );
     }
 
