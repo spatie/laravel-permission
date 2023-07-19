@@ -26,7 +26,7 @@ class ClientService
     public static function getClientPermissions($client): array
     {
         $permissions = $client->permissions->pluck('name')->toArray();
-        foreach($client->roles as $role) {
+        foreach ($client->roles as $role) {
             $permissions = array_merge($permissions, $role->permissions->pluck('name')->toArray());
         }
 

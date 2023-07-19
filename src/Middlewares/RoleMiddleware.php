@@ -23,7 +23,7 @@ class RoleMiddleware
             $client = ClientService::getClient($bearerToken);
             $assignedRoles = ClientService::getClientRoles($client);
 
-            foreach($roles as $role) {
+            foreach ($roles as $role) {
                 if (in_array($role, $assignedRoles)) {
                     return $next($request);
                 }

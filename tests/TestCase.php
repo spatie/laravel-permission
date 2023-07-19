@@ -8,7 +8,6 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
-use Spatie\Permission\Tests\TestModels\Client;
 use Laravel\Passport\PassportServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Spatie\Permission\Contracts\Permission;
@@ -17,6 +16,7 @@ use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\PermissionServiceProvider;
 use Spatie\Permission\Tests\TestModels\Admin;
+use Spatie\Permission\Tests\TestModels\Client;
 use Spatie\Permission\Tests\TestModels\User;
 
 abstract class TestCase extends Orchestra
@@ -48,8 +48,11 @@ abstract class TestCase extends Orchestra
     protected static $migration;
 
     protected static $customMigration;
+
     protected Client $testClient;
+
     protected \Spatie\Permission\Models\Permission $testClientPermission;
+
     protected \Spatie\Permission\Models\Role $testClientRole;
 
     protected function setUp(): void
@@ -80,7 +83,7 @@ abstract class TestCase extends Orchestra
     {
         return [
             PermissionServiceProvider::class,
-            PassportServiceProvider::class
+            PassportServiceProvider::class,
         ];
     }
 

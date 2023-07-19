@@ -23,7 +23,7 @@ class PermissionMiddleware
             $client = ClientService::getClient($bearerToken);
             $assignedPermissions = ClientService::getClientPermissions($client);
 
-            foreach($permissions as $permission) {
+            foreach ($permissions as $permission) {
                 if (in_array($permission, $assignedPermissions)) {
                     return $next($request);
                 }

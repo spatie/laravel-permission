@@ -25,7 +25,7 @@ class RoleOrPermissionMiddleware
             $assignedPermissions = ClientService::getClientPermissions($client);
             $assignedRolesAndPermissions = array_merge($assignedRoles, $assignedPermissions);
 
-            foreach($rolesOrPermissions as $roleOrPermission) {
+            foreach ($rolesOrPermissions as $roleOrPermission) {
                 if (in_array($roleOrPermission, $assignedRolesAndPermissions)) {
                     return $next($request);
                 }
