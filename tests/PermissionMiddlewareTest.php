@@ -123,11 +123,42 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    public function a_client_can_access_a_route_protected_by_permission_middleware_if_have_this_permission(): void
+    {
+        Passport::actingAsClient($this->testClient, ['*']);
+
+        $this->testClient->givePermissionTo('edit-articles');
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->permissionMiddleware, 'edit-articles')
+        );
+    }
+
+    /** @test */
     public function a_user_can_access_a_route_protected_by_this_permission_middleware_if_have_one_of_the_permissions()
     {
         Auth::login($this->testUser);
 
         $this->testUser->givePermissionTo('edit-articles');
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->permissionMiddleware, 'edit-news|edit-articles')
+        );
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->permissionMiddleware, ['edit-news', 'edit-articles'])
+        );
+    }
+
+    /** @test */
+    public function a_client_can_access_a_route_protected_by_this_permission_middleware_if_have_one_of_the_permissions(): void
+    {
+        Passport::actingAsClient($this->testClient, ['*']);
+
+        $this->testClient->givePermissionTo('edit-articles');
 
         $this->assertEquals(
             200,
@@ -167,9 +198,33 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    public function a_client_cannot_access_a_route_protected_by_the_permission_middleware_if_have_a_different_permission(): void
+    {
+        Passport::actingAsClient($this->testClient, ['*']);
+
+        $this->testClient->givePermissionTo('edit-articles');
+
+        $this->assertEquals(
+            403,
+            $this->runMiddleware($this->permissionMiddleware, 'edit-news')
+        );
+    }
+
+    /** @test */
     public function a_user_cannot_access_a_route_protected_by_permission_middleware_if_have_not_permissions()
     {
         Auth::login($this->testUser);
+
+        $this->assertEquals(
+            403,
+            $this->runMiddleware($this->permissionMiddleware, 'edit-articles|edit-news')
+        );
+    }
+
+    /** @test */
+    public function a_client_cannot_access_a_route_protected_by_permission_middleware_if_have_not_permissions(): void
+    {
+        Passport::actingAsClient($this->testClient, ['*']);
 
         $this->assertEquals(
             403,
@@ -189,6 +244,25 @@ class PermissionMiddlewareTest extends TestCase
 
         $this->testUserRole->givePermissionTo('edit-articles');
         $this->testUser->assignRole('testRole');
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->permissionMiddleware, 'edit-articles')
+        );
+    }
+
+    /** @test */
+    public function a_client_can_access_a_route_protected_by_permission_middleware_if_has_permission_via_role(): void
+    {
+        Passport::actingAsClient($this->testClient, ['*']);
+
+        $this->assertEquals(
+            403,
+            $this->runMiddleware($this->permissionMiddleware, 'edit-articles')
+        );
+
+        $this->testClientRole->givePermissionTo('edit-articles');
+        $this->testClient->assignRole('testRole');
 
         $this->assertEquals(
             200,

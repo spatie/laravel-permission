@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission;
 
+use Laravel\Passport\Client;
 use Laravel\Passport\Token;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Signer\Key\InMemory;
@@ -9,6 +10,10 @@ use Lcobucci\JWT\Signer\Rsa\Sha256;
 
 class ClientService
 {
+    /**
+     * @param string $bearerToken
+     * @return Client
+     */
     public static function getClient(string $bearerToken)
     {
         $tokenId = Configuration::forSymmetricSigner(new Sha256(), InMemory::plainText('empty', 'empty'))
@@ -23,6 +28,10 @@ class ClientService
         return $client;
     }
 
+    /**
+     * @param Client $client
+     * @return array
+     */
     public static function getClientPermissions($client): array
     {
         $permissions = $client->permissions->pluck('name')->toArray();
@@ -33,6 +42,10 @@ class ClientService
         return $permissions;
     }
 
+    /**
+     * @param Client $client
+     * @return array
+     */
     public static function getClientRoles($client): array
     {
         return $client->roles->pluck('name')->toArray();
