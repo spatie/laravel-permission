@@ -11,7 +11,6 @@ use Lcobucci\JWT\Signer\Rsa\Sha256;
 class ClientService
 {
     /**
-     * @param string $bearerToken
      * @return Client
      */
     public static function getClient(string $bearerToken)
@@ -29,8 +28,7 @@ class ClientService
     }
 
     /**
-     * @param Client $client
-     * @return array
+     * @param  Client  $client
      */
     public static function getClientPermissions($client): array
     {
@@ -43,8 +41,7 @@ class ClientService
     }
 
     /**
-     * @param Client $client
-     * @return array
+     * @param  Client  $client
      */
     public static function getClientRoles($client): array
     {
