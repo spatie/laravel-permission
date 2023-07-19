@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
 use InvalidArgumentException;
+use Laravel\Passport\Passport;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
@@ -63,6 +64,28 @@ class PermissionMiddlewareTest extends TestCase
         $this->assertEquals(
             200,
             $this->runMiddleware($this->permissionMiddleware, 'edit-articles2', 'web')
+        );
+
+        $this->assertEquals(
+            403,
+            $this->runMiddleware($this->permissionMiddleware, 'admin-permission2', 'web')
+        );
+    }
+
+    /** @test */
+    public function a_client_cannot_access_a_route_protected_by_the_permission_middleware_of_a_different_guard(): void
+    {
+        // These permissions are created fresh here in reverse order of guard being applied, so they are not "found first" in the db lookup when matching
+        app(Permission::class)->create(['name' => 'edit-articles2', 'guard_name' => 'admin']);
+        $p1 = app(Permission::class)->create(['name' => 'edit-articles2', 'guard_name' => 'web']);
+
+        Passport::actingAsClient($this->testClient, ['*']);
+
+        $this->testUser->givePermissionTo($p1);
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->permissionMiddleware, 'edit-articles2', 'api')
         );
 
         $this->assertEquals(

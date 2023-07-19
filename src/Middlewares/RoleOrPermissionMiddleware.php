@@ -4,6 +4,7 @@ namespace Spatie\Permission\Middlewares;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\ClientService;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 
 class RoleOrPermissionMiddleware
@@ -11,6 +12,25 @@ class RoleOrPermissionMiddleware
     public function handle($request, Closure $next, $roleOrPermission, $guard = null)
     {
         $authGuard = Auth::guard($guard);
+
+        $rolesOrPermissions = is_array($roleOrPermission)
+            ? $roleOrPermission
+            : explode('|', $roleOrPermission);
+
+        // For machine-to-machine Passport clients
+        $bearerToken = $request->bearerToken();
+        if ($bearerToken) {
+            $client = ClientService::getClient($bearerToken);
+            $assignedRoles = ClientService::getClientRoles($client);
+            $assignedPermissions = ClientService::getClientPermissions($client);
+            $assignedRolesAndPermissions = array_merge($assignedRoles, $assignedPermissions);
+
+            foreach($rolesOrPermissions as $roleOrPermission) {
+                if (in_array($roleOrPermission, $assignedRolesAndPermissions)) {
+                    return $next($request);
+                }
+            }
+        }
         if ($authGuard->guest()) {
             throw UnauthorizedException::notLoggedIn();
         }
@@ -20,10 +40,6 @@ class RoleOrPermissionMiddleware
         if (! method_exists($user, 'hasAnyRole') || ! method_exists($user, 'hasAnyPermission')) {
             throw UnauthorizedException::missingTraitHasRoles($user);
         }
-
-        $rolesOrPermissions = is_array($roleOrPermission)
-            ? $roleOrPermission
-            : explode('|', $roleOrPermission);
 
         if (! $user->canAny($rolesOrPermissions) && ! $user->hasAnyRole($rolesOrPermissions)) {
             throw UnauthorizedException::forRolesOrPermissions($rolesOrPermissions);

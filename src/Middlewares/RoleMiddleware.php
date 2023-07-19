@@ -4,6 +4,7 @@ namespace Spatie\Permission\Middlewares;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\ClientService;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 
 class RoleMiddleware
@@ -11,6 +12,23 @@ class RoleMiddleware
     public function handle($request, Closure $next, $role, $guard = null)
     {
         $authGuard = Auth::guard($guard);
+
+        $roles = is_array($role)
+            ? $role
+            : explode('|', $role);
+
+        // For machine-to-machine Passport clients
+        $bearerToken = $request->bearerToken();
+        if ($bearerToken) {
+            $client = ClientService::getClient($bearerToken);
+            $assignedRoles = ClientService::getClientRoles($client);
+
+            foreach($roles as $role) {
+                if (in_array($role, $assignedRoles)) {
+                    return $next($request);
+                }
+            }
+        }
 
         if ($authGuard->guest()) {
             throw UnauthorizedException::notLoggedIn();
@@ -21,10 +39,6 @@ class RoleMiddleware
         if (! method_exists($user, 'hasAnyRole')) {
             throw UnauthorizedException::missingTraitHasRoles($user);
         }
-
-        $roles = is_array($role)
-            ? $role
-            : explode('|', $role);
 
         if (! $user->hasAnyRole($roles)) {
             throw UnauthorizedException::forRoles($roles);

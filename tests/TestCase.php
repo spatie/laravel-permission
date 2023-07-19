@@ -8,6 +8,8 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
+use Spatie\Permission\Tests\TestModels\Client;
+use Laravel\Passport\PassportServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
@@ -46,6 +48,9 @@ abstract class TestCase extends Orchestra
     protected static $migration;
 
     protected static $customMigration;
+    protected Client $testClient;
+    protected \Spatie\Permission\Models\Permission $testClientPermission;
+    protected \Spatie\Permission\Models\Role $testClientRole;
 
     protected function setUp(): void
     {
@@ -54,6 +59,9 @@ abstract class TestCase extends Orchestra
         if (! self::$migration) {
             $this->prepareMigration();
         }
+
+        $this->artisan('migrate:fresh');
+        $this->artisan('passport:keys');
 
         // Note: this also flushes the cache from within the migration
         $this->setUpDatabase($this->app);
@@ -72,6 +80,7 @@ abstract class TestCase extends Orchestra
     {
         return [
             PermissionServiceProvider::class,
+            PassportServiceProvider::class
         ];
     }
 
@@ -98,7 +107,7 @@ abstract class TestCase extends Orchestra
         $app['config']->set('view.paths', [__DIR__.'/resources/views']);
 
         // ensure api guard exists (required since Laravel 8.55)
-        $app['config']->set('auth.guards.api', ['driver' => 'session', 'provider' => 'users']);
+        $app['config']->set('auth.guards.api', ['driver' => 'passport', 'provider' => 'users']);
 
         // Set-up admin guard
         $app['config']->set('auth.guards.admin', ['driver' => 'session', 'provider' => 'admins']);
@@ -158,14 +167,21 @@ abstract class TestCase extends Orchestra
         }
 
         $this->testUser = User::create(['email' => 'test@user.com']);
-        $this->testAdmin = Admin::create(['email' => 'admin@user.com']);
         $this->testUserRole = $app[Role::class]->create(['name' => 'testRole']);
-        $app[Role::class]->create(['name' => 'testRole2']);
-        $this->testAdminRole = $app[Role::class]->create(['name' => 'testAdminRole', 'guard_name' => 'admin']);
         $this->testUserPermission = $app[Permission::class]->create(['name' => 'edit-articles']);
+
+        $this->testAdmin = Admin::create(['email' => 'admin@user.com']);
+        $this->testAdminRole = $app[Role::class]->create(['name' => 'testAdminRole', 'guard_name' => 'admin']);
+        $this->testAdminPermission = $app[Permission::class]->create(['name' => 'admin-permission', 'guard_name' => 'admin']);
+
+        $this->testClient = Client::create(['name' => 'Test', 'redirect' => 'https://google.com', 'personal_access_client' => 0, 'password_client' => 0, 'revoked' => 0]);
+        $this->testClientRole = $app[Role::class]->create(['name' => 'clientRole', 'guard_name' => 'api']);
+        $this->testClientPermission = $app[Permission::class]->create(['name' => 'edit-posts', 'guard_name' => 'api']);
+
+        $app[Role::class]->create(['name' => 'testRole2']);
+
         $app[Permission::class]->create(['name' => 'edit-news']);
         $app[Permission::class]->create(['name' => 'edit-blog']);
-        $this->testAdminPermission = $app[Permission::class]->create(['name' => 'admin-permission', 'guard_name' => 'admin']);
         $app[Permission::class]->create(['name' => 'Edit News']);
     }
 
