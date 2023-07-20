@@ -21,13 +21,13 @@ class RoleMiddleware
         $bearerToken = $request->bearerToken();
         if ($bearerToken) {
             $client = ClientService::getClient($bearerToken);
-            $assignedRoles = ClientService::getClientRoles($client);
 
-            foreach ($roles as $role) {
-                if (in_array($role, $assignedRoles)) {
-                    return $next($request);
-                }
+            if(!$client->hasAnyRole($roles))
+            {
+                throw UnauthorizedException::forRoles($roles);
             }
+
+            return $next($request);
         }
 
         if ($authGuard->guest()) {

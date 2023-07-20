@@ -76,21 +76,23 @@ class PermissionMiddlewareTest extends TestCase
     public function a_client_cannot_access_a_route_protected_by_the_permission_middleware_of_a_different_guard(): void
     {
         // These permissions are created fresh here in reverse order of guard being applied, so they are not "found first" in the db lookup when matching
+        app(Permission::class)->create(['name' => 'admin-permission2', 'guard_name' => 'web']);
+        $p1 = app(Permission::class)->create(['name' => 'admin-permission2', 'guard_name' => 'api-client']);
         app(Permission::class)->create(['name' => 'edit-articles2', 'guard_name' => 'admin']);
-        $p1 = app(Permission::class)->create(['name' => 'edit-articles2', 'guard_name' => 'web']);
+        $p2 = app(Permission::class)->create(['name' => 'edit-articles2', 'guard_name' => 'web']);
 
-        Passport::actingAsClient($this->testClient, ['*']);
+        Passport::actingAsClient($this->testClient, ['*'], 'api-client');
 
-        $this->testUser->givePermissionTo($p1);
+        $this->testClient->givePermissionTo($p1);
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-articles2', 'api')
+            $this->runMiddleware($this->permissionMiddleware, 'admin-permission2', 'api-client')
         );
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->permissionMiddleware, 'admin-permission2', 'web')
+            $this->runMiddleware($this->permissionMiddleware, 'edit-articles2', 'web')
         );
     }
 
@@ -125,13 +127,13 @@ class PermissionMiddlewareTest extends TestCase
     /** @test */
     public function a_client_can_access_a_route_protected_by_permission_middleware_if_have_this_permission(): void
     {
-        Passport::actingAsClient($this->testClient, ['*']);
+        Passport::actingAsClient($this->testClient, ['*'], 'api-client');
 
-        $this->testClient->givePermissionTo('edit-articles');
+        $this->testClient->givePermissionTo('edit-posts');
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-articles')
+            $this->runMiddleware($this->permissionMiddleware, 'edit-posts', 'api-client')
         );
     }
 
@@ -158,11 +160,11 @@ class PermissionMiddlewareTest extends TestCase
     {
         Passport::actingAsClient($this->testClient, ['*']);
 
-        $this->testClient->givePermissionTo('edit-articles');
+        $this->testClient->givePermissionTo('edit-posts');
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-news|edit-articles')
+            $this->runMiddleware($this->permissionMiddleware, 'edit-news|edit-posts')
         );
 
         $this->assertEquals(
@@ -202,11 +204,11 @@ class PermissionMiddlewareTest extends TestCase
     {
         Passport::actingAsClient($this->testClient, ['*']);
 
-        $this->testClient->givePermissionTo('edit-articles');
+        $this->testClient->givePermissionTo('edit-posts');
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-news')
+            $this->runMiddleware($this->permissionMiddleware, 'edit-news', 'api')
         );
     }
 
@@ -228,7 +230,7 @@ class PermissionMiddlewareTest extends TestCase
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-articles|edit-news')
+            $this->runMiddleware($this->permissionMiddleware, 'edit-articles|edit-posts')
         );
     }
 

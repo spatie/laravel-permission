@@ -7,6 +7,7 @@ use Laravel\Passport\Token;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Signer\Key\InMemory;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
+use Spatie\Permission\Exceptions\UnauthorizedException;
 
 class ClientService
 {
@@ -23,6 +24,10 @@ class ClientService
 
         $client = Token::find($tokenId)->client;
         $client->loadMissing(['permissions', 'roles.permissions']);
+
+        if (! method_exists($client, 'hasAnyRole') || ! method_exists($client, 'hasAnyPermission')) {
+            throw UnauthorizedException::missingTraitHasRoles($client);
+        }
 
         return $client;
     }

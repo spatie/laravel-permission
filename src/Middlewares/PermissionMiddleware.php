@@ -21,12 +21,9 @@ class PermissionMiddleware
         $bearerToken = $request->bearerToken();
         if ($bearerToken) {
             $client = ClientService::getClient($bearerToken);
-            $assignedPermissions = ClientService::getClientPermissions($client);
 
-            foreach ($permissions as $permission) {
-                if (in_array($permission, $assignedPermissions)) {
-                    return $next($request);
-                }
+            if (! $client->canAny($permissions)) {
+                throw UnauthorizedException::forPermissions($permissions);
             }
         }
 
