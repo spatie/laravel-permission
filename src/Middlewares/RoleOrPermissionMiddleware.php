@@ -13,27 +13,20 @@ class RoleOrPermissionMiddleware
     {
         $authGuard = Auth::guard($guard);
 
-        $rolesOrPermissions = is_array($roleOrPermission)
-            ? $roleOrPermission
-            : explode('|', $roleOrPermission);
-
         // For machine-to-machine Passport clients
-        $bearerToken = $request->bearerToken();
-        if ($bearerToken) {
-            $client = ClientService::getClient($bearerToken);
-
-            if (! $client->canAny($rolesOrPermissions) && ! $client->hasAnyRole($rolesOrPermissions)) {
-                throw UnauthorizedException::forRolesOrPermissions($rolesOrPermissions);
-            }
-
-            return $next($request);
+        if (method_exists($authGuard, 'client')) {
+            $user = $authGuard->client();
         }
 
-        if ($authGuard->guest()) {
+        $user = $user ?? $authGuard->user();
+
+        if (! $user) {
             throw UnauthorizedException::notLoggedIn();
         }
 
-        $user = $authGuard->user();
+        $rolesOrPermissions = is_array($roleOrPermission)
+            ? $roleOrPermission
+            : explode('|', $roleOrPermission);
 
         if (! method_exists($user, 'hasAnyRole') || ! method_exists($user, 'hasAnyPermission')) {
             throw UnauthorizedException::missingTraitHasRoles($user);

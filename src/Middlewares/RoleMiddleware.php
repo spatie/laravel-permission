@@ -13,31 +13,24 @@ class RoleMiddleware
     {
         $authGuard = Auth::guard($guard);
 
-        $roles = is_array($role)
-            ? $role
-            : explode('|', $role);
-
         // For machine-to-machine Passport clients
-        $bearerToken = $request->bearerToken();
-        if ($bearerToken) {
-            $client = ClientService::getClient($bearerToken);
-
-            if (! $client->hasAnyRole($roles)) {
-                throw UnauthorizedException::forRoles($roles);
-            }
-
-            return $next($request);
+        if (method_exists($authGuard, 'client')) {
+            $user = $authGuard->client();
         }
 
-        if ($authGuard->guest()) {
+        $user = $user ?? $authGuard->user();
+
+        if (! $user) {
             throw UnauthorizedException::notLoggedIn();
         }
-
-        $user = $authGuard->user();
 
         if (! method_exists($user, 'hasAnyRole')) {
             throw UnauthorizedException::missingTraitHasRoles($user);
         }
+
+        $roles = is_array($role)
+            ? $role
+            : explode('|', $role);
 
         if (! $user->hasAnyRole($roles)) {
             throw UnauthorizedException::forRoles($roles);
