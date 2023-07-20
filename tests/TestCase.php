@@ -249,8 +249,7 @@ abstract class TestCase extends Orchestra
     public function runMiddleware($middleware, $permission, $guard = null, bool $client = false)
     {
         $request = new Request;
-        if($client)
-        {
+        if ($client) {
             $request->headers->set('Authorization', 'Bearer '.str()->random(30));
         }
 

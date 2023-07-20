@@ -4,7 +4,6 @@ namespace Spatie\Permission\Middlewares;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
-use Spatie\Permission\ClientService;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 
 class RoleMiddleware
