@@ -22,8 +22,7 @@ class RoleMiddleware
         if ($bearerToken) {
             $client = ClientService::getClient($bearerToken);
 
-            if(!$client->hasAnyRole($roles))
-            {
+            if (! $client->hasAnyRole($roles)) {
                 throw UnauthorizedException::forRoles($roles);
             }
 
