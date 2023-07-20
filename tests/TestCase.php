@@ -112,9 +112,6 @@ abstract class TestCase extends Orchestra
         // ensure api guard exists (required since Laravel 8.55)
         $app['config']->set('auth.guards.api', ['driver' => 'passport', 'provider' => 'users']);
 
-        $app['config']->set('auth.guards.api-client', ['driver' => 'passport', 'provider' => 'clients']);
-        $app['config']->set('auth.providers.clients', ['driver' => 'eloquent', 'model' => Client::class]);
-
         // Set-up admin guard
         $app['config']->set('auth.guards.admin', ['driver' => 'session', 'provider' => 'admins']);
         $app['config']->set('auth.providers.admins', ['driver' => 'eloquent', 'model' => Admin::class]);
@@ -181,8 +178,8 @@ abstract class TestCase extends Orchestra
         $this->testAdminPermission = $app[Permission::class]->create(['name' => 'admin-permission', 'guard_name' => 'admin']);
 
         $this->testClient = Client::create(['name' => 'Test', 'redirect' => 'https://google.com', 'personal_access_client' => 0, 'password_client' => 0, 'revoked' => 0]);
-        $this->testClientRole = $app[Role::class]->create(['name' => 'clientRole', 'guard_name' => 'api-client']);
-        $this->testClientPermission = $app[Permission::class]->create(['name' => 'edit-posts', 'guard_name' => 'api-client']);
+        $this->testClientRole = $app[Role::class]->create(['name' => 'clientRole', 'guard_name' => 'api']);
+        $this->testClientPermission = $app[Permission::class]->create(['name' => 'edit-posts', 'guard_name' => 'api']);
 
         $app[Role::class]->create(['name' => 'testRole2']);
 

@@ -13,29 +13,24 @@ class PermissionMiddleware
     {
         $authGuard = Auth::guard($guard);
 
-        $permissions = is_array($permission)
-            ? $permission
-            : explode('|', $permission);
-
         // For machine-to-machine Passport clients
-        $bearerToken = $request->bearerToken();
-        if ($bearerToken) {
-            $client = ClientService::getClient($bearerToken);
-
-            if (! $client->canAny($permissions)) {
-                throw UnauthorizedException::forPermissions($permissions);
-            }
+        if (method_exists($authGuard, 'client')) {
+            $user = $authGuard->client();
         }
 
-        if ($authGuard->guest()) {
+        $user = $user ?? $authGuard->user();
+
+        if (!$user) {
             throw UnauthorizedException::notLoggedIn();
         }
-
-        $user = $authGuard->user();
 
         if (! method_exists($user, 'hasAnyPermission')) {
             throw UnauthorizedException::missingTraitHasRoles($user);
         }
+
+        $permissions = is_array($permission)
+            ? $permission
+            : explode('|', $permission);
 
         if (! $user->canAny($permissions)) {
             throw UnauthorizedException::forPermissions($permissions);
