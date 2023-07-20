@@ -246,10 +246,16 @@ abstract class TestCase extends Orchestra
     }
 
     ////// TEST HELPERS
-    public function runMiddleware($middleware, $permission, $guard = null)
+    public function runMiddleware($middleware, $permission, $guard = null, bool $client = false)
     {
+        $request = new Request;
+        if($client)
+        {
+            $request->headers->set('Authorization', 'Bearer '.str()->random(30));
+        }
+
         try {
-            return $middleware->handle(new Request(), function () {
+            return $middleware->handle($request, function () {
                 return (new Response())->setContent('<html></html>');
             }, $permission, $guard)->status();
         } catch (UnauthorizedException $e) {

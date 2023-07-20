@@ -77,14 +77,14 @@ class RoleOrPermissionMiddlewareTest extends TestCase
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'clientRole|edit-news|edit-posts')
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'clientRole|edit-news|edit-posts', 'api', true)
         );
 
         $this->testClient->removeRole('clientRole');
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'clientRole|edit-posts')
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'clientRole|edit-posts', 'api', true)
         );
 
         $this->testClient->revokePermissionTo('edit-posts');
@@ -92,12 +92,12 @@ class RoleOrPermissionMiddlewareTest extends TestCase
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'clientRole|edit-posts')
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'clientRole|edit-posts', 'api', true)
         );
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, ['clientRole', 'edit-posts'])
+            $this->runMiddleware($this->roleOrPermissionMiddleware, ['clientRole', 'edit-posts'], 'api', true)
         );
     }
 
@@ -136,12 +136,12 @@ class RoleOrPermissionMiddlewareTest extends TestCase
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles')
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles', 'api', true)
         );
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'missingRole|missingPermission')
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'missingRole|missingPermission', 'api', true)
         );
     }
 
@@ -152,12 +152,12 @@ class RoleOrPermissionMiddlewareTest extends TestCase
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'clientRole|edit-posts')
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'clientRole|edit-posts', 'api', true)
         );
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'missingRole|missingPermission')
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'missingRole|missingPermission', 'api', true)
         );
     }
 
@@ -201,7 +201,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'edit-posts|clientRole', 'admin')
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'edit-posts|clientRole', 'admin', true)
         );
     }
 

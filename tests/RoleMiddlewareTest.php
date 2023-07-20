@@ -48,13 +48,13 @@ class RoleMiddlewareTest extends TestCase
     /** @test */
     public function a_client_cannot_access_a_route_protected_by_role_middleware_of_another_guard(): void
     {
-        $client = Passport::actingAsClient($this->testClient, ['*']);
+        Passport::actingAsClient($this->testClient, ['*']);
 
         $this->testClient->assignRole('clientRole');
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->roleMiddleware, 'testAdminRole')
+            $this->runMiddleware($this->roleMiddleware, 'testAdminRole', 'api', true)
         );
     }
 
@@ -80,7 +80,7 @@ class RoleMiddlewareTest extends TestCase
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->roleMiddleware, 'clientRole')
+            $this->runMiddleware($this->roleMiddleware, 'clientRole', 'api', true)
         );
     }
 
@@ -111,12 +111,12 @@ class RoleMiddlewareTest extends TestCase
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->roleMiddleware, 'clientRole|testRole2')
+            $this->runMiddleware($this->roleMiddleware, 'clientRole|testRole2', 'api', true)
         );
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->roleMiddleware, ['testRole2', 'clientRole'])
+            $this->runMiddleware($this->roleMiddleware, ['testRole2', 'clientRole'], 'api', true)
         );
     }
 
@@ -151,11 +151,11 @@ class RoleMiddlewareTest extends TestCase
     {
         Passport::actingAsClient($this->testClient, ['*']);
 
-        $this->testUser->assignRole(['clientRole']);
+        $this->testClient->assignRole(['clientRole']);
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->roleMiddleware, 'clientRole2')
+            $this->runMiddleware($this->roleMiddleware, 'clientRole2', 'api', true)
         );
     }
 
@@ -177,7 +177,7 @@ class RoleMiddlewareTest extends TestCase
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->roleMiddleware, 'testRole|testRole2')
+            $this->runMiddleware($this->roleMiddleware, 'testRole|testRole2', 'api', true)
         );
     }
 
@@ -199,7 +199,7 @@ class RoleMiddlewareTest extends TestCase
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->roleMiddleware, '')
+            $this->runMiddleware($this->roleMiddleware, '', 'api', true)
         );
     }
 
@@ -277,11 +277,11 @@ class RoleMiddlewareTest extends TestCase
     {
         Passport::actingAsClient($this->testClient, ['*']);
 
-        $this->testUser->assignRole('clientRole');
+        $this->testClient->assignRole('clientRole');
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->roleMiddleware, 'clientRole', 'admin')
+            $this->runMiddleware($this->roleMiddleware, 'clientRole', 'admin', true)
         );
     }
 

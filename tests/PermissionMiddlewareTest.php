@@ -85,12 +85,12 @@ class PermissionMiddlewareTest extends TestCase
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->permissionMiddleware, 'admin-permission2', 'api')
+            $this->runMiddleware($this->permissionMiddleware, 'admin-permission2', 'api', true)
         );
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-articles2', 'web')
+            $this->runMiddleware($this->permissionMiddleware, 'edit-articles2', 'web', true)
         );
     }
 
@@ -131,7 +131,7 @@ class PermissionMiddlewareTest extends TestCase
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-posts', 'api')
+            $this->runMiddleware($this->permissionMiddleware, 'edit-posts', 'api', true)
         );
     }
 
@@ -162,12 +162,12 @@ class PermissionMiddlewareTest extends TestCase
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-news|edit-posts')
+            $this->runMiddleware($this->permissionMiddleware, 'edit-news|edit-posts', 'api', true)
         );
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->permissionMiddleware, ['edit-news', 'edit-posts'])
+            $this->runMiddleware($this->permissionMiddleware, ['edit-news', 'edit-posts'], 'api', true)
         );
     }
 
@@ -206,7 +206,7 @@ class PermissionMiddlewareTest extends TestCase
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-news', 'api')
+            $this->runMiddleware($this->permissionMiddleware, 'edit-news', 'api', true)
         );
     }
 
@@ -228,7 +228,7 @@ class PermissionMiddlewareTest extends TestCase
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-articles|edit-posts')
+            $this->runMiddleware($this->permissionMiddleware, 'edit-articles|edit-posts', 'api', true)
         );
     }
 
@@ -258,7 +258,7 @@ class PermissionMiddlewareTest extends TestCase
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-articles')
+            $this->runMiddleware($this->permissionMiddleware, 'edit-articles', 'api', true)
         );
 
         $this->testClientRole->givePermissionTo('edit-posts');
@@ -266,7 +266,7 @@ class PermissionMiddlewareTest extends TestCase
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-posts')
+            $this->runMiddleware($this->permissionMiddleware, 'edit-posts', 'api', true)
         );
     }
 
@@ -348,7 +348,7 @@ class PermissionMiddlewareTest extends TestCase
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-posts', 'admin')
+            $this->runMiddleware($this->permissionMiddleware, 'edit-posts', 'admin', true)
         );
     }
 
