@@ -54,7 +54,7 @@ class RoleMiddlewareTest extends TestCase
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->roleMiddleware, 'testAdminRole', 'api', true)
+            $this->runMiddleware($this->roleMiddleware, 'testAdminRole', null, true)
         );
     }
 
@@ -80,7 +80,7 @@ class RoleMiddlewareTest extends TestCase
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->roleMiddleware, 'clientRole', 'api', true)
+            $this->runMiddleware($this->roleMiddleware, 'clientRole', null, true)
         );
     }
 
@@ -111,12 +111,12 @@ class RoleMiddlewareTest extends TestCase
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->roleMiddleware, 'clientRole|testRole2', 'api', true)
+            $this->runMiddleware($this->roleMiddleware, 'clientRole|testRole2', null, true)
         );
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->roleMiddleware, ['testRole2', 'clientRole'], 'api', true)
+            $this->runMiddleware($this->roleMiddleware, ['testRole2', 'clientRole'], null, true)
         );
     }
 
@@ -155,7 +155,7 @@ class RoleMiddlewareTest extends TestCase
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->roleMiddleware, 'clientRole2', 'api', true)
+            $this->runMiddleware($this->roleMiddleware, 'clientRole2', null, true)
         );
     }
 
@@ -177,7 +177,7 @@ class RoleMiddlewareTest extends TestCase
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->roleMiddleware, 'testRole|testRole2', 'api', true)
+            $this->runMiddleware($this->roleMiddleware, 'testRole|testRole2', null, true)
         );
     }
 
@@ -199,7 +199,7 @@ class RoleMiddlewareTest extends TestCase
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->roleMiddleware, '', 'api', true)
+            $this->runMiddleware($this->roleMiddleware, '', null, true)
         );
     }
 

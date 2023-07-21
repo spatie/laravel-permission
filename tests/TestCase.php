@@ -177,7 +177,7 @@ abstract class TestCase extends Orchestra
         $this->testAdminRole = $app[Role::class]->create(['name' => 'testAdminRole', 'guard_name' => 'admin']);
         $this->testAdminPermission = $app[Permission::class]->create(['name' => 'admin-permission', 'guard_name' => 'admin']);
 
-        $this->testClient = Client::create(['name' => 'Test', 'redirect' => 'https://google.com', 'personal_access_client' => 0, 'password_client' => 0, 'revoked' => 0]);
+        $this->testClient = Client::create(['name' => 'Test', 'redirect' => 'https://example.com', 'personal_access_client' => 0, 'password_client' => 0, 'revoked' => 0]);
         $this->testClientRole = $app[Role::class]->create(['name' => 'clientRole', 'guard_name' => 'api']);
         $this->testClientPermission = $app[Permission::class]->create(['name' => 'edit-posts', 'guard_name' => 'api']);
 

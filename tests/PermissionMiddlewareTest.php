@@ -131,7 +131,7 @@ class PermissionMiddlewareTest extends TestCase
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-posts', 'api', true)
+            $this->runMiddleware($this->permissionMiddleware, 'edit-posts', null, true)
         );
     }
 
@@ -162,12 +162,12 @@ class PermissionMiddlewareTest extends TestCase
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-news|edit-posts', 'api', true)
+            $this->runMiddleware($this->permissionMiddleware, 'edit-news|edit-posts', null, true)
         );
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->permissionMiddleware, ['edit-news', 'edit-posts'], 'api', true)
+            $this->runMiddleware($this->permissionMiddleware, ['edit-news', 'edit-posts'], null, true)
         );
     }
 
@@ -206,7 +206,7 @@ class PermissionMiddlewareTest extends TestCase
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-news', 'api', true)
+            $this->runMiddleware($this->permissionMiddleware, 'edit-news', null, true)
         );
     }
 
@@ -228,7 +228,7 @@ class PermissionMiddlewareTest extends TestCase
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-articles|edit-posts', 'api', true)
+            $this->runMiddleware($this->permissionMiddleware, 'edit-articles|edit-posts', null, true)
         );
     }
 
@@ -258,7 +258,7 @@ class PermissionMiddlewareTest extends TestCase
 
         $this->assertEquals(
             403,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-articles', 'api', true)
+            $this->runMiddleware($this->permissionMiddleware, 'edit-articles', null, true)
         );
 
         $this->testClientRole->givePermissionTo('edit-posts');
@@ -266,7 +266,7 @@ class PermissionMiddlewareTest extends TestCase
 
         $this->assertEquals(
             200,
-            $this->runMiddleware($this->permissionMiddleware, 'edit-posts', 'api', true)
+            $this->runMiddleware($this->permissionMiddleware, 'edit-posts', null, true)
         );
     }
 

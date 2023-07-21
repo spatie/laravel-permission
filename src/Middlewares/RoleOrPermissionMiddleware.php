@@ -24,13 +24,13 @@ class RoleOrPermissionMiddleware
             throw UnauthorizedException::notLoggedIn();
         }
 
-        $rolesOrPermissions = is_array($roleOrPermission)
-            ? $roleOrPermission
-            : explode('|', $roleOrPermission);
-
         if (! method_exists($user, 'hasAnyRole') || ! method_exists($user, 'hasAnyPermission')) {
             throw UnauthorizedException::missingTraitHasRoles($user);
         }
+
+        $rolesOrPermissions = is_array($roleOrPermission)
+            ? $roleOrPermission
+            : explode('|', $roleOrPermission);
 
         if (! $user->canAny($rolesOrPermissions) && ! $user->hasAnyRole($rolesOrPermissions)) {
             throw UnauthorizedException::forRolesOrPermissions($rolesOrPermissions);
