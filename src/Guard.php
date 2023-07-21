@@ -2,8 +2,10 @@
 
 namespace Spatie\Permission;
 
+use Illuminate\Contracts\Auth\Access\Authorizable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class Guard
 {
@@ -71,5 +73,35 @@ class Guard
         }
 
         return $possible_guards->first() ?: $default;
+    }
+
+    /**
+     * Lookup a passport guard
+     */
+    public static function getPassportClient($guard): ?Authorizable
+    {
+        $guards = collect(config('auth.guards'))->where('driver', 'passport');
+
+        if (! $guards->count()) {
+            return null;
+        }
+
+        $authGuard = Auth::guard($guards->keys()[0]);
+
+        if (! \method_exists($authGuard, 'client')) {
+            return null;
+        }
+
+        $client = $authGuard->client();
+
+        if (! $guard || ! $client) {
+            return $client;
+        }
+
+        if (self::getNames($client)->contains($guard)) {
+            return $client;
+        }
+
+        return null;
     }
 }

@@ -4,8 +4,8 @@ namespace Spatie\Permission\Middlewares;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
-use Laravel\Passport\Guards\TokenGuard;
 use Spatie\Permission\Exceptions\UnauthorizedException;
+use Spatie\Permission\Guard;
 
 class RoleOrPermissionMiddleware
 {
@@ -13,19 +13,12 @@ class RoleOrPermissionMiddleware
     {
         $authGuard = Auth::guard($guard);
 
+        $user = $authGuard->user();
+
         // For machine-to-machine Passport clients
-        $bearerToken = $request->bearerToken();
-        if ($bearerToken) {
-            if (! $authGuard instanceof TokenGuard && ! $guard) {
-                $authGuard = Auth::guard('api');
-            }
-
-            if (method_exists($authGuard, 'client')) {
-                $user = $authGuard->client();
-            }
+        if (! $user && $request->bearerToken()) {
+            $user = Guard::getPassportClient($guard);
         }
-
-        $user = $user ?? $authGuard->user();
 
         if (! $user) {
             throw UnauthorizedException::notLoggedIn();

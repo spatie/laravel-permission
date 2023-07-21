@@ -16,6 +16,8 @@ class RoleMiddlewareTest extends TestCase
 {
     protected $roleMiddleware;
 
+    protected $usePassport = true;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -48,6 +50,10 @@ class RoleMiddlewareTest extends TestCase
     /** @test */
     public function a_client_cannot_access_a_route_protected_by_role_middleware_of_another_guard(): void
     {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
         Passport::actingAsClient($this->testClient, ['*']);
 
         $this->testClient->assignRole('clientRole');
@@ -74,6 +80,10 @@ class RoleMiddlewareTest extends TestCase
     /** @test */
     public function a_client_can_access_a_route_protected_by_role_middleware_if_have_this_role(): void
     {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
         Passport::actingAsClient($this->testClient, ['*']);
 
         $this->testClient->assignRole('clientRole');
@@ -105,6 +115,10 @@ class RoleMiddlewareTest extends TestCase
     /** @test */
     public function a_client_can_access_a_route_protected_by_this_role_middleware_if_have_one_of_the_roles(): void
     {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
         Passport::actingAsClient($this->testClient, ['*']);
 
         $this->testClient->assignRole('clientRole');
@@ -149,6 +163,10 @@ class RoleMiddlewareTest extends TestCase
     /** @test */
     public function a_client_cannot_access_a_route_protected_by_the_role_middleware_if_have_a_different_role(): void
     {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
         Passport::actingAsClient($this->testClient, ['*']);
 
         $this->testClient->assignRole(['clientRole']);
@@ -173,6 +191,10 @@ class RoleMiddlewareTest extends TestCase
     /** @test */
     public function a_client_cannot_access_a_route_protected_by_role_middleware_if_have_not_roles(): void
     {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
         Passport::actingAsClient($this->testClient, ['*']);
 
         $this->assertEquals(
@@ -195,6 +217,10 @@ class RoleMiddlewareTest extends TestCase
     /** @test */
     public function a_client_cannot_access_a_route_protected_by_role_middleware_if_role_is_undefined(): void
     {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
         Passport::actingAsClient($this->testClient, ['*']);
 
         $this->assertEquals(
@@ -275,6 +301,10 @@ class RoleMiddlewareTest extends TestCase
     /** @test */
     public function client_can_not_access_role_with_guard_admin_while_login_using_default_guard(): void
     {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
         Passport::actingAsClient($this->testClient, ['*']);
 
         $this->testClient->assignRole('clientRole');
