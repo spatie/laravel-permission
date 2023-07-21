@@ -170,21 +170,19 @@ abstract class TestCase extends Orchestra
         }
 
         $this->testUser = User::create(['email' => 'test@user.com']);
-        $this->testUserRole = $app[Role::class]->create(['name' => 'testRole']);
-        $this->testUserPermission = $app[Permission::class]->create(['name' => 'edit-articles']);
-
         $this->testAdmin = Admin::create(['email' => 'admin@user.com']);
+        $this->testUserRole = $app[Role::class]->create(['name' => 'testRole']);
+        $app[Role::class]->create(['name' => 'testRole2']);
         $this->testAdminRole = $app[Role::class]->create(['name' => 'testAdminRole', 'guard_name' => 'admin']);
-        $this->testAdminPermission = $app[Permission::class]->create(['name' => 'admin-permission', 'guard_name' => 'admin']);
+        $this->testUserPermission = $app[Permission::class]->create(['name' => 'edit-articles']);
 
         $this->testClient = Client::create(['name' => 'Test', 'redirect' => 'https://example.com', 'personal_access_client' => 0, 'password_client' => 0, 'revoked' => 0]);
         $this->testClientRole = $app[Role::class]->create(['name' => 'clientRole', 'guard_name' => 'api']);
         $this->testClientPermission = $app[Permission::class]->create(['name' => 'edit-posts', 'guard_name' => 'api']);
 
-        $app[Role::class]->create(['name' => 'testRole2']);
-
         $app[Permission::class]->create(['name' => 'edit-news']);
         $app[Permission::class]->create(['name' => 'edit-blog']);
+        $this->testAdminPermission = $app[Permission::class]->create(['name' => 'admin-permission', 'guard_name' => 'admin']);
         $app[Permission::class]->create(['name' => 'Edit News']);
     }
 
