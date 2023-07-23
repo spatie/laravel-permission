@@ -67,7 +67,7 @@ class Show extends Command
 
                         return implode('_', $name);
                     })
-                        ->prepend('')->toArray(),
+                        ->prepend(new TableCell(''))->toArray(),
                 ),
                 $body->toArray(),
                 $style
