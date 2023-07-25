@@ -292,6 +292,7 @@ abstract class TestCase extends Orchestra
             return (new Response())->setContent('<html></html>');
         };
     }
+
     protected function getLaravelVersion()
     {
         return (float) app()->version();
