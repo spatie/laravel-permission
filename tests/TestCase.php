@@ -49,6 +49,9 @@ abstract class TestCase extends Orchestra
 
     protected static $customMigration;
 
+    /** @var bool */
+    protected $usePassport = false;
+
     protected Client $testClient;
 
     protected \Spatie\Permission\Models\Permission $testClientPermission;
@@ -63,13 +66,14 @@ abstract class TestCase extends Orchestra
             $this->prepareMigration();
         }
 
-        $this->artisan('migrate:fresh');
-        $this->artisan('passport:keys');
-
         // Note: this also flushes the cache from within the migration
         $this->setUpDatabase($this->app);
         if ($this->hasTeams) {
             setPermissionsTeamId(1);
+        }
+
+        if ($this->usePassport) {
+            $this->setUpPassport($this->app);
         }
 
         $this->setUpRoutes();
@@ -81,7 +85,9 @@ abstract class TestCase extends Orchestra
      */
     protected function getPackageProviders($app)
     {
-        return [
+        return $this->getLaravelVersion() < 9 ? [
+            PermissionServiceProvider::class,
+        ] : [
             PermissionServiceProvider::class,
             PassportServiceProvider::class,
         ];
@@ -110,7 +116,7 @@ abstract class TestCase extends Orchestra
         $app['config']->set('view.paths', [__DIR__.'/resources/views']);
 
         // ensure api guard exists (required since Laravel 8.55)
-        $app['config']->set('auth.guards.api', ['driver' => 'passport', 'provider' => 'users']);
+        $app['config']->set('auth.guards.api', ['driver' => 'session', 'provider' => 'users']);
 
         // Set-up admin guard
         $app['config']->set('auth.guards.admin', ['driver' => 'session', 'provider' => 'admins']);
@@ -175,15 +181,25 @@ abstract class TestCase extends Orchestra
         $app[Role::class]->create(['name' => 'testRole2']);
         $this->testAdminRole = $app[Role::class]->create(['name' => 'testAdminRole', 'guard_name' => 'admin']);
         $this->testUserPermission = $app[Permission::class]->create(['name' => 'edit-articles']);
-
-        $this->testClient = Client::create(['name' => 'Test', 'redirect' => 'https://example.com', 'personal_access_client' => 0, 'password_client' => 0, 'revoked' => 0]);
-        $this->testClientRole = $app[Role::class]->create(['name' => 'clientRole', 'guard_name' => 'api']);
-        $this->testClientPermission = $app[Permission::class]->create(['name' => 'edit-posts', 'guard_name' => 'api']);
-
         $app[Permission::class]->create(['name' => 'edit-news']);
         $app[Permission::class]->create(['name' => 'edit-blog']);
         $this->testAdminPermission = $app[Permission::class]->create(['name' => 'admin-permission', 'guard_name' => 'admin']);
         $app[Permission::class]->create(['name' => 'Edit News']);
+    }
+
+    protected function setUpPassport($app)
+    {
+        if ($this->getLaravelVersion() < 9) {
+            return;
+        }
+        $app['config']->set('auth.guards.api', ['driver' => 'passport', 'provider' => 'users']);
+
+        $this->artisan('migrate');
+        $this->artisan('passport:install');
+
+        $this->testClient = Client::create(['name' => 'Test', 'redirect' => 'https://example.com', 'personal_access_client' => 0, 'password_client' => 0, 'revoked' => 0]);
+        $this->testClientRole = $app[Role::class]->create(['name' => 'clientRole', 'guard_name' => 'api']);
+        $this->testClientPermission = $app[Permission::class]->create(['name' => 'edit-posts', 'guard_name' => 'api']);
     }
 
     private function prepareMigration()
@@ -275,5 +291,9 @@ abstract class TestCase extends Orchestra
         return function () {
             return (new Response())->setContent('<html></html>');
         };
+    }
+    protected function getLaravelVersion()
+    {
+        return (float) app()->version();
     }
 }

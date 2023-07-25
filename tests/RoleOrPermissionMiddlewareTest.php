@@ -17,6 +17,8 @@ class RoleOrPermissionMiddlewareTest extends TestCase
 {
     protected $roleOrPermissionMiddleware;
 
+    protected $usePassport = true;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -70,6 +72,10 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     /** @test */
     public function a_client_can_access_a_route_protected_by_permission_or_role_middleware_if_has_this_permission_or_role(): void
     {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
         Passport::actingAsClient($this->testClient, ['*']);
 
         $this->testClient->assignRole('clientRole');
@@ -148,6 +154,10 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     /** @test */
     public function a_client_can_not_access_a_route_protected_by_permission_or_role_middleware_if_have_not_this_permission_and_role(): void
     {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
         Passport::actingAsClient($this->testClient, ['*']);
 
         $this->assertEquals(
@@ -194,6 +204,10 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     /** @test */
     public function client_can_not_access_permission_or_role_with_guard_admin_while_login_using_default_guard(): void
     {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
         Passport::actingAsClient($this->testClient, ['*']);
 
         $this->testClient->assignRole('clientRole');

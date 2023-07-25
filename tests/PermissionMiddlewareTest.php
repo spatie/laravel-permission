@@ -18,6 +18,8 @@ class PermissionMiddlewareTest extends TestCase
 {
     protected $permissionMiddleware;
 
+    protected $usePassport = true;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -75,6 +77,10 @@ class PermissionMiddlewareTest extends TestCase
     /** @test */
     public function a_client_cannot_access_a_route_protected_by_the_permission_middleware_of_a_different_guard(): void
     {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
         // These permissions are created fresh here in reverse order of guard being applied, so they are not "found first" in the db lookup when matching
         app(Permission::class)->create(['name' => 'admin-permission2', 'guard_name' => 'web']);
         $p1 = app(Permission::class)->create(['name' => 'admin-permission2', 'guard_name' => 'api']);
@@ -125,6 +131,10 @@ class PermissionMiddlewareTest extends TestCase
     /** @test */
     public function a_client_can_access_a_route_protected_by_permission_middleware_if_have_this_permission(): void
     {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
         Passport::actingAsClient($this->testClient, ['*'], 'api');
 
         $this->testClient->givePermissionTo('edit-posts');
@@ -156,6 +166,10 @@ class PermissionMiddlewareTest extends TestCase
     /** @test */
     public function a_client_can_access_a_route_protected_by_this_permission_middleware_if_have_one_of_the_permissions(): void
     {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
         Passport::actingAsClient($this->testClient, ['*']);
 
         $this->testClient->givePermissionTo('edit-posts');
@@ -200,6 +214,10 @@ class PermissionMiddlewareTest extends TestCase
     /** @test */
     public function a_client_cannot_access_a_route_protected_by_the_permission_middleware_if_have_a_different_permission(): void
     {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
         Passport::actingAsClient($this->testClient, ['*']);
 
         $this->testClient->givePermissionTo('edit-posts');
@@ -224,6 +242,10 @@ class PermissionMiddlewareTest extends TestCase
     /** @test */
     public function a_client_cannot_access_a_route_protected_by_permission_middleware_if_have_not_permissions(): void
     {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
         Passport::actingAsClient($this->testClient, ['*']);
 
         $this->assertEquals(
@@ -254,6 +276,10 @@ class PermissionMiddlewareTest extends TestCase
     /** @test */
     public function a_client_can_access_a_route_protected_by_permission_middleware_if_has_permission_via_role(): void
     {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
         Passport::actingAsClient($this->testClient, ['*']);
 
         $this->assertEquals(
@@ -342,6 +368,10 @@ class PermissionMiddlewareTest extends TestCase
     /** @test */
     public function client_can_not_access_permission_with_guard_admin_while_login_using_default_guard(): void
     {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
         Passport::actingAsClient($this->testClient, ['*']);
 
         $this->testClient->givePermissionTo('edit-posts');
