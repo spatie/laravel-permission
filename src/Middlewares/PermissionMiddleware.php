@@ -5,6 +5,7 @@ namespace Spatie\Permission\Middlewares;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Exceptions\UnauthorizedException;
+use Spatie\Permission\Guard;
 
 class PermissionMiddleware
 {
@@ -12,11 +13,16 @@ class PermissionMiddleware
     {
         $authGuard = Auth::guard($guard);
 
-        if ($authGuard->guest()) {
-            throw UnauthorizedException::notLoggedIn();
+        $user = $authGuard->user();
+
+        // For machine-to-machine Passport clients
+        if (! $user && $request->bearerToken() && config('permission.use_passport_client_credentials')) {
+            $user = Guard::getPassportClient($guard);
         }
 
-        $user = $authGuard->user();
+        if (! $user) {
+            throw UnauthorizedException::notLoggedIn();
+        }
 
         if (! method_exists($user, 'hasAnyPermission')) {
             throw UnauthorizedException::missingTraitHasRoles($user);

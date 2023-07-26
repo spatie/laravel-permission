@@ -40,6 +40,10 @@ jobs:
           extensions: curl, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, iconv
           coverage: none
 
+      - name: Install dependencies (remove passport)
+        run: composer remove --dev laravel/passport --no-interaction --no-update
+        if: matrix.laravel == '8.*'
+
       - name: Install dependencies
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" "symfony/console:>=4.3.4" "mockery/mockery:^1.3.2" "nesbot/carbon:>=2.62.1" --no-interaction --no-update

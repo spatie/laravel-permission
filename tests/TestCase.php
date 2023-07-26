@@ -8,6 +8,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
+use Laravel\Passport\PassportServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
@@ -15,6 +16,7 @@ use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\PermissionServiceProvider;
 use Spatie\Permission\Tests\TestModels\Admin;
+use Spatie\Permission\Tests\TestModels\Client;
 use Spatie\Permission\Tests\TestModels\User;
 
 abstract class TestCase extends Orchestra
@@ -47,6 +49,15 @@ abstract class TestCase extends Orchestra
 
     protected static $customMigration;
 
+    /** @var bool */
+    protected $usePassport = false;
+
+    protected Client $testClient;
+
+    protected \Spatie\Permission\Models\Permission $testClientPermission;
+
+    protected \Spatie\Permission\Models\Role $testClientRole;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -61,6 +72,10 @@ abstract class TestCase extends Orchestra
             setPermissionsTeamId(1);
         }
 
+        if ($this->usePassport) {
+            $this->setUpPassport($this->app);
+        }
+
         $this->setUpRoutes();
     }
 
@@ -70,8 +85,11 @@ abstract class TestCase extends Orchestra
      */
     protected function getPackageProviders($app)
     {
-        return [
+        return $this->getLaravelVersion() < 9 ? [
             PermissionServiceProvider::class,
+        ] : [
+            PermissionServiceProvider::class,
+            PassportServiceProvider::class,
         ];
     }
 
@@ -169,6 +187,23 @@ abstract class TestCase extends Orchestra
         $app[Permission::class]->create(['name' => 'Edit News']);
     }
 
+    protected function setUpPassport($app): void
+    {
+        if ($this->getLaravelVersion() < 9) {
+            return;
+        }
+
+        $app['config']->set('permission.use_passport_client_credentials', true);
+        $app['config']->set('auth.guards.api', ['driver' => 'passport', 'provider' => 'users']);
+
+        $this->artisan('migrate');
+        $this->artisan('passport:install');
+
+        $this->testClient = Client::create(['name' => 'Test', 'redirect' => 'https://example.com', 'personal_access_client' => 0, 'password_client' => 0, 'revoked' => 0]);
+        $this->testClientRole = $app[Role::class]->create(['name' => 'clientRole', 'guard_name' => 'api']);
+        $this->testClientPermission = $app[Permission::class]->create(['name' => 'edit-posts', 'guard_name' => 'api']);
+    }
+
     private function prepareMigration()
     {
         $migration = str_replace(
@@ -227,10 +262,15 @@ abstract class TestCase extends Orchestra
     }
 
     ////// TEST HELPERS
-    public function runMiddleware($middleware, $permission, $guard = null)
+    public function runMiddleware($middleware, $permission, $guard = null, bool $client = false)
     {
+        $request = new Request;
+        if ($client) {
+            $request->headers->set('Authorization', 'Bearer '.str()->random(30));
+        }
+
         try {
-            return $middleware->handle(new Request(), function () {
+            return $middleware->handle($request, function () {
                 return (new Response())->setContent('<html></html>');
             }, $permission, $guard)->status();
         } catch (UnauthorizedException $e) {
@@ -253,5 +293,10 @@ abstract class TestCase extends Orchestra
         return function () {
             return (new Response())->setContent('<html></html>');
         };
+    }
+
+    protected function getLaravelVersion()
+    {
+        return (float) app()->version();
     }
 }

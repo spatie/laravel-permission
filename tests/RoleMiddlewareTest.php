@@ -7,6 +7,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use InvalidArgumentException;
+use Laravel\Passport\Passport;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middlewares\RoleMiddleware;
 use Spatie\Permission\Tests\TestModels\UserWithoutHasRoles;
@@ -14,6 +15,8 @@ use Spatie\Permission\Tests\TestModels\UserWithoutHasRoles;
 class RoleMiddlewareTest extends TestCase
 {
     protected $roleMiddleware;
+
+    protected $usePassport = true;
 
     protected function setUp(): void
     {
@@ -45,6 +48,23 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    public function a_client_cannot_access_a_route_protected_by_role_middleware_of_another_guard(): void
+    {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
+        Passport::actingAsClient($this->testClient, ['*']);
+
+        $this->testClient->assignRole('clientRole');
+
+        $this->assertEquals(
+            403,
+            $this->runMiddleware($this->roleMiddleware, 'testAdminRole', null, true)
+        );
+    }
+
+    /** @test */
     public function a_user_can_access_a_route_protected_by_role_middleware_if_have_this_role()
     {
         Auth::login($this->testUser);
@@ -54,6 +74,23 @@ class RoleMiddlewareTest extends TestCase
         $this->assertEquals(
             200,
             $this->runMiddleware($this->roleMiddleware, 'testRole')
+        );
+    }
+
+    /** @test */
+    public function a_client_can_access_a_route_protected_by_role_middleware_if_have_this_role(): void
+    {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
+        Passport::actingAsClient($this->testClient, ['*']);
+
+        $this->testClient->assignRole('clientRole');
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->roleMiddleware, 'clientRole', null, true)
         );
     }
 
@@ -72,6 +109,28 @@ class RoleMiddlewareTest extends TestCase
         $this->assertEquals(
             200,
             $this->runMiddleware($this->roleMiddleware, ['testRole2', 'testRole'])
+        );
+    }
+
+    /** @test */
+    public function a_client_can_access_a_route_protected_by_this_role_middleware_if_have_one_of_the_roles(): void
+    {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
+        Passport::actingAsClient($this->testClient, ['*']);
+
+        $this->testClient->assignRole('clientRole');
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->roleMiddleware, 'clientRole|testRole2', null, true)
+        );
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->roleMiddleware, ['testRole2', 'clientRole'], null, true)
         );
     }
 
@@ -102,6 +161,23 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    public function a_client_cannot_access_a_route_protected_by_the_role_middleware_if_have_a_different_role(): void
+    {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
+        Passport::actingAsClient($this->testClient, ['*']);
+
+        $this->testClient->assignRole(['clientRole']);
+
+        $this->assertEquals(
+            403,
+            $this->runMiddleware($this->roleMiddleware, 'clientRole2', null, true)
+        );
+    }
+
+    /** @test */
     public function a_user_cannot_access_a_route_protected_by_role_middleware_if_have_not_roles()
     {
         Auth::login($this->testUser);
@@ -113,6 +189,21 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    public function a_client_cannot_access_a_route_protected_by_role_middleware_if_have_not_roles(): void
+    {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
+        Passport::actingAsClient($this->testClient, ['*']);
+
+        $this->assertEquals(
+            403,
+            $this->runMiddleware($this->roleMiddleware, 'testRole|testRole2', null, true)
+        );
+    }
+
+    /** @test */
     public function a_user_cannot_access_a_route_protected_by_role_middleware_if_role_is_undefined()
     {
         Auth::login($this->testUser);
@@ -120,6 +211,21 @@ class RoleMiddlewareTest extends TestCase
         $this->assertEquals(
             403,
             $this->runMiddleware($this->roleMiddleware, '')
+        );
+    }
+
+    /** @test */
+    public function a_client_cannot_access_a_route_protected_by_role_middleware_if_role_is_undefined(): void
+    {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
+        Passport::actingAsClient($this->testClient, ['*']);
+
+        $this->assertEquals(
+            403,
+            $this->runMiddleware($this->roleMiddleware, '', null, true)
         );
     }
 
@@ -189,6 +295,23 @@ class RoleMiddlewareTest extends TestCase
         $this->assertEquals(
             403,
             $this->runMiddleware($this->roleMiddleware, 'testRole', 'admin')
+        );
+    }
+
+    /** @test */
+    public function client_can_not_access_role_with_guard_admin_while_login_using_default_guard(): void
+    {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
+        Passport::actingAsClient($this->testClient, ['*']);
+
+        $this->testClient->assignRole('clientRole');
+
+        $this->assertEquals(
+            403,
+            $this->runMiddleware($this->roleMiddleware, 'clientRole', 'admin', true)
         );
     }
 

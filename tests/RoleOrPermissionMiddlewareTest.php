@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
 use InvalidArgumentException;
+use Laravel\Passport\Passport;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middlewares\RoleOrPermissionMiddleware;
 use Spatie\Permission\Tests\TestModels\UserWithoutHasRoles;
@@ -15,6 +16,8 @@ use Spatie\Permission\Tests\TestModels\UserWithoutHasRoles;
 class RoleOrPermissionMiddlewareTest extends TestCase
 {
     protected $roleOrPermissionMiddleware;
+
+    protected $usePassport = true;
 
     protected function setUp(): void
     {
@@ -67,6 +70,44 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    public function a_client_can_access_a_route_protected_by_permission_or_role_middleware_if_has_this_permission_or_role(): void
+    {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
+        Passport::actingAsClient($this->testClient, ['*']);
+
+        $this->testClient->assignRole('clientRole');
+        $this->testClient->givePermissionTo('edit-posts');
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'clientRole|edit-news|edit-posts', null, true)
+        );
+
+        $this->testClient->removeRole('clientRole');
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'clientRole|edit-posts', null, true)
+        );
+
+        $this->testClient->revokePermissionTo('edit-posts');
+        $this->testClient->assignRole('clientRole');
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'clientRole|edit-posts', null, true)
+        );
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->roleOrPermissionMiddleware, ['clientRole', 'edit-posts'], null, true)
+        );
+    }
+
+    /** @test */
     public function a_super_admin_user_can_access_a_route_protected_by_permission_or_role_middleware()
     {
         Auth::login($this->testUser);
@@ -111,6 +152,26 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    public function a_client_can_not_access_a_route_protected_by_permission_or_role_middleware_if_have_not_this_permission_and_role(): void
+    {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
+        Passport::actingAsClient($this->testClient, ['*']);
+
+        $this->assertEquals(
+            403,
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'clientRole|edit-posts', null, true)
+        );
+
+        $this->assertEquals(
+            403,
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'missingRole|missingPermission', null, true)
+        );
+    }
+
+    /** @test */
     public function use_not_existing_custom_guard_in_role_or_permission()
     {
         $class = null;
@@ -137,6 +198,24 @@ class RoleOrPermissionMiddlewareTest extends TestCase
         $this->assertEquals(
             403,
             $this->runMiddleware($this->roleOrPermissionMiddleware, 'edit-articles|testRole', 'admin')
+        );
+    }
+
+    /** @test */
+    public function client_can_not_access_permission_or_role_with_guard_admin_while_login_using_default_guard(): void
+    {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
+        Passport::actingAsClient($this->testClient, ['*']);
+
+        $this->testClient->assignRole('clientRole');
+        $this->testClient->givePermissionTo('edit-posts');
+
+        $this->assertEquals(
+            403,
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'edit-posts|clientRole', 'admin', true)
         );
     }
 
