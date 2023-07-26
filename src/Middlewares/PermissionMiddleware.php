@@ -16,7 +16,7 @@ class PermissionMiddleware
         $user = $authGuard->user();
 
         // For machine-to-machine Passport clients
-        if (! $user && $request->bearerToken()) {
+        if (config('permission.use_passport_client_credentials') && ! $user && $request->bearerToken()) {
             $user = Guard::getPassportClient($guard);
         }
 

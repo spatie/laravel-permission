@@ -114,6 +114,7 @@ abstract class TestCase extends Orchestra
         $app['config']->set('permission.column_names.role_pivot_key', 'role_test_id');
         $app['config']->set('permission.column_names.permission_pivot_key', 'permission_test_id');
         $app['config']->set('view.paths', [__DIR__.'/resources/views']);
+        $app['config']->set('permission.use_passport_client_credentials', true);
 
         // ensure api guard exists (required since Laravel 8.55)
         $app['config']->set('auth.guards.api', ['driver' => 'session', 'provider' => 'users']);
