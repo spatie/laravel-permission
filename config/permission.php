@@ -115,7 +115,6 @@ return [
 
     'teams' => false,
 
-
     /*
      * Passport Client Credentials Grant
      * When set to true the package will use Passports Client to check permissions
