@@ -73,6 +73,37 @@ Role::create(['name' => 'reviewer']);
 
 The role/permission assignment and removal for teams are the same as without teams, but they take the global `team_id` which is set on login.
 
+## Changing The Active Team ID
+
+While your middleware will set a user's `team_id` upon login, you may later need to set it to another team for various reasons. The two most common reasons are these:
+
+### Switching Teams After Login
+If your application allows the user to switch between various teams which they belong to, you can activate the roles/permissions for that team by calling `setPermissionsTeamId($new_team_id)` and unsetting relations as described below.
+
+### Administrating Team Details
+You may have created a User-Manager page where you can view the roles/permissions of users on certain teams. For managing that user in each team they belong to, you must also use `setPermissionsTeamId($new_team_id)` to cause lookups to relate to that new team, and unset prior relations as described below.
+
+### Querying Roles/Permissions for Other Teams
+Whenever you switch the active `team_id` using `setPermissionsTeamId()`, you need to `unset` the user's/model's `roles` and `permissions` relations before querying what roles/permissions that user has (`$user->roles`, etc) and before calling any authorization functions (`can()`, `hasPermissionTo()`, `hasRole()`, etc).
+
+Example:
+```php
+// set active global team_id
+setPermissionsTeamId($new_team_id);
+
+// $user = Auth::user();
+
+// unset cached model relations so new team relations will get reloaded
+$user->unsetRelation('roles','permissions');
+
+// Now you can check:
+$roles = $user->roles;
+$hasRole = $user->hasRole('my_role');
+$user->hasPermissionTo('foo');
+$user->can('bar');
+// etc
+```
+
 ## Defining a Super-Admin on Teams
 
 Global roles can be assigned to different teams, and `team_id` (which is the primary key of the relationships) is always required. 
