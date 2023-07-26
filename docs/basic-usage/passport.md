@@ -43,3 +43,11 @@ All middlewares provided by this package work with the Client.
 
 Do make sure that you only wrap your routes in the [`client`](https://laravel.com/docs/master/passport#via-middleware) middleware and not the `auth:api` middleware as well.
 Wrapping routes in the `auth:api` middleware currently does not work for the Client Credentials Grant.
+
+## Config
+Finally, update the config file as well. Setting `use_passport_client_credentials` to `true` will make sure that the right checks are performed.
+
+```php
+// config/permission.php
+'use_passport_client_credentials' => true,
+```
