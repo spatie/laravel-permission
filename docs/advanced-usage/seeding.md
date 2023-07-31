@@ -3,9 +3,11 @@ title: Database Seeding
 weight: 2
 ---
 
-## Flush cache before seeding
+## Flush cache before/after seeding
 
-You may discover that it is best to flush this package's cache before seeding, to avoid cache conflict errors. 
+You may discover that it is best to flush this package's cache **BEFORE seeding, to avoid cache conflict errors**.
+
+And if you use the `WithoutModelEvents` trait in your seeders, flush it **AFTER seeding as well**.
 
 ```php
 // reset cached roles and permissions
