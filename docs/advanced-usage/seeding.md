@@ -14,7 +14,7 @@ And if you use the `WithoutModelEvents` trait in your seeders, flush it **AFTER 
 app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 ```
 
-You can do this in the `SetUp()` method of your test suite (see the Testing page in the docs).
+You can optionally flush the cache before seeding by using the `SetUp()` method of your test suite (see the Testing page in the docs).
 
 Or it can be done directly in a seeder class, as shown below.
 
@@ -97,6 +97,8 @@ foreach ($permissionIdsByRole as $role => $permissionIds) {
             ])->toArray()
         );
 }
+
+// and also add the command to flush the cache again now after doing all these inserts
 ```
 
 **CAUTION**: ANY TIME YOU DIRECTLY RUN DB QUERIES you are bypassing cache-control features. So you will need to manually flush the package cache AFTER running direct DB queries, even in a seeder.
