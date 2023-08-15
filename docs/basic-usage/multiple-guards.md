@@ -12,6 +12,16 @@ However, when using multiple guards they will act like namespaces for your permi
 Note that this package requires you to register a permission name for each guard you want to authenticate with. So, "edit-article" would have to be created multiple times for each guard your app uses. An exception will be thrown if you try to authenticate against a non-existing permission+guard combination. Same for roles.
 
 > **Tip**: If your app uses only a single guard, but is not `web` (Laravel's default, which shows "first" in the auth config file) then change the order of your listed guards in your `config/auth.php` to list your primary guard as the default and as the first in the list of defined guards. While you're editing that file, best to remove any guards you don't use, too.
+> 
+> OR you could use the suggestion below to force the use of a single guard:
+
+## Forcing Use Of A Single Guard
+
+If your app structure does NOT differentiate between guards when it comes to roles/permissions, (ie: if ALL your roles/permissions are the SAME for ALL guards), you can override the `getDefaultGuardName` function by adding it to your User model, and specifying your desired guard_name. Then you only need to create roles/permissions for that single guard_name, not duplicating them. The example here sets it to `web`, but use whatever your application's default is:
+
+```php
+    protected function getDefaultGuardName(): string { return 'web'; }
+````
 
 
 ## Using permissions and roles with multiple guards
