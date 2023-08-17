@@ -104,6 +104,14 @@ return [
     'register_permission_check_method' => true,
 
     /*
+     * When set to true, the Spatie\Permission\Listeners\OctaneReloadPermissions listener will be registered
+     * on the Laravel\Octane\Events\OperationTerminated event, this will refresh permissions on every
+     * TickTerminated, TaskTerminated and RequestTerminated
+     * NOTE: This should not be needed in most cases, but an Octane/Vapor combination benefited from it.
+     */
+    'register_octane_reset_listener' => false,
+
+    /*
      * Teams Feature.
      * When set to true the package implements teams using the 'team_foreign_key'.
      * If you want the migrations to register the 'team_foreign_key', you must
