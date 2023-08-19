@@ -27,13 +27,13 @@ If you also want the roles and permissions to use a UUID for their `id` value, t
 ```diff
     Schema::create($tableNames['permissions'], function (Blueprint $table) {
 -        $table->bigIncrements('id'); // permission id
-+        $table->uuid('id')->primary()->unique(); // permission id
++        $table->uuid('uuid')->primary()->unique(); // permission id
 //...
     });
 
     Schema::create($tableNames['roles'], function (Blueprint $table) {
 -        $table->bigIncrements('id'); // role id
-+        $table->uuid('id')->primary()->unique(); // role id
++        $table->uuid('uuid')->primary()->unique(); // role id
 //...
     });
 
@@ -98,7 +98,7 @@ If you want all the role/permission objects to have a UUID instead of an integer
 
 Examples:
 
-Create new models, which extend the Role and Permission models of this package, and add the HasUuids trait (available since Laravel 9):
+Create new models, which extend the Role and Permission models of this package, and add Laravel's `HasUuids` trait (available since Laravel 9):
 ```bash
 php artisan make:model Role
 php artisan make:model Permission
@@ -107,7 +107,6 @@ php artisan make:model Permission
 `App\Model\Role.php`
 ```php
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -116,7 +115,8 @@ use Spatie\Permission\Models\Role as SpatieRole;
 
 class Role extends SpatieRole
 {
-    use HasFactory, HasUuids;
+    use HasFactory;
+    use HasUuids;
     protected $primaryKey = 'uuid';
 }
 ```
@@ -124,7 +124,6 @@ class Role extends SpatieRole
 `App\Model\Permission.php`
 ```php
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -133,7 +132,8 @@ use Spatie\Permission\Models\Permission as SpatiePermission;
 
 class Permission extends SpatiePermission
 {
-    use HasFactory, HasUuids;
+    use HasFactory;
+    use HasUuids;
     protected $primaryKey = 'uuid';
 }
 ```
@@ -167,63 +167,3 @@ And edit `config/permission.php`
 
     ],
 ```
-
-
-It is common to use a trait to handle the $keyType and $incrementing settings, as well as add a boot event trigger to ensure new records are assigned a uuid. You would `use` this trait in your User and extended Role/Permission models. An example `UuidTrait` is shown here for inspiration. Adjust to suit your needs.
-
-```php
-    <?php
-    namespace App;
-
-    use Facades\Str;
-
-    trait UuidTrait
-    {
-        public static function bootUuidTrait()
-        {
-            static::creating(function ($model) {
-                $model->keyType = 'string';
-                $model->incrementing = false;
-
-                $model->{$model->getKeyName()} = $model->{$model->getKeyName()} ?: (string) Str::orderedUuid();
-            });
-        }
-        
-        public function getIncrementing()
-        {
-            return false;
-        }
-        
-        public function getKeyType()
-        {
-            return 'string';
-        }
-    }
-```
-
-
-## User Models
-> Troubleshooting tip: In the ***Prerequisites*** section of the docs we remind you that your User model must implement the `Illuminate\Contracts\Auth\Access\Authorizable` contract so that the Gate features are made available to the User object.
-In the default User model provided with Laravel, this is done by extending another model (aliased to `Authenticatable`), which extends the base Eloquent model. 
-However, your app's UUID implementation may need to override that in order to set some of the properties mentioned in the Models section above. 
-
-If you are running into difficulties, you may want to double-check whether your User model is doing UUIDs consistent with other parts of your app.
-
-
-# REMINDER:
-
-> THIS IS NOT A FULL LESSON ON HOW TO IMPLEMENT UUIDs IN YOUR APP.
-
-Again, since each UUID implementation approach is different, some of these may or may not benefit you. As always, your implementation may vary.
-
-
-
-## Packages
-There are many packages offering UUID features for Eloquent models. You may want to explore whether these are of value to you in your study of implementing UUID in your applications:
-
-https://github.com/JamesHemery/laravel-uuid
-https://github.com/jamesmills/eloquent-uuid
-https://github.com/goldspecdigital/laravel-eloquent-uuid
-https://github.com/michaeldyrynda/laravel-model-uuid
-
-Remember: always make sure you understand what a package is doing before you use it! If it's doing "more than what you need" then you're adding more complexity to your application, as well as more things to test and support!
