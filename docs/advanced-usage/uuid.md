@@ -10,7 +10,7 @@ If you're using UUIDs for your User models there are a few considerations to not
 Since each UUID implementation approach is different, some of these may or may not benefit you. As always, your implementation may vary.
 
 ## Migrations
-You will need to update the `create_permission_tables.php` migration:
+You will need to update the `create_permission_tables.php` migration after creating it with `php artisan vendor:publish`. After making your edits, be sure to run the migration!
 
 **User Models using UUIDs**
 If your User models are using `uuid` instead of `unsignedBigInteger` then you'll need to reflect the change in the migration provided by this package. Something like the following would be typical, for **both** `model_has_permissions` and `model_has_roles` tables:
