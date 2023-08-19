@@ -12,8 +12,8 @@ class PermissionDoesNotExist extends InvalidArgumentException
     }
 
     /**
-     * @param int|string $permissionId
-     * @param string $guardName
+     * @param  int|string  $permissionId
+     * @param  string  $guardName
      * @return static
      */
     public static function withId($permissionId, ?string $guardName)

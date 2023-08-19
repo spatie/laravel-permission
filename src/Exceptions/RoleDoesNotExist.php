@@ -12,8 +12,7 @@ class RoleDoesNotExist extends InvalidArgumentException
     }
 
     /**
-     * @param int|string $roleId
-     * @param string|null $guardName
+     * @param  int|string  $roleId
      * @return static
      */
     public static function withId($roleId, ?string $guardName)
