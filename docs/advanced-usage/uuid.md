@@ -3,65 +3,61 @@ title: UUID
 weight: 7
 ---
 
-If you're using UUIDs or GUIDs for your User models there are a few considerations to note.
+If you're using UUIDs for your User models there are a few considerations to note.
 
 > THIS IS NOT A FULL LESSON ON HOW TO IMPLEMENT UUIDs IN YOUR APP.
 
 Since each UUID implementation approach is different, some of these may or may not benefit you. As always, your implementation may vary.
 
-
 ## Migrations
-You will probably want to update the `create_permission_tables.php` migration:
+You will need to update the `create_permission_tables.php` migration:
 
-If your User models are using `uuid` instead of `unsignedBigInteger` then you'll need to reflect the change in the migration provided by this package. Something like this would be typical, for both `model_has_permissions` and `model_has_roles` tables:
+**User Models using UUIDs**
+If your User models are using `uuid` instead of `unsignedBigInteger` then you'll need to reflect the change in the migration provided by this package. Something like the following would be typical, for **both** `model_has_permissions` and `model_has_roles` tables:
 
 ```diff
+// note: this is done in two places in the default migration file, so edit both places:
 -  $table->unsignedBigInteger($columnNames['model_morph_key'])
 +  $table->uuid($columnNames['model_morph_key'])
 ```
 
-OPTIONAL: If you also want the roles and permissions to use a UUID for their `id` value, then you'll need to also change the id fields accordingly, and manually set the primary key. LEAVE THE FIELD NAME AS `id` unless you also change it in dozens of other places.
+**Roles and Permissions using UUIDS**
+If you also want the roles and permissions to use a UUID for their `id` value, then you'll need to change the id fields accordingly, and manually set the primary key.
 
 ```diff
     Schema::create($tableNames['permissions'], function (Blueprint $table) {
 -        $table->bigIncrements('id'); // permission id
 +        $table->uuid('id')->primary()->unique(); // permission id
-        $table->string('name');
-        $table->string('guard_name');
-        $table->timestamps();
-
-        $table->unique(['name', 'guard_name']);
+//...
     });
 
     Schema::create($tableNames['roles'], function (Blueprint $table) {
 -        $table->bigIncrements('id'); // role id
 +        $table->uuid('id')->primary()->unique(); // role id
-        if ($teams || config('permission.testing')) { // permission.testing is a fix for sqlite testing
-            $table->unsignedBigInteger($columnNames['team_foreign_key'])->nullable();
-            $table->index($columnNames['team_foreign_key'], 'roles_team_foreign_key_index');
-        }
-        $table->string('name');       // For MySQL 8.0 use string('name', 125);
-        $table->string('guard_name'); // For MySQL 8.0 use string('guard_name', 125);
-        $table->timestamps();
-        if ($teams || config('permission.testing')) {
-            $table->unique([$columnNames['team_foreign_key'], 'name', 'guard_name']);
-        } else {
-            $table->unique(['name', 'guard_name']);
-        }
-});
+//...
+    });
 
     Schema::create($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames, $columnNames) {
 -        $table->unsignedBigInteger(PermissionRegistrar::$pivotPermission);
 +        $table->uuid(PermissionRegistrar::$pivotPermission);
-    ...
+        $table->string('model_type');
+//...
+        $table->foreign(PermissionRegistrar::$pivotPermission)
+-            ->references('id') // permission id
++            ->references('uuid') // permission id
+            ->on($tableNames['permissions'])
+            ->onDelete('cascade');
+//...
 
     Schema::create($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames, $columnNames) {
 -        $table->unsignedBigInteger(PermissionRegistrar::$pivotRole);
 +        $table->uuid(PermissionRegistrar::$pivotRole);
-        $table->string('model_type');
--       $table->unsignedBigInteger($columnNames['model_morph_key']);
-+       $table->uuid($columnNames['model_morph_key']);
-    ...
+//...
+        $table->foreign(PermissionRegistrar::$pivotRole)
+-            ->references('id') // role id
++            ->references('uuid') // role id
+            ->on($tableNames['roles'])
+            ->onDelete('cascade');//...
 
     Schema::create($tableNames['role_has_permissions'], function (Blueprint $table) use ($tableNames) {
 -        $table->unsignedBigInteger(PermissionRegistrar::$pivotPermission);
@@ -75,7 +71,7 @@ OPTIONAL: If you also want the roles and permissions to use a UUID for their `id
 You might want to change the pivot table field name from `model_id` to `model_uuid`, just for semantic purposes.
 For this, in the configuration file edit `column_names.model_morph_key`:
 
-- OPTIONAL: Change to `model_uuid` instead of the default `model_id`. (The default of `model_id` is shown in this snippet below. Change it to match your needs.)
+- OPTIONAL: Change to `model_uuid` instead of the default `model_id`.
 ```diff
         'column_names' => [    
         /*
@@ -100,13 +96,9 @@ For this, in the configuration file edit `column_names.model_morph_key`:
 ## Models
 If you want all the role/permission objects to have a UUID instead of an integer, you will need to Extend the default Role and Permission models into your own namespace in order to set some specific properties. (See the Extending section of the docs, where it explains requirements of Extending, as well as the configuration settings you need to update.)
 
-- You likely want to set `protected $keyType = 'string';` so Laravel handles joins as strings and doesn't cast to integer.
-- OPTIONAL: If you changed the field name in your migrations, you must set `protected $primaryKey = 'uuid';` to match.
-- Usually for UUID you will also set `public $incrementing = false;`. Remove it if it causes problems for you.
-
 Examples:
 
-Create new models:
+Create new models, which extend the Role and Permission models of this package, and add the HasUuids trait (available since Laravel 9):
 ```bash
 php artisan make:model Role
 php artisan make:model Permission
@@ -125,9 +117,7 @@ use Spatie\Permission\Models\Role as SpatieRole;
 class Role extends SpatieRole
 {
     use HasFactory, HasUuids;
-    protected $primaryKey = 'id';
-    protected $keyType = 'string';
-    public $incrementing = false;
+    protected $primaryKey = 'uuid';
 }
 ```
 
@@ -144,9 +134,7 @@ use Spatie\Permission\Models\Permission as SpatiePermission;
 class Permission extends SpatiePermission
 {
     use HasFactory, HasUuids;
-    protected $primaryKey = 'id';
-    protected $keyType = 'string';
-    public $incrementing = false;
+    protected $primaryKey = 'uuid';
 }
 ```
 And edit `config/permission.php`
