@@ -82,12 +82,11 @@ class Permission extends Model implements PermissionContract
     /**
      * Find a permission by its name (and optionally guardName).
      *
-     * @param string|null $guardName
      * @return PermissionContract|Permission
      *
      * @throws PermissionDoesNotExist
      */
-    public static function findByName(string $name, ?string $guardName = null): PermissionContract
+    public static function findByName(string $name, string $guardName = null): PermissionContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
         $permission = static::getPermission(['name' => $name, 'guard_name' => $guardName]);
@@ -102,12 +101,11 @@ class Permission extends Model implements PermissionContract
      * Find a permission by its id (and optionally guardName).
      *
      * @param  int|string  $id
-     * @param string|null $guardName
      * @return PermissionContract|Permission
      *
      * @throws PermissionDoesNotExist
      */
-    public static function findById($id, ?string $guardName = null): PermissionContract
+    public static function findById($id, string $guardName = null): PermissionContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
         $permission = static::getPermission([(new static())->getKeyName() => $id, 'guard_name' => $guardName]);
@@ -122,10 +120,9 @@ class Permission extends Model implements PermissionContract
     /**
      * Find or create permission by its name (and optionally guardName).
      *
-     * @param string|null $guardName
      * @return PermissionContract|Permission
      */
-    public static function findOrCreate(string $name, ?string $guardName = null): PermissionContract
+    public static function findOrCreate(string $name, string $guardName = null): PermissionContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
         $permission = static::getPermission(['name' => $name, 'guard_name' => $guardName]);

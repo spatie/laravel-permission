@@ -21,7 +21,6 @@ interface Role
     /**
      * Find a role by its name and guard name.
      *
-     * @param string|null $guardName
      * @return \Spatie\Permission\Contracts\Role
      *
      * @throws \Spatie\Permission\Exceptions\RoleDoesNotExist
@@ -31,8 +30,7 @@ interface Role
     /**
      * Find a role by its id and guard name.
      *
-     * @param int|string $id
-     * @param string|null $guardName
+     * @param  int|string  $id
      * @return \Spatie\Permission\Contracts\Role
      *
      * @throws \Spatie\Permission\Exceptions\RoleDoesNotExist
@@ -42,7 +40,6 @@ interface Role
     /**
      * Find or create a role by its name and guard name.
      *
-     * @param string|null $guardName
      * @return \Spatie\Permission\Contracts\Role
      */
     public static function findOrCreate(string $name, ?string $guardName): self;
@@ -51,7 +48,6 @@ interface Role
      * Determine if the user may perform the given permission.
      *
      * @param  string|\Spatie\Permission\Contracts\Permission  $permission
-     * @param string|null $guardName
      */
     public function hasPermissionTo($permission, ?string $guardName): bool;
 }

@@ -21,7 +21,6 @@ interface Permission
     /**
      * Find a permission by its name.
      *
-     * @param string|null $guardName
      *
      * @throws \Spatie\Permission\Exceptions\PermissionDoesNotExist
      */
@@ -30,8 +29,7 @@ interface Permission
     /**
      * Find a permission by its id.
      *
-     * @param int|string $id
-     * @param string|null $guardName
+     * @param  int|string  $id
      *
      * @throws \Spatie\Permission\Exceptions\PermissionDoesNotExist
      */
@@ -39,8 +37,6 @@ interface Permission
 
     /**
      * Find or Create a permission by its name and guard name.
-     *
-     * @param string|null $guardName
      */
     public static function findOrCreate(string $name, ?string $guardName): self;
 }
