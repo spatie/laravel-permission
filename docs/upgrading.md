@@ -15,13 +15,15 @@ ALL upgrades of this package should follow these steps:
 
 3. Config file. Incorporate any changes to the permission.php config file, updating your existing file. (It may be easiest to make a backup copy of your existing file, re-publish it from this package, and then re-make your customizations to it.)
 
-4. Models. If you have made any custom Models from this package into your own app, compare the old and new models and apply any relevant updates to your custom models.
+4. Models. If you have made any custom Models by extending them into your own app, compare the package's old and new models and apply any relevant updates to your custom models.
 
 5. Custom Methods/Traits. If you have overridden any methods from this package's Traits, compare the old and new traits, and apply any relevant updates to your overridden methods.
 
-6. Apply any version-specific special updates as outlined below...
+6. Contract/Interface updates. If you have implemented this package's contracts in any models, check to see if there were any changes to method signatures. Mismatches will trigger PHP errors.
 
-7. Review the changelog, which details all the changes: [CHANGELOG](https://github.com/spatie/laravel-permission/blob/main/CHANGELOG.md)
+7. Apply any version-specific special updates as outlined below...
+
+8. Review the changelog, which details all the changes: [CHANGELOG](https://github.com/spatie/laravel-permission/blob/main/CHANGELOG.md)
 and/or consult the [Release Notes](https://github.com/spatie/laravel-permission/releases)
 
 
