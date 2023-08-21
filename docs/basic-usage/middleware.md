@@ -1,5 +1,5 @@
 ---
-title: Using a middleware
+title: Using a Middleware
 weight: 11
 ---
 
@@ -45,7 +45,12 @@ protected $middlewareAliases = [
 Then you can protect your routes using middleware rules:
 
 ```php
-Route::group(['middleware' => ['role:super-admin']], function () {
+Route::group(['middleware' => ['role:manager']], function () {
+    //
+});
+
+// for a specific guard:
+Route::group(['middleware' => ['role:manager,api']], function () {
     //
 });
 
@@ -53,7 +58,7 @@ Route::group(['middleware' => ['permission:publish articles']], function () {
     //
 });
 
-Route::group(['middleware' => ['role:super-admin','permission:publish articles']], function () {
+Route::group(['middleware' => ['role:manager','permission:publish articles']], function () {
     //
 });
 
@@ -65,7 +70,7 @@ Route::group(['middleware' => ['role_or_permission:publish articles']], function
 You can specify multiple roles or permissions with a `|` (pipe) character, which is treated as `OR`:
 
 ```php
-Route::group(['middleware' => ['role:super-admin|writer']], function () {
+Route::group(['middleware' => ['role:manager|writer']], function () {
     //
 });
 
@@ -73,7 +78,12 @@ Route::group(['middleware' => ['permission:publish articles|edit articles']], fu
     //
 });
 
-Route::group(['middleware' => ['role_or_permission:super-admin|edit articles']], function () {
+// for a specific guard
+Route::group(['middleware' => ['permission:publish articles|edit articles,api']], function () {
+    //
+});
+
+Route::group(['middleware' => ['role_or_permission:manager|edit articles']], function () {
     //
 });
 ```
@@ -85,14 +95,14 @@ You can protect your controllers similarly, by setting desired middleware in the
 ```php
 public function __construct()
 {
-    $this->middleware(['role:super-admin','permission:publish articles|edit articles']);
+    $this->middleware(['role:manager','permission:publish articles|edit articles']);
 }
 ```
 
 ```php
 public function __construct()
 {
-    $this->middleware(['role_or_permission:super-admin|edit articles']);
+    $this->middleware(['role_or_permission:manager|edit articles']);
 }
 ```
 
@@ -104,7 +114,7 @@ All of the middlewares can also be applied by calling the static `using` method,
 which accepts either a `|`-separated string or an array as input.
 
 ```php
-Route::group(['middleware' => [\Spatie\Permission\Middlewares\RoleMiddleware::using('super-admin')]], function () {
+Route::group(['middleware' => [\Spatie\Permission\Middlewares\RoleMiddleware::using('manager')]], function () {
     //
 });
 
@@ -112,7 +122,7 @@ Route::group(['middleware' => [\Spatie\Permission\Middlewares\PermissionMiddlewa
     //
 });
 
-Route::group(['middleware' => [\Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::using(['super-admin', 'edit articles'])]], function () {
+Route::group(['middleware' => [\Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::using(['manager', 'edit articles'])]], function () {
     //
 });
 ```
