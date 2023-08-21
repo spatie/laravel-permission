@@ -111,10 +111,9 @@ class Role extends Model implements RoleContract
     /**
      * Find a role by its id (and optionally guardName).
      *
-     * @param  int|string  $id
      * @return RoleContract|Role
      */
-    public static function findById($id, string $guardName = null): RoleContract
+    public static function findById(int|string $id, string $guardName = null): RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 

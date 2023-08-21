@@ -30,12 +30,11 @@ interface Role
     /**
      * Find a role by its id and guard name.
      *
-     * @param  int|string  $id
      * @return \Spatie\Permission\Contracts\Role
      *
      * @throws \Spatie\Permission\Exceptions\RoleDoesNotExist
      */
-    public static function findById($id, ?string $guardName): self;
+    public static function findById(int|string $id, ?string $guardName): self;
 
     /**
      * Find or create a role by its name and guard name.
