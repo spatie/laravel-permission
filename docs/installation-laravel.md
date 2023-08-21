@@ -9,7 +9,7 @@ This package can be used with Laravel 6.0 or higher.
 
 Package Version | Laravel Version
 ----------------|-----------
-   ^6.0         |  8,9,10
+   ^6.0         |  8,9,10 (PHP 8.0+)
    ^5.8         |  7,8,9,10
    ^5.7         |  7,8,9
    ^5.4-^5.6    |  7,8
