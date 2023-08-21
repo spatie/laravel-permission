@@ -49,6 +49,11 @@ Route::group(['middleware' => ['role:manager']], function () {
     //
 });
 
+// for a specific guard:
+Route::group(['middleware' => ['role:manager,api']], function () {
+    //
+});
+
 Route::group(['middleware' => ['permission:publish articles']], function () {
     //
 });
@@ -70,6 +75,11 @@ Route::group(['middleware' => ['role:manager|writer']], function () {
 });
 
 Route::group(['middleware' => ['permission:publish articles|edit articles']], function () {
+    //
+});
+
+// for a specific guard
+Route::group(['middleware' => ['permission:publish articles|edit articles,api']], function () {
     //
 });
 
