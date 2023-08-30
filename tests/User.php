@@ -9,11 +9,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Model implements AuthorizableContract, AuthenticatableContract
+class User extends Model implements AuthenticatableContract, AuthorizableContract
 {
-    use HasRoles;
-    use Authorizable;
     use Authenticatable;
+    use Authorizable;
+    use HasRoles;
 
     protected $fillable = ['email'];
 
