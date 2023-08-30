@@ -344,8 +344,8 @@ class PermissionRegistrar
 
         return Collection::make(
             array_map(function ($item) use ($permissionInstance) {
-                return $permissionInstance
-                    ->newFromBuilder($this->aliasedArray(array_diff_key($item, ['r' => 0])))
+                return $permissionInstance->newInstance([], true)
+                    ->setRawAttributes($this->aliasedArray(array_diff_key($item, ['r' => 0])), true)
                     ->setRelation('roles', $this->getHydratedRoleCollection($item['r'] ?? []));
             }, $this->permissions['permissions'])
         );
@@ -364,7 +364,8 @@ class PermissionRegistrar
         $roleInstance = new $roleClass();
 
         array_map(function ($item) use ($roleInstance) {
-            $role = $roleInstance->newFromBuilder($this->aliasedArray($item));
+            $role = $roleInstance->newInstance([], true)
+                ->setRawAttributes($this->aliasedArray($item), true);
             $this->cachedRoles[$role->getKey()] = $role;
         }, $this->permissions['roles']);
 
