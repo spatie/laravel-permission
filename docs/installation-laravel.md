@@ -5,7 +5,7 @@ weight: 4
 
 ## Laravel Version Compatibility
 
-This package can be used with Laravel 6.0 or higher.
+Choose the version of this package that suits your Laravel version.
 
 Package Version | Laravel Version
 ----------------|-----------
@@ -50,7 +50,7 @@ Package Version | Laravel Version
        - must set `'teams' => true,`
        - and (optional) you may set `team_foreign_key` name in the config file if you want to use a custom foreign key in your database for teams
 
-   - **If you are using MySQL 8**, look at the migration files for notes about MySQL 8 to set/limit the index key length, and edit accordingly.
+   - **If you are using MySQL 8**, look at the migration files for notes about MySQL 8 to set/limit the index key length, and edit accordingly. If you get `ERROR: 1071 Specified key was too long` then you need to do this.
 
 7. **Clear your config cache**. This package requires access to the `permission` config settings in order to run migrations. If you've been caching configurations locally, clear your config cache with either of these commands:
 
