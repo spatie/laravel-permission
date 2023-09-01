@@ -5,7 +5,7 @@ weight: 4
 
 ## Laravel Version Compatibility
 
-This package can be used with Laravel 6.0 or higher.
+Choose the version of this package that suits your Laravel version.
 
 Package Version | Laravel Version
 ----------------|-----------
