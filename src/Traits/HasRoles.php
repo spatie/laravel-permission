@@ -136,7 +136,7 @@ trait HasRoles
     /**
      * Returns roles ids as array keys
      *
-     * @param  array|string|int|Role|Collection|\BackedEnum  $roles
+     * @param  string|int|array|Role|Collection|\BackedEnum  $roles
      */
     private function collectRoles(...$roles): array
     {
@@ -163,7 +163,7 @@ trait HasRoles
     /**
      * Assign the given role to the model.
      *
-     * @param  array|string|int|Role|Collection|\BackedEnum  ...$roles
+     * @param  string|int|array|Role|Collection|\BackedEnum  ...$roles
      * @return $this
      */
     public function assignRole(...$roles)
@@ -221,7 +221,7 @@ trait HasRoles
     /**
      * Remove all current roles and set the given ones.
      *
-     * @param  array|Role|Collection|string|int  ...$roles
+     * @param  string|int|array|Role|Collection|\BackedEnum  ...$roles
      * @return $this
      */
     public function syncRoles(...$roles)
@@ -293,7 +293,7 @@ trait HasRoles
      *
      * Alias to hasRole() but without Guard controls
      *
-     * @param  string|int|array|Role|Collection  $roles
+     * @param  string|int|array|Role|Collection|\BackedEnum  $roles
      */
     public function hasAnyRole(...$roles): bool
     {
