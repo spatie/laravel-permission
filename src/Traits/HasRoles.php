@@ -163,7 +163,7 @@ trait HasRoles
     /**
      * Assign the given role to the model.
      *
-     * @param  array|string|int|Role|Collection  ...$roles
+     * @param  array|string|int|Role|Collection|\BackedEnum  ...$roles
      * @return $this
      */
     public function assignRole(...$roles)
