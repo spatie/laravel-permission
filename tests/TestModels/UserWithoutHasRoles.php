@@ -8,10 +8,10 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 
-class UserWithoutHasRoles extends Model implements AuthorizableContract, AuthenticatableContract
+class UserWithoutHasRoles extends Model implements AuthenticatableContract, AuthorizableContract
 {
-    use Authorizable;
     use Authenticatable;
+    use Authorizable;
 
     protected $fillable = ['email'];
 

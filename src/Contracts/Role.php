@@ -21,7 +21,6 @@ interface Role
     /**
      * Find a role by its name and guard name.
      *
-     * @return \Spatie\Permission\Contracts\Role
      *
      * @throws \Spatie\Permission\Exceptions\RoleDoesNotExist
      */
@@ -30,7 +29,6 @@ interface Role
     /**
      * Find a role by its id and guard name.
      *
-     * @return \Spatie\Permission\Contracts\Role
      *
      * @throws \Spatie\Permission\Exceptions\RoleDoesNotExist
      */
@@ -38,8 +36,6 @@ interface Role
 
     /**
      * Find or create a role by its name and guard name.
-     *
-     * @return \Spatie\Permission\Contracts\Role
      */
     public static function findOrCreate(string $name, ?string $guardName): self;
 

@@ -9,8 +9,8 @@ use Spatie\Permission\Traits\HasRoles;
 
 class Client extends BaseClient implements AuthorizableContract
 {
-    use HasRoles;
     use Authorizable;
+    use HasRoles;
 
     /**
      * Required to make clear that the client requires the api guard
