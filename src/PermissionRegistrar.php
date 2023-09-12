@@ -398,7 +398,7 @@ class PermissionRegistrar
         }
 
         // check if is ULID
-        $ulid = 26 == strlen($value) && 26 == strspn($value, '0123456789ABCDEFGHJKMNPQRSTVWXYZabcdefghjkmnpqrstvwxyz') && $value[0] <= '7';
+        $ulid = strlen($value) == 26 && strspn($value, '0123456789ABCDEFGHJKMNPQRSTVWXYZabcdefghjkmnpqrstvwxyz') == 26 && $value[0] <= '7';
         if ($ulid) {
             return true;
         }
