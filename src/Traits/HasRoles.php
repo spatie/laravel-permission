@@ -203,7 +203,7 @@ trait HasRoles
     /**
      * Revoke the given role from the model.
      *
-     * @param  string|int|Role  $role
+     * @param  string|int|Role|\BackedEnum  $role
      */
     public function removeRole($role)
     {
