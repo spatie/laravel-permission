@@ -354,12 +354,11 @@ class PermissionRegistrar
 
     private function getHydratedPermissionCollection(): Collection
     {
-        $permissionClass = $this->getPermissionClass();
-        $permissionInstance = new $permissionClass();
+        $permissionInstance = new ($this->getPermissionClass())();
 
         return Collection::make(array_map(
-            fn ($item) => $permissionInstance
-                ->newFromBuilder($this->aliasedArray(array_diff_key($item, ['r' => 0])))
+            fn ($item) => $permissionInstance->newInstance([], true)
+                ->setRawAttributes($this->aliasedArray(array_diff_key($item, ['r' => 0])), true)
                 ->setRelation('roles', $this->getHydratedRoleCollection($item['r'] ?? [])),
             $this->permissions['permissions']
         ));
@@ -374,11 +373,11 @@ class PermissionRegistrar
 
     private function hydrateRolesCache(): void
     {
-        $roleClass = $this->getRoleClass();
-        $roleInstance = new $roleClass();
+        $roleInstance = new ($this->getRoleClass())();
 
         array_map(function ($item) use ($roleInstance) {
-            $role = $roleInstance->newFromBuilder($this->aliasedArray($item));
+            $role = $roleInstance->newInstance([], true)
+                ->setRawAttributes($this->aliasedArray($item), true);
             $this->cachedRoles[$role->getKey()] = $role;
         }, $this->permissions['roles']);
 

@@ -101,10 +101,8 @@ trait HasPermissions
     {
         $permissions = $this->convertToPermissionModels($permissions);
 
-        $permissionClass = $this->getPermissionClass();
-        $permissionKey = (new $permissionClass())->getKeyName();
-        $roleClass = is_a($this, Role::class) ? static::class : $this->getRoleClass();
-        $roleKey = (new $roleClass())->getKeyName();
+        $permissionKey = (new ($this->getPermissionClass())())->getKeyName();
+        $roleKey = (new (is_a($this, Role::class) ? static::class : $this->getRoleClass())())->getKeyName();
 
         $rolesWithPermissions = is_a($this, Role::class) ? [] : array_unique(
             array_reduce($permissions, fn ($result, $permission) => array_merge($result, $permission->roles->all()), [])
@@ -132,10 +130,8 @@ trait HasPermissions
     {
         $permissions = $this->convertToPermissionModels($permissions);
 
-        $permissionClass = $this->getPermissionClass();
-        $permissionKey = (new $permissionClass())->getKeyName();
-        $roleClass = is_a($this, Role::class) ? static::class : $this->getRoleClass();
-        $roleKey = (new $roleClass())->getKeyName();
+        $permissionKey = (new ($this->getPermissionClass())())->getKeyName();
+        $roleKey = (new (is_a($this, Role::class) ? static::class : $this->getRoleClass())())->getKeyName();
 
         $rolesWithPermissions = is_a($this, Role::class) ? [] : array_unique(
             array_reduce($permissions, fn ($result, $permission) => array_merge($result, $permission->roles->all()), [])
