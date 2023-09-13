@@ -253,8 +253,7 @@ trait HasRoles
         }
 
         if (is_int($roles) || PermissionRegistrar::isUid($roles)) {
-            $roleClass = $this->getRoleClass();
-            $key = (new $roleClass())->getKeyName();
+            $key = (new ($this->getRoleClass())())->getKeyName();
 
             return $guard
                 ? $this->roles->where('guard_name', $guard)->contains($key, $roles)
