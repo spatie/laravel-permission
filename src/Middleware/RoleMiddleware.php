@@ -1,15 +1,15 @@
 <?php
 
-namespace Spatie\Permission\Middlewares;
+namespace Spatie\Permission\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Guard;
 
-class PermissionMiddleware
+class RoleMiddleware
 {
-    public function handle($request, Closure $next, $permission, $guard = null)
+    public function handle($request, Closure $next, $role, $guard = null)
     {
         $authGuard = Auth::guard($guard);
 
@@ -24,32 +24,32 @@ class PermissionMiddleware
             throw UnauthorizedException::notLoggedIn();
         }
 
-        if (! method_exists($user, 'hasAnyPermission')) {
+        if (! method_exists($user, 'hasAnyRole')) {
             throw UnauthorizedException::missingTraitHasRoles($user);
         }
 
-        $permissions = is_array($permission)
-            ? $permission
-            : explode('|', $permission);
+        $roles = is_array($role)
+            ? $role
+            : explode('|', $role);
 
-        if (! $user->canAny($permissions)) {
-            throw UnauthorizedException::forPermissions($permissions);
+        if (! $user->hasAnyRole($roles)) {
+            throw UnauthorizedException::forRoles($roles);
         }
 
         return $next($request);
     }
 
     /**
-     * Specify the permission and guard for the middleware.
+     * Specify the role and guard for the middleware.
      *
-     * @param  array|string  $permission
+     * @param  array|string  $role
      * @param  string|null  $guard
      * @return string
      */
-    public static function using($permission, $guard = null)
+    public static function using($role, $guard = null)
     {
-        $permissionString = is_string($permission) ? $permission : implode('|', $permission);
-        $args = is_null($guard) ? $permissionString : "$permissionString,$guard";
+        $roleString = is_string($role) ? $role : implode('|', $role);
+        $args = is_null($guard) ? $roleString : "$roleString,$guard";
 
         return static::class.':'.$args;
     }
