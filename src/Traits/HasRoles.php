@@ -70,8 +70,9 @@ trait HasRoles
      *
      * @param  string|int|array|Role|Collection|\BackedEnum  $roles
      * @param  string  $guard
+     * @param  bool  $without
      */
-    public function scopeRole(Builder $query, $roles, $guard = null): Builder
+    public function scopeRole(Builder $query, $roles, $guard = null, $without = false): Builder
     {
         if ($roles instanceof Collection) {
             $roles = $roles->all();
@@ -91,10 +92,9 @@ trait HasRoles
             return $this->getRoleClass()::{$method}($role, $guard ?: $this->getDefaultGuardName());
         }, Arr::wrap($roles));
 
-        $roleClass = $this->getRoleClass();
-        $key = (new $roleClass())->getKeyName();
+        $key = (new ($this->getRoleClass())())->getKeyName();
 
-        return $query->whereHas('roles', fn (Builder $subQuery) => $subQuery
+        return $query->{! $without ? 'whereHas' : 'whereDoesntHave'}('roles', fn (Builder $subQuery) => $subQuery
             ->whereIn(config('permission.table_names.roles').".$key", \array_column($roles, $key))
         );
     }
@@ -107,30 +107,7 @@ trait HasRoles
      */
     public function scopeWithoutRole(Builder $query, $roles, $guard = null): Builder
     {
-        if ($roles instanceof Collection) {
-            $roles = $roles->all();
-        }
-
-        $roles = array_map(function ($role) use ($guard) {
-            if ($role instanceof Role) {
-                return $role;
-            }
-
-            if ($role instanceof \BackedEnum) {
-                $role = $role->value;
-            }
-
-            $method = is_int($role) || PermissionRegistrar::isUid($role) ? 'findById' : 'findByName';
-
-            return $this->getRoleClass()::{$method}($role, $guard ?: $this->getDefaultGuardName());
-        }, Arr::wrap($roles));
-
-        $roleClass = $this->getRoleClass();
-        $key = (new $roleClass())->getKeyName();
-
-        return $query->whereDoesntHave('roles', fn (Builder $subQuery) => $subQuery
-            ->whereIn(config('permission.table_names.roles').".$key", \array_column($roles, $key))
-        );
+        return $this->scopeRole($query, $roles, $guard, true);
     }
 
     /**
