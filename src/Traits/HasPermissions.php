@@ -96,8 +96,9 @@ trait HasPermissions
      * Scope the model query to certain permissions only.
      *
      * @param  string|int|array|Permission|Collection|\BackedEnum  $permissions
+     * @param  bool  $without
      */
-    public function scopePermission(Builder $query, $permissions): Builder
+    public function scopePermission(Builder $query, $permissions, $without = false): Builder
     {
         $permissions = $this->convertToPermissionModels($permissions);
 
@@ -109,11 +110,11 @@ trait HasPermissions
         );
 
         return $query->where(fn (Builder $query) => $query
-            ->whereHas('permissions', fn (Builder $subQuery) => $subQuery
+            ->{! $without ? 'whereHas' : 'whereDoesntHave'}('permissions', fn (Builder $subQuery) => $subQuery
                 ->whereIn(config('permission.table_names.permissions').".$permissionKey", \array_column($permissions, $permissionKey))
             )
             ->when(count($rolesWithPermissions), fn ($whenQuery) => $whenQuery
-                ->orWhereHas('roles', fn (Builder $subQuery) => $subQuery
+                ->{! $without ? 'orWhereHas' : 'whereDoesntHave'}('roles', fn (Builder $subQuery) => $subQuery
                     ->whereIn(config('permission.table_names.roles').".$roleKey", \array_column($rolesWithPermissions, $roleKey))
                 )
             )
@@ -126,27 +127,9 @@ trait HasPermissions
      *
      * @param  string|int|array|Permission|Collection|\BackedEnum  $permissions
      */
-    public function scopeWithoutPermission(Builder $query, $permissions, $debug = false): Builder
+    public function scopeWithoutPermission(Builder $query, $permissions): Builder
     {
-        $permissions = $this->convertToPermissionModels($permissions);
-
-        $permissionKey = (new ($this->getPermissionClass())())->getKeyName();
-        $roleKey = (new (is_a($this, Role::class) ? static::class : $this->getRoleClass())())->getKeyName();
-
-        $rolesWithPermissions = is_a($this, Role::class) ? [] : array_unique(
-            array_reduce($permissions, fn ($result, $permission) => array_merge($result, $permission->roles->all()), [])
-        );
-
-        return $query->where(fn (Builder $query) => $query
-            ->whereDoesntHave('permissions', fn (Builder $subQuery) => $subQuery
-                ->whereIn(config('permission.table_names.permissions').".$permissionKey", \array_column($permissions, $permissionKey))
-            )
-            ->when(count($rolesWithPermissions), fn ($whenQuery) => $whenQuery
-                ->whereDoesntHave('roles', fn (Builder $subQuery) => $subQuery
-                    ->whereIn(config('permission.table_names.roles').".$roleKey", \array_column($rolesWithPermissions, $roleKey))
-                )
-            )
-        );
+        return $this->scopePermission($query, $permissions, true);
     }
 
     /**
