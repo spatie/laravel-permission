@@ -34,9 +34,9 @@ Note the property name difference between Laravel 10 and older versions of Larav
 // Laravel 10+ uses $middlewareAliases = [
 protected $middlewareAliases = [
     // ...
-    'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
-    'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
-    'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
+    'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+    'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+    'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
 ];
 ```
 
@@ -110,19 +110,19 @@ public function __construct()
 
 ## Use middleware static methods
 
-All of the middlewares can also be applied by calling the static `using` method,
+All of the middleware can also be applied by calling the static `using` method,
 which accepts either a `|`-separated string or an array as input.
 
 ```php
-Route::group(['middleware' => [\Spatie\Permission\Middlewares\RoleMiddleware::using('manager')]], function () {
+Route::group(['middleware' => [\Spatie\Permission\Middleware\RoleMiddleware::using('manager')]], function () {
     //
 });
 
-Route::group(['middleware' => [\Spatie\Permission\Middlewares\PermissionMiddleware::using('publish articles|edit articles')]], function () {
+Route::group(['middleware' => [\Spatie\Permission\Middleware\PermissionMiddleware::using('publish articles|edit articles')]], function () {
     //
 });
 
-Route::group(['middleware' => [\Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::using(['manager', 'edit articles'])]], function () {
+Route::group(['middleware' => [\Spatie\Permission\Middleware\RoleOrPermissionMiddleware::using(['manager', 'edit articles'])]], function () {
     //
 });
 ```
