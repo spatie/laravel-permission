@@ -5,11 +5,11 @@ weight: 8
 
 We strongly recommend that a Super-Admin be handled by setting a global `Gate::before` or `Gate::after` rule which checks for the desired role. 
 
-Then you can implement the best-practice of primarily using permission-based controls (@can and $user->can, etc) throughout your app, without always having to check for "is this a super-admin" everywhere. Best not to use role-checking (ie: `hasRole`) when you have Super Admin features like this.
+Then you can implement the best-practice of primarily using permission-based controls (@can and $user->can, etc) throughout your app, without always having to check for "is this a super-admin" everywhere. **Best not to use role-checking (ie: `hasRole`) (except here in Gate/Policy rules) when you have Super Admin features like this.**
 
 
 ## `Gate::before`
-If you want a "Super Admin" role to respond `true` to all permissions, without needing to assign all those permissions to a role, you can use Laravel's `Gate::before()` method. For example:
+If you want a "Super Admin" role to respond `true` to all permissions, without needing to assign all those permissions to a role, you can use [Laravel's `Gate::before()` method](https://laravel.com/docs/master/authorization#intercepting-gate-checks). For example:
 
 ```php
 use Illuminate\Support\Facades\Gate;
@@ -33,12 +33,33 @@ NOTE: `Gate::before` rules need to return `null` rather than `false`, else it wi
 
 Jeffrey Way explains the concept of a super-admin (and a model owner, and model policies) in the [Laravel 6 Authorization Filters](https://laracasts.com/series/laravel-6-from-scratch/episodes/51) video and some related lessons in that chapter.
 
+## Policy `before()`
+
+If you aren't using `Gate::before()` as described above, you could alternatively grant super-admin control by checking the role in individual Policy classes, using the `before()` method.
+
+Here is an example from the [Laravel Documentation on Policy Filters](https://laravel.com/docs/master/authorization#policy-filters)
+
+```php
+use App\Models\User; // could be any model
+ 
+/**
+ * Perform pre-authorization checks on the model.
+ */
+public function before(User $user, string $ability): bool|null
+{
+    if ($user->hasRole('Super Admin') {
+        return true;
+    }
+ 
+    return null; // see the note above in Gate::before about why null must be returned here.
+}
+```
 
 ## `Gate::after`
 
 Alternatively you might want to move the Super Admin check to the `Gate::after` phase instead, particularly if your Super Admin shouldn't be allowed to do things your app doesn't want "anyone" to do, such as writing more than 1 review, or bypassing unsubscribe rules, etc.
 
-The following code snippet is inspired from [Freek's blog article](https://freek.dev/1325-when-to-use-gateafter-in-laravel) where this topic is discussed further.
+The following code snippet is inspired from [Freek's blog article](https://freek.dev/1325-when-to-use-gateafter-in-laravel) where this topic is discussed further. You can also consult the [Laravel Docs on gate interceptions](https://laravel.com/docs/master/authorization#intercepting-gate-checks)
 
 ```php
 // somewhere in a service provider
