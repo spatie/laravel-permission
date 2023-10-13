@@ -3,7 +3,9 @@ title: Installation in Lumen
 weight: 5
 ---
 
-NOTE: Lumen is **not** officially supported by this package. However, the following are some steps which may help get you started.
+NOTE: Lumen is **not** officially supported by this package. And Lumen is no longer under active development.
+
+However, the following are some steps which may help get you started.
 
 Lumen installation instructions can be found in the [Lumen documentation](https://lumen.laravel.com/docs/master).
 
