@@ -123,8 +123,8 @@ class PermissionServiceProvider extends ServiceProvider
         $bladeCompiler->directive('elserole', fn ($args) => "<?php elseif({$bladeMethodWrapper}('hasRole', {$args})): ?>");
         $bladeCompiler->directive('endrole', fn () => '<?php endif; ?>');
 
-        $bladeCompiler->directive('haspermission', fn ($args) => "<?php if({$bladeMethodWrapper}('hasPermissionTo', {$args})): ?>");
-        $bladeCompiler->directive('elsehaspermission', fn ($args) => "<?php elseif({$bladeMethodWrapper}('hasPermissionTo', {$args})): ?>");
+        $bladeCompiler->directive('haspermission', fn ($args) => "<?php if({$bladeMethodWrapper}('checkPermissionTo', {$args})): ?>");
+        $bladeCompiler->directive('elsehaspermission', fn ($args) => "<?php elseif({$bladeMethodWrapper}('checkPermissionTo', {$args})): ?>");
         $bladeCompiler->directive('endhaspermission', fn () => '<?php endif; ?>');
 
         $bladeCompiler->directive('hasrole', fn ($args) => "<?php if({$bladeMethodWrapper}('hasRole', {$args})): ?>");
