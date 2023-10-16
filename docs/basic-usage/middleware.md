@@ -40,6 +40,9 @@ protected $middlewareAliases = [
 ];
 ```
 
+**YOU SHOULD ALSO** set [the `$middlewarePriority` array](https://laravel.com/docs/master/middleware#sorting-middleware) to include this package's middleware before the `SubstituteBindings` middleware, else you may get *404 Not Found* responses when a *403 Not Authorized* response might be expected.
+
+
 ## Middleware via Routes
 
 Then you can protect your routes using middleware rules:
