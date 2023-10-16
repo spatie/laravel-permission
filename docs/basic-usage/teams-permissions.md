@@ -35,7 +35,8 @@ Example Team Middleware:
 ```php
 namespace App\Http\Middleware;
 
-class TeamsPermission{
+class TeamsPermission
+{
     
     public function handle($request, \Closure $next){
         if(!empty(auth()->user())){
@@ -52,7 +53,8 @@ class TeamsPermission{
     }
 }
 ```
-NOTE: You must add your custom `Middleware` to `$middlewarePriority` in `app/Http/Kernel.php`.
+
+**YOU MUST ALSO** set [the `$middlewarePriority` array](https://laravel.com/docs/master/middleware#sorting-middleware) in `app/Http/Kernel.php` to include your custom middleware before the `SubstituteBindings` middleware, else you may get *404 Not Found* responses when a *403 Not Authorized* response might be expected.
  
 ## Roles Creating
 
