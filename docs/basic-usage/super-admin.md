@@ -47,7 +47,7 @@ use App\Models\User; // could be any model
  */
 public function before(User $user, string $ability): bool|null
 {
-    if ($user->hasRole('Super Admin') {
+    if ($user->hasRole('Super Admin')) {
         return true;
     }
  
