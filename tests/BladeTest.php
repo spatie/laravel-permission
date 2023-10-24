@@ -104,7 +104,7 @@ class BladeTest extends TestCase
 
         $guard = 'admin';
         $elsepermission = 'na';
-        $this->assertEquals('does not have permission', $this->renderView('haspermission', compact('permission', 'elsepermission' ,'guard')));
+        $this->assertEquals('does not have permission', $this->renderView('haspermission', compact('permission', 'elsepermission', 'guard')));
 
         $this->testAdminRole->givePermissionTo($this->testAdminPermission);
         $this->testAdmin->assignRole($this->testAdminRole);
