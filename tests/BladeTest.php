@@ -27,8 +27,10 @@ class BladeTest extends TestCase
         $role = 'writer';
         $roles = [$role];
         $elserole = 'na';
+        $elsepermission = 'na';
 
         $this->assertEquals('does not have permission', $this->renderView('can', ['permission' => $permission]));
+        $this->assertEquals('does not have permission', $this->renderView('haspermission', compact('permission', 'elsepermission')));
         $this->assertEquals('does not have role', $this->renderView('role', compact('role', 'elserole')));
         $this->assertEquals('does not have role', $this->renderView('hasRole', compact('role', 'elserole')));
         $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', compact('roles')));
@@ -44,10 +46,12 @@ class BladeTest extends TestCase
         $role = 'writer';
         $roles = 'writer';
         $elserole = 'na';
+        $elsepermission = 'na';
 
         auth()->setUser($this->testUser);
 
-        $this->assertEquals('does not have permission', $this->renderView('can', ['permission' => $permission]));
+        $this->assertEquals('does not have permission', $this->renderView('can', compact('permission')));
+        $this->assertEquals('does not have permission', $this->renderView('haspermission', compact('permission', 'elsepermission')));
         $this->assertEquals('does not have role', $this->renderView('role', compact('role', 'elserole')));
         $this->assertEquals('does not have role', $this->renderView('hasRole', compact('role', 'elserole')));
         $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', compact('roles')));
@@ -61,10 +65,12 @@ class BladeTest extends TestCase
         $role = 'writer';
         $roles = 'writer';
         $elserole = 'na';
+        $elsepermission = 'na';
 
         auth('admin')->setUser($this->testAdmin);
 
         $this->assertEquals('does not have permission', $this->renderView('can', compact('permission')));
+        $this->assertEquals('does not have permission', $this->renderView('haspermission', compact('permission', 'elsepermission')));
         $this->assertEquals('does not have role', $this->renderView('role', compact('role', 'elserole')));
         $this->assertEquals('does not have role', $this->renderView('hasRole', compact('role', 'elserole')));
         $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', compact('roles')));
@@ -82,6 +88,30 @@ class BladeTest extends TestCase
         auth()->setUser($user);
 
         $this->assertEquals('has permission', $this->renderView('can', ['permission' => 'edit-articles']));
+    }
+
+    /** @test */
+    public function the_haspermission_directive_will_evaluate_true_when_the_logged_in_user_has_the_permission()
+    {
+        $user = $this->getWriter();
+
+        $permission = 'edit-articles';
+        $user->givePermissionTo('edit-articles');
+
+        auth()->setUser($user);
+
+        $this->assertEquals('has permission', $this->renderView('haspermission', compact('permission')));
+
+        $guard = 'admin';
+        $elsepermission = 'na';
+        $this->assertEquals('does not have permission', $this->renderView('haspermission', compact('permission', 'elsepermission' ,'guard')));
+
+        $this->testAdminRole->givePermissionTo($this->testAdminPermission);
+        $this->testAdmin->assignRole($this->testAdminRole);
+        auth('admin')->setUser($this->testAdmin);
+        $guard = 'admin';
+        $permission = 'admin-permission';
+        $this->assertEquals('has permission', $this->renderView('haspermission', compact('permission', 'guard', 'elsepermission')));
     }
 
     /** @test */
