@@ -157,6 +157,13 @@ abstract class TestCase extends Orchestra
             $table->string('email');
         });
 
+        $schema->create('content', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('content');
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+            $table->timestamps();
+        });
+
         if (Cache::getStore() instanceof \Illuminate\Cache\DatabaseStore ||
             $app[PermissionRegistrar::class]->getCacheStore() instanceof \Illuminate\Cache\DatabaseStore) {
             $this->createCacheTable();
