@@ -122,9 +122,12 @@ class PermissionRegistrar
      */
     public function registerPermissions(Gate $gate): bool
     {
-        $gate->before(function (Authorizable $user, string $ability) {
+        $gate->before(function (Authorizable $user, string $ability, array &$args = []) {
+            if (is_string($args[0] ?? null) && !class_exists($args[0])) {
+                $guard = array_shift($args);
+            }
             if (method_exists($user, 'checkPermissionTo')) {
-                return $user->checkPermissionTo($ability) ?: null;
+                return $user->checkPermissionTo($ability, $guard ?? null) ?: null;
             }
         });
 

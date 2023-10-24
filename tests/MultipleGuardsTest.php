@@ -18,6 +18,7 @@ class MultipleGuardsTest extends TestCase
             'api' => ['driver' => 'token', 'provider' => 'users'],
             'jwt' => ['driver' => 'token', 'provider' => 'users'],
             'abc' => ['driver' => 'abc'],
+            'admin' => ['driver' => 'session', 'provider' => 'admins'],
         ]);
 
         $this->setUpRoutes();
@@ -51,6 +52,47 @@ class MultipleGuardsTest extends TestCase
         $this->assertTrue($this->testUser->checkPermissionTo('do_this', 'web'));
         $this->assertTrue($this->testUser->checkPermissionTo('do_that', 'api'));
         $this->assertFalse($this->testUser->checkPermissionTo('do_that', 'web'));
+    }
+
+    /** @test */
+    public function the_gate_can_grant_permission_to_a_user_by_passing_a_guard_name()
+    {
+        $this->testUser->givePermissionTo(app(Permission::class)::create([
+            'name' => 'do_this',
+            'guard_name' => 'web',
+        ]));
+
+        $this->testUser->givePermissionTo(app(Permission::class)::create([
+            'name' => 'do_that',
+            'guard_name' => 'api',
+        ]));
+
+        $this->assertTrue($this->testUser->can('do_this', 'web'));
+        $this->assertTrue($this->testUser->can('do_that', 'api'));
+        $this->assertFalse($this->testUser->can('do_that', 'web'));
+
+        $this->assertTrue($this->testUser->cannot('do_that', 'web'));
+        $this->assertTrue($this->testUser->canAny(['do_this', 'do_that'], 'web'));
+
+        $this->testAdminRole->givePermissionTo($this->testAdminPermission);
+        $this->testAdmin->assignRole($this->testAdminRole);
+
+        $this->assertTrue($this->testAdmin->hasPermissionTo($this->testAdminPermission));
+        $this->assertTrue($this->testAdmin->can('admin-permission'));
+        $this->assertTrue($this->testAdmin->can('admin-permission', 'admin'));
+        $this->assertTrue($this->testAdmin->cannot('admin-permission', 'web'));
+
+        $this->assertTrue($this->testAdmin->cannot('non-existing-permission'));
+        $this->assertTrue($this->testAdmin->cannot('non-existing-permission', 'web'));
+        $this->assertTrue($this->testAdmin->cannot('non-existing-permission', 'admin'));
+        $this->assertTrue($this->testAdmin->cannot(['admin-permission', 'non-existing-permission'], 'web'));
+
+        $this->assertFalse($this->testAdmin->can('edit-articles', 'web'));
+        $this->assertFalse($this->testAdmin->can('edit-articles', 'admin'));
+
+        $this->assertTrue($this->testUser->cannot('edit-articles', 'admin'));
+        $this->assertTrue($this->testUser->cannot('admin-permission', 'admin'));
+        $this->assertTrue($this->testUser->cannot('admin-permission', 'web'));
     }
 
     /** @test */

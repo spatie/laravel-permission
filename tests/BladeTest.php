@@ -79,6 +79,37 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    public function the_can_directive_can_accept_a_guard_name()
+    {
+        $user = $this->getWriter();
+        $user->givePermissionTo('edit-articles');
+        auth()->setUser($user);
+
+        $permission = 'edit-articles';
+        $guard = 'web';
+        $this->assertEquals('has permission', $this->renderView('can', compact('permission', 'guard')));
+        $guard = 'admin';
+        $this->assertEquals('does not have permission', $this->renderView('can', compact('permission', 'guard')));
+
+        auth()->logout();
+
+
+        // log in as the Admin with the permission-via-role
+        $this->testAdmin->givePermissionTo($this->testAdminPermission);
+        $user = $this->testAdmin;
+        auth()->setUser($user);
+
+        $permission = 'edit-articles';
+        $guard = 'web';
+        $this->assertEquals('does not have permission', $this->renderView('can', compact('permission', 'guard')));
+
+        $permission = 'admin-permission';
+        $guard = 'admin';
+        $this->assertTrue($this->testAdmin->checkPermissionTo($permission, $guard));
+        $this->assertEquals('has permission', $this->renderView('can', compact('permission', 'guard')));
+    }
+
+    /** @test */
     public function the_can_directive_will_evaluate_true_when_the_logged_in_user_has_the_permission()
     {
         $user = $this->getWriter();
