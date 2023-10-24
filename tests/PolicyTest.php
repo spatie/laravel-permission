@@ -32,7 +32,7 @@ class PolicyTest extends TestCase
 }
 class ContentPolicy
 {
-    public function before(Authorizable $user, string $ability): bool|null
+    public function before(Authorizable $user, string $ability): ?bool
     {
         return $user->hasRole('testAdminRole', 'admin') ?: null;
     }
@@ -41,6 +41,7 @@ class ContentPolicy
     {
         return $user->id === $content->user_id;
     }
+
     public function update($user, $modelRecord): bool
     {
         return $user->id === $modelRecord->user_id || $user->can('edit-articles');
