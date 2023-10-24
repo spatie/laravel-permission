@@ -19,6 +19,19 @@ class GateTest extends TestCase
         $this->assertFalse($this->testUser->can('edit-articles'));
 
         app(Gate::class)->before(function () {
+            // this Gate-before intercept overrides everything to true ... like a typical Super-Admin might use
+            return true;
+        });
+
+        $this->assertTrue($this->testUser->can('edit-articles'));
+    }
+
+    /** @test */
+    public function it_allows_gate_after_callback_to_grant_denied_privileges()
+    {
+        $this->assertFalse($this->testUser->can('edit-articles'));
+
+        app(Gate::class)->after(function ($user, $ability, $result) {
             return true;
         });
 
