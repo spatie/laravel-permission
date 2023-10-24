@@ -93,7 +93,6 @@ class BladeTest extends TestCase
 
         auth()->logout();
 
-
         // log in as the Admin with the permission-via-role
         $this->testAdmin->givePermissionTo($this->testAdminPermission);
         $user = $this->testAdmin;
