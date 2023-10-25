@@ -8,7 +8,7 @@ weight: 6
 ALL upgrades of this package should follow these steps:
 
 1. Composer. Upgrading between major versions of this package always require the usual Composer steps:
-   - Update your `composer.json` to specify the new major version, such as `^6.0`
+   - Update your `composer.json` to specify the new major version, for example: `^6.0`
    - Then run `composer update`. 
 
 2. Migrations. Compare the `migration` file stubs in the NEW version of this package against the migrations you've already run inside your app. If necessary, create a new migration (by hand) to apply any new database changes.
@@ -30,6 +30,8 @@ and/or consult the [Release Notes](https://github.com/spatie/laravel-permission/
 ## Upgrading from v5 to v6
 There are a few breaking-changes when upgrading to v6, but most of them won't affect you unless you have been customizing things.
 
+For guidance with upgrading your extended models, your migrations, your routes, etc, see the **Upgrade Essentials** section at the top of this file.
+
 1. If you have overridden the `getPermissionClass()` or `getRoleClass()` methods or have custom Models, you will need to revisit those customizations. See PR #2368 for details. 
 eg: if you have a custom model you will need to make changes, including accessing the model using `$this->permissionClass::` syntax (eg: using `::` instead of `->`) in all the overridden methods that make use of the models.
 
@@ -42,15 +44,15 @@ eg: if you have a custom model you will need to make changes, including accessin
 
 4. MIDDLEWARE:
 
-    1. The `\Spatie\Permission\Middlewares\` namespace has been renamed to `\Spatie\Permission\Middleware\` (singular). Update your references to them in your `/app/Http/Kernel.php` and any routes that have the fully qualified path. 
+    1. The `\Spatie\Permission\Middlewares\` namespace has been renamed to `\Spatie\Permission\Middleware\` (singular). Update any references to them in your `/app/Http/Kernel.php` and any routes (or imported classes in your routes files) that have the fully qualified namespace.
 
     2. NOTE: For consistency with `PermissionMiddleware`, the `RoleOrPermissionMiddleware` has switched from only checking permissions provided by this package to using `canAny()` to check against any abilities registered by your application. This may have the effect of granting those other abilities (such as Super Admin) when using the `RoleOrPermissionMiddleware`, which previously would have failed silently.
 
-    3. In the unlikely event that you have customized the Wildcard Permissions feature by extending the `WildcardPermission` model, please note that the public interface has changed and you will need to update your extended model with the new method signatures.
+    3. In the unlikely event that you have customized the Wildcard Permissions feature by extending the `WildcardPermission` model, please note that the public interface has changed significantly and you will need to update your extended model with the new method signatures.
 
 5. Test suites. If you have tests which manually clear the permission cache and re-register permissions, you no longer need to call `\Spatie\Permission\PermissionRegistrar::class)->registerPermissions();`. In fact, **calls to `->registerPermissions()` MUST be deleted from your tests**. 
     
-    (Calling `app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();` after creating roles and permissions is still okay and encouraged.) 
+    (Calling `app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();` after creating roles and permissions in migrations and factories and seeders is still okay and encouraged.) 
 
 
 ## Upgrading from v4 to v5
