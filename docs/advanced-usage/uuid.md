@@ -64,6 +64,18 @@ If you also want the roles and permissions to use a UUID for their `id` value, t
 -        $table->unsignedBigInteger(PermissionRegistrar::$pivotRole);
 +        $table->uuid(PermissionRegistrar::$pivotPermission);
 +        $table->uuid(PermissionRegistrar::$pivotRole);
+
+         $table->foreign(PermissionRegistrar::$pivotPermission)
+-            ->references('id') // permission id
++            ->references('uuid') // permission id
+            ->on($tableNames['permissions'])
+            ->onDelete('cascade');
+
+         $table->foreign(PermissionRegistrar::$pivotRole)
+-            ->references('id') // role id
++            ->references('uuid') // role id
+            ->on($tableNames['roles'])
+            ->onDelete('cascade'); 
 ```
 
 
