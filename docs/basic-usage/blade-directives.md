@@ -5,7 +5,7 @@ weight: 7
 
 ## Permissions
 This package doesn't add any **permission**-specific Blade directives. 
-Instead, use Laravel's native `@can` directive to check if a user has a certain permission.
+Instead, use Laravel's native `@can` directive to check if a user has a certain permission (whether you gave them that permission directly or if you granted it indirectly via a role):
 
 ```php
 @can('edit articles')
@@ -27,7 +27,7 @@ As discussed in the Best Practices section of the docs, **it is strongly recomme
 
 Additionally, if your reason for testing against Roles is for a Super-Admin, see the *Defining A Super-Admin* section of the docs.
 
-If you actually need to test for Roles, this package offers some Blade directives to verify whether the currently logged in user has all or any of a given list of roles. 
+If you actually need to directly test for Roles, this package offers some Blade directives to verify whether the currently logged in user has all or any of a given list of roles.
 
 Optionally you can pass in the `guard` that the check will be performed on as a second argument.
 
@@ -47,6 +47,12 @@ is the same as
 @else
     I am not a writer...
 @endhasrole
+```
+which is also the same as
+```php
+@if(auth()->user()->hasRole('writer'))
+  //
+@endif
 ```
 
 Check for any role in a list:
