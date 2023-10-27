@@ -39,7 +39,7 @@ eg: if you have a custom model you will need to make changes, including accessin
 
 2. Model and Contract/Interface updates. The Role and Permission Models and Contracts/Interfaces have been updated with syntax changes to method signatures. Update any models you have extended, or contracts implemented, accordingly. See PR #2380 and #2480 for some of the specifics. 
 
-3. Migrations will need to be upgraded. (They have been updated to anonymous-class syntax that was introduced in Laravel 8, AND some structural coding changes in the registrar class changed the way we extracted configuration settings in the migration files.) If you had not customized it from the original then replacing the contents of the file should be straightforward. Usually the only customization is if you've switched to UUIDs or customized MySQL index name lengths. 
+3. Migrations WILL need to be upgraded. (They have been updated to anonymous-class syntax that was introduced in Laravel 8, AND some structural coding changes in the registrar class changed the way we extracted configuration settings in the migration files.) There are no changes to the package's structure since v5, so if you had not customized it from the original then replacing the contents of the file should be enough. (Usually the only customization is if you've switched to UUIDs or customized MySQL index name lengths.)
 **If you get the following error, it means your migration file needs upgrading: `Error: Access to undeclared static property Spatie\Permission\PermissionRegistrar::$pivotPermission`**
 
 4. MIDDLEWARE:
