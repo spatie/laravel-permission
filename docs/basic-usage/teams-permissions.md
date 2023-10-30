@@ -96,7 +96,7 @@ setPermissionsTeamId($new_team_id);
 // $user = Auth::user();
 
 // unset cached model relations so new team relations will get reloaded
-$user->unsetRelation('roles','permissions');
+$user->unsetRelation('roles')->unsetRelation('permissions');
 
 // Now you can check:
 $roles = $user->roles;
