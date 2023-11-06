@@ -7,7 +7,7 @@ weight: 2
 
 It's better to assign permissions to Roles, and then assign Roles to Users.
 
-See the [Roles vs Permissions](../best-practices/roles-vs-permissions.md) section of the docs for a deeper explanation.
+See the [Roles vs Permissions](../best-practices/roles-vs-permissions) section of the docs for a deeper explanation.
 
 HOWEVER, If you have reason to directly assign individual permissions to specific users (instead of to roles assigned to those users), you can do that as described below:
 
