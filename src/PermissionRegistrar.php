@@ -66,7 +66,7 @@ class PermissionRegistrar
         $this->cacheExpirationTime = config('permission.cache.expiration_time') ?: \DateInterval::createFromDateString('24 hours');
 
         $this->teams = config('permission.teams', false);
-        $this->teamsKey = config('permission.column_names.team_foreign_key');
+        $this->teamsKey = config('permission.column_names.team_foreign_key', 'team_id');
 
         $this->cacheKey = config('permission.cache.key');
 
