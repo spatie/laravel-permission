@@ -180,11 +180,14 @@ trait HasRoles
     /**
      * Revoke the given role from the model.
      *
-     * @param  string|int|Role|\BackedEnum  $role
+     * @param  string|string[]|int|Role|Role[]|\BackedEnum  $role
      */
     public function removeRole($role)
     {
-        $this->roles()->detach($this->getStoredRole($role));
+        $this->roles()->detach(array_map(
+            fn ($item) => $this->getStoredRole($item)->getKey(),
+            is_a($role, Collection::class) ? $role->all() : Arr::wrap($role)
+        ));
 
         $this->unsetRelation('roles');
 
