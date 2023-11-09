@@ -6,8 +6,10 @@ All notable changes to `laravel-permission` will be documented in this file
 
 ### What's Changed
 
-- Reset teamId on octane by @erikn69 in https://github.com/spatie/laravel-permission/pull/2547   
+- Reset teamId on Octane by @erikn69 in https://github.com/spatie/laravel-permission/pull/2547   
   NOTE: The `\Spatie\Permission\Listeners\OctaneReloadPermissions` listener introduced in 6.0.0 is removed in 6.1.0, because the logic is directly incorporated into the ServiceProvider now.
+
+  Thanks @jameshulse for the heads-up and code-review.
 
 **Full Changelog**: https://github.com/spatie/laravel-permission/compare/6.0.1...6.1.0
 
