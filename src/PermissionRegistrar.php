@@ -191,7 +191,7 @@ class PermissionRegistrar
      */
     private function loadPermissions(): void
     {
-        if ($this->permissions) {
+        if (count($this->permissions ?? [])) {
             return;
         }
 
