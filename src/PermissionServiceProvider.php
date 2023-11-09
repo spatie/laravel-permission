@@ -13,7 +13,6 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 use Spatie\Permission\Contracts\Role as RoleContract;
-use Spatie\Permission\Listeners\OctaneReloadPermissions;
 
 class PermissionServiceProvider extends ServiceProvider
 {
@@ -91,17 +90,25 @@ class PermissionServiceProvider extends ServiceProvider
 
     protected function registerOctaneListener(): void
     {
-        if ($this->app->runningInConsole() || ! $this->app['config']->get('permission.register_octane_reset_listener')) {
-            return;
-        }
-
-        if (! $this->app['config']->get('octane.listeners')) {
+        if ($this->app->runningInConsole() || ! $this->app['config']->get('octane.listeners')) {
             return;
         }
 
         $dispatcher = $this->app[Dispatcher::class];
         // @phpstan-ignore-next-line
-        $dispatcher->listen(\Laravel\Octane\Events\OperationTerminated::class, OctaneReloadPermissions::class);
+        $dispatcher->listen(function (\Laravel\Octane\Events\OperationTerminated $event) {
+            // @phpstan-ignore-next-line
+            $event->sandbox->make(PermissionRegistrar::class)->setPermissionsTeamId(null);
+        });
+
+        if (! $this->app['config']->get('permission.register_octane_reset_listener')) {
+            return;
+        }
+        // @phpstan-ignore-next-line
+        $dispatcher->listen(function (\Laravel\Octane\Events\OperationTerminated $event) {
+            // @phpstan-ignore-next-line
+            $event->sandbox->make(PermissionRegistrar::class)->clearPermissionsCollection();
+        });
     }
 
     protected function registerModelBindings(): void
