@@ -494,7 +494,12 @@ trait HasPermissions
                     return $permission->value;
                 }
 
-                return is_a($permission, Permission::class) ? $permission->name : $permission;
+                if (is_a($permission, Permission::class)) {
+                    return $permission->name;
+                }
+
+                // covers both int|string -> id|name
+                return $permission;
             }, $permissions);
 
             return $this->getPermissionClass()::whereIn('name', $permissions)
