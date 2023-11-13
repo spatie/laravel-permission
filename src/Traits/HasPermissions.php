@@ -452,10 +452,7 @@ trait HasPermissions
      */
     public function revokePermissionTo($permission)
     {
-        $this->permissions()->detach(array_map(
-            fn ($item) => $this->getStoredPermission($item)->getKey(),
-            is_a($permission, Collection::class) ? $permission->all() : Arr::wrap($permission)
-        ));
+        $this->permissions()->detach($this->collectPermissions($permission));
 
         if (is_a($this, Role::class)) {
             $this->forgetCachedPermissions();

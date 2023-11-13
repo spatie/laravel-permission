@@ -184,10 +184,7 @@ trait HasRoles
      */
     public function removeRole($role)
     {
-        $this->roles()->detach(array_map(
-            fn ($item) => $this->getStoredRole($item)->getKey(),
-            is_a($role, Collection::class) ? $role->all() : Arr::wrap($role)
-        ));
+        $this->roles()->detach($this->collectRoles($role));
 
         $this->unsetRelation('roles');
 
