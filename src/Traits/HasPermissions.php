@@ -507,7 +507,7 @@ trait HasPermissions
              */
             $col = 'name'; // default
             if(count(array_filter($permissions, 'is_numeric')) > 0) { // consider ids here
-                $col = $permissionClass->getKeyName();
+                $col = $this->getPermissionClass()->getKeyName();
             }
 
             return $this->getPermissionClass()::whereIn($col, $permissions)
