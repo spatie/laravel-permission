@@ -152,6 +152,8 @@ trait HasRoles
             [app(PermissionRegistrar::class)->teamsKey => getPermissionsTeamId()] : [];
 
         if ($model->exists) {
+            $this->load('roles');
+
             $currentRoles = $this->roles->map(fn ($role) => $role->getKey())->toArray();
 
             $this->roles()->attach(array_diff($roles, $currentRoles), $teamPivot);

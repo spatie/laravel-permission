@@ -149,4 +149,34 @@ class TeamHasRolesTest extends HasRolesTest
         $this->assertEquals(0, $scopedUsers2Team2->count());
         $this->assertEquals(1, $scopedUsers3Team2->count());
     }
+
+    /** @test */
+    public function it_can_assign_the_same_across_teams_when_roles_already_loaded()
+    {
+        setPermissionsTeamId(1);
+        $this->testUser->assignRole('testRole');
+
+        $this->testUser->load('roles');
+
+        setPermissionsTeamId(2);
+        $this->testUser->assignRole('testRole');
+
+        setPermissionsTeamId(1);
+        $this->testUser->load('roles');
+
+        $this->assertEquals(
+            collect(['testRole']),
+            $this->testUser->getRoleNames()->sort()->values()
+        );
+        $this->assertTrue($this->testUser->hasExactRoles(['testRole']));
+
+        setPermissionsTeamId(2);
+        $this->testUser->load('roles');
+
+        $this->assertEquals(
+            collect(['testRole']),
+            $this->testUser->getRoleNames()->sort()->values()
+        );
+        $this->assertTrue($this->testUser->hasExactRoles(['testRole']));
+    }
 }
