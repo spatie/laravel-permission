@@ -16,6 +16,8 @@ trait HasRoles
 
     private ?string $roleClass = null;
 
+    private mixed $rolesLoadedWithTeamId = null;
+
     public static function bootHasRoles()
     {
         static::deleting(function ($model) {
@@ -60,6 +62,8 @@ trait HasRoles
         }
 
         $teamField = config('permission.table_names.roles').'.'.app(PermissionRegistrar::class)->teamsKey;
+
+        $this->rolesLoadedWithTeamId = getPermissionsTeamId();
 
         return $relation->wherePivot(app(PermissionRegistrar::class)->teamsKey, getPermissionsTeamId())
             ->where(fn ($q) => $q->whereNull($teamField)->orWhere($teamField, getPermissionsTeamId()));
@@ -152,7 +156,9 @@ trait HasRoles
             [app(PermissionRegistrar::class)->teamsKey => getPermissionsTeamId()] : [];
 
         if ($model->exists) {
-            $this->load('roles');
+            if (getPermissionsTeamId() !== $this->rolesLoadedWithTeamId) {
+                $this->load('roles');
+            }
 
             $currentRoles = $this->roles->map(fn ($role) => $role->getKey())->toArray();
 
