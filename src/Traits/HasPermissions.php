@@ -502,7 +502,15 @@ trait HasPermissions
                 return $permission;
             }, $permissions);
 
-            return $this->getPermissionClass()::whereIn('name', $permissions)
+            /**
+             * To support array of permission ids (PRIORITY GIVEN)
+             */
+            $col = 'name'; // default
+            if(count(array_filter($permissions, 'is_numeric')) > 0) { // consider ids here
+                $col = $permissionClass->getKeyName();
+            }
+
+            return $this->getPermissionClass()::whereIn($col, $permissions)
                 ->whereIn('guard_name', $this->getGuardNames())
                 ->get();
         }
