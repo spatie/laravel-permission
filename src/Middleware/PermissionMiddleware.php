@@ -32,7 +32,7 @@ class PermissionMiddleware
             ? $permission
             : explode('|', $permission);
 
-        if (! $user->canAny($permissions)) {
+        if (! $user->canAny($permissions, $guard)) {
             throw UnauthorizedException::forPermissions($permissions);
         }
 

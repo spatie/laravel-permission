@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use InvalidArgumentException;
 use Laravel\Passport\Passport;
+use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Tests\TestModels\UserWithoutHasRoles;
@@ -295,6 +296,21 @@ class RoleMiddlewareTest extends TestCase
         $this->assertEquals(
             403,
             $this->runMiddleware($this->roleMiddleware, 'testRole', 'admin')
+        );
+    }
+
+    /** @test */
+    public function multiple_guard_user_can_access_role_while_login_using_specific_guard(): void
+    {
+        config()->set('auth.guards.api.driver', 'session');
+        Auth::guard('api')->login($this->testUser);
+
+        $testClientRole = app(Role::class)->create(['name' => 'apiRole', 'guard_name' => 'api']);
+        $this->testUser->assignRole($testClientRole);
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->roleMiddleware, 'apiRole', 'api')
         );
     }
 
