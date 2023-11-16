@@ -73,10 +73,12 @@ return [
 
     'column_names' => [
         /*
-         * Change this if you want to name the related pivots other than defaults
+         * Change this if you want to name the related pivots other than defaults,
+         * which are `role_id` and `permission_id` respectively.
          */
-        'role_pivot_key' => null, //default 'role_id',
-        'permission_pivot_key' => null, //default 'permission_id',
+    
+        'role_pivot_key' => null,
+        'permission_pivot_key' => null,
 
         /*
          * Change this if you want to name the related model primary key other than
