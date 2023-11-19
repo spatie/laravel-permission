@@ -66,7 +66,7 @@ php artisan migrate
 
 ---
 ## User Model
-NOTE: Remember that Laravel's authorization layer requires that your `User` model implement the `Illuminate\Contracts\Auth\Access\Authorizable` contract. In Lumen you will then also need to use the `Laravel\Lumen\Auth\Authorizable` trait.
+NOTE: Remember that Laravel's authorization layer requires that your `User` model implement the `Illuminate\Contracts\Auth\Access\Authorizable` contract. In Lumen you will then also need to use the `Laravel\Lumen\Auth\Authorizable` trait. And if you want to use middleware from this package, you will need to implement the `canAny()` method from [Illuminate\Foundation\Auth\Access\Authorizable](https://github.com/laravel/framework/blob/10.x/src/Illuminate/Foundation/Auth/Access/Authorizable.php) in your `User` model because Lumen doesn't include it in its `Authorizable` trait.
 
 ---
 ## User Table
