@@ -3,9 +3,10 @@ title: Wildcard permissions
 weight: 6
 ---
 
-When enabled, wildcard permissions offers you a flexible representation for a variety of permission schemes. The idea
- behind wildcard permissions is inspired by the default permission implementation of 
- [Apache Shiro](https://shiro.apache.org/permissions.html). See the Shiro documentation for more examples.
+When enabled, wildcard permissions offers you a flexible representation for a variety of permission schemes. 
+
+The wildcard permissions implementation is inspired by the default permission implementation of 
+ [Apache Shiro](https://shiro.apache.org/permissions.html). See the Shiro documentation for more examples and deeper explanation of the concepts.
 
 ## Enabling Wildcard Features
 
@@ -84,4 +85,4 @@ Permission::create(['name'=>'posts.*.1,4,6']);
 $user->givePermissionTo('posts.*.1,4,6');
 ```
 
-> As said before, the meaning of each part is determined by the application layer! So, you are free to use each part as you like. And you can use as many parts and subparts as you want.
+> Remember: the meaning of each 'part' is determined by your application! So, you are free to use each part as you like. And you can use as many parts and subparts as you want.
