@@ -187,7 +187,7 @@ class PermissionRegistrar
 
     /**
      * Load permissions from cache
-     * This get cache and turns array into \Illuminate\Database\Eloquent\Collection
+     * And turns permissions array into a \Illuminate\Database\Eloquent\Collection
      */
     private function loadPermissions(): void
     {
