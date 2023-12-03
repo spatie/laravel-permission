@@ -23,15 +23,15 @@
     "homepage": "https://github.com/spatie/laravel-permission",
     "require": {
         "php": "^8.0",
-        "illuminate/auth": "^8.12|^9.0|^10.0",
-        "illuminate/container": "^8.12|^9.0|^10.0",
-        "illuminate/contracts": "^8.12|^9.0|^10.0",
-        "illuminate/database": "^8.12|^9.0|^10.0"
+        "illuminate/auth": "^8.12|^9.0|^10.0|^11.0",
+        "illuminate/container": "^8.12|^9.0|^10.0|^11.0",
+        "illuminate/contracts": "^8.12|^9.0|^10.0|^11.0",
+        "illuminate/database": "^8.12|^9.0|^10.0|^11.0"
     },
     "require-dev": {
         "laravel/passport": "^11.0",
-        "orchestra/testbench": "^6.23|^7.0|^8.0",
-        "phpunit/phpunit": "^9.4"
+        "orchestra/testbench": "^6.23|^7.0|^8.0|^9.0",
+        "phpunit/phpunit": "^9.4|^10.1"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
