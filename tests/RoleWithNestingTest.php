@@ -10,10 +10,10 @@ class RoleWithNestingTest extends TestCase
     protected $useCustomModels = true;
 
     /** @var Role[] */
-    protected $parent_roles = [];
+    protected array $parent_roles = [];
 
     /** @var Role[] */
-    protected $child_roles = [];
+    protected array $child_roles = [];
 
     protected function setUp(): void
     {
@@ -67,7 +67,7 @@ class RoleWithNestingTest extends TestCase
         $role = $this->$role_group[$index];
         $count_field_name = sprintf('%s_count', $relation);
 
-        $actualCount = intval(Role::withCount($relation)->find($role->getKey())->$count_field_name);
+        $actualCount = (int)Role::withCount($relation)->find($role->getKey())->$count_field_name;
 
         $this->assertSame(
             $expectedCount,
@@ -76,7 +76,7 @@ class RoleWithNestingTest extends TestCase
         );
     }
 
-    public function roles_list()
+    public static function roles_list()
     {
         return [
             ['parent_roles', 'has_no_children', 'children', 0],
