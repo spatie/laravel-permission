@@ -260,6 +260,16 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_avoid_sync_duplicated_roles()
+    {
+        $this->testUser->syncRoles('testRole', 'testRole', 'testRole2');
+
+        $this->assertTrue($this->testUser->hasRole('testRole'));
+
+        $this->assertTrue($this->testUser->hasRole('testRole2'));
+    }
+
+    /** @test */
     public function it_can_sync_multiple_roles()
     {
         $this->testUser->syncRoles('testRole', 'testRole2');

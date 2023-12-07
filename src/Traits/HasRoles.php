@@ -129,9 +129,10 @@ trait HasRoles
                     return $array;
                 }
 
-                $this->ensureModelSharesGuard($role);
-
-                $array[] = $role->getKey();
+                if (! in_array($role->getKey(), $array)) {
+                    $this->ensureModelSharesGuard($role);
+                    $array[] = $role->getKey();
+                }
 
                 return $array;
             }, []);

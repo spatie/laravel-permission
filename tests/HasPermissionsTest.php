@@ -542,6 +542,16 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    public function it_can_avoid_sync_duplicated_permissions()
+    {
+        $this->testUser->syncPermissions('edit-articles', 'edit-blog', 'edit-blog');
+
+        $this->assertTrue($this->testUser->hasDirectPermission('edit-articles'));
+
+        $this->assertTrue($this->testUser->hasDirectPermission('edit-blog'));
+    }
+
+    /** @test */
     public function it_can_sync_multiple_permissions_by_id()
     {
         $this->testUser->givePermissionTo('edit-news');
