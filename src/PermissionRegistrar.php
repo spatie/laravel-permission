@@ -145,7 +145,7 @@ class PermissionRegistrar
         return $this->cache->forget($this->cacheKey);
     }
 
-    public function forgetWildcardPermissionIndex(Model $record = null): void
+    public function forgetWildcardPermissionIndex(?Model $record = null): void
     {
         if ($record) {
             unset($this->wildcardPermissionsIndex[get_class($record)][$record->getKey()]);
