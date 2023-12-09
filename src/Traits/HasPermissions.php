@@ -370,9 +370,10 @@ trait HasPermissions
                     return $array;
                 }
 
-                $this->ensureModelSharesGuard($permission);
-
-                $array[] = $permission->getKey();
+                if (! in_array($permission->getKey(), $array)) {
+                    $this->ensureModelSharesGuard($permission);
+                    $array[] = $permission->getKey();
+                }
 
                 return $array;
             }, []);
