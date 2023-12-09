@@ -2,14 +2,23 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 6.2.0 - 2023-12-09
+
+### What's Changed
+
+* Skip duplicates on sync (was triggering Integrity Constraint Violation error) by @erikn69 in https://github.com/spatie/laravel-permission/pull/2574
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/6.1.0...6.2.0
+
 ## 6.1.0 - 2023-11-09
 
 ### What's Changed
 
-- Reset teamId on Octane by @erikn69 in https://github.com/spatie/laravel-permission/pull/2547   
+- Reset teamId on Octane by @erikn69 in https://github.com/spatie/laravel-permission/pull/2547
   NOTE: The `\Spatie\Permission\Listeners\OctaneReloadPermissions` listener introduced in 6.0.0 is removed in 6.1.0, because the logic is directly incorporated into the ServiceProvider now.
-
+  
   Thanks @jameshulse for the heads-up and code-review.
+  
 
 **Full Changelog**: https://github.com/spatie/laravel-permission/compare/6.0.1...6.1.0
 
@@ -725,6 +734,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -772,6 +782,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
