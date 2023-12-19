@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Report or reproducable bug
+about: Report a reproducible bug
 title: ''
 labels: ''
 assignees: ''
@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 **Before creating a new bug report**
-Please check if there isn't a similar issue on [the issue tracker](https://github.com/spatie/laravel-permission/issues) or in [the discussions](https://github.com/spatie/laravel-permission/discussions).
+Please check that there isn't already a similar issue on [the issue tracker](https://github.com/spatie/laravel-permission/issues) or in [the discussions](https://github.com/spatie/laravel-permission/discussions).
 
 **Describe the bug**
 A clear and concise description of what the bug is.
@@ -16,7 +16,7 @@ A clear and concise description of what the bug is.
 **Versions**
 You can use `composer show` to get the version numbers of:
 - spatie/laravel-permission package version:
-- illuminate/framework package
+- laravel/framework package
 
 PHP version:
 
@@ -40,4 +40,5 @@ Add any other context about the problem here.
 **Environment (please complete the following information, because it helps us investigate better):**
  - OS: [e.g. macOS]
  - Version [e.g. 22]
+
  
