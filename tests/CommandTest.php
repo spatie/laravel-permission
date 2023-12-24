@@ -184,4 +184,22 @@ class CommandTest extends TestCase
             $this->assertRegExp('/\|\s+\|\s+testRole\s+\|\s+testRole_2\s+\|\s+testRole_Team\s+\|\s+testRole_Team\s+\|/', $output);
         }
     }
+
+    /** @test */
+    public function it_can_respond_to_about_command()
+    {
+        config()->set('permission.teams', true);
+        app(\Spatie\Permission\PermissionRegistrar::class)->initializeCache();
+
+        Artisan::call('about');
+
+        $output = Artisan::output();
+
+        $pattern = '/Spatie Permissions[ .\n]*Features Enabled[ .]*Teams[ .\n]*Version/';
+        if (method_exists($this, 'assertMatchesRegularExpression')) {
+            $this->assertMatchesRegularExpression($pattern, $output);
+        } else { // phpUnit 9/8
+            $this->assertRegExp($pattern, $output);
+        }
+    }
 }

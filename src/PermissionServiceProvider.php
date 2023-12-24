@@ -2,10 +2,12 @@
 
 namespace Spatie\Permission;
 
+use Composer\InstalledVersions;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -38,6 +40,8 @@ class PermissionServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(PermissionRegistrar::class);
+
+        $this->registerAbout();
     }
 
     public function register()
@@ -180,5 +184,28 @@ class PermissionServiceProvider extends ServiceProvider
             ->flatMap(fn ($path) => $filesystem->glob($path.'*_'.$migrationFileName))
             ->push($this->app->databasePath()."/migrations/{$timestamp}_{$migrationFileName}")
             ->first();
+    }
+
+    protected function registerAbout(): void
+    {
+        if (! class_exists(InstalledVersions::class) || ! class_exists(AboutCommand::class)) {
+            return;
+        }
+
+        $features = [
+            'Teams' => 'teams',
+            'Wildcard-Permissions' => 'enable_wildcard_permission',
+            'Octane-Listener' => 'register_octane_reset_listener',
+            'Passport' => 'use_passport_client_credentials',
+        ];
+
+        AboutCommand::add('Spatie Permissions', fn () => [
+            'Features Enabled' => collect($features)
+                ->filter(fn (string $feature, string $name): bool => $this->app['config']->get("permission.{$feature}"))
+                ->keys()
+                ->whenEmpty(fn (Collection $collection) => $collection->push('Default'))
+                ->join(', '),
+            'Version' => InstalledVersions::getPrettyVersion('spatie/laravel-permission'),
+        ]);
     }
 }
