@@ -173,6 +173,7 @@ class PermissionRegistrar
     public function clearPermissionsCollection(): void
     {
         $this->permissions = null;
+        $this->wildcardPermissionsIndex = [];
     }
 
     /**
