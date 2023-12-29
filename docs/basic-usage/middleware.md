@@ -42,6 +42,7 @@ protected $middlewareAliases = [
 
 **YOU SHOULD ALSO** set [the `$middlewarePriority` array](https://laravel.com/docs/master/middleware#sorting-middleware) to include this package's middleware before the `SubstituteBindings` middleware, else you may get *404 Not Found* responses when a *403 Not Authorized* response might be expected.
 
+>  See a typo? Note that since v6 the 'Middleware' namespace is singular. Prior to v6 it was 'Middlewares'. Time to upgrade your app!
 
 ## Middleware via Routes
 
