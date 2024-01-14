@@ -18,6 +18,8 @@ You can optionally flush the cache before seeding by using the `SetUp()` method 
 
 Or it can be done directly in a seeder class, as shown below.
 
+## Roles/Permissions Seeder
+
 Here is a sample seeder, which first clears the cache, creates permissions and then assigns permissions to roles (the order of these steps is intentional):
 
 ```php
@@ -53,6 +55,42 @@ class RolesAndPermissionsSeeder extends Seeder
     }
 }
 ```
+
+## User Seeding with Factories and States
+
+To use Factory States to assign roles after creating users:
+
+```php
+// Factory:
+    public function definition() {...}
+
+    public function active(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 1,
+            ])
+            ->afterCreating(function (User $user) {
+                $user->assignRole('ActiveMember');
+            });
+    }
+
+// Seeder:
+// To create 4 users using this 'active' state in a Seeder:
+User::factory(4)->active()->create();
+```
+
+To seed multiple users and then assign each of them a role, WITHOUT using Factory States:
+
+```php
+// Seeder:
+User::factory()
+    ->count(50)
+    ->create()
+    ->each(function ($user) {
+        $user->assignRole('Member');
+    });
+```
+
 
 ## Speeding up seeding for large data sets
 
