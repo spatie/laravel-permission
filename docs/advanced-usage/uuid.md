@@ -1,13 +1,15 @@
 ---
-title: UUID
+title: UUID/ULID
 weight: 7
 ---
 
-If you're using UUIDs for your User models there are a few considerations to note.
+If you're using UUIDs (ULID, GUID, etc) for your User models or Role/Permission models there are a few considerations to note.
 
-> THIS IS NOT A FULL LESSON ON HOW TO IMPLEMENT UUIDs IN YOUR APP.
+> NOTE: THIS IS NOT A FULL LESSON ON HOW TO IMPLEMENT UUIDs IN YOUR APP.
 
 Since each UUID implementation approach is different, some of these may or may not benefit you. As always, your implementation may vary.
+
+We use "uuid" in the examples below. Adapt for ULID or GUID as needed.
 
 ## Migrations
 You will need to update the `create_permission_tables.php` migration after creating it with `php artisan vendor:publish`. After making your edits, be sure to run the migration!
