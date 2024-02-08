@@ -231,6 +231,7 @@ trait HasPermissions
         }
 
         if ($permission instanceof Permission) {
+            $guardName = $permission->guard_name ?? $guardName;
             $permission = $permission->name;
         }
 
