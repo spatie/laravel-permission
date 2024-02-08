@@ -13,7 +13,7 @@ jobs:
         laravel: ["^11.0", "^10.0", "^9.0", "^8.12"]
         dependency-version: [prefer-lowest, prefer-stable]
         include:
-          - laravel: 11.*
+          - laravel: "^11.0"
             testbench: 9.*
           - laravel: "^10.0"
             testbench: 8.*
@@ -22,8 +22,10 @@ jobs:
           - laravel: "^8.12"
             testbench: "^6.23"
         exclude:
-            - laravel: 11.*
+            - laravel: "^11.0"
               php: 8.1
+            - laravel: "^11.0"
+              php: 8.0
             - laravel: "^10.0"
               php: 8.0
             - laravel: "^8.12"
