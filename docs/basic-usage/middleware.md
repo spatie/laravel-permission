@@ -38,6 +38,9 @@ protected $middlewareAliases = [
 ];
 ```
 
+> See a typo? You are reading older `v5` documentation. Note that since v6 the 'Middleware' namespace is singular. Prior to v6 it was 'Middlewares'. If you are still using 'Middlewares' (plural), it is time to upgrade your app to the latest version of this package!
+
+
 **YOU SHOULD ALSO** set [the `$middlewarePriority` array](https://laravel.com/docs/master/middleware#sorting-middleware) to include this package's middleware before the `SubstituteBindings` middleware, else you may get *404 Not Found* responses when a *403 Not Authorized* response might be expected.
 
 ## Middleware via Routes
