@@ -43,7 +43,7 @@ class PermissionServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(
-            __DIR__.'/../config/permission.php',
+            __DIR__ . '/../config/permission.php',
             'permission'
         );
 
@@ -52,21 +52,21 @@ class PermissionServiceProvider extends ServiceProvider
 
     protected function offerPublishing(): void
     {
-        if (! $this->app->runningInConsole()) {
+        if (!$this->app->runningInConsole()) {
             return;
         }
 
-        if (! function_exists('config_path')) {
+        if (!function_exists('config_path')) {
             // function not available and 'publish' not relevant in Lumen
             return;
         }
 
         $this->publishes([
-            __DIR__.'/../config/permission.php' => config_path('permission.php'),
+            __DIR__ . '/../config/permission.php' => config_path('permission.php'),
         ], 'permission-config');
 
         $this->publishes([
-            __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->getMigrationFileName('create_permission_tables.php'),
+            __DIR__ . '/../database/migrations/create_permission_tables.php.stub' => $this->getMigrationFileName('create_permission_tables.php'),
         ], 'permission-migrations');
     }
 
@@ -76,7 +76,7 @@ class PermissionServiceProvider extends ServiceProvider
             Commands\CacheReset::class,
         ]);
 
-        if (! $this->app->runningInConsole()) {
+        if (!$this->app->runningInConsole()) {
             return;
         }
 
@@ -90,7 +90,7 @@ class PermissionServiceProvider extends ServiceProvider
 
     protected function registerOctaneListener(): void
     {
-        if ($this->app->runningInConsole() || ! $this->app['config']->get('octane.listeners')) {
+        if ($this->app->runningInConsole() || !$this->app['config']->get('octane.listeners')) {
             return;
         }
 
@@ -101,7 +101,7 @@ class PermissionServiceProvider extends ServiceProvider
             $event->sandbox->make(PermissionRegistrar::class)->setPermissionsTeamId(null);
         });
 
-        if (! $this->app['config']->get('permission.register_octane_reset_listener')) {
+        if (!$this->app['config']->get('permission.register_octane_reset_listener')) {
             return;
         }
         // @phpstan-ignore-next-line
@@ -131,6 +131,8 @@ class PermissionServiceProvider extends ServiceProvider
         $bladeCompiler->directive('endrole', fn () => '<?php endif; ?>');
 
         $bladeCompiler->directive('haspermission', fn ($args) => "<?php if({$bladeMethodWrapper}('checkPermissionTo', {$args})): ?>");
+        $bladeCompiler->directive('hasanypermission', fn ($args) => "<?php if({$bladeMethodWrapper}('hasAnyPermission', {$args})): ?>");
+        $bladeCompiler->directive('endhasanypermission', fn ($args) => "<?php elseif({$bladeMethodWrapper}('hasAnyPermission', {$args})): ?>");
         $bladeCompiler->directive('elsehaspermission', fn ($args) => "<?php elseif({$bladeMethodWrapper}('checkPermissionTo', {$args})): ?>");
         $bladeCompiler->directive('endhaspermission', fn () => '<?php endif; ?>');
 
@@ -152,18 +154,18 @@ class PermissionServiceProvider extends ServiceProvider
 
     protected function registerMacroHelpers(): void
     {
-        if (! method_exists(Route::class, 'macro')) { // Lumen
+        if (!method_exists(Route::class, 'macro')) { // Lumen
             return;
         }
 
         Route::macro('role', function ($roles = []) {
             /** @var Route $this */
-            return $this->middleware('role:'.implode('|', Arr::wrap($roles)));
+            return $this->middleware('role:' . implode('|', Arr::wrap($roles)));
         });
 
         Route::macro('permission', function ($permissions = []) {
             /** @var Route $this */
-            return $this->middleware('permission:'.implode('|', Arr::wrap($permissions)));
+            return $this->middleware('permission:' . implode('|', Arr::wrap($permissions)));
         });
     }
 
@@ -176,9 +178,9 @@ class PermissionServiceProvider extends ServiceProvider
 
         $filesystem = $this->app->make(Filesystem::class);
 
-        return Collection::make([$this->app->databasePath().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR])
-            ->flatMap(fn ($path) => $filesystem->glob($path.'*_'.$migrationFileName))
-            ->push($this->app->databasePath()."/migrations/{$timestamp}_{$migrationFileName}")
+        return Collection::make([$this->app->databasePath() . DIRECTORY_SEPARATOR . 'migrations' . DIRECTORY_SEPARATOR])
+            ->flatMap(fn ($path) => $filesystem->glob($path . '*_' . $migrationFileName))
+            ->push($this->app->databasePath() . "/migrations/{$timestamp}_{$migrationFileName}")
             ->first();
     }
 }
