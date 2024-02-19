@@ -48,7 +48,7 @@ trait HasRoles
     public function roles(): BelongsToMany
     {
         $relation = $this->morphToMany(
-            config('permission.models.role'),
+            $this->getRoleClass(),
             'model',
             config('permission.table_names.model_has_roles'),
             config('permission.column_names.model_morph_key'),

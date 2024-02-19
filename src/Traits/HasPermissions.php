@@ -78,7 +78,7 @@ trait HasPermissions
     public function permissions(): BelongsToMany
     {
         $relation = $this->morphToMany(
-            config('permission.models.permission'),
+            $this->getPermissionClass(),
             'model',
             config('permission.table_names.model_has_permissions'),
             config('permission.column_names.model_morph_key'),
