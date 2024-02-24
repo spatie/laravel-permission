@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Tests\TestModels\MultiSchemas\App1;
 
+use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Tests\TestModels\UserWithoutHasRoles;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -12,13 +13,8 @@ class User extends UserWithoutHasRoles
     protected string $guard_name = 'web';
     protected $connection = 'sqlite';
 
-    public function getRoleClass(): string
+    public static function getPermissionRegistrar(): PermissionRegistrar
     {
-        return Role::class;
-    }
-
-    public function getPermissionClass(): string
-    {
-        return Permission::class;
+        return app('PermissionRegistrarApp1');
     }
 }

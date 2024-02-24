@@ -3,6 +3,7 @@
 namespace Spatie\Permission\Tests\TestModels\MultiSchemas\App2;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Traits\HasRoles;
 
 class Customer extends Model
@@ -14,13 +15,8 @@ class Customer extends Model
     protected $guarded = [];
     public $timestamps = false;
 
-    public function getRoleClass(): string
+    public static function getPermissionRegistrar(): PermissionRegistrar
     {
-        return Role::class;
-    }
-
-    public function getPermissionClass(): string
-    {
-        return Permission::class;
+        return app('PermissionRegistrarApp2');
     }
 }

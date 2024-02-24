@@ -1,10 +1,7 @@
 <?php
 
 if (! function_exists('getModelForGuard')) {
-    /**
-     * @return string|null
-     */
-    function getModelForGuard(string $guard)
+    function getModelForGuard(string $guard): ?string
     {
         return collect(config('auth.guards'))
             ->map(fn ($guard) => isset($guard['provider']) ? config("auth.providers.{$guard['provider']}.model") : null)
@@ -13,21 +10,17 @@ if (! function_exists('getModelForGuard')) {
 }
 
 if (! function_exists('setPermissionsTeamId')) {
-    /**
-     * @param  int|string|\Illuminate\Database\Eloquent\Model  $id
-     */
-    function setPermissionsTeamId($id)
+    function setPermissionsTeamId(int|string|\Illuminate\Database\Eloquent\Model|null $id, ?\Spatie\Permission\PermissionRegistrar $permissionRegistrar = null): void
     {
-        app(\Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId($id);
+        $permissionRegistrar ??= app(\Spatie\Permission\PermissionRegistrar::class);
+        $permissionRegistrar->setPermissionsTeamId($id);
     }
 }
 
 if (! function_exists('getPermissionsTeamId')) {
-    /**
-     * @return int|string
-     */
-    function getPermissionsTeamId()
+    function getPermissionsTeamId(?\Spatie\Permission\PermissionRegistrar $permissionRegistrar = null): int|string|null
     {
-        return app(\Spatie\Permission\PermissionRegistrar::class)->getPermissionsTeamId();
+        $permissionRegistrar ??= app(\Spatie\Permission\PermissionRegistrar::class);
+        return $permissionRegistrar->getPermissionsTeamId();
     }
 }

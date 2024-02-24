@@ -4,24 +4,27 @@ namespace Spatie\Permission\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
-use Spatie\Permission\Contracts\Permission as PermissionContract;
-use Spatie\Permission\Contracts\Role as RoleContract;
+use Spatie\Permission\PermissionRegistrar;
 use Symfony\Component\Console\Helper\TableCell;
 
 class Show extends Command
 {
     protected $signature = 'permission:show
-            {guard? : The name of the guard}
-            {style? : The display style (default|borderless|compact|box)}';
+        {guard? : The name of the guard}
+        {style? : The display style (default|borderless|compact|box)}
+        {--p|permission-registrar=}';
 
     protected $description = 'Show a table of roles and permissions per guard';
 
     public function handle()
     {
-        $permissionClass = app(PermissionContract::class);
-        $roleClass = app(RoleContract::class);
-        $teamsEnabled = config('permission.teams');
-        $team_key = config('permission.column_names.team_foreign_key');
+        /** @var PermissionRegistrar $permissionRegistrar */
+        $permissionRegistrar = app($this->option('permission-registrar') ?? PermissionRegistrar::class);
+
+        $permissionClass = $permissionRegistrar->getPermissionClass();
+        $roleClass = $permissionRegistrar->getRoleClass();
+        $teamsEnabled = $permissionRegistrar->teams;
+        $team_key = $permissionRegistrar->teamsKey;
 
         $style = $this->argument('style') ?? 'default';
         $guard = $this->argument('guard');

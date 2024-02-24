@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission;
 
+use DateInterval;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Contracts\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Access\Gate;
@@ -16,28 +17,25 @@ class PermissionRegistrar
 {
     protected Repository $cache;
 
-    protected CacheManager $cacheManager;
+    protected array $config;
 
     protected string $permissionClass;
 
     protected string $roleClass;
 
-    /** @var Collection|array|null */
-    protected $permissions;
+    protected Collection|array|null $permissions;
 
     public string $pivotRole;
 
     public string $pivotPermission;
 
-    /** @var \DateInterval|int */
-    public $cacheExpirationTime;
+    public DateInterval|int $cacheExpirationTime;
 
     public bool $teams;
 
     public string $teamsKey;
 
-    /** @var int|string */
-    protected $teamId = null;
+    protected null|int|string $teamId = null;
 
     public string $cacheKey;
 
@@ -49,38 +47,38 @@ class PermissionRegistrar
 
     private array $wildcardPermissionsIndex = [];
 
-    /**
-     * PermissionRegistrar constructor.
-     */
-    public function __construct(CacheManager $cacheManager)
+    public function __construct(array $config, protected CacheManager $cacheManager)
     {
-        $this->permissionClass = config('permission.models.permission');
-        $this->roleClass = config('permission.models.role');
-
-        $this->cacheManager = $cacheManager;
-        $this->initializeCache();
+        $this->initialize($config);
     }
 
-    public function initializeCache(): void
+    public function initialize(array $config): void
     {
-        $this->cacheExpirationTime = config('permission.cache.expiration_time') ?: \DateInterval::createFromDateString('24 hours');
+        $this->config = $config;
 
-        $this->teams = config('permission.teams', false);
-        $this->teamsKey = config('permission.column_names.team_foreign_key', 'team_id');
+        $this->permissionClass = data_get($this->config, 'models.permission');
+        $this->roleClass = data_get($this->config, 'models.role');
 
-        $this->cacheKey = config('permission.cache.key');
+        $this->cacheExpirationTime = data_get($this->config, 'cache.expiration_time') ?: DateInterval::createFromDateString('24 hours');
 
-        $this->pivotRole = config('permission.column_names.role_pivot_key') ?: 'role_id';
-        $this->pivotPermission = config('permission.column_names.permission_pivot_key') ?: 'permission_id';
+        $this->teams = data_get($this->config,'teams', false);
+        $this->teamsKey = data_get($this->config, 'column_names.team_foreign_key', 'team_id');
+
+        $this->cacheKey = data_get($this->config, 'cache.key');
+
+        $this->pivotRole = data_get($this->config, 'column_names.role_pivot_key') ?: 'role_id';
+        $this->pivotPermission = data_get($this->config,'column_names.permission_pivot_key') ?: 'permission_id';
 
         $this->cache = $this->getCacheStoreFromConfig();
+
+        $this->permissions = null;
     }
 
     protected function getCacheStoreFromConfig(): Repository
     {
         // the 'default' fallback here is from the permission.php config file,
         // where 'default' means to use config(cache.default)
-        $cacheDriver = config('permission.cache.store', 'default');
+        $cacheDriver = data_get($this->config, 'cache.store', 'default');
 
         // when 'default' is specified, no action is required since we already have the default instance
         if ($cacheDriver === 'default') {
@@ -97,21 +95,16 @@ class PermissionRegistrar
 
     /**
      * Set the team id for teams/groups support, this id is used when querying permissions/roles
-     *
-     * @param  int|string|\Illuminate\Database\Eloquent\Model|null  $id
      */
-    public function setPermissionsTeamId($id): void
+    public function setPermissionsTeamId(int|string|Model|null $id): void
     {
-        if ($id instanceof \Illuminate\Database\Eloquent\Model) {
+        if ($id instanceof Model) {
             $id = $id->getKey();
         }
         $this->teamId = $id;
     }
 
-    /**
-     * @return int|string
-     */
-    public function getPermissionsTeamId()
+    public function getPermissionsTeamId(): int|string|null
     {
         return $this->teamId;
     }
@@ -137,7 +130,7 @@ class PermissionRegistrar
     /**
      * Flush the cache.
      */
-    public function forgetCachedPermissions()
+    public function forgetCachedPermissions(): bool
     {
         $this->permissions = null;
         $this->forgetWildcardPermissionIndex();
@@ -181,7 +174,7 @@ class PermissionRegistrar
      *
      * @alias of clearPermissionsCollection()
      */
-    public function clearClassPermissions()
+    public function clearClassPermissions(): void
     {
         $this->clearPermissionsCollection();
     }
@@ -248,11 +241,13 @@ class PermissionRegistrar
         return $this->permissionClass;
     }
 
-    public function setPermissionClass($permissionClass)
+    public function setPermissionClass($permissionClass, bool $bindContract = true): static
     {
         $this->permissionClass = $permissionClass;
-        config()->set('permission.models.permission', $permissionClass);
-        app()->bind(Permission::class, $permissionClass);
+
+        if ($bindContract) {
+            app()->bind(Permission::class, $permissionClass);
+        }
 
         return $this;
     }
@@ -262,11 +257,13 @@ class PermissionRegistrar
         return $this->roleClass;
     }
 
-    public function setRoleClass($roleClass)
+    public function setRoleClass($roleClass, bool $bindContract = true): static
     {
         $this->roleClass = $roleClass;
-        config()->set('permission.models.role', $roleClass);
-        app()->bind(Role::class, $roleClass);
+
+        if ($bindContract) {
+            app()->bind(Role::class, $roleClass);
+        }
 
         return $this;
     }
@@ -318,7 +315,7 @@ class PermissionRegistrar
      */
     private function getSerializedPermissionsForCache(): array
     {
-        $this->except = config('permission.cache.column_names_except', ['created_at', 'updated_at', 'deleted_at']);
+        $this->except = data_get($this->config, 'cache.column_names_except', ['created_at', 'updated_at', 'deleted_at']);
 
         $permissions = $this->getPermissionsWithRoles()
             ->map(function ($permission) {

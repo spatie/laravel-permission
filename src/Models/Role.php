@@ -10,7 +10,6 @@ use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Exceptions\RoleAlreadyExists;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Guard;
-use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
 
@@ -42,16 +41,18 @@ class Role extends Model implements RoleContract
      */
     public static function create(array $attributes = [])
     {
+        $permissionRegistrar = static::getPermissionRegistrar();
+
         $attributes['guard_name'] = $attributes['guard_name'] ?? Guard::getDefaultName(static::class);
 
         $params = ['name' => $attributes['name'], 'guard_name' => $attributes['guard_name']];
-        if (app(PermissionRegistrar::class)->teams) {
-            $teamsKey = app(PermissionRegistrar::class)->teamsKey;
+        if ($permissionRegistrar->teams) {
+            $teamsKey = $permissionRegistrar->teamsKey;
 
             if (array_key_exists($teamsKey, $attributes)) {
                 $params[$teamsKey] = $attributes[$teamsKey];
             } else {
-                $attributes[$teamsKey] = getPermissionsTeamId();
+                $attributes[$teamsKey] = $permissionRegistrar->getPermissionsTeamId();
             }
         }
         if (static::findByParam($params)) {
@@ -66,11 +67,13 @@ class Role extends Model implements RoleContract
      */
     public function permissions(): BelongsToMany
     {
+        $permissionRegistrar = static::getPermissionRegistrar();
+
         return $this->belongsToMany(
-            $this->getPermissionClass(),
+            $permissionRegistrar->getPermissionClass(),
             config('permission.table_names.role_has_permissions'),
-            app(PermissionRegistrar::class)->pivotRole,
-            app(PermissionRegistrar::class)->pivotPermission
+            $permissionRegistrar->pivotRole,
+            $permissionRegistrar->pivotPermission
         );
     }
 
@@ -79,11 +82,13 @@ class Role extends Model implements RoleContract
      */
     public function users(): BelongsToMany
     {
+        $permissionRegistrar = static::getPermissionRegistrar();
+
         return $this->morphedByMany(
             getModelForGuard($this->attributes['guard_name'] ?? config('auth.defaults.guard')),
             'model',
             config('permission.table_names.model_has_roles'),
-            app(PermissionRegistrar::class)->pivotRole,
+            $permissionRegistrar->pivotRole,
             config('permission.column_names.model_morph_key')
         );
     }
@@ -133,12 +138,13 @@ class Role extends Model implements RoleContract
      */
     public static function findOrCreate(string $name, ?string $guardName = null): RoleContract
     {
+        $permissionRegistrar = static::getPermissionRegistrar();
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
         $role = static::findByParam(['name' => $name, 'guard_name' => $guardName]);
 
         if (! $role) {
-            return static::query()->create(['name' => $name, 'guard_name' => $guardName] + (app(PermissionRegistrar::class)->teams ? [app(PermissionRegistrar::class)->teamsKey => getPermissionsTeamId()] : []));
+            return static::query()->create(['name' => $name, 'guard_name' => $guardName] + ($permissionRegistrar->teams ? [$permissionRegistrar->teamsKey => $permissionRegistrar->getPermissionsTeamId()] : []));
         }
 
         return $role;
@@ -151,13 +157,14 @@ class Role extends Model implements RoleContract
      */
     protected static function findByParam(array $params = []): ?RoleContract
     {
+        $permissionRegistrar = static::getPermissionRegistrar();
         $query = static::query();
 
-        if (app(PermissionRegistrar::class)->teams) {
-            $teamsKey = app(PermissionRegistrar::class)->teamsKey;
+        if ($permissionRegistrar->teams) {
+            $teamsKey = $permissionRegistrar->teamsKey;
 
             $query->where(fn ($q) => $q->whereNull($teamsKey)
-                ->orWhere($teamsKey, $params[$teamsKey] ?? getPermissionsTeamId())
+                ->orWhere($teamsKey, $params[$teamsKey] ?? $permissionRegistrar->getPermissionsTeamId())
             );
             unset($params[$teamsKey]);
         }

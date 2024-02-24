@@ -9,7 +9,6 @@ use Spatie\Permission\Contracts\Permission as PermissionContract;
 use Spatie\Permission\Exceptions\PermissionAlreadyExists;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Guard;
-use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
 
@@ -57,11 +56,13 @@ class Permission extends Model implements PermissionContract
      */
     public function roles(): BelongsToMany
     {
+        $permissionRegistrar = static::getPermissionRegistrar();
+
         return $this->belongsToMany(
-            $this->getRoleClass(),
+            $permissionRegistrar->getRoleClass(),
             config('permission.table_names.role_has_permissions'),
-            app(PermissionRegistrar::class)->pivotPermission,
-            app(PermissionRegistrar::class)->pivotRole
+            $permissionRegistrar->pivotPermission,
+            $permissionRegistrar->pivotRole
         );
     }
 
@@ -70,11 +71,13 @@ class Permission extends Model implements PermissionContract
      */
     public function users(): BelongsToMany
     {
+        $permissionRegistrar = static::getPermissionRegistrar();
+
         return $this->morphedByMany(
             getModelForGuard($this->attributes['guard_name'] ?? config('auth.defaults.guard')),
             'model',
             config('permission.table_names.model_has_permissions'),
-            app(PermissionRegistrar::class)->pivotPermission,
+            $permissionRegistrar->pivotPermission,
             config('permission.column_names.model_morph_key')
         );
     }
@@ -138,8 +141,7 @@ class Permission extends Model implements PermissionContract
      */
     protected static function getPermissions(array $params = [], bool $onlyOne = false): Collection
     {
-        return app(PermissionRegistrar::class)
-            ->setPermissionClass(static::class)
+        return static::getPermissionRegistrar()
             ->getPermissions($params, $onlyOne);
     }
 

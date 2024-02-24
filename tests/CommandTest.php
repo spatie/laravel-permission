@@ -164,7 +164,7 @@ class CommandTest extends TestCase
     public function it_can_show_roles_by_teams()
     {
         config()->set('permission.teams', true);
-        app(\Spatie\Permission\PermissionRegistrar::class)->initializeCache();
+        app(\Spatie\Permission\PermissionRegistrar::class)->initialize(config('permission'));
 
         Role::where('name', 'testRole2')->delete();
         Role::create(['name' => 'testRole_2']);

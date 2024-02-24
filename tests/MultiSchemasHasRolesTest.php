@@ -2,8 +2,9 @@
 
 namespace Spatie\Permission\Tests;
 
-use Spatie\Permission\Tests\TestModels\MultiSchemas\App1;
-use Spatie\Permission\Tests\TestModels\MultiSchemas\App2;
+use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Contracts\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class MultiSchemasHasRolesTest extends MultiSchemasTestCase
 {
@@ -17,14 +18,28 @@ class MultiSchemasHasRolesTest extends MultiSchemasTestCase
         $permissionApp1Name = 'testPermissionApp1InWebGuard';
         $permissionApp2Name = 'testPermissionApp2InWebGuard';
 
+        /** @var PermissionRegistrar $permissionRegistrarApp1 */
+        $permissionRegistrarApp1 = $this->app->make('PermissionRegistrarApp1');
+        /** @var Role $roleClassApp1 */
+        $roleClassApp1 = $permissionRegistrarApp1->getRoleClass();
+        /** @var Permission $permissionClassApp1 */
+        $permissionClassApp1 = $permissionRegistrarApp1->getPermissionClass();
+
+        /** @var PermissionRegistrar $permissionRegistrarApp2 */
+        $permissionRegistrarApp2 = $this->app->make('PermissionRegistrarApp2');
+        /** @var Role $roleClassApp2 */
+        $roleClassApp2 = $permissionRegistrarApp2->getRoleClass();
+        /** @var Permission $permissionClassApp2 */
+        $permissionClassApp2 = $permissionRegistrarApp2->getPermissionClass();
+
         $this->assertFalse($this->testUserApp1->hasRole($roleApp1Name));
         $this->assertFalse($this->testCustomerApp2->hasRole($roleApp2Name));
 
-        $roleApp1 = App1\Role::findOrCreate($roleApp1Name, 'web');
-        $roleApp2 = App2\Role::findOrCreate($roleApp2Name, 'web');
+        $roleApp1 = $roleClassApp1::findOrCreate($roleApp1Name, 'web');
+        $roleApp2 = $roleClassApp2::findOrCreate($roleApp2Name, 'web');
 
-        $permissionApp1 = App1\Permission::findOrCreate($permissionApp1Name, 'web');
-        $permissionApp2 = App2\Permission::findOrCreate($permissionApp2Name, 'web');
+        $permissionApp1 = $permissionClassApp1::findOrCreate($permissionApp1Name, 'web');
+        $permissionApp2 = $permissionClassApp2::findOrCreate($permissionApp2Name, 'web');
 
         $roleApp1->givePermissionTo([$permissionApp1Name]);
         $roleApp2->givePermissionTo([$permissionApp2Name]);
@@ -33,9 +48,7 @@ class MultiSchemasHasRolesTest extends MultiSchemasTestCase
         $this->assertTrue($roleApp2->hasPermissionTo($permissionApp2));
 
         $this->assertTrue($roleApp1->hasPermissionTo($permissionApp1Name));
-        // note: actually this fail (seems cache/singleton related)
-        // debug: permission->findByName -> Permission::getPermission -> Permission::getPermissions -> PermissionRegistrar::getPermissions -> PermissionRegistrar::loadPermissions -> cache
-        //$this->assertTrue($roleApp2->hasPermissionTo($permissionApp2Name));
+        $this->assertTrue($roleApp2->hasPermissionTo($permissionApp2Name));
 
         $this->assertFalse($this->testUserApp1->hasRole($roleApp1));
         $this->assertFalse($this->testCustomerApp2->hasRole($roleApp2));
@@ -61,9 +74,7 @@ class MultiSchemasHasRolesTest extends MultiSchemasTestCase
         $this->assertFalse($this->testUserApp1->checkPermissionTo($permissionApp2Name));
         $this->assertFalse($this->testUserApp1->checkPermissionTo($permissionApp2));
 
-        // note: actually this fail (seems cache/singleton related)
-        // debug: permission->findByName -> Permission::getPermission -> Permission::getPermissions -> PermissionRegistrar::getPermissions -> PermissionRegistrar::loadPermissions -> cache
-        //$this->assertTrue($this->testCustomerApp2->hasPermissionTo($permissionApp2Name)); // note: this fail ...
+        $this->assertTrue($this->testCustomerApp2->hasPermissionTo($permissionApp2Name));
         $this->assertTrue($this->testCustomerApp2->hasPermissionTo($permissionApp2));
         $this->assertFalse($this->testCustomerApp2->checkPermissionTo($permissionApp1Name));
         $this->assertFalse($this->testCustomerApp2->checkPermissionTo($permissionApp1));

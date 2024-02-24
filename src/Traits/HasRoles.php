@@ -14,8 +14,6 @@ trait HasRoles
 {
     use HasPermissions;
 
-    private ?string $roleClass = null;
-
     public static function bootHasRoles()
     {
         static::deleting(function ($model) {
@@ -23,23 +21,21 @@ trait HasRoles
                 return;
             }
 
-            $teams = app(PermissionRegistrar::class)->teams;
-            app(PermissionRegistrar::class)->teams = false;
+            $permissionRegistrar = $model::getPermissionRegistrar();
+
+            $teams = $permissionRegistrar->teams;
+            $permissionRegistrar->teams = false;
             $model->roles()->detach();
             if (is_a($model, Permission::class)) {
                 $model->users()->detach();
             }
-            app(PermissionRegistrar::class)->teams = $teams;
+            $permissionRegistrar->teams = $teams;
         });
     }
 
-    public function getRoleClass(): string
+    public static function getPermissionRegistrar(): PermissionRegistrar
     {
-        if (! $this->roleClass) {
-            $this->roleClass = app(PermissionRegistrar::class)->getRoleClass();
-        }
-
-        return $this->roleClass;
+        return app(PermissionRegistrar::class);
     }
 
     /**
@@ -47,22 +43,24 @@ trait HasRoles
      */
     public function roles(): BelongsToMany
     {
+        $permissionRegistrar = static::getPermissionRegistrar();
+
         $relation = $this->morphToMany(
-            $this->getRoleClass(),
+            $permissionRegistrar->getRoleClass(),
             'model',
             config('permission.table_names.model_has_roles'),
             config('permission.column_names.model_morph_key'),
-            app(PermissionRegistrar::class)->pivotRole
+            $permissionRegistrar->pivotRole
         );
 
-        if (! app(PermissionRegistrar::class)->teams) {
+        if (! $permissionRegistrar->teams) {
             return $relation;
         }
 
-        $teamField = config('permission.table_names.roles').'.'.app(PermissionRegistrar::class)->teamsKey;
+        $teamField = config('permission.table_names.roles').'.'.$permissionRegistrar->teamsKey;
 
-        return $relation->wherePivot(app(PermissionRegistrar::class)->teamsKey, getPermissionsTeamId())
-            ->where(fn ($q) => $q->whereNull($teamField)->orWhere($teamField, getPermissionsTeamId()));
+        return $relation->wherePivot($permissionRegistrar->teamsKey, $permissionRegistrar->getPermissionsTeamId())
+            ->where(fn ($q) => $q->whereNull($teamField)->orWhere($teamField, $permissionRegistrar->getPermissionsTeamId()));
     }
 
     /**
@@ -74,11 +72,13 @@ trait HasRoles
      */
     public function scopeRole(Builder $query, $roles, $guard = null, $without = false): Builder
     {
+        $permissionRegistrar = static::getPermissionRegistrar();
+
         if ($roles instanceof Collection) {
             $roles = $roles->all();
         }
 
-        $roles = array_map(function ($role) use ($guard) {
+        $roles = array_map(function ($role) use ($guard, $permissionRegistrar) {
             if ($role instanceof Role) {
                 return $role;
             }
@@ -87,12 +87,12 @@ trait HasRoles
                 $role = $role->value;
             }
 
-            $method = is_int($role) || PermissionRegistrar::isUid($role) ? 'findById' : 'findByName';
+            $method = is_int($role) || $permissionRegistrar::isUid($role) ? 'findById' : 'findByName';
 
-            return $this->getRoleClass()::{$method}($role, $guard ?: $this->getDefaultGuardName());
+            return $permissionRegistrar->getRoleClass()::{$method}($role, $guard ?: $this->getDefaultGuardName());
         }, Arr::wrap($roles));
 
-        $key = (new ($this->getRoleClass())())->getKeyName();
+        $key = (new ($permissionRegistrar->getRoleClass())())->getKeyName();
 
         return $query->{! $without ? 'whereHas' : 'whereDoesntHave'}('roles', fn (Builder $subQuery) => $subQuery
             ->whereIn(config('permission.table_names.roles').".$key", \array_column($roles, $key))
@@ -146,11 +146,12 @@ trait HasRoles
      */
     public function assignRole(...$roles)
     {
+        $permissionRegistrar = static::getPermissionRegistrar();
         $roles = $this->collectRoles($roles);
 
         $model = $this->getModel();
-        $teamPivot = app(PermissionRegistrar::class)->teams && ! is_a($this, Permission::class) ?
-            [app(PermissionRegistrar::class)->teamsKey => getPermissionsTeamId()] : [];
+        $teamPivot = $permissionRegistrar->teams && ! is_a($this, Permission::class) ?
+            [$permissionRegistrar->teamsKey => $permissionRegistrar->getPermissionsTeamId()] : [];
 
         if ($model->exists) {
             $currentRoles = $this->roles->map(fn ($role) => $role->getKey())->toArray();
@@ -220,6 +221,7 @@ trait HasRoles
      */
     public function hasRole($roles, ?string $guard = null): bool
     {
+        $permissionRegistrar = static::getPermissionRegistrar();
         $this->loadMissing('roles');
 
         if (is_string($roles) && strpos($roles, '|') !== false) {
@@ -230,8 +232,8 @@ trait HasRoles
             $roles = $roles->value;
         }
 
-        if (is_int($roles) || PermissionRegistrar::isUid($roles)) {
-            $key = (new ($this->getRoleClass())())->getKeyName();
+        if (is_int($roles) || $permissionRegistrar::isUid($roles)) {
+            $key = (new ($permissionRegistrar->getRoleClass())())->getKeyName();
 
             return $guard
                 ? $this->roles->where('guard_name', $guard)->contains($key, $roles)
@@ -363,16 +365,18 @@ trait HasRoles
 
     protected function getStoredRole($role): Role
     {
+        $permissionRegistrar = static::getPermissionRegistrar();
+
         if ($role instanceof \BackedEnum) {
             $role = $role->value;
         }
 
-        if (is_int($role) || PermissionRegistrar::isUid($role)) {
-            return $this->getRoleClass()::findById($role, $this->getDefaultGuardName());
+        if (is_int($role) || $permissionRegistrar::isUid($role)) {
+            return $permissionRegistrar->getRoleClass()::findById($role, $this->getDefaultGuardName());
         }
 
         if (is_string($role)) {
-            return $this->getRoleClass()::findByName($role, $this->getDefaultGuardName());
+            return $permissionRegistrar->getRoleClass()::findByName($role, $this->getDefaultGuardName());
         }
 
         return $role;

@@ -2,12 +2,14 @@
 
 namespace Spatie\Permission\Tests\TestModels\MultiSchemas\App1;
 
+use Spatie\Permission\PermissionRegistrar;
+
 class Permission extends \Spatie\Permission\Models\Permission
 {
     protected $connection = 'sqlite';
 
-    public function getRoleClass(): string
+    public static function getPermissionRegistrar(): PermissionRegistrar
     {
-        return Role::class;
+        return app('PermissionRegistrarApp1');
     }
 }

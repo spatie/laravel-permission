@@ -85,9 +85,9 @@ class PermissionRegistarTest extends TestCase
         $this->assertSame(SpatiePermission::class, app(PermissionRegistrar::class)->getPermissionClass());
         $this->assertSame(SpatiePermission::class, get_class(app(PermissionContract::class)));
 
-        app(PermissionRegistrar::class)->setPermissionClass(TestPermission::class);
+        app(PermissionRegistrar::class)->setPermissionClass(permissionClass: TestPermission::class);
 
-        $this->assertSame(TestPermission::class, config('permission.models.permission'));
+        $this->assertNotSame(TestPermission::class, config('permission.models.permission'));
         $this->assertSame(TestPermission::class, app(PermissionRegistrar::class)->getPermissionClass());
         $this->assertSame(TestPermission::class, get_class(app(PermissionContract::class)));
     }
@@ -106,9 +106,9 @@ class PermissionRegistarTest extends TestCase
         $this->assertSame(SpatieRole::class, app(PermissionRegistrar::class)->getRoleClass());
         $this->assertSame(SpatieRole::class, get_class(app(RoleContract::class)));
 
-        app(PermissionRegistrar::class)->setRoleClass(TestRole::class);
+        app(PermissionRegistrar::class)->setRoleClass(roleClass: TestRole::class);
 
-        $this->assertSame(TestRole::class, config('permission.models.role'));
+        $this->assertNotSame(TestRole::class, config('permission.models.role'));
         $this->assertSame(TestRole::class, app(PermissionRegistrar::class)->getRoleClass());
         $this->assertSame(TestRole::class, get_class(app(RoleContract::class)));
     }
