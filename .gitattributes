@@ -13,7 +13,7 @@
 /.editorconfig      export-ignore
 /.php_cs.dist.php   export-ignore
 /phpstan*           export-ignore
-/psalm.xml       export-ignore
+/psalm.xml          export-ignore
 /CHANGELOG.md       export-ignore
 /CONTRIBUTING.md    export-ignore
 
