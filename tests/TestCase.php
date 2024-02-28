@@ -203,7 +203,6 @@ abstract class TestCase extends Orchestra
         $app['config']->set('permission.use_passport_client_credentials', true);
         $app['config']->set('auth.guards.api', ['driver' => 'passport', 'provider' => 'users']);
 
-
         // mimic passport:install (must load migrations using our own call to loadMigrationsFrom() else rollbacks won't occur, and migrations will be left in skeleton directory
         $this->artisan('passport:keys');
         $this->loadMigrationsFrom(__DIR__.'/../vendor/laravel/passport/database/migrations/');
@@ -211,7 +210,6 @@ abstract class TestCase extends Orchestra
         $this->artisan('passport:client', ['--personal' => true, '--name' => config('app.name').' Personal Access Client']);
         $this->artisan('passport:client', ['--password' => true, '--name' => config('app.name').' Password Grant Client', '--provider' => $provider]);
 
-        
         $this->testClient = Client::create(['name' => 'Test', 'redirect' => 'https://example.com', 'personal_access_client' => 0, 'password_client' => 0, 'revoked' => 0]);
         $this->testClientRole = $app[Role::class]->create(['name' => 'clientRole', 'guard_name' => 'api']);
         $this->testClientPermission = $app[Permission::class]->create(['name' => 'edit-posts', 'guard_name' => 'api']);
