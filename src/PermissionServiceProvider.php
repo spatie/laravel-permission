@@ -122,21 +122,20 @@ class PermissionServiceProvider extends ServiceProvider
         return auth($guard)->check() && auth($guard)->user()->{$method}($role);
     }
 
-    protected function registerBladeExtensions($bladeCompiler): void
+    protected function registerBladeExtensions(BladeCompiler $bladeCompiler): void
     {
-        /** @var BladeCompiler $bladeCompiler */
         $bladeMethodWrapper = '\\Spatie\\Permission\\PermissionServiceProvider::bladeMethodWrapper';
 
         // permission checks
-        $bladeCompiler->if('haspermission', fn ($args) => $bladeMethodWrapper('checkPermissionTo', $args));
+        $bladeCompiler->if('haspermission', fn () => $bladeMethodWrapper('checkPermissionTo', ...func_get_args()));
 
         // role checks
-        $bladeCompiler->if('role', fn ($args) => $bladeMethodWrapper('hasRole', $args));
-        $bladeCompiler->if('hasrole', fn ($args) => $bladeMethodWrapper('hasRole', $args));
-        $bladeCompiler->if('hasanyrole', fn ($args) => $bladeMethodWrapper('hasAnyRole', $args));
-        $bladeCompiler->if('hasanyrole', fn ($args) => $bladeMethodWrapper('hasAnyRole', $args));
-        $bladeCompiler->if('hasallroles', fn ($args) => $bladeMethodWrapper('hasAllRoles', $args));
-        $bladeCompiler->if('hasexactroles', fn ($args) => $bladeMethodWrapper('hasExactRoles', $args));
+        $bladeCompiler->if('role', fn () => $bladeMethodWrapper('hasRole', ...func_get_args()));
+        $bladeCompiler->if('hasrole', fn () => $bladeMethodWrapper('hasRole', ...func_get_args()));
+        $bladeCompiler->if('hasanyrole', fn () => $bladeMethodWrapper('hasAnyRole', ...func_get_args()));
+        $bladeCompiler->if('hasallroles', fn () => $bladeMethodWrapper('hasAllRoles', ...func_get_args()));
+        $bladeCompiler->if('hasexactroles', fn () => $bladeMethodWrapper('hasExactRoles', ...func_get_args()));
+        $bladeCompiler->directive('endunlessrole', fn () => '<?php endif; ?>');
     }
 
     protected function registerMacroHelpers(): void
