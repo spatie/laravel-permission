@@ -20,7 +20,7 @@ jobs:
                   coverage: none
 
             - name: Install composer dependencies
-              uses: ramsey/composer-install@v2
+              uses: ramsey/composer-install@v3
 
             - name: Install larastan
               run: |
