@@ -109,7 +109,7 @@ class PermissionRegistrar
     }
 
     /**
-     * @return int|string
+     * @return int|string|null
      */
     public function getPermissionsTeamId()
     {

@@ -14,7 +14,7 @@ if (! function_exists('getModelForGuard')) {
 
 if (! function_exists('setPermissionsTeamId')) {
     /**
-     * @param  int|string|\Illuminate\Database\Eloquent\Model  $id
+     * @param  int|string|null|\Illuminate\Database\Eloquent\Model  $id
      */
     function setPermissionsTeamId($id)
     {
@@ -24,7 +24,7 @@ if (! function_exists('setPermissionsTeamId')) {
 
 if (! function_exists('getPermissionsTeamId')) {
     /**
-     * @return int|string
+     * @return int|string|null
      */
     function getPermissionsTeamId()
     {
