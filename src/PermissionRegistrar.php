@@ -105,6 +105,7 @@ class PermissionRegistrar
     }
 
     public function getPermissionsTeamId(): int|string|null
+    public function getPermissionsTeamId()
     {
         return $this->teamId;
     }

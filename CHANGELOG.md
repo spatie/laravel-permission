@@ -2,6 +2,27 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 6.4.0 - 2024-02-28
+
+* Laravel 11 Support
+
+### What's Changed
+
+* Add Laravel 11 to workflow run tests by @mraheelkhan in https://github.com/spatie/laravel-permission/pull/2605
+* And Passport 12
+
+### Internals
+
+* Update to use Larastan Org by @arnebr in https://github.com/spatie/laravel-permission/pull/2585
+* laravel-pint-action to major version tag by @erikn69 in https://github.com/spatie/laravel-permission/pull/2586
+
+### New Contributors
+
+* @arnebr made their first contribution in https://github.com/spatie/laravel-permission/pull/2585
+* @mraheelkhan made their first contribution in https://github.com/spatie/laravel-permission/pull/2605
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/6.3.0...6.4.0
+
 ## 6.3.0 - 2023-12-24
 
 ### What's Changed
@@ -744,6 +765,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -791,6 +813,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
