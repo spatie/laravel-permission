@@ -155,6 +155,43 @@ Your app will have Models, Controllers, routes, Views, Factories, Policies, Test
 
 You can see examples of these in the demo app at https://github.com/drbyte/spatie-permissions-demo/
 
+
+### Quick Examples
+If you are creating a demo app for reporting a bug or getting help with troubleshooting something, skip this section and proceed to "Sharing" below.
+
+If this is your first app with this package, you may want some quick permission examples to see it in action. If you've set up your app using the instructions above, the following examples will work in conjunction with the users and permissions created in the seeder.
+
+Three users were created: test@example.com, admin@example.com, superadmin@example.com and the password for each is "password".
+
+`/resources/views/dashboard.php`
+```diff
+    <div class="p-6 text-gray-900">
+        {{ __("You're logged in!") }}
+    </div>
++    @can('edit articles')
++    You can EDIT ARTICLES.
++    @endcan
++    @can('publish articles')
++    You can PUBLISH ARTICLES.
++    @endcan
++    @can('only super-admins can see this section')
++    Congratulations, you are a super-admin!
++    @endcan
+```
+With the above code, when you login with each respective user, you will see different messages based on that access.
+
+Here's a routes example with Breeze and Laravel 11. 
+Edit `/routes/web.php`:
+```diff
+-Route::middleware('auth')->group(function () {
++Route::middleware('role_or_permission:publish articles')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+```
+With the above change, you will be unable to access the user "Profile" page unless you are logged in with "admin" or "super-admin". You could change `role_or_permission:publish_articles` to `role:writer` to make it only available to the "test" user.
+
 ## Sharing
 To share your app on Github for easy collaboration:
 
