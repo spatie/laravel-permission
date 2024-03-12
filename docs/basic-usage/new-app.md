@@ -74,7 +74,7 @@ class PermissionsDemoSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         // Reset cached roles and permissions
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
@@ -137,7 +137,6 @@ Super-Admins are a common feature. The following approach allows that when your 
 
     public function boot()
     {
-
 +        // Implicitly grant "Super-Admin" role all permission checks using can()
 +        Gate::before(function ($user, $ability) {
 +            if ($user->hasRole('Super-Admin')) {
