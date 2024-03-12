@@ -16,6 +16,12 @@ If you're new to Laravel or to any of the concepts mentioned here, you can learn
 ```sh
 cd ~/Sites
 laravel new mypermissionsdemo
+# (Choose Laravel Breeze, choose Blade with Alpine)
+# (choose your own dark-mode-support choice)
+# (choose your desired testing framework)
+# (say Yes to initialize a Git repo, so that you can track your code changes)
+# (Choose SQLite)
+
 cd mypermissionsdemo
 git init
 git add .
@@ -38,8 +44,10 @@ php artisan migrate:fresh
 sed -i '' $'s/use HasFactory, Notifiable;/use HasFactory, Notifiable;\\\n    use \\\\Spatie\\\\Permission\\\\Traits\\\\HasRoles;/' app/Models/User.php
 sed -i '' $'s/use HasApiTokens, HasFactory, Notifiable;/use HasApiTokens, HasFactory, Notifiable;\\\n    use \\\\Spatie\\\\Permission\\\\Traits\\\\HasRoles;/' app/Models/User.php
 git add . && git commit -m "Add HasRoles trait"
+```
 
-# Add Laravel's basic auth scaffolding
+If you didn't install Laravel Breeze or Jetstream, add Laravel's basic auth scaffolding:
+```php
 composer require laravel/ui --dev
 php artisan ui bootstrap --auth
 # npm install && npm run prod
@@ -125,11 +133,10 @@ Super-Admins are a common feature. The following approach allows that when your 
 - Add a Gate::before check in your `AuthServiceProvider`:
 
 ```diff
++ use Illuminate\Support\Facades\Gate;
+
     public function boot()
     {
-        $this->registerPolicies();
-        
-        //
 
 +        // Implicitly grant "Super-Admin" role all permission checks using can()
 +        Gate::before(function ($user, $ability) {
