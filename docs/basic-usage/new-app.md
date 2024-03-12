@@ -9,7 +9,7 @@ If you want to just try out the features of this package you can get started wit
 
 The examples on this page are primarily added for assistance in creating a quick demo app for troubleshooting purposes, to post the repo on github for convenient sharing to collaborate or get support.
 
-If you're new to Laravel or to any of the concepts mentioned here, you can learn more in the [Laravel documentation](https://laravel.com/docs/) and in the free videos at Laracasts such as with the [Laravel From Scratch series](https://laracasts.com/series/laravel-8-from-scratch/).
+If you're new to Laravel or to any of the concepts mentioned here, you can learn more in the [Laravel documentation](https://laravel.com/docs/) and in the free videos at Laracasts such as with the [Laravel 11 in 30 days](https://laracasts.com/series/30-days-to-learn-laravel-11) or [Laravel 8 From Scratch](https://laracasts.com/series/laravel-8-from-scratch/) series.
 
 ### Initial setup:
 
