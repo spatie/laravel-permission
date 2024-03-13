@@ -55,7 +55,8 @@ protected $middlewareAliases = [
 ];
 ```
 
-In Laravel 11 you can add them in `bootstrap/app.php` under `->withMiddleware(function (Middleware $middleware) {`
+In Laravel 11 you can add them in `bootstrap/app.php` under 
+`->withMiddleware(function (Middleware $middleware) {`
 
 ```php
     $middleware->alias([
