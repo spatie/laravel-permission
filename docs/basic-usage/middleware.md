@@ -23,14 +23,13 @@ Route::group(['middleware' => [\Illuminate\Auth\Middleware\Authorize::using('pub
 
 ## Package Middleware
 
+**See a typo? Note that since v6 the _'Middleware'_ namespace is singular. Prior to v6 it was _'Middlewares'_. Time to upgrade your app!**
+
 This package comes with `RoleMiddleware`, `PermissionMiddleware` and `RoleOrPermissionMiddleware` middleware.
 
 You can register their aliases for easy reference elsewhere in your app:
 
->  See a typo? Note that since v6 the 'Middleware' namespace is singular. Prior to v6 it was 'Middlewares'. Time to upgrade your app!
-
 In Laravel 11 open `/bootstrap/app.php` and register it there:
-
 ```php
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
@@ -42,7 +41,6 @@ In Laravel 11 open `/bootstrap/app.php` and register it there:
 ```
 
 In Laravel 9 and 10 you can add them in `app/Http/Kernel.php`:
-
 ```php
 // Laravel 9 uses $routeMiddleware = [
 //protected $routeMiddleware = [
