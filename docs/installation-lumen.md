@@ -74,7 +74,7 @@ NOTE: Remember that Laravel's authorization layer requires that your `User` mode
 ## User Table
 NOTE: If you are working with a fresh install of Lumen, then you probably also need a migration file for your Users table. You can create your own, or you can copy a basic one from Laravel:
 
-[https://github.com/laravel/laravel/blob/master/database/migrations/2014_10_12_000000_create_users_table.php](https://github.com/laravel/laravel/blob/master/database/migrations/2014_10_12_000000_create_users_table.php)
+[https://github.com/laravel/laravel/blob/master/database/migrations/0001_01_01_000000_create_users_table.php](https://github.com/laravel/laravel/blob/master/database/migrations/0001_01_01_000000_create_users_table.php)
 
 (You will need to run `php artisan migrate` after adding this file.)
 
