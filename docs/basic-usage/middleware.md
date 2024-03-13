@@ -1,5 +1,5 @@
 ---
-title: Using a Middleware
+title: Middleware
 weight: 11
 ---
 
