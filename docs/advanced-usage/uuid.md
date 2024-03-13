@@ -83,7 +83,7 @@ If you also want the roles and permissions to use a UUID for their `id` value, t
 
 ## Configuration (OPTIONAL)
 You might want to change the pivot table field name from `model_id` to `model_uuid`, just for semantic purposes.
-For this, in the configuration file edit `column_names.model_morph_key`:
+For this, in the `permissions.php` configuration file edit `column_names.model_morph_key`:
 
 - OPTIONAL: Change to `model_uuid` instead of the default `model_id`.
 ```diff
@@ -105,10 +105,10 @@ For this, in the configuration file edit `column_names.model_morph_key`:
 +            'model_morph_key' => 'model_uuid',
         ],
 ```
-- If you extend the models into your app, be sure to list those models in your configuration file. See the Extending section of the documentation and the Models section below.
+- If you extend the models into your app, be sure to list those models in your `permissions.php` configuration file. See the Extending section of the documentation and the Models section below.
 
 ## Models
-If you want all the role/permission objects to have a UUID instead of an integer, you will need to Extend the default Role and Permission models into your own namespace in order to set some specific properties. (See the Extending section of the docs, where it explains requirements of Extending, as well as the configuration settings you need to update.)
+If you want all the role/permission objects to have a UUID instead of an integer, you will need to Extend the default Role and Permission models into your own namespace in order to set some specific properties. (See the Extending section of the docs, where it explains requirements of Extending, as well as the `permissions.php` configuration settings you need to update.)
 
 Examples:
 
