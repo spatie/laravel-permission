@@ -1,5 +1,5 @@
 ---
-title: Using artisan commands
+title: Artisan Commands
 weight: 10
 ---
 
