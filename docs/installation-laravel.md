@@ -9,7 +9,7 @@ Choose the version of this package that suits your Laravel version.
 
 Package Version | Laravel Version
 ----------------|-----------
-   ^6.0         |  8,9,10 (PHP 8.0+)
+   ^6.0         |  8,9,10,11 (PHP 8.0+)
    ^5.8         |  7,8,9,10
    ^5.7         |  7,8,9
    ^5.4-^5.6    |  7,8
