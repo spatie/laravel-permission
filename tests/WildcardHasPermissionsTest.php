@@ -31,6 +31,47 @@ class WildcardHasPermissionsTest extends TestCase
         $this->assertFalse($user1->hasPermissionTo('projects.view'));
     }
 
+    /** @test */
+    public function it_can_check_wildcard_permission_for_a_non_default_guard()
+    {
+        app('config')->set('permission.enable_wildcard_permission', true);
+
+        $user1 = User::create(['email' => 'user1@test.com']);
+
+        $permission1 = Permission::create(['name' => 'articles.edit,view,create', 'guard_name' => 'api']);
+        $permission2 = Permission::create(['name' => 'news.*', 'guard_name' => 'api']);
+        $permission3 = Permission::create(['name' => 'posts.*', 'guard_name' => 'api']);
+
+        $user1->givePermissionTo([$permission1, $permission2, $permission3]);
+
+        $this->assertTrue($user1->hasPermissionTo('posts.create', 'api'));
+        $this->assertTrue($user1->hasPermissionTo('posts.create.123', 'api'));
+        $this->assertTrue($user1->hasPermissionTo('posts.*', 'api'));
+        $this->assertTrue($user1->hasPermissionTo('articles.view', 'api'));
+        $this->assertFalse($user1->hasPermissionTo('projects.view', 'api'));
+    }
+
+    /** @test */
+    public function it_can_check_wildcard_permission_from_instance_without_explicit_guard_argument()
+    {
+        app('config')->set('permission.enable_wildcard_permission', true);
+
+        $user1 = User::create(['email' => 'user1@test.com']);
+
+        $permission2 = Permission::create(['name' => 'articles.view']);
+        $permission1 = Permission::create(['name' => 'articles.edit', 'guard_name' => 'api']);
+        $permission3 = Permission::create(['name' => 'news.*', 'guard_name' => 'api']);
+        $permission4 = Permission::create(['name' => 'posts.*', 'guard_name' => 'api']);
+
+        $user1->givePermissionTo([$permission1, $permission2, $permission3]);
+
+        $this->assertTrue($user1->hasPermissionTo($permission1));
+        $this->assertTrue($user1->hasPermissionTo($permission2));
+        $this->assertTrue($user1->hasPermissionTo($permission3));
+        $this->assertFalse($user1->hasPermissionTo($permission4));
+        $this->assertFalse($user1->hasPermissionTo('articles.edit'));
+    }
+
     /**
      * @test
      *
