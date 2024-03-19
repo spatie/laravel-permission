@@ -24,6 +24,8 @@ When using a permission-name associated with permissions created in this package
 
 You can also use `@haspermission('permission-name')` or `@haspermission('permission-name', 'guard_name')` in similar fashion. With corresponding `@endhaspermission`.
 
+There is no `@hasanypermission` directive: use `@canany` instead.
+
 
 ## Roles 
 As discussed in the Best Practices section of the docs, **it is strongly recommended to always use permission directives**, instead of role directives.
