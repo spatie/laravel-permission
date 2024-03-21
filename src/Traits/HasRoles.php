@@ -111,7 +111,7 @@ trait HasRoles
     }
 
     /**
-     * Returns roles ids as array keys
+     * Returns array of role ids
      *
      * @param  string|int|array|Role|Collection|\BackedEnum  $roles
      */
