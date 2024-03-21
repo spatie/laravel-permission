@@ -352,7 +352,7 @@ trait HasPermissions
     }
 
     /**
-     * Returns permissions ids as array values
+     * Returns array of permissions ids
      *
      * @param  string|int|array|Permission|Collection|\BackedEnum  $permissions
      */
