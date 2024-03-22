@@ -129,6 +129,21 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    public function multiple_guard_user_can_access_a_route_protected_by_permission_middleware_using_specific_guard(): void
+    {
+        config()->set('auth.guards.api.driver', 'session');
+        Auth::guard('api')->login($this->testUser);
+
+        $testClientPermission = app(Permission::class)->create(['name' => 'apiPermission', 'guard_name' => 'api']);
+        $this->testUser->givePermissionTo($testClientPermission);
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->permissionMiddleware, 'apiPermission', 'api')
+        );
+    }
+
+    /** @test */
     public function a_client_can_access_a_route_protected_by_permission_middleware_if_have_this_permission(): void
     {
         if ($this->getLaravelVersion() < 9) {
