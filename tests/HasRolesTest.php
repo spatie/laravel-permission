@@ -47,23 +47,43 @@ class HasRolesTest extends TestCase
     {
         $enum1 = TestModels\TestRolePermissionsEnum::USERMANAGER;
         $enum2 = TestModels\TestRolePermissionsEnum::WRITER;
+        $enum3 = TestModels\TestRolePermissionsEnum::CASTED_ENUM_1;
+        $enum4 = TestModels\TestRolePermissionsEnum::CASTED_ENUM_2;
 
         app(Role::class)->findOrCreate($enum1->value, 'web');
         app(Role::class)->findOrCreate($enum2->value, 'web');
+        app(Role::class)->findOrCreate($enum3->value, 'web');
+        app(Role::class)->findOrCreate($enum4->value, 'web');
 
         $this->assertFalse($this->testUser->hasRole($enum1));
         $this->assertFalse($this->testUser->hasRole($enum2));
+        $this->assertFalse($this->testUser->hasRole($enum3));
+        $this->assertFalse($this->testUser->hasRole($enum4));
+        $this->assertFalse($this->testUser->hasRole('user-manager'));
+        $this->assertFalse($this->testUser->hasRole('writer'));
+        $this->assertFalse($this->testUser->hasRole('casted_enum-1'));
+        $this->assertFalse($this->testUser->hasRole('casted_enum-2'));
 
         $this->testUser->assignRole($enum1);
         $this->testUser->assignRole($enum2);
+        $this->testUser->assignRole($enum3);
+        $this->testUser->assignRole($enum4);
 
         $this->assertTrue($this->testUser->hasRole($enum1));
         $this->assertTrue($this->testUser->hasRole($enum2));
+        $this->assertTrue($this->testUser->hasRole($enum3));
+        $this->assertTrue($this->testUser->hasRole($enum4));
 
-        $this->assertTrue($this->testUser->hasAllRoles([$enum1, $enum2]));
-        $this->assertFalse($this->testUser->hasAllRoles([$enum1, $enum2, 'not exist']));
+        $this->assertTrue($this->testUser->hasRole([$enum1, 'writer']));
+        $this->assertTrue($this->testUser->hasRole([$enum3, 'casted_enum-2']));
 
-        $this->assertTrue($this->testUser->hasExactRoles([$enum2, $enum1]));
+        $this->assertTrue($this->testUser->hasAllRoles([$enum1, $enum2, $enum3, $enum4]));
+        $this->assertTrue($this->testUser->hasAllRoles(['user-manager', 'writer', 'casted_enum-1', 'casted_enum-2']));
+        $this->assertFalse($this->testUser->hasAllRoles([$enum1, $enum2, $enum3, $enum4, 'not exist']));
+        $this->assertFalse($this->testUser->hasAllRoles(['user-manager', 'writer', 'casted_enum-1', 'casted_enum-2', 'not exist']));
+
+        $this->assertTrue($this->testUser->hasExactRoles([$enum4, $enum3, $enum2, $enum1]));
+        $this->assertTrue($this->testUser->hasExactRoles(['user-manager', 'writer', 'casted_enum-1', 'casted_enum-2']));
 
         $this->testUser->removeRole($enum1);
 

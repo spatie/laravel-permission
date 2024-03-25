@@ -18,6 +18,20 @@ class Role extends \Spatie\Permission\Models\Role
     const HIERARCHY_TABLE = 'roles_hierarchy';
 
     /**
+     * @return string|\BackedEnum
+     */
+    public function getNameAttribute()
+    {
+        $name = $this->attributes['name'];
+
+        if (str_contains($name, 'casted_enum')) {
+            return TestRolePermissionsEnum::from($name);
+        }
+
+        return $name;
+    }
+
+    /**
      * @return BelongsToMany
      */
     public function parents()
