@@ -87,7 +87,7 @@ trait HasRoles
                 $role = $role->value;
             }
 
-            $method = is_int($role) || PermissionRegistrar::isUid($role) ? 'findById' : 'findByName';
+            $method = is_numeric($role) || PermissionRegistrar::isUid($role) ? 'findById' : 'findByName';
 
             return $this->getRoleClass()::{$method}($role, $guard ?: $this->getDefaultGuardName());
         }, Arr::wrap($roles));
@@ -181,11 +181,11 @@ trait HasRoles
     /**
      * Revoke the given role from the model.
      *
-     * @param  string|int|Role|\BackedEnum  $role
+     * @param  string|string[]|int|Role|Role[]|\BackedEnum  $role
      */
     public function removeRole($role)
     {
-        $this->roles()->detach($this->getStoredRole($role));
+        $this->roles()->detach($this->collectRoles($role));
 
         $this->unsetRelation('roles');
 
@@ -230,7 +230,7 @@ trait HasRoles
             $roles = $roles->value;
         }
 
-        if (is_int($roles) || PermissionRegistrar::isUid($roles)) {
+        if (is_numeric($roles) || PermissionRegistrar::isUid($roles)) {
             $key = (new ($this->getRoleClass())())->getKeyName();
 
             return $guard
@@ -367,7 +367,7 @@ trait HasRoles
             $role = $role->value;
         }
 
-        if (is_int($role) || PermissionRegistrar::isUid($role)) {
+        if (is_numeric($role) || PermissionRegistrar::isUid($role)) {
             return $this->getRoleClass()::findById($role, $this->getDefaultGuardName());
         }
 

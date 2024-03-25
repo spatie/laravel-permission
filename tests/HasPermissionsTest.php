@@ -148,6 +148,29 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    public function it_can_scope_users_using_a_string_int()
+    {
+        User::all()->each(fn ($item) => $item->delete());
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user3 = User::create(['email' => 'user3@test.com']);
+        $user1->givePermissionTo(['1', '2']);
+        $this->testUserRole->givePermissionTo('1');
+        $user2->assignRole('testRole');
+
+        $scopedUsers1 = User::permission('1')->get();
+        $scopedUsers2 = User::permission(['2'])->get();
+        $scopedUsers3 = User::withoutPermission(['2'])->get();
+
+        $this->assertEquals(2, $scopedUsers1->count());
+        $this->assertEquals(1, $scopedUsers2->count());
+        $this->assertEquals(2, $scopedUsers3->count());
+
+        $user1->revokePermissionTo(['1']);
+        $this->assertEquals(1, User::permission('1')->count());
+    }
+
+    /** @test */
     public function it_can_scope_users_using_an_array()
     {
         User::all()->each(fn ($item) => $item->delete());
