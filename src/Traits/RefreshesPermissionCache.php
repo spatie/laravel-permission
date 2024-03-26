@@ -2,18 +2,13 @@
 
 namespace Spatie\Permission\Traits;
 
-use Spatie\Permission\PermissionRegistrar;
-
 trait RefreshesPermissionCache
 {
-    public static function bootRefreshesPermissionCache()
+    public static function bootRefreshesPermissionCache(): void
     {
-        static::saved(function () {
-            app(PermissionRegistrar::class)->forgetCachedPermissions();
-        });
+        $permissionRegistrar = static::getPermissionRegistrar();
 
-        static::deleted(function () {
-            app(PermissionRegistrar::class)->forgetCachedPermissions();
-        });
+        static::saved(fn () => $permissionRegistrar->forgetCachedPermissions());
+        static::deleted(fn () => $permissionRegistrar->forgetCachedPermissions());
     }
 }
