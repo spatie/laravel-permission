@@ -85,6 +85,18 @@ Route::group(['middleware' => ['permission:publish articles|edit articles,api']]
 
 ### Controllers
 
+In Laravel 11, if your controller implements the `HasMiddleware` interface, you can register controller middleware using the `middleware()` method:
+
+```php
+public static function middleware(): array
+{
+    return [
+        'role_or_permission:manager|edit articles',
+    ];
+}
+```
+
+Or, like in prior versions, you can register it in the constructor:
 ```php
 public function __construct()
 {
