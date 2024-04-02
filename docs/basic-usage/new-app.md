@@ -23,11 +23,13 @@ laravel new mypermissionsdemo
 # (Choose SQLite)
 
 cd mypermissionsdemo
+
+# the following git commands are not needed if you Initialized a git repo while "laravel new" was running above:
 git init
 git add .
 git commit -m "Fresh Laravel Install"
 
-# Environment
+# These Environment steps are not needed if you already selected SQLite while "laravel new" was running above:
 cp -n .env.example .env
 sed -i '' 's/DB_CONNECTION=mysql/DB_CONNECTION=sqlite/' .env
 sed -i '' 's/DB_DATABASE=/#DB_DATABASE=/' .env
@@ -71,8 +73,6 @@ class PermissionsDemoSeeder extends Seeder
 {
     /**
      * Create the initial roles and permissions.
-     *
-     * @return void
      */
     public function run(): void
     {
