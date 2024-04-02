@@ -96,7 +96,7 @@ public static function middleware(): array
 }
 ```
 
-Or, like in prior versions, you can register it in the constructor:
+In Laravel 10 and older, you can register it in the constructor:
 ```php
 public function __construct()
 {
