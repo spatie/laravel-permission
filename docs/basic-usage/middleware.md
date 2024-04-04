@@ -91,8 +91,11 @@ In Laravel 11, if your controller implements the `HasMiddleware` interface, you 
 public static function middleware(): array
 {
     return [
+        // examples with aliases, pipe-separated names, guards, etc:
         'role_or_permission:manager|edit articles',
         new Middleware('role:author', only: ['index']),
+        new Middleware(\Spatie\Permission\Middleware\RoleMiddleware::using('manager'), except:['show']),
+        new Middleware(\Spatie\Permission\Middleware\PermissionMiddleware::using('delete records,api'), only:['destroy']),
     ];
 }
 ```
@@ -101,8 +104,8 @@ In Laravel 10 and older, you can register it in the constructor:
 ```php
 public function __construct()
 {
+    // examples:
     $this->middleware(['role:manager','permission:publish articles|edit articles']);
-    // or
     $this->middleware(['role_or_permission:manager|edit articles']);
     // or with specific guard
     $this->middleware(['role_or_permission:manager|edit articles,api']);
