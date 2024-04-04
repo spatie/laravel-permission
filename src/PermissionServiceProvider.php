@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission;
 
+use Illuminate\Cache\CacheManager;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
@@ -37,7 +38,7 @@ class PermissionServiceProvider extends ServiceProvider
             }
         });
 
-        $this->app->singleton(PermissionRegistrar::class);
+        $this->app->singleton(PermissionRegistrar::class, fn (Application $app) => new PermissionRegistrar(config: config('permission'), cacheManager: $app->make(CacheManager::class)));
     }
 
     public function register()
