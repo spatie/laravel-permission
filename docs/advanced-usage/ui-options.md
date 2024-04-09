@@ -27,5 +27,6 @@ If you decide you need a UI, even if it's not for creating/editing role/permissi
 
 - [Generating UI boilerplate using InfyOm](https://youtu.be/hlGu2pa1bdU) video tutorial by [Shailesh](https://github.com/shailesh-ladumor)
 
-
 - [LiveWire Base Admin Panel](https://github.com/aliqasemzadeh/bap) User management by [AliQasemzadeh](https://github.com/aliqasemzadeh)
+
+- [UI for Spatie Laravel Permissions](https://craftable.pro/article/implementing-a-ui-for-spatie-laravel-permissions) using the Craftable PRO admin panel & crud generator
