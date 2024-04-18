@@ -96,7 +96,7 @@ class PermissionServiceProvider extends ServiceProvider
 
         $dispatcher = $this->app[Dispatcher::class];
         // @phpstan-ignore-next-line
-        $dispatcher->listen(function (\Laravel\Octane\Events\OperationTerminated $event) {
+        $dispatcher->listen(function (\Laravel\Octane\Contracts\OperationTerminated $event) {
             // @phpstan-ignore-next-line
             $event->sandbox->make(PermissionRegistrar::class)->setPermissionsTeamId(null);
         });
