@@ -40,11 +40,11 @@ If you also want the roles and permissions to use a UUID for their `id` value, t
     });
 
     Schema::create($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames, $columnNames) {
--        $table->unsignedBigInteger(PermissionRegistrar::$pivotPermission);
-+        $table->uuid(PermissionRegistrar::$pivotPermission);
+-        $table->unsignedBigInteger($pivotPermission);
++        $table->uuid($pivotPermission);
         $table->string('model_type');
 //...
-        $table->foreign(PermissionRegistrar::$pivotPermission)
+        $table->foreign($pivotPermission)
 -            ->references('id') // permission id
 +            ->references('uuid') // permission id
             ->on($tableNames['permissions'])
@@ -52,28 +52,28 @@ If you also want the roles and permissions to use a UUID for their `id` value, t
 //...
 
     Schema::create($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames, $columnNames) {
--        $table->unsignedBigInteger(PermissionRegistrar::$pivotRole);
-+        $table->uuid(PermissionRegistrar::$pivotRole);
+-        $table->unsignedBigInteger($pivotRole);
++        $table->uuid($pivotRole);
 //...
-        $table->foreign(PermissionRegistrar::$pivotRole)
+        $table->foreign($pivotRole)
 -            ->references('id') // role id
 +            ->references('uuid') // role id
             ->on($tableNames['roles'])
             ->onDelete('cascade');//...
 
     Schema::create($tableNames['role_has_permissions'], function (Blueprint $table) use ($tableNames) {
--        $table->unsignedBigInteger(PermissionRegistrar::$pivotPermission);
--        $table->unsignedBigInteger(PermissionRegistrar::$pivotRole);
-+        $table->uuid(PermissionRegistrar::$pivotPermission);
-+        $table->uuid(PermissionRegistrar::$pivotRole);
+-        $table->unsignedBigInteger($pivotPermission);
+-        $table->unsignedBigInteger($pivotRole);
++        $table->uuid($pivotPermission);
++        $table->uuid($pivotRole);
 
-         $table->foreign(PermissionRegistrar::$pivotPermission)
+         $table->foreign($pivotPermission)
 -            ->references('id') // permission id
 +            ->references('uuid') // permission id
             ->on($tableNames['permissions'])
             ->onDelete('cascade');
 
-         $table->foreign(PermissionRegistrar::$pivotRole)
+         $table->foreign($pivotRole)
 -            ->references('id') // role id
 +            ->references('uuid') // role id
             ->on($tableNames['roles'])
