@@ -2,6 +2,30 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 6.5.0 - 2024-04-18
+
+### What's Changed
+
+* Octane: Fix wrong event listener by @erikn69 in https://github.com/spatie/laravel-permission/pull/2656
+* Teams: Add nullable team_id by @Androlax2 in https://github.com/spatie/laravel-permission/pull/2607
+* Blade: simplify the definition of multiple Blade "if" directives by @alissn in https://github.com/spatie/laravel-permission/pull/2628
+* DocBlocks: Update HasPermissions::collectPermissions() docblock by @Plytas in https://github.com/spatie/laravel-permission/pull/2641
+
+#### Internals
+
+* Update role-permissions.md by @killjin in https://github.com/spatie/laravel-permission/pull/2631
+* Bump ramsey/composer-install from 2 to 3 by @dependabot in https://github.com/spatie/laravel-permission/pull/2630
+* Bump dependabot/fetch-metadata from 1 to 2 by @dependabot in https://github.com/spatie/laravel-permission/pull/2642
+
+### New Contributors
+
+* @alissn made their first contribution in https://github.com/spatie/laravel-permission/pull/2628
+* @Androlax2 made their first contribution in https://github.com/spatie/laravel-permission/pull/2607
+* @Plytas made their first contribution in https://github.com/spatie/laravel-permission/pull/2641
+* @killjin made their first contribution in https://github.com/spatie/laravel-permission/pull/2631
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/6.4.0...6.5.0
+
 ## 6.4.0 - 2024-02-28
 
 * Laravel 11 Support
@@ -766,6 +790,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -813,6 +838,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
