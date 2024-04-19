@@ -109,7 +109,7 @@ class PermissionServiceProvider extends ServiceProvider
             return;
         }
         // @phpstan-ignore-next-line
-        $dispatcher->listen(function (\Laravel\Octane\Events\OperationTerminated $event) {
+        $dispatcher->listen(function (\Laravel\Octane\Contracts\OperationTerminated $event) {
             // @phpstan-ignore-next-line
             $event->sandbox->make(PermissionRegistrar::class)->clearPermissionsCollection();
         });
