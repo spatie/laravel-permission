@@ -228,6 +228,16 @@ trait HasRoles
 
         if ($roles instanceof \BackedEnum) {
             $roles = $roles->value;
+
+            return $this->roles
+                ->when($guard, fn ($q) => $q->where('guard_name', $guard))
+                ->contains(function ($role) use ($roles) {
+                    if ($role->name instanceof \BackedEnum) {
+                        return $role->name->value == $roles;
+                    }
+
+                    return $role->name == $roles;
+                });
         }
 
         if (is_int($roles) || PermissionRegistrar::isUid($roles)) {
@@ -295,9 +305,7 @@ trait HasRoles
         }
 
         if (is_string($roles)) {
-            return $guard
-                ? $this->roles->where('guard_name', $guard)->contains('name', $roles)
-                : $this->roles->contains('name', $roles);
+            return $this->hasRole($roles, $guard);
         }
 
         if ($roles instanceof Role) {
@@ -312,17 +320,25 @@ trait HasRoles
             return $role instanceof Role ? $role->name : $role;
         });
 
-        return $roles->intersect(
-            $guard
-                ? $this->roles->where('guard_name', $guard)->pluck('name')
-                : $this->getRoleNames()
-        ) == $roles;
+        $roleNames = $guard
+            ? $this->roles->where('guard_name', $guard)->pluck('name')
+            : $this->getRoleNames();
+
+        $roleNames = $roleNames->transform(function ($roleName) {
+            if ($roleName instanceof \BackedEnum) {
+                return $roleName->value;
+            }
+
+            return $roleName;
+        });
+
+        return $roles->intersect($roleNames) == $roles;
     }
 
     /**
      * Determine if the model has exactly all of the given role(s).
      *
-     * @param  string|array|Role|Collection  $roles
+     * @param  string|array|Role|Collection|\BackedEnum  $roles
      */
     public function hasExactRoles($roles, ?string $guard = null): bool
     {
