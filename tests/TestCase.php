@@ -3,6 +3,7 @@
 namespace Spatie\Permission\Tests;
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
@@ -77,6 +78,15 @@ abstract class TestCase extends Orchestra
         }
 
         $this->setUpRoutes();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        if (method_exists(AboutCommand::class, 'flushState')) {
+            AboutCommand::flushState();
+        }
     }
 
     /**

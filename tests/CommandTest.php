@@ -2,6 +2,8 @@
 
 namespace Spatie\Permission\Tests;
 
+use Composer\InstalledVersions;
+use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\Facades\Artisan;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -186,13 +188,43 @@ class CommandTest extends TestCase
     }
 
     /** @test */
-    public function it_can_respond_to_about_command()
+    public function it_can_respond_to_about_command_with_default()
     {
-        config()->set('permission.teams', true);
+        if (! class_exists(InstalledVersions::class) || ! class_exists(AboutCommand::class)) {
+            $this->markTestSkipped();
+        }
+        if (! method_exists(AboutCommand::class, 'flushState')) {
+            $this->markTestSkipped();
+        }
+
         app(\Spatie\Permission\PermissionRegistrar::class)->initializeCache();
 
         Artisan::call('about');
+        $output = Artisan::output();
 
+        $pattern = '/Spatie Permissions[ .\n]*Features Enabled[ .]*Default[ .\n]*Version/';
+        if (method_exists($this, 'assertMatchesRegularExpression')) {
+            $this->assertMatchesRegularExpression($pattern, $output);
+        } else { // phpUnit 9/8
+            $this->assertRegExp($pattern, $output);
+        }
+    }
+
+    /** @test */
+    public function it_can_respond_to_about_command_with_teams()
+    {
+        if (! class_exists(InstalledVersions::class) || ! class_exists(AboutCommand::class)) {
+            $this->markTestSkipped();
+        }
+        if (! method_exists(AboutCommand::class, 'flushState')) {
+            $this->markTestSkipped();
+        }
+
+        app(\Spatie\Permission\PermissionRegistrar::class)->initializeCache();
+
+        config()->set('permission.teams', true);
+
+        Artisan::call('about');
         $output = Artisan::output();
 
         $pattern = '/Spatie Permissions[ .\n]*Features Enabled[ .]*Teams[ .\n]*Version/';

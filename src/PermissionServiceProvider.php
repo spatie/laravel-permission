@@ -180,6 +180,7 @@ class PermissionServiceProvider extends ServiceProvider
             return;
         }
 
+        // array format: 'Display Text' => 'boolean-config-key name'
         $features = [
             'Teams' => 'teams',
             'Wildcard-Permissions' => 'enable_wildcard_permission',
@@ -187,9 +188,11 @@ class PermissionServiceProvider extends ServiceProvider
             'Passport' => 'use_passport_client_credentials',
         ];
 
-        AboutCommand::add('Spatie Permissions', fn () => [
+        $config = $this->app['config'];
+
+        AboutCommand::add('Spatie Permissions', static fn () => [
             'Features Enabled' => collect($features)
-                ->filter(fn (string $feature, string $name): bool => $this->app['config']->get("permission.{$feature}"))
+                ->filter(fn(string $feature, string $name): bool => $config->get("permission.{$feature}"))
                 ->keys()
                 ->whenEmpty(fn (Collection $collection) => $collection->push('Default'))
                 ->join(', '),
