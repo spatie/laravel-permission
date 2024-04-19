@@ -2,6 +2,22 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 6.6.0 - 2024-04-19
+
+### What's Changed
+
+* Roles: Support for casting role names to enums by @gajosadrian in https://github.com/spatie/laravel-permission/pull/2616
+* Fix permission:show UUID error #2581 by @drbyte in https://github.com/spatie/laravel-permission/pull/2582
+* Cover WilcardPermission instance verification based on its own guard (Allow hasAllPermissions and hasAnyPermission to run on custom guard for WildcardPermission) by @AlexandreBellas in https://github.com/spatie/laravel-permission/pull/2608
+* Register Laravel "About" details by @drbyte in https://github.com/spatie/laravel-permission/pull/2584
+
+### New Contributors
+
+* @gajosadrian made their first contribution in https://github.com/spatie/laravel-permission/pull/2616
+* @AlexandreBellas made their first contribution in https://github.com/spatie/laravel-permission/pull/2608
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/6.5.0...6.6.0
+
 ## 6.5.0 - 2024-04-18
 
 ### What's Changed
@@ -791,6 +807,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -838,6 +855,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
