@@ -192,7 +192,7 @@ class PermissionServiceProvider extends ServiceProvider
 
         AboutCommand::add('Spatie Permissions', static fn () => [
             'Features Enabled' => collect($features)
-                ->filter(fn(string $feature, string $name): bool => $config->get("permission.{$feature}"))
+                ->filter(fn (string $feature, string $name): bool => $config->get("permission.{$feature}"))
                 ->keys()
                 ->whenEmpty(fn (Collection $collection) => $collection->push('Default'))
                 ->join(', '),
