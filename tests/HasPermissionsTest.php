@@ -20,12 +20,11 @@ class HasPermissionsTest extends TestCase
         $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission));
     }
 
-
     /** @test */
     public function it_can_assign_a_permission_to_a_user_with_a_non_default_guard()
     {
         $testUserPermission = app(Permission::class)->create([
-            'name'       => 'edit-articles',
+            'name' => 'edit-articles',
             'guard_name' => 'api',
         ]);
 
