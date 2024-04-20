@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [8.4, 8.3, 8.2, 8.1, 8.0]
+        php: [8.3, 8.2, 8.1, 8.0]
         laravel: ["^11.0", "^10.0", "^9.0", "^8.12"]
         dependency-version: [prefer-lowest, prefer-stable]
         include:
