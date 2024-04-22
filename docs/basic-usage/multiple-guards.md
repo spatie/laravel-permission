@@ -54,7 +54,7 @@ $user->hasPermissionTo('publish articles', 'admin');
 
 ## Assigning permissions and roles to guard users
 
-You can use the same core methods to assign permissions and roles to users; just make sure the `guard_name` on the permission or role matches the guard of the user, otherwise a `GuardDoesNotMatch` or `Role/PermissionDoesNotExist` exception will be thrown.
+You can use the same core methods to assign permissions and roles to users; just make sure the `guard_name` on the permission or role matches the guard of the user, otherwise a `GuardDoesNotMatch` or `Role/PermissionDoesNotExist` exception will be thrown. If your user is able to consume multiple roles or permissions from different guards; make sure the user's `$guard_name` property or `guardName()` method returns all allowed guards in an array.
 
 
 ## Using blade directives with multiple guards
