@@ -11,21 +11,18 @@ Then you can implement the best-practice of primarily using permission-based con
 ## `Gate::before`
 If you want a "Super Admin" role to respond `true` to all permissions, without needing to assign all those permissions to a role, you can use [Laravel's `Gate::before()` method](https://laravel.com/docs/master/authorization#intercepting-gate-checks). For example:
 
+In Laravel 11 this would go in the `boot()` method of `AppServiceProvider`:
+In Laravel 10 and below it would go in the `boot()` method of `AuthServiceProvider.php`:
 ```php
 use Illuminate\Support\Facades\Gate;
-
-class AuthServiceProvider extends ServiceProvider
+// ...
+public function boot()
 {
-    public function boot()
-    {
-//...
-
-        // Implicitly grant "Super Admin" role all permissions
-        // This works in the app by using gate-related functions like auth()->user->can() and @can()
-        Gate::before(function ($user, $ability) {
-            return $user->hasRole('Super Admin') ? true : null;
-        });
-    }
+    // Implicitly grant "Super Admin" role all permissions
+    // This works in the app by using gate-related functions like auth()->user->can() and @can()
+    Gate::before(function ($user, $ability) {
+        return $user->hasRole('Super Admin') ? true : null;
+    });
 }
 ```
 
@@ -37,11 +34,11 @@ Jeffrey Way explains the concept of a super-admin (and a model owner, and model 
 
 If you aren't using `Gate::before()` as described above, you could alternatively grant super-admin control by checking the role in individual Policy classes, using the `before()` method.
 
-Here is an example from the [Laravel Documentation on Policy Filters](https://laravel.com/docs/master/authorization#policy-filters)
+Here is an example from the [Laravel Documentation on Policy Filters](https://laravel.com/docs/master/authorization#policy-filters), where you can define `before()` in your Policy where needed:
 
 ```php
-use App\Models\User; // could be any model
- 
+use App\Models\User; // could be any Authorizable model
+
 /**
  * Perform pre-authorization checks on the model.
  */
