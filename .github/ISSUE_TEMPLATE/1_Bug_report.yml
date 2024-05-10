@@ -1,0 +1,55 @@
+name: Bug Report
+description: "Report a reproducible bug."
+body:
+  - type: markdown
+    attributes:
+      value: |
+          Before creating a new Bug Report, please check that there isn't already a similar issue on [the issue tracker](https://github.com/spatie/laravel-permission/issues) or in [the discussions](https://github.com/spatie/laravel-permission/discussions).
+          Also, **many issues/questions/problems are already answered** in the [documentation](https://spatie.be/docs/laravel-permission) already. **Please be sure to check the docs** because it will save you time!
+
+  - type: textarea
+    attributes:
+      label: Description
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps To Reproduce
+      description: How do you trigger this bug? Please walk us through it step by step.
+      value: |
+        1.
+        2.
+        3.
+        ...
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Example Application
+      description: "Here is a link to my Github repo containing a minimal Laravel application which shows my problem:"
+  - type: markdown
+    attributes:
+      value: |
+          You can use `composer show` to get package version numbers:
+  - type: input
+    attributes:
+      label: "Version of spatie/laravel-permission package:"
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: "Version of laravel/framework package:"
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: "PHP version:"
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: "Database engine and version:"
+  - type: input
+    attributes:
+      label: "OS: Windows/Mac/Linux version:" 
