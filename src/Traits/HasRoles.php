@@ -55,13 +55,19 @@ trait HasRoles
             app(PermissionRegistrar::class)->pivotRole
         );
 
+        $teamsKey = app(PermissionRegistrar::class)->teamsKey;
+
+        if ($teamsKey) {
+            $relation->withPivot($teamsKey);
+        }
+
         if (! app(PermissionRegistrar::class)->teams) {
             return $relation;
         }
 
-        $teamField = config('permission.table_names.roles').'.'.app(PermissionRegistrar::class)->teamsKey;
+        $teamField = config('permission.table_names.roles').'.'.$teamsKey;
 
-        return $relation->wherePivot(app(PermissionRegistrar::class)->teamsKey, getPermissionsTeamId())
+        return $relation->wherePivot($teamsKey, getPermissionsTeamId())
             ->where(fn ($q) => $q->whereNull($teamField)->orWhere($teamField, getPermissionsTeamId()));
     }
 
