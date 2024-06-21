@@ -233,12 +233,14 @@ trait HasRoles
 
             return $this->roles
                 ->when($guard, fn ($q) => $q->where('guard_name', $guard))
-                ->contains(function ($role) use ($roles) {
-                    if ($role->name instanceof \BackedEnum) {
-                        return $role->name->value == $roles;
+                ->pluck('name')
+                ->contains(function ($name) use ($roles) {
+                    /** @var string|\BackedEnum $name */
+                    if ($name instanceof \BackedEnum) {
+                        return $name->value == $roles;
                     }
 
-                    return $role->name == $roles;
+                    return $name == $roles;
                 });
         }
 

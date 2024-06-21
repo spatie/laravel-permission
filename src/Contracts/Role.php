@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property string|null $guard_name
  *
  * @mixin \Spatie\Permission\Models\Role
+ * @phpstan-require-extends \Spatie\Permission\Models\Role
  */
 interface Role
 {
