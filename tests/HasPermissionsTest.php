@@ -636,7 +636,7 @@ class HasPermissionsTest extends TestCase
         $user = new User(['email' => 'test@user.com']);
         $user->syncPermissions('edit-articles');
         $user->save();
-        $user->save(); // test save same model twice 
+        $user->save(); // test save same model twice
 
         $this->assertTrue($user->hasPermissionTo('edit-articles'));
 
