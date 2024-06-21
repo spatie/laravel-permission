@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 6.8.0 - 2024-06-21
+
+### What's Changed
+
+* Fix can't save the same model twice by @erikn69 in https://github.com/spatie/laravel-permission/pull/2658
+* Fix phpstan from #2616 by @erikn69 in https://github.com/spatie/laravel-permission/pull/2685
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/6.7.0...6.8.0
+
 ## 6.7.0 - 2024-04-19
 
 ### What's Changed
@@ -817,6 +826,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -864,6 +874,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
