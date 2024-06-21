@@ -341,6 +341,7 @@ class HasRolesTest extends TestCase
         $user = new User(['email' => 'test@user.com']);
         $user->syncRoles([$this->testUserRole]);
         $user->save();
+        $user->save(); // test save same model twice 
 
         $this->assertTrue($user->hasRole($this->testUserRole));
 
