@@ -44,7 +44,7 @@ interface Role
     /**
      * Determine if the user may perform the given permission.
      *
-     * @param  string|\Spatie\Permission\Contracts\Permission  $permission
+     * @param  string|int|\Spatie\Permission\Contracts\Permission|\BackedEnum  $permission
      */
     public function hasPermissionTo($permission, ?string $guardName): bool;
 }
