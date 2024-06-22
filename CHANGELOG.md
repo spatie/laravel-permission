@@ -2,6 +2,23 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 6.9.0 - 2024-06-22
+
+### What's Changed
+
+* Use `->withPivot()` for teamed relationships (allows `getPivotColumns()`) by @juliangums in https://github.com/spatie/laravel-permission/pull/2679
+* Update docblock on `$role->hasPermissionTo()` to include `BackedEnum` by @drbyte co-authored by @SanderMuller
+* [Docs] Clarify that `$guard_name` can be an array by @angelej in https://github.com/spatie/laravel-permission/pull/2659
+* Fix misc typos in changelog by @szepeviktor in https://github.com/spatie/laravel-permission/pull/2686
+
+### New Contributors
+
+* @angelej made their first contribution in https://github.com/spatie/laravel-permission/pull/2659
+* @SanderMuller made their first contribution in #2676
+* @szepeviktor made their first contribution in https://github.com/spatie/laravel-permission/pull/2686
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/6.8.0...6.9.0
+
 ## 6.8.0 - 2024-06-21
 
 ### What's Changed
@@ -827,6 +844,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -874,6 +892,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
