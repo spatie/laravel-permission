@@ -26,7 +26,7 @@ interface Role
      *
      * @throws \Spatie\Permission\Exceptions\RoleDoesNotExist
      */
-    public static function findByName(string $name, ?string $guardName): self;
+    public static function findByName(string $name, ?string $guardName = null): self;
 
     /**
      * Find a role by its id and guard name.
@@ -34,17 +34,17 @@ interface Role
      *
      * @throws \Spatie\Permission\Exceptions\RoleDoesNotExist
      */
-    public static function findById(int|string $id, ?string $guardName): self;
+    public static function findById(int|string $id, ?string $guardName = null): self;
 
     /**
      * Find or create a role by its name and guard name.
      */
-    public static function findOrCreate(string $name, ?string $guardName): self;
+    public static function findOrCreate(string $name, ?string $guardName = null): self;
 
     /**
      * Determine if the user may perform the given permission.
      *
      * @param  string|int|\Spatie\Permission\Contracts\Permission|\BackedEnum  $permission
      */
-    public function hasPermissionTo($permission, ?string $guardName): bool;
+    public function hasPermissionTo($permission, ?string $guardName = null): bool;
 }
