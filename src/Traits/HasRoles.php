@@ -59,9 +59,11 @@ trait HasRoles
             return $relation;
         }
 
-        $teamField = config('permission.table_names.roles').'.'.app(PermissionRegistrar::class)->teamsKey;
+        $teamsKey = app(PermissionRegistrar::class)->teamsKey;
+        $relation->withPivot($teamsKey);
+        $teamField = config('permission.table_names.roles').'.'.$teamsKey;
 
-        return $relation->wherePivot(app(PermissionRegistrar::class)->teamsKey, getPermissionsTeamId())
+        return $relation->wherePivot($teamsKey, getPermissionsTeamId())
             ->where(fn ($q) => $q->whereNull($teamField)->orWhere($teamField, getPermissionsTeamId()));
     }
 
@@ -159,14 +161,16 @@ trait HasRoles
             $model->unsetRelation('roles');
         } else {
             $class = \get_class($model);
+            $saved = false;
 
             $class::saved(
-                function ($object) use ($roles, $model, $teamPivot) {
-                    if ($model->getKey() != $object->getKey()) {
+                function ($object) use ($roles, $model, $teamPivot, &$saved) {
+                    if ($saved || $model->getKey() != $object->getKey()) {
                         return;
                     }
                     $model->roles()->attach($roles, $teamPivot);
                     $model->unsetRelation('roles');
+                    $saved = true;
                 }
             );
         }
@@ -231,12 +235,14 @@ trait HasRoles
 
             return $this->roles
                 ->when($guard, fn ($q) => $q->where('guard_name', $guard))
-                ->contains(function ($role) use ($roles) {
-                    if ($role->name instanceof \BackedEnum) {
-                        return $role->name->value == $roles;
+                ->pluck('name')
+                ->contains(function ($name) use ($roles) {
+                    /** @var string|\BackedEnum $name */
+                    if ($name instanceof \BackedEnum) {
+                        return $name->value == $roles;
                     }
 
-                    return $role->name == $roles;
+                    return $name == $roles;
                 });
         }
 
