@@ -58,7 +58,7 @@ trait HasRoles
         if (! app(PermissionRegistrar::class)->teams) {
             return $relation;
         }
-        
+
         $teamsKey = app(PermissionRegistrar::class)->teamsKey;
         $relation->withPivot($teamsKey);
         $teamField = config('permission.table_names.roles').'.'.$teamsKey;
