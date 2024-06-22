@@ -25,7 +25,7 @@ All notable changes to `laravel-permission` will be documented in this file
 
 * Roles: Support for casting role names to enums by @gajosadrian in https://github.com/spatie/laravel-permission/pull/2616
 * Fix permission:show UUID error #2581 by @drbyte in https://github.com/spatie/laravel-permission/pull/2582
-* Cover WilcardPermission instance verification based on its own guard (Allow hasAllPermissions and hasAnyPermission to run on custom guard for WildcardPermission) by @AlexandreBellas in https://github.com/spatie/laravel-permission/pull/2608
+* Cover WildcardPermission instance verification based on its own guard (Allow hasAllPermissions and hasAnyPermission to run on custom guard for WildcardPermission) by @AlexandreBellas in https://github.com/spatie/laravel-permission/pull/2608
 * Register Laravel "About" details by @drbyte in https://github.com/spatie/laravel-permission/pull/2584
 
 ### New Contributors
@@ -538,7 +538,7 @@ Just a maintenance release.
 
 ## 5.2.0 - 2021-10-28
 
-- [V5] Fix detaching on all teams intstead of only current #1888 by @erikn69 in https://github.com/spatie/laravel-permission/pull/1890
+- [V5] Fix detaching on all teams instead of only current #1888 by @erikn69 in https://github.com/spatie/laravel-permission/pull/1890
 - [V5] Add uuid compatibility support on teams by @erikn69 in https://github.com/spatie/laravel-permission/pull/1857
 - Adds setRoleClass method to PermissionRegistrar by @timschwartz in https://github.com/spatie/laravel-permission/pull/1867
 - Load permissions for preventLazyLoading by @bahramsadin in https://github.com/spatie/laravel-permission/pull/1884
@@ -1205,7 +1205,7 @@ BEST NOT TO USE v2.7.7 if you've changed tablenames in the config file.
 
 ** this version does not work in Laravel 5.1, please upgrade to version 1.5.1 of this package
 
-- allowed `givePermissonTo` to accept multiple permissions
+- allowed `givePermissionTo` to accept multiple permissions
 - allowed `assignRole` to accept multiple roles
 - added `syncPermissions`-method
 - added `syncRoles`-method
