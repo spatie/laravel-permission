@@ -31,6 +31,28 @@ class HasRolesWithCustomModelsTest extends HasRolesTest
     }
 
     /** @test */
+    public function it_can_scope_users_using_a_int()
+    {
+        // Skipped because custom model uses uuid,
+        // replacement "it_can_scope_users_using_a_uuid"
+        $this->assertTrue(true);
+    }
+
+    /** @test */
+    public function it_can_scope_users_using_a_string_int()
+    {
+        // Skipped because custom model uses uuid
+        $this->assertTrue(true);
+    }
+
+    /** @test */
+    public function it_can_assign_and_remove_a_role_using_different_datatypes()
+    {
+        // Skipped because custom model uses uuid
+        $this->assertTrue(true);
+    }
+
+    /** @test */
     public function it_doesnt_detach_permissions_when_soft_deleting()
     {
         $this->testUserRole->givePermissionTo($this->testUserPermission);
