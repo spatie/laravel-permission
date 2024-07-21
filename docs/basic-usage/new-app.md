@@ -130,7 +130,7 @@ php artisan migrate:fresh --seed --seeder=PermissionsDemoSeeder
 Super-Admins are a common feature. The following approach allows that when your Super-Admin user is logged in, all permission-checks in your app which call `can()` or `@can()` will return true.
 
 - Create a role named `Super-Admin`. (Or whatever name you wish; but use it consistently just like you must with any role name.)
-- Add a Gate::before check in your `AuthServiceProvider`:
+- Add a Gate::before check in your `AuthServiceProvider` (or `AppServiceProvider` since Laravel 11):
 
 ```diff
 + use Illuminate\Support\Facades\Gate;
