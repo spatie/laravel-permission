@@ -49,23 +49,23 @@ class PostPolicy
 
     public function update(User $user, Post $post)
     {
-        if ($user->can('edit own posts')) {
-            return $user->id == $post->user_id;
-        }
-
         if ($user->can('edit all posts')) {
             return true;
+        }
+
+        if ($user->can('edit own posts')) {
+            return $user->id == $post->user_id;
         }
     }
 
     public function delete(User $user, Post $post)
     {
-        if ($user->can('delete own posts')) {
-            return $user->id == $post->user_id;
-        }
-
         if ($user->can('delete any post')) {
             return true;
+        }
+
+        if ($user->can('delete own posts')) {
+            return $user->id == $post->user_id;
         }
     }
 }
