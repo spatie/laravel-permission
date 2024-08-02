@@ -57,12 +57,20 @@ class Permission extends Model implements PermissionContract
      */
     public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(
+        $relation = $this->belongsToMany(
             config('permission.models.role'),
             config('permission.table_names.role_has_permissions'),
             app(PermissionRegistrar::class)->pivotPermission,
             app(PermissionRegistrar::class)->pivotRole
         );
+
+        if (! app(PermissionRegistrar::class)->teams) {
+            return $relation;
+        }
+
+        $teamField = config('permission.table_names.roles').'.'.app(PermissionRegistrar::class)->teamsKey;
+
+        return $relation->whereNull($teamField)->orWhere($teamField, getPermissionsTeamId());
     }
 
     /**
