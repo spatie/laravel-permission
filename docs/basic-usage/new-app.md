@@ -100,7 +100,7 @@ class PermissionsDemoSeeder extends Seeder
         // create demo users
         $user = \App\Models\User::factory()->create([
             'name' => 'Example User',
-            'email' => 'test@example.com',
+            'email' => 'tester@example.com',
         ]);
         $user->assignRole($role1);
 
