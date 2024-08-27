@@ -7,7 +7,7 @@ weight: 2
 
 You may discover that it is best to flush this package's cache **BEFORE seeding, to avoid cache conflict errors**.
 
-And if you use the `WithoutModelEvents` trait in your seeders, flush it **AFTER seeding as well**.
+And if you use the `WithoutModelEvents` trait in your seeders, flush it **AFTER creating any roles/permissions as well, before assigning or granting them.**.
 
 ```php
 // reset cached roles and permissions
@@ -39,6 +39,10 @@ class RolesAndPermissionsSeeder extends Seeder
         Permission::create(['name' => 'delete articles']);
         Permission::create(['name' => 'publish articles']);
         Permission::create(['name' => 'unpublish articles']);
+
+        // update cache to know about the newly created permissions (required if using WithoutModelEvents in seeders)
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
 
         // create roles and assign created permissions
 
