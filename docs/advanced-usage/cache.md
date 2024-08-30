@@ -48,6 +48,8 @@ php artisan permission:cache-reset
 
 ## Cache Configuration Settings
 
+This package allows you to customize cache-related operations via its config file. In most cases the defaults are fine; however, in a multitenancy situation you may wish to do some cache-prefix overrides when switching tenants. See below for more details.
+
 ### Cache Expiration Time
 
 The default cache `expiration_time` is `24 hours`.
@@ -82,10 +84,15 @@ Setting `'cache.store' => 'array'` in `config/permission.php` will effectively d
 Alternatively, in development mode you can bypass ALL of Laravel's caching between visits by setting `CACHE_DRIVER=array` in `.env`. You can see an example of this in the default `phpunit.xml` file that comes with a new Laravel install. Of course, don't do this in production though!
 
 
-## File cache driver
+## File cache Store
 
 This situation is not specific to this package, but is mentioned here due to the common question being asked.
 
-If you are using the `File` cache driver and run into problems clearing the cache, it is most likely because your filesystem's permissions are preventing the PHP CLI from altering the cache files because the PHP-FPM process is running as a different user. 
+If you are using the `File` cache Store and run into problems clearing the cache, it is most likely because your filesystem's permissions are preventing the PHP CLI from altering the cache files because the PHP-FPM process is running as a different user. 
 
 Work with your server administrator to fix filesystem ownership on your cache files.
+
+## Database cache Store
+
+TIP: If you have `CACHE_STORE=database` set in your `.env`, remember that [you must install Laravel's cache tables via a migration before performing any cache operations](https://laravel.com/docs/cache#prerequisites-database). If you fail to install those migrations, you'll run into errors like `Call to a member function perform() on null` when the cache store attempts to purge or update the cache. This package does strategic cache resets in various places, so may trigger that error if your app's cache dependencies aren't set up.
+
