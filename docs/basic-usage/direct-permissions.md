@@ -13,6 +13,8 @@ HOWEVER, If you have reason to directly assign individual permissions to specifi
 
 ## Direct Permissions to Users
 
+### Giving/Revoking direct permissions
+
 A permission can be given to any user:
 
 ```php
@@ -36,6 +38,15 @@ Or revoke & add new permissions in one go:
 ```php
 $user->syncPermissions(['edit articles', 'delete articles']);
 ```
+
+## Checking Direct Permissions
+Like all permissions assigned via roles, you can check if a user has a permission by using Laravel's default `can` function. This will also allow you to use Super-Admin features provided by Laravel's Gate:
+
+```php
+$user->can('edit articles');
+```
+
+NOTE: The following `hasPermissionTo`, `hasAnyPermission`, `hasAllPermissions` functions do not support Super-Admin functionality. Use `can`, `canAny`, `canAll` instead.
 
 You can check if a user has a permission:
 
@@ -67,10 +78,4 @@ You may also pass integers to lookup by permission id
 
 ```php
 $user->hasAnyPermission(['edit articles', 1, 5]);
-```
-
-Like all permissions assigned via roles, you can check if a user has a permission by using Laravel's default `can` function:
-
-```php
-$user->can('edit articles');
 ```
