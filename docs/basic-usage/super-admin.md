@@ -7,6 +7,8 @@ We strongly recommend that a Super-Admin be handled by setting a global `Gate::b
 
 Then you can implement the best-practice of primarily using permission-based controls (@can and $user->can, etc) throughout your app, without always having to check for "is this a super-admin" everywhere. **Best not to use role-checking (ie: `hasRole`) (except here in Gate/Policy rules) when you have Super Admin features like this.**
 
+NOTE: Using this approach, you can/must call Laravel's standard `can()`, `canAny()`, `cannot()`, etc checks for permission authorization to get a correct Super response. Calls which bypass Laravel's Gate (such as a direct call to `->hasPermissionTo()`) will not go through the Gate, and will not get the Super response.
+
 
 ## `Gate::before`
 If you want a "Super Admin" role to respond `true` to all permissions, without needing to assign all those permissions to a role, you can use [Laravel's `Gate::before()` method](https://laravel.com/docs/master/authorization#intercepting-gate-checks). For example:
