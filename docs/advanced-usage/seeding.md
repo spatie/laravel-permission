@@ -18,6 +18,10 @@ You can optionally flush the cache before seeding by using the `SetUp()` method 
 
 Or it can be done directly in a seeder class, as shown below.
 
+## Database Cache Store
+
+TIP: If you have `CACHE_STORE=database` set in your `.env`, remember that [you must install Laravel's cache tables via a migration before performing any cache operations](https://laravel.com/docs/cache#prerequisites-database). If you fail to install those migrations, you'll run into errors like `Call to a member function perform() on null` when the cache store attempts to purge or update the cache. This package does strategic cache resets in various places, so may trigger that error if your app's cache dependencies aren't set up.
+
 ## Roles/Permissions Seeder
 
 Here is a sample seeder, which first clears the cache, creates permissions and then assigns permissions to roles (the order of these steps is intentional):
