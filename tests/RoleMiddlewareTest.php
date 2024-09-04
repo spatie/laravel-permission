@@ -22,7 +22,7 @@ class RoleMiddlewareTest extends TestCase
     {
         parent::setUp();
 
-        $this->roleMiddleware = new RoleMiddleware();
+        $this->roleMiddleware = new RoleMiddleware;
     }
 
     /** @test */
@@ -238,8 +238,8 @@ class RoleMiddlewareTest extends TestCase
         $requiredRoles = [];
 
         try {
-            $this->roleMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
+            $this->roleMiddleware->handle(new Request, function () {
+                return (new Response)->setContent('<html></html>');
             }, 'some-role');
         } catch (UnauthorizedException $e) {
             $message = $e->getMessage();
@@ -259,8 +259,8 @@ class RoleMiddlewareTest extends TestCase
         $message = null;
 
         try {
-            $this->roleMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
+            $this->roleMiddleware->handle(new Request, function () {
+                return (new Response)->setContent('<html></html>');
             }, 'some-role');
         } catch (UnauthorizedException $e) {
             $message = $e->getMessage();
@@ -275,8 +275,8 @@ class RoleMiddlewareTest extends TestCase
         $class = null;
 
         try {
-            $this->roleMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
+            $this->roleMiddleware->handle(new Request, function () {
+                return (new Response)->setContent('<html></html>');
             }, 'testRole', 'xxx');
         } catch (InvalidArgumentException $e) {
             $class = get_class($e);

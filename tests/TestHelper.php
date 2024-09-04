@@ -16,8 +16,8 @@ class TestHelper
     public function testMiddleware($middleware, $parameter)
     {
         try {
-            return $middleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
+            return $middleware->handle(new Request, function () {
+                return (new Response)->setContent('<html></html>');
             }, $parameter)->status();
         } catch (HttpException $e) {
             return $e->getStatusCode();
