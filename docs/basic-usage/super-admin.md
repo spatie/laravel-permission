@@ -51,7 +51,7 @@ use App\Models\User; // could be any Authorizable model
 /**
  * Perform pre-authorization checks on the model.
  */
-public function before(User $user, string $ability): bool|null
+public function before(User $user, string $ability): ?bool
 {
     if ($user->hasRole('Super Admin')) {
         return true;
