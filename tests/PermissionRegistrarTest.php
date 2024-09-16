@@ -10,7 +10,7 @@ use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Tests\TestModels\Permission as TestPermission;
 use Spatie\Permission\Tests\TestModels\Role as TestRole;
 
-class PermissionRegistarTest extends TestCase
+class PermissionRegistrarTest extends TestCase
 {
     /** @test */
     public function it_can_clear_loaded_permissions_collection()
