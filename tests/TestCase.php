@@ -292,7 +292,7 @@ abstract class TestCase extends Orchestra
 
         try {
             return $middleware->handle($request, function () {
-                return (new Response())->setContent('<html></html>');
+                return (new Response)->setContent('<html></html>');
             }, $permission, $guard)->status();
         } catch (UnauthorizedException $e) {
             return $e->getStatusCode();
@@ -312,7 +312,7 @@ abstract class TestCase extends Orchestra
     public function getRouteResponse()
     {
         return function () {
-            return (new Response())->setContent('<html></html>');
+            return (new Response)->setContent('<html></html>');
         };
     }
 

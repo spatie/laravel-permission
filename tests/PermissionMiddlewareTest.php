@@ -24,7 +24,7 @@ class PermissionMiddlewareTest extends TestCase
     {
         parent::setUp();
 
-        $this->permissionMiddleware = new PermissionMiddleware();
+        $this->permissionMiddleware = new PermissionMiddleware;
     }
 
     /** @test */
@@ -305,8 +305,8 @@ class PermissionMiddlewareTest extends TestCase
         $requiredPermissions = [];
 
         try {
-            $this->permissionMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
+            $this->permissionMiddleware->handle(new Request, function () {
+                return (new Response)->setContent('<html></html>');
             }, 'some-permission');
         } catch (UnauthorizedException $e) {
             $message = $e->getMessage();
@@ -326,8 +326,8 @@ class PermissionMiddlewareTest extends TestCase
         $message = null;
 
         try {
-            $this->permissionMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
+            $this->permissionMiddleware->handle(new Request, function () {
+                return (new Response)->setContent('<html></html>');
             }, 'some-permission');
         } catch (UnauthorizedException $e) {
             $message = $e->getMessage();
@@ -342,8 +342,8 @@ class PermissionMiddlewareTest extends TestCase
         $class = null;
 
         try {
-            $this->permissionMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
+            $this->permissionMiddleware->handle(new Request, function () {
+                return (new Response)->setContent('<html></html>');
             }, 'edit-articles', 'xxx');
         } catch (InvalidArgumentException $e) {
             $class = get_class($e);

@@ -190,7 +190,7 @@ trait HasPermissions
         }
 
         if (! $permission instanceof Permission) {
-            throw new PermissionDoesNotExist();
+            throw new PermissionDoesNotExist;
         }
 
         return $permission;

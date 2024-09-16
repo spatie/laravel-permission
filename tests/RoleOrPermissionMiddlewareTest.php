@@ -23,7 +23,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     {
         parent::setUp();
 
-        $this->roleOrPermissionMiddleware = new RoleOrPermissionMiddleware();
+        $this->roleOrPermissionMiddleware = new RoleOrPermissionMiddleware;
     }
 
     /** @test */
@@ -177,8 +177,8 @@ class RoleOrPermissionMiddlewareTest extends TestCase
         $class = null;
 
         try {
-            $this->roleOrPermissionMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
+            $this->roleOrPermissionMiddleware->handle(new Request, function () {
+                return (new Response)->setContent('<html></html>');
             }, 'testRole', 'xxx');
         } catch (InvalidArgumentException $e) {
             $class = get_class($e);
@@ -242,8 +242,8 @@ class RoleOrPermissionMiddlewareTest extends TestCase
         $requiredRolesOrPermissions = [];
 
         try {
-            $this->roleOrPermissionMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
+            $this->roleOrPermissionMiddleware->handle(new Request, function () {
+                return (new Response)->setContent('<html></html>');
             }, 'some-permission|some-role');
         } catch (UnauthorizedException $e) {
             $message = $e->getMessage();
@@ -264,8 +264,8 @@ class RoleOrPermissionMiddlewareTest extends TestCase
         $message = null;
 
         try {
-            $this->roleOrPermissionMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
+            $this->roleOrPermissionMiddleware->handle(new Request, function () {
+                return (new Response)->setContent('<html></html>');
             }, 'some-permission|some-role');
         } catch (UnauthorizedException $e) {
             $message = $e->getMessage();

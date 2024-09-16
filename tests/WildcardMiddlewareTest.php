@@ -23,11 +23,11 @@ class WildcardMiddlewareTest extends TestCase
     {
         parent::setUp();
 
-        $this->roleMiddleware = new RoleMiddleware();
+        $this->roleMiddleware = new RoleMiddleware;
 
-        $this->permissionMiddleware = new PermissionMiddleware();
+        $this->permissionMiddleware = new PermissionMiddleware;
 
-        $this->roleOrPermissionMiddleware = new RoleOrPermissionMiddleware();
+        $this->roleOrPermissionMiddleware = new RoleOrPermissionMiddleware;
 
         app('config')->set('permission.enable_wildcard_permission', true);
     }
@@ -146,8 +146,8 @@ class WildcardMiddlewareTest extends TestCase
         $requiredPermissions = [];
 
         try {
-            $this->permissionMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
+            $this->permissionMiddleware->handle(new Request, function () {
+                return (new Response)->setContent('<html></html>');
             }, 'permission.some');
         } catch (UnauthorizedException $e) {
             $requiredPermissions = $e->getRequiredPermissions();
