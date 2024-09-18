@@ -18,7 +18,7 @@ class CacheReset extends Command
 
         if ($permissionRegistrar->forgetCachedPermissions()) {
             $this->info('Permission cache flushed.');
-        } else if ($cacheExists) {
+        } elseif ($cacheExists) {
             $this->error('Unable to flush cache.');
         }
     }
