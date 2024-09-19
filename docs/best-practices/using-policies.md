@@ -22,7 +22,7 @@ class PostPolicy
 {
     use HandlesAuthorization;
 
-    public function view(?User $user, Post $post)
+    public function view(?User $user, Post $post): bool
     {
         if ($post->published) {
             return true;
@@ -42,12 +42,12 @@ class PostPolicy
         return $user->id == $post->user_id;
     }
 
-    public function create(User $user)
+    public function create(User $user): bool
     {
         return ($user->can('create posts'));
     }
 
-    public function update(User $user, Post $post)
+    public function update(User $user, Post $post): bool
     {
         if ($user->can('edit all posts')) {
             return true;
@@ -58,7 +58,7 @@ class PostPolicy
         }
     }
 
-    public function delete(User $user, Post $post)
+    public function delete(User $user, Post $post): bool
     {
         if ($user->can('delete any post')) {
             return true;
