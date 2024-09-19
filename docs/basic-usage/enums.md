@@ -47,7 +47,7 @@ enum RolesEnum: string
 
 ## Creating Roles/Permissions using Enums
 
-When creating roles/permissions, you cannot pass a Enum name directly, because Eloquent expects a string for the name.
+When **creating** roles/permissions, you cannot pass an Enum name directly, because Eloquent expects a string for the name.
 
 You must manually convert the name to its value in order to pass the correct string to Eloquent for the role/permission name.
 
@@ -62,7 +62,7 @@ Same with creating Permissions.
 
 In your application code, when checking for authorization using features of this package, you can use `MyEnum::NAME` directly in most cases, without passing `->value` to convert to a string.
 
-There will be times where you will need to manually fallback to adding `->value` (eg: `MyEnum::NAME->value`) when using features that aren't aware of Enum support. This will occur when you need to pass `string` values instead of an `Enum`, such as when interacting with Laravel's Gate via the `can()` methods/helpers (eg: `can`, `canAny`, etc).
+There may occasionally be times where you will need to manually fallback to adding `->value` (eg: `MyEnum::NAME->value`) when using features that aren't aware of Enum support, such as when you need to pass `string` values instead of an `Enum` to a function that doesn't recognize Enums (Prior to Laravel v11.23.0 the framework didn't support Enums when interacting with Gate via the `can()` methods/helpers (eg: `can`, `canAny`, etc)).
 
 Examples:
 ```php
@@ -70,7 +70,7 @@ Examples:
 $user->hasPermissionTo(PermissionsEnum::VIEWPOSTS);
 $user->hasPermissionTo(PermissionsEnum::VIEWPOSTS->value);
 
-// when calling Gate features, such as Model Policies, etc
+// when calling Gate features, such as Model Policies, etc, prior to Laravel v11.23.0
 $user->can(PermissionsEnum::VIEWPOSTS->value);
 $model->can(PermissionsEnum::VIEWPOSTS->value);
 
