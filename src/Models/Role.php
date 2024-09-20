@@ -67,7 +67,7 @@ class Role extends Model implements RoleContract
     public function permissions(): BelongsToMany
     {
         return $this->belongsToMany(
-            config('permission.models.permission'),
+            $this->getPermissionClass(),
             config('permission.table_names.role_has_permissions'),
             app(PermissionRegistrar::class)->pivotRole,
             app(PermissionRegistrar::class)->pivotPermission
