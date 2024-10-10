@@ -39,7 +39,7 @@ In Laravel 9 and 10 you can add them in `app/Http/Kernel.php`:
 ```php
 // Laravel 9 uses $routeMiddleware = [
 //protected $routeMiddleware = [
-// Laravel 10+ uses $middlewareAliases = [
+// Laravel 10 uses $middlewareAliases = [
 protected $middlewareAliases = [
     // ...
     'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
@@ -48,11 +48,18 @@ protected $middlewareAliases = [
 ];
 ```
 
+In Laravel 11 you can add them in `bootstrap/app.php` inside the `->withMiddleware` section:
+
+```php
+$middleware->alias([
+            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+        ]);
+```
+
 ### Middleware Priority
 If your app is triggering *404 Not Found* responses when a *403 Not Authorized* response might be expected, it might be a middleware priority clash. Explore reordering priorities so that this package's middleware runs before Laravel's `SubstituteBindings` middleware. (See [Middleware docs](https://laravel.com/docs/master/middleware#sorting-middleware) ). 
-
-In Laravel 11 you could explore `$middleware->prependToGroup()` instead. See the Laravel Documentation for details.
-
 
 ## Using Middleware in Routes and Controllers
 
