@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Event;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Events\PermissionAttached;
+use Spatie\Permission\Events\PermissionDetached;
 use Spatie\Permission\Events\RoleAttached;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
@@ -778,6 +779,20 @@ class HasPermissionsTest extends TestCase
 
         Event::assertDispatched(PermissionAttached::class, function ($event) {
             return $event->model instanceof User && $event->model->hasPermissionTo('edit-news');
+        });
+    }
+
+    /** @test */
+    public function it_fires_an_event_when_a_permission_is_removed()
+    {
+        Event::fake();
+
+        $this->testUser->givePermissionTo('edit-news');
+
+        $this->testUser->revokePermissionTo('edit-news');
+
+        Event::assertDispatched(PermissionDetached::class, function ($event) {
+            return $event->model instanceof User && !$event->model->hasPermissionTo('edit-news');
         });
     }
 }
