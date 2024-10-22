@@ -3,8 +3,11 @@
 namespace Spatie\Permission\Tests;
 
 use DB;
+use Illuminate\Support\Facades\Event;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
+use Spatie\Permission\Events\PermissionAttached;
+use Spatie\Permission\Events\RoleAttached;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Tests\TestModels\SoftDeletingUser;
@@ -764,5 +767,17 @@ class HasPermissionsTest extends TestCase
         $response->assertJson([
             'status' => false,
         ]);
+    }
+
+    /** @test */
+    public function it_fires_an_event_when_a_permission_is_added()
+    {
+        Event::fake();
+
+        $this->testUser->givePermissionTo('edit-news');
+
+        Event::assertDispatched(PermissionAttached::class, function ($event) {
+            return $event->model instanceof User && $event->model->hasPermissionTo('edit-news');
+        });
     }
 }

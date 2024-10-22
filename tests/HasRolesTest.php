@@ -3,7 +3,9 @@
 namespace Spatie\Permission\Tests;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Spatie\Permission\Contracts\Role;
+use Spatie\Permission\Events\RoleAttached;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Tests\TestModels\Admin;
@@ -855,5 +857,17 @@ class HasRolesTest extends TestCase
         $user = SoftDeletingUser::withTrashed()->find($user->id);
 
         $this->assertTrue($user->hasRole('testRole'));
+    }
+
+    /** @test */
+    public function it_fires_an_event_when_a_role_is_added()
+    {
+        Event::fake();
+
+        $this->testUser->assignRole('testRole');
+
+        Event::assertDispatched(RoleAttached::class, function ($event) {
+            return $event->model instanceof User && $event->model->hasRole('testRole');
+        });
     }
 }
