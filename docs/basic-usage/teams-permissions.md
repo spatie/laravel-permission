@@ -56,6 +56,34 @@ class TeamsPermission
 
 **YOU MUST ALSO** set [the `$middlewarePriority` array](https://laravel.com/docs/master/middleware#sorting-middleware) in `app/Http/Kernel.php` to include your custom middleware before the `SubstituteBindings` middleware, else you may get *404 Not Found* responses when a *403 Not Authorized* response might be expected.
 
+For example, in Laravel 11.27+ you can add something similiar to the `boot` method of your `AppServiceProvider`.
+
+```php
+use App\Http\Middleware\YourCustomMiddlewareClass;
+use Illuminate\Foundation\Http\Kernel;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Support\ServiceProvider;
+
+class AppServiceProvider extends ServiceProvider
+{
+    public function register(): void
+    {
+        //
+    }
+
+    public function boot(): void
+    {
+        /** @var Kernel $kernel */
+        $kernel = app()->make(Kernel::class);
+
+        $kernel->addToMiddlewarePriorityBefore(
+            SubstituteBindings::class,
+            YourCustomMiddlewareClass::class,
+        );
+    }
+}
+```
+
 ## Roles Creating
 
 When creating a role you can pass the `team_id` as an optional parameter
