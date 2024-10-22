@@ -44,7 +44,7 @@ class PostPolicy
 
     public function create(User $user): bool
     {
-        return ($user->can('create posts'));
+        return $user->can('create posts');
     }
 
     public function update(User $user, Post $post): bool
