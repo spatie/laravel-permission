@@ -4,28 +4,9 @@ if (! function_exists('getModelForGuard')) {
     /**
      * @return string|null
      */
-    function getModelForGuard(string $guard)
+    function getModelForGuard(string $guard): ?string
     {
-        // Get the guard configuration
-        $guardConfig = config("auth.guards.{$guard}");
-        
-        // If the guard has a provider and the provider is defined
-        if (isset($guardConfig['provider'])) {
-            $provider = $guardConfig['provider'];
-            
-            // Check if the provider uses LDAP
-            $providerConfig = config("auth.providers.{$provider}");
-    
-            if (isset($providerConfig['driver']) && $providerConfig['driver'] === 'ldap') {
-                // Return the Eloquent model defined in the LDAP provider's database configuration
-                return $providerConfig['database']['model'] ?? null;
-            }
-    
-            // Otherwise, return the standard Eloquent model
-            return config("auth.providers.{$provider}.model");
-        }
-    
-        return null;
+        return Spatie\Permission\Guard::getModelForGuard($guard);
     }
 
 }
