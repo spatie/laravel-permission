@@ -6,10 +6,28 @@ if (! function_exists('getModelForGuard')) {
      */
     function getModelForGuard(string $guard)
     {
-        return collect(config('auth.guards'))
-            ->map(fn ($guard) => isset($guard['provider']) ? config("auth.providers.{$guard['provider']}.model") : null)
-            ->get($guard);
+        // Get the guard configuration
+        $guardConfig = config("auth.guards.{$guard}");
+        
+        // If the guard has a provider and the provider is defined
+        if (isset($guardConfig['provider'])) {
+            $provider = $guardConfig['provider'];
+            
+            // Check if the provider uses LDAP
+            $providerConfig = config("auth.providers.{$provider}");
+    
+            if (isset($providerConfig['driver']) && $providerConfig['driver'] === 'ldap') {
+                // Return the Eloquent model defined in the LDAP provider's database configuration
+                return $providerConfig['database']['model'] ?? null;
+            }
+    
+            // Otherwise, return the standard Eloquent model
+            return config("auth.providers.{$provider}.model");
+        }
+    
+        return null;
     }
+
 }
 
 if (! function_exists('setPermissionsTeamId')) {
