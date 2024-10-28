@@ -775,10 +775,17 @@ class HasPermissionsTest extends TestCase
     {
         Event::fake();
 
-        $this->testUser->givePermissionTo('edit-news');
+        $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
 
-        Event::assertDispatched(PermissionAttached::class, function ($event) {
-            return $event->model instanceof User && $event->model->hasPermissionTo('edit-news');
+        $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-news'])
+            ->pluck($this->testUserPermission->getKeyName())
+            ->toArray();
+
+        Event::assertDispatched(PermissionAttached::class, function ($event) use ($ids) {
+            return $event->model instanceof User
+                && $event->model->hasPermissionTo('edit-news')
+                && $event->model->hasPermissionTo('edit-articles')
+                && $ids === $event->permissionIds;
         });
     }
 
@@ -787,12 +794,17 @@ class HasPermissionsTest extends TestCase
     {
         Event::fake();
 
-        $this->testUser->givePermissionTo('edit-news');
+        $permissions = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-news'])->get();
 
-        $this->testUser->revokePermissionTo('edit-news');
+        $this->testUser->givePermissionTo($permissions);
 
-        Event::assertDispatched(PermissionDetached::class, function ($event) {
-            return $event->model instanceof User && !$event->model->hasPermissionTo('edit-news');
+        $this->testUser->revokePermissionTo($permissions);
+
+        Event::assertDispatched(PermissionDetached::class, function ($event) use ($permissions) {
+            return $event->model instanceof User
+                && !$event->model->hasPermissionTo('edit-news')
+                && !$event->model->hasPermissionTo('edit-articles')
+                && $event->permission === $permissions;
         });
     }
 }

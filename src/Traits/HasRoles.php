@@ -181,7 +181,7 @@ trait HasRoles
             $this->forgetCachedPermissions();
         }
 
-        event(new RoleAttached($this->getModel()));
+        event(new RoleAttached($this->getModel(), $roles));
 
         return $this;
     }
@@ -193,7 +193,9 @@ trait HasRoles
      */
     public function removeRole($role)
     {
-        $this->roles()->detach($this->getStoredRole($role));
+        $storedRole = $this->getStoredRole($role);
+
+        $this->roles()->detach($storedRole);
 
         $this->unsetRelation('roles');
 
@@ -201,7 +203,7 @@ trait HasRoles
             $this->forgetCachedPermissions();
         }
 
-        event(new RoleDetached($this->getModel()));
+        event(new RoleDetached($this->getModel(), $storedRole));
 
         return $this;
     }

@@ -15,6 +15,6 @@ class RoleAttached
     use InteractsWithSockets;
     use SerializesModels;
 
-    public function __construct(public Model $model)
+    public function __construct(public Model $model, public array $roleIds)
     {}
 }

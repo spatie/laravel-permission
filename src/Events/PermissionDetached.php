@@ -8,6 +8,8 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Collection;
+use Spatie\Permission\Contracts\Permission;
 
 class PermissionDetached
 {
@@ -15,6 +17,10 @@ class PermissionDetached
     use InteractsWithSockets;
     use SerializesModels;
 
-    public function __construct(public Model $model)
+    /**
+     * @param Model $model
+     * @param Permission|Permission[]|Collection $permission
+     */
+    public function __construct(public Model $model, public mixed $permission)
     {}
 }

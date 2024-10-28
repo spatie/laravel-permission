@@ -865,10 +865,17 @@ class HasRolesTest extends TestCase
     {
         Event::fake();
 
-        $this->testUser->assignRole('testRole');
+        $this->testUser->assignRole(['testRole', 'testRole2']);
 
-        Event::assertDispatched(RoleAttached::class, function ($event) {
-            return $event->model instanceof User && $event->model->hasRole('testRole');
+        $roleIds = app(Role::class)::whereIn('name', ['testRole', 'testRole2'])
+            ->pluck($this->testUserRole->getKeyName())
+            ->toArray();
+
+        Event::assertDispatched(RoleAttached::class, function ($event) use ($roleIds) {
+            return $event->model instanceof User
+                && $event->model->hasRole('testRole')
+                && $event->model->hasRole('testRole2')
+                && $event->roleIds === $roleIds;
         });
     }
 
@@ -882,7 +889,9 @@ class HasRolesTest extends TestCase
         $this->testUser->removeRole('testRole');
 
         Event::assertDispatched(RoleDetached::class, function ($event) {
-            return $event->model instanceof User && !$event->model->hasRole('testRole');
+            return $event->model instanceof User
+                && !$event->model->hasRole('testRole')
+                && $event->role->name === 'testRole';
         });
     }
 }

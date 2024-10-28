@@ -8,6 +8,7 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Spatie\Permission\Contracts\Role;
 
 class RoleDetached
 {
@@ -15,6 +16,6 @@ class RoleDetached
     use InteractsWithSockets;
     use SerializesModels;
 
-    public function __construct(public Model $model)
+    public function __construct(public Model $model, public Role $role)
     {}
 }
