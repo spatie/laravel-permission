@@ -360,7 +360,7 @@ class PermissionRegistrar
         $permissionInstance = new ($this->getPermissionClass())();
 
         return Collection::make(array_map(
-            fn ($item) => $permissionInstance->newInstance([], true)
+            fn ($item) => (clone $permissionInstance)
                 ->setRawAttributes($this->aliasedArray(array_diff_key($item, ['r' => 0])), true)
                 ->setRelation('roles', $this->getHydratedRoleCollection($item['r'] ?? [])),
             $this->permissions['permissions']
@@ -379,7 +379,7 @@ class PermissionRegistrar
         $roleInstance = new ($this->getRoleClass())();
 
         array_map(function ($item) use ($roleInstance) {
-            $role = $roleInstance->newInstance([], true)
+            $role = (clone $roleInstance)
                 ->setRawAttributes($this->aliasedArray($item), true);
             $this->cachedRoles[$role->getKey()] = $role;
         }, $this->permissions['roles']);
