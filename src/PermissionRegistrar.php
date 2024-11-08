@@ -349,7 +349,7 @@ class PermissionRegistrar
 
     private function getHydratedPermissionCollection(): Collection
     {
-        $permissionInstance = new ($this->getPermissionClass())();
+        $permissionInstance = (new ($this->getPermissionClass())())->newInstance([], true);
 
         return Collection::make(array_map(
             fn ($item) => (clone $permissionInstance)
@@ -368,7 +368,7 @@ class PermissionRegistrar
 
     private function hydrateRolesCache(): void
     {
-        $roleInstance = new ($this->getRoleClass())();
+        $roleInstance = (new ($this->getRoleClass())())->newInstance([], true);
 
         array_map(function ($item) use ($roleInstance) {
             $role = (clone $roleInstance)
