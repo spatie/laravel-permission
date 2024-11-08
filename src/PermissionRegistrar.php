@@ -199,14 +199,6 @@ class PermissionRegistrar
             $this->cacheKey, $this->cacheExpirationTime, fn () => $this->getSerializedPermissionsForCache()
         );
 
-        // fallback for old cache method, must be removed on next major version
-        if (! isset($this->permissions['alias'])) {
-            $this->forgetCachedPermissions();
-            $this->loadPermissions();
-
-            return;
-        }
-
         $this->alias = $this->permissions['alias'];
 
         $this->hydrateRolesCache();
