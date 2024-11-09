@@ -67,4 +67,15 @@ class PermissionTest extends TestCase
 
         $this->assertEquals($this->testUserPermission->id, $permission_by_id->id);
     }
+
+    /** @test */
+    public function it_can_delete_hydrated_permissions()
+    {
+        $this->reloadPermissions();
+
+        $permission = app(Permission::class)->findByName($this->testUserPermission->name);
+        $permission->delete();
+
+        $this->assertCount(0, app(Permission::class)->where($this->testUserPermission->getKeyName(), $this->testUserPermission->getKey())->get());
+    }
 }
