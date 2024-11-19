@@ -165,7 +165,7 @@ And edit `config/permission.php`
          */
 
 -        'permission' => Spatie\Permission\Models\Permission::class
-+        'permission' => App\Models\Permission::class,
++        'permission' => \App\Models\Permission::class,
 
         /*
          * When using the "HasRoles" trait from this package, we need to know which
@@ -177,7 +177,7 @@ And edit `config/permission.php`
          */
 
 -        'role' => Spatie\Permission\Models\Role::class,
-+        'role' => App\Models\Role::class,
++        'role' => \App\Models\Role::class,
 
     ],
 ```
