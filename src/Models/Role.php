@@ -3,7 +3,7 @@
 namespace Spatie\Permission\Models;
 
 use MongoDB\Laravel\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use MongoDB\Laravel\Relations\BelongsToMany;
 use Spatie\Permission\Contracts\Role as RoleContract;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
