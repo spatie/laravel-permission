@@ -3,7 +3,7 @@
 namespace Spatie\Permission;
 
 use Illuminate\Contracts\Auth\Access\Authorizable;
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
