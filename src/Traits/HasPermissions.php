@@ -3,7 +3,7 @@
 namespace Spatie\Permission\Traits;
 
 use MongoDB\Laravel\Eloquent\Builder;
-use MongoDB\Laravel\Relations\BelongsToMany;
+use MongoDB\Laravel\Relations\MorphToMany;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Permission;
@@ -75,7 +75,7 @@ trait HasPermissions
     /**
      * A model may have multiple direct permissions.
      */
-    public function permissions(): BelongsToMany
+    public function permissions(): MorphToMany
     {
         $relation = $this->morphToMany(
             config('permission.models.permission'),
