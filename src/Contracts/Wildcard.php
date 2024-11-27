@@ -2,7 +2,7 @@
 
 namespace Spatie\Permission\Contracts;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 interface Wildcard
 {
