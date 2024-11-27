@@ -474,7 +474,7 @@ trait HasPermissions
 
     public function getPermissionNames(): Collection
     {
-        return $this->permissions->pluck('name');
+        return $this->permissions->pluck('display_name');
     }
 
     /**
