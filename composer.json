@@ -10,9 +10,16 @@
         "roles",
         "acl",
         "rbac",
+        "mongodb",
         "security"
     ],
     "authors": [
+        {
+            "name": "Zethus Studio",
+            "email": "info@zethus-studio.ir",
+            "homepage": "zethus-studio.ir",
+            "role": "Developer"
+        },
         {
             "name": "Freek Van der Herten",
             "email": "freek@spatie.be",
@@ -26,7 +33,8 @@
         "illuminate/auth": "^8.12|^9.0|^10.0|^11.0",
         "illuminate/container": "^8.12|^9.0|^10.0|^11.0",
         "illuminate/contracts": "^8.12|^9.0|^10.0|^11.0",
-        "illuminate/database": "^8.12|^9.0|^10.0|^11.0"
+        "illuminate/database": "^8.12|^9.0|^10.0|^11.0",
+        "mongodb/laravel-mongodb": "^4.7"
     },
     "require-dev": {
         "larastan/larastan": "^1.0|^2.0",
