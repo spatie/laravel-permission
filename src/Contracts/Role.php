@@ -2,7 +2,7 @@
 
 namespace Spatie\Permission\Contracts;
 
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use MongoDB\Laravel\Relations\BelongsToMany;
 
 /**
  * @property int|string $id
