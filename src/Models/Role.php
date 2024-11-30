@@ -4,6 +4,7 @@ namespace Spatie\Permission\Models;
 
 use MongoDB\Laravel\Eloquent\Model;
 use MongoDB\Laravel\Relations\BelongsToMany;
+use MongoDB\Laravel\Relations\MorphToMany;
 use Spatie\Permission\Contracts\Role as RoleContract;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
@@ -77,7 +78,7 @@ class Role extends Model implements RoleContract
     /**
      * A role belongs to some users of the model associated with its guard.
      */
-    public function users(): BelongsToMany
+    public function users(): MorphToMany
     {
         return $this->morphedByMany(
             getModelForGuard($this->attributes['guard_name'] ?? config('auth.defaults.guard')),
