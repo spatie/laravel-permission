@@ -5,6 +5,7 @@ namespace Spatie\Permission\Models;
 use Illuminate\Database\Eloquent\Collection;
 use MongoDB\Laravel\Eloquent\Model;
 use MongoDB\Laravel\Relations\BelongsToMany;
+use MongoDB\Laravel\Relations\MorphToMany;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 use Spatie\Permission\Exceptions\PermissionAlreadyExists;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
@@ -68,7 +69,7 @@ class Permission extends Model implements PermissionContract
     /**
      * A permission belongs to some users of the model associated with its guard.
      */
-    public function users(): BelongsToMany
+    public function users(): MorphToMany
     {
         return $this->morphedByMany(
             getModelForGuard($this->attributes['guard_name'] ?? config('auth.defaults.guard')),
