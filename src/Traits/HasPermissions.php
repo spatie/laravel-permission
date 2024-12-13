@@ -323,7 +323,8 @@ trait HasPermissions
     {
         $permission = $this->filterPermission($permission);
 
-        return $this->permissions->contains($permission->getKeyName(), $permission->getKey());
+        return $this->loadMissing('permissions')->permissions
+            ->contains($permission->getKeyName(), $permission->getKey());
     }
 
     /**
@@ -348,7 +349,7 @@ trait HasPermissions
         /** @var Collection $permissions */
         $permissions = $this->permissions;
 
-        if (method_exists($this, 'roles')) {
+        if (!is_a($this, Permission::class)) {
             $permissions = $permissions->merge($this->getPermissionsViaRoles());
         }
 
