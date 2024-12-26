@@ -96,7 +96,7 @@ class MultipleGuardsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_honour_guard_name_function_on_model_for_overriding_guard_name_property()
+    public function it_can_honour_guardName_function_on_model_for_overriding_guard_name_property()
     {
         $user = Manager::create(['email' => 'manager@test.com']);
         $user->givePermissionTo(app(Permission::class)::create([

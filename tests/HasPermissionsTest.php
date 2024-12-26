@@ -257,7 +257,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_calling_has_permission_to_with_an_invalid_type()
+    public function it_throws_an_exception_when_calling_hasPermissionTo_with_an_invalid_type()
     {
         $user = User::create(['email' => 'user1@test.com']);
 
@@ -267,7 +267,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_calling_has_permission_to_with_null()
+    public function it_throws_an_exception_when_calling_hasPermissionTo_with_null()
     {
         $user = User::create(['email' => 'user1@test.com']);
 
@@ -277,7 +277,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_calling_has_direct_permission_with_an_invalid_type()
+    public function it_throws_an_exception_when_calling_hasDirectPermission_with_an_invalid_type()
     {
         $user = User::create(['email' => 'user1@test.com']);
 
@@ -287,7 +287,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_calling_has_direct_permission_with_null()
+    public function it_throws_an_exception_when_calling_hasDirectPermission_with_null()
     {
         $user = User::create(['email' => 'user1@test.com']);
 
@@ -658,7 +658,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function calling_give_permission_to_before_saving_object_doesnt_interfere_with_other_objects()
+    public function calling_givePermissionTo_before_saving_object_doesnt_interfere_with_other_objects()
     {
         $user = new User(['email' => 'test@user.com']);
         $user->givePermissionTo('edit-news');
@@ -680,7 +680,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function calling_sync_permissions_before_saving_object_doesnt_interfere_with_other_objects()
+    public function calling_syncPermissions_before_saving_object_doesnt_interfere_with_other_objects()
     {
         $user = new User(['email' => 'test@user.com']);
         $user->syncPermissions('edit-news');
