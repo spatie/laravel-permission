@@ -79,7 +79,7 @@ class WildcardRoleTest extends TestCase
     }
 
     /** @test */
-    public function it_creates_permission_object_with_findOrCreate_if_it_does_not_have_a_permission_object()
+    public function it_creates_permission_object_with_find_or_create_if_it_does_not_have_a_permission_object()
     {
         $permission = app(Permission::class)->findOrCreate('another-permission');
 

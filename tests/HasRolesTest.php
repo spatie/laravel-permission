@@ -363,7 +363,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function calling_syncRoles_before_saving_object_doesnt_interfere_with_other_objects()
+    public function calling_sync_roles_before_saving_object_doesnt_interfere_with_other_objects()
     {
         $user = new User(['email' => 'test@user.com']);
         $user->syncRoles('testRole');
@@ -385,7 +385,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function calling_assignRole_before_saving_object_doesnt_interfere_with_other_objects()
+    public function calling_assign_role_before_saving_object_doesnt_interfere_with_other_objects()
     {
         $user = new User(['email' => 'test@user.com']);
         $user->assignRole('testRole');
@@ -827,7 +827,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_if_an_unsupported_type_is_passed_to_hasRoles()
+    public function it_throws_an_exception_if_an_unsupported_type_is_passed_to_has_roles()
     {
         $this->expectException(\TypeError::class);
 

@@ -62,7 +62,7 @@ class RoleWithNestingTest extends TestCase
     /** @test
      * @dataProvider roles_list
      */
-    public function it_returns_correct_withCount_of_nested_roles($role_group, $index, $relation, $expectedCount)
+    public function it_returns_correct_with_count_of_nested_roles($role_group, $index, $relation, $expectedCount)
     {
         $role = $this->$role_group[$index];
         $count_field_name = sprintf('%s_count', $relation);
