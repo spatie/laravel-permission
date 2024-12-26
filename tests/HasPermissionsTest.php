@@ -765,4 +765,33 @@ class HasPermissionsTest extends TestCase
             'status' => false,
         ]);
     }
+
+    /** @test */
+    public function it_can_be_given_a_permission_on_role_when_lazy_loading_is_restricted()
+    {
+        try {
+            $testRole = app(Role::class)->with('permissions')->get()->first();
+
+            $testRole->givePermissionTo('edit-articles');
+
+            $this->assertTrue($testRole->hasPermissionTo('edit-articles'));
+        } catch (Exception $e) {
+            $this->fail('Lazy loading detected in the givePermissionTo method: ' . $e->getMessage());
+        }
+    }
+
+    /** @test */
+    public function it_can_be_given_a_permission_on_user_when_lazy_loading_is_restricted()
+    {
+        try {
+            User::create(['email' => 'other@user.com']);
+            $testUser = User::with('permissions')->get()->first();
+
+            $testUser->givePermissionTo('edit-articles');
+
+            $this->assertTrue($testUser->hasPermissionTo('edit-articles'));
+        } catch (Exception $e) {
+            $this->fail('Lazy loading detected in the givePermissionTo method: ' . $e->getMessage());
+        }
+    }
 }

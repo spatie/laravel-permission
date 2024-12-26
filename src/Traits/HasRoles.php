@@ -127,9 +127,6 @@ trait HasRoles
                 }
 
                 $role = $this->getStoredRole($role);
-                if (! $role instanceof Role) {
-                    return $array;
-                }
 
                 if (! in_array($role->getKey(), $array)) {
                     $this->ensureModelSharesGuard($role);
