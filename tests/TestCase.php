@@ -285,14 +285,14 @@ abstract class TestCase extends Orchestra
     ////// TEST HELPERS
     public function runMiddleware($middleware, $permission, $guard = null, bool $client = false)
     {
-        $request = new Request;
+        $request = new Request();
         if ($client) {
             $request->headers->set('Authorization', 'Bearer '.str()->random(30));
         }
 
         try {
             return $middleware->handle($request, function () {
-                return (new Response)->setContent('<html></html>');
+                return (new Response())->setContent('<html></html>');
             }, $permission, $guard)->status();
         } catch (UnauthorizedException $e) {
             return $e->getStatusCode();
@@ -312,7 +312,7 @@ abstract class TestCase extends Orchestra
     public function getRouteResponse()
     {
         return function () {
-            return (new Response)->setContent('<html></html>');
+            return (new Response())->setContent('<html></html>');
         };
     }
 

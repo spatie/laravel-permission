@@ -29,6 +29,7 @@
         "illuminate/database": "^8.12|^9.0|^10.0|^11.0"
     },
     "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.65",
         "larastan/larastan": "^1.0|^2.0",
         "laravel/passport": "^11.0|^12.0",
         "orchestra/testbench": "^6.23|^7.0|^8.0|^9.0",
@@ -55,7 +56,7 @@
     "extra": {
         "branch-alias": {
             "dev-main": "6.x-dev",
-            "dev-master": "6.x-dev"
+        "dev-master": "6.x-dev"
         },
         "laravel": {
             "providers": [
@@ -65,7 +66,7 @@
     },
     "scripts": {
         "test": "phpunit",
-        "format": "php-cs-fixer fix --allow-risky=yes",
+        "format": "php-cs-fixer fix --allow-risky=yes .",
         "analyse": "phpstan analyse"
     }
 }

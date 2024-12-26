@@ -831,7 +831,7 @@ class HasRolesTest extends TestCase
     {
         $this->expectException(\TypeError::class);
 
-        $this->testUser->hasRole(new class {});
+        $this->testUser->hasRole(new class () {});
     }
 
     /** @test */

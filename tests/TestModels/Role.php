@@ -15,7 +15,7 @@ class Role extends \Spatie\Permission\Models\Role
         'name',
     ];
 
-    const HIERARCHY_TABLE = 'roles_hierarchy';
+    public const HIERARCHY_TABLE = 'roles_hierarchy';
 
     /**
      * @return string|\BackedEnum
@@ -40,7 +40,8 @@ class Role extends \Spatie\Permission\Models\Role
             static::class,
             static::HIERARCHY_TABLE,
             'child_id',
-            'parent_id');
+            'parent_id'
+        );
     }
 
     /**
@@ -52,7 +53,8 @@ class Role extends \Spatie\Permission\Models\Role
             static::class,
             static::HIERARCHY_TABLE,
             'parent_id',
-            'child_id');
+            'child_id'
+        );
     }
 
     protected static function boot()

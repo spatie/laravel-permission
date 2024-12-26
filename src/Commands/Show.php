@@ -47,9 +47,10 @@ class Show extends Command
 
             $permissions = $permissionClass::whereGuardName($guard)->orderBy('name')->pluck('name', $permissionClass->getKeyName());
 
-            $body = $permissions->map(fn ($permission, $id) => $roles->map(
-                fn (array $role_data) => $role_data['permissions']->contains($id) ? ' ✔' : ' ·'
-            )->prepend($permission)
+            $body = $permissions->map(
+                fn ($permission, $id) => $roles->map(
+                    fn (array $role_data) => $role_data['permissions']->contains($id) ? ' ✔' : ' ·'
+                )->prepend($permission)
             );
 
             if ($teamsEnabled) {

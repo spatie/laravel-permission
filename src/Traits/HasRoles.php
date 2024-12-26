@@ -96,7 +96,9 @@ trait HasRoles
 
         $key = (new ($this->getRoleClass())())->getKeyName();
 
-        return $query->{! $without ? 'whereHas' : 'whereDoesntHave'}('roles', fn (Builder $subQuery) => $subQuery
+        return $query->{! $without ? 'whereHas' : 'whereDoesntHave'}(
+            'roles',
+            fn (Builder $subQuery) => $subQuery
             ->whereIn(config('permission.table_names.roles').".$key", \array_column($roles, $key))
         );
     }
@@ -362,7 +364,8 @@ trait HasRoles
             $roles = [$roles->name];
         }
 
-        $roles = collect()->make($roles)->map(fn ($role) => $role instanceof Role ? $role->name : $role
+        $roles = collect()->make($roles)->map(
+            fn ($role) => $role instanceof Role ? $role->name : $role
         );
 
         return $this->roles->count() == $roles->count() && $this->hasAllRoles($roles, $guard);
