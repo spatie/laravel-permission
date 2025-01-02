@@ -29,7 +29,7 @@ class Client extends BaseClient implements AuthorizableContract
     
     public function guardName()
     {
-        return 'api'
+        return 'api';
     }
 }
 ```
