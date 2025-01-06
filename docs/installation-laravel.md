@@ -36,14 +36,23 @@ Package Version | Laravel Version
         Spatie\Permission\PermissionServiceProvider::class,
     ];
     ```
+    
+    NOTE: If you are using laravel 11, then your providers will be located into `config/providers.php` file and you just need to add
 
-5. **You should publish** [the migration](https://github.com/spatie/laravel-permission/blob/main/database/migrations/create_permission_tables.php.stub) and the [`config/permission.php` config file](https://github.com/spatie/laravel-permission/blob/main/config/permission.php) with:
+   ```
+    return [
+        // ... other providers
+        Spatie\Permission\PermissionServiceProvider::class,
+    ];
+    ```
+
+6. **You should publish** [the migration](https://github.com/spatie/laravel-permission/blob/main/database/migrations/create_permission_tables.php.stub) and the [`config/permission.php` config file](https://github.com/spatie/laravel-permission/blob/main/config/permission.php) with:
 
     ```
     php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
     ```
 
-6. BEFORE RUNNING MIGRATIONS
+7. BEFORE RUNNING MIGRATIONS
 
    - **If you are using UUIDs**, see the Advanced section of the docs on UUID steps, before you continue. It explains some changes you may want to make to the migrations and config file before continuing. It also mentions important considerations after extending this package's models for UUID capability.
 
@@ -55,22 +64,22 @@ Package Version | Laravel Version
 
    - **If you are using CACHE_STORE=database**, be sure to [install Laravel's cache migration](https://laravel.com/docs/cache#prerequisites-database), else you will encounter cache errors.
 
-7. **Clear your config cache**. This package requires access to the `permission` config settings in order to run migrations. If you've been caching configurations locally, clear your config cache with either of these commands:
+8. **Clear your config cache**. This package requires access to the `permission` config settings in order to run migrations. If you've been caching configurations locally, clear your config cache with either of these commands:
 
         php artisan optimize:clear
         # or
         php artisan config:clear
 
-8. **Run the migrations**: After the config and migration have been published and configured, you can create the tables for this package by running:
+9. **Run the migrations**: After the config and migration have been published and configured, you can create the tables for this package by running:
 
         php artisan migrate
 
-9. **Add the necessary trait to your User model**: 
+10. **Add the necessary trait to your User model**: 
 
         // The User model requires this trait
         use HasRoles;
 
-10. Consult the **Basic Usage** section of the docs to get started using the features of this package.
+11. Consult the **Basic Usage** section of the docs to get started using the features of this package.
 
 .
 
