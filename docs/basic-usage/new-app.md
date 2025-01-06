@@ -160,7 +160,7 @@ If you are creating a demo app for reporting a bug or getting help with troubles
 
 If this is your first app with this package, you may want some quick permission examples to see it in action. If you've set up your app using the instructions above, the following examples will work in conjunction with the users and permissions created in the seeder.
 
-Three users were created: test@example.com, admin@example.com, superadmin@example.com and the password for each is "password".
+Three users were created: tester@example.com, admin@example.com, superadmin@example.com and the password for each is "password".
 
 `/resources/views/dashboard.php`
 ```diff
