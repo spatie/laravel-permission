@@ -35,7 +35,7 @@ class PermissionRegistrar
 
     public bool $teams;
 
-    public PermissionsTeamResolver $teamResolver;
+    protected PermissionsTeamResolver $teamResolver;
 
     public string $teamsKey;
 
