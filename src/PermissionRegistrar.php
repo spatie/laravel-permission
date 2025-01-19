@@ -56,7 +56,7 @@ class PermissionRegistrar
     {
         $this->permissionClass = config('permission.models.permission');
         $this->roleClass = config('permission.models.role');
-        $this->teamResolver = config('permission.team_resolver', DefaultPermissionsTeamResolver::class);
+        $this->teamResolver = new (config('permission.team_resolver', DefaultTeamResolver::class));
 
         $this->cacheManager = $cacheManager;
         $this->initializeCache();

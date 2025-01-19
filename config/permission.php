@@ -126,7 +126,7 @@ return [
     /*
      * The class to use to resolve the permissions team id
      */
-    'team_resolver' => \Spatie\Permission\DefaultPermissionsTeamResolver::class,
+    'team_resolver' => \Spatie\Permission\DefaultTeamResolver::class,
 
     /*
      * Passport Client Credentials Grant

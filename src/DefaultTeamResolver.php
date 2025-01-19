@@ -4,7 +4,7 @@ namespace Spatie\Permission;
 
 use Spatie\Permission\Contracts\PermissionsTeamResolver;
 
-class DefaultPermissionsTeamResolver implements PermissionsTeamResolver
+class DefaultTeamResolver implements PermissionsTeamResolver
 {
     protected int|string|null $teamId = null;
 
