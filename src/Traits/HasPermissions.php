@@ -348,6 +348,7 @@ trait HasPermissions
         /** @var Collection $permissions */
         $permissions = $this->permissions;
 
+        // @phpstan-ignore-next-line
         if (method_exists($this, 'roles')) {
             $permissions = $permissions->merge($this->getPermissionsViaRoles());
         }

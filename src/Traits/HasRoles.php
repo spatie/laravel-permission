@@ -127,6 +127,7 @@ trait HasRoles
                 }
 
                 $role = $this->getStoredRole($role);
+                // @phpstan-ignore-next-line
                 if (! $role instanceof Role) {
                     return $array;
                 }

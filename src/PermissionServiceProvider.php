@@ -144,6 +144,7 @@ class PermissionServiceProvider extends ServiceProvider
 
     protected function registerMacroHelpers(): void
     {
+        // @phpstan-ignore-next-line
         if (! method_exists(Route::class, 'macro')) { // Lumen
             return;
         }
