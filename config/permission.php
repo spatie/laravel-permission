@@ -122,6 +122,12 @@ return [
 
     'teams' => false,
 
+
+    /*
+     * The class to use to resolve the permissions team id
+     */
+    'team_resolver' => \Spatie\Permission\DefaultTeamResolver::class,
+
     /*
      * Passport Client Credentials Grant
      * When set to true the package will use Passports Client to check permissions
