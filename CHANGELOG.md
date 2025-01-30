@@ -2,6 +2,38 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 6.11.0 - 2025-01-30
+
+### What's Changed
+
+* Add configurable team resolver for permission team id (helpful for Jetstream, etc) by @adrenallen in https://github.com/spatie/laravel-permission/pull/2790
+
+### Internals
+
+* Replace php-cs-fixer with Laravel Pint by @bobbrodie in https://github.com/spatie/laravel-permission/pull/2780
+
+### Documentation Updates
+
+* [Docs] Include namespace in example in uuid.md by @ken-tam in https://github.com/spatie/laravel-permission/pull/2764
+* [Docs] Include Laravel 11 example in exceptions.md by @frankliniwobi in https://github.com/spatie/laravel-permission/pull/2768
+* [Docs] Fix typo in code example in passport.md by @m3skalina in https://github.com/spatie/laravel-permission/pull/2782
+* [Docs] Correct username in new-app.md by @trippodi in https://github.com/spatie/laravel-permission/pull/2785
+* [Docs] Add composer specificity by @imanghafoori1 in https://github.com/spatie/laravel-permission/pull/2772
+* [Docs] Update installation-laravel.md to fix providers.php location. by @curiousteam in https://github.com/spatie/laravel-permission/pull/2796
+
+### New Contributors
+
+* @ken-tam made their first contribution in https://github.com/spatie/laravel-permission/pull/2764
+* @frankliniwobi made their first contribution in https://github.com/spatie/laravel-permission/pull/2768
+* @bobbrodie made their first contribution in https://github.com/spatie/laravel-permission/pull/2780
+* @m3skalina made their first contribution in https://github.com/spatie/laravel-permission/pull/2782
+* @trippodi made their first contribution in https://github.com/spatie/laravel-permission/pull/2785
+* @imanghafoori1 made their first contribution in https://github.com/spatie/laravel-permission/pull/2772
+* @curiousteam made their first contribution in https://github.com/spatie/laravel-permission/pull/2796
+* @adrenallen made their first contribution in https://github.com/spatie/laravel-permission/pull/2790
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/6.10.1...6.11.0
+
 ## 6.10.1 - 2024-11-08
 
 ### What's Changed
@@ -893,6 +925,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -940,6 +973,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
