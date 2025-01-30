@@ -21,10 +21,7 @@ class DefaultTeamResolver implements PermissionsTeamResolver
         $this->teamId = $id;
     }
 
-    /**
-     * @return int|string|null
-     */
-    public function getPermissionsTeamId() : int|string|null
+    public function getPermissionsTeamId(): int|string|null
     {
         return $this->teamId;
     }

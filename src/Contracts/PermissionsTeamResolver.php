@@ -4,10 +4,7 @@ namespace Spatie\Permission\Contracts;
 
 interface PermissionsTeamResolver
 {
-    /**
-     * @return int|string|null
-     */
-    public function getPermissionsTeamId() : int|string|null;
+    public function getPermissionsTeamId(): int|string|null;
 
     /**
      * Set the team id for teams/groups support, this id is used when querying permissions/roles

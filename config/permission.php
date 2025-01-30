@@ -122,7 +122,6 @@ return [
 
     'teams' => false,
 
-
     /*
      * The class to use to resolve the permissions team id
      */
