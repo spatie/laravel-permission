@@ -29,7 +29,6 @@
         "illuminate/database": "^8.12|^9.0|^10.0|^11.0"
     },
     "require-dev": {
-        "larastan/larastan": "^1.0|^2.0|^3.0",
         "laravel/passport": "^11.0|^12.0",
         "laravel/pint": "^1.0",
         "orchestra/testbench": "^6.23|^7.0|^8.0|^9.0",
@@ -67,6 +66,6 @@
     "scripts": {
         "test": "phpunit",
         "format": "pint",
-        "analyse": "phpstan analyse"
+        "analyse": "echo 'Checking dependencies...' && composer require --dev larastan/larastan && phpstan analyse"
     }
 }
