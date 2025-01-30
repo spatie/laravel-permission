@@ -123,7 +123,7 @@ class HasPermissionsWithCustomModelsTest extends HasPermissionsTest
         $this->testUserPermission->forceDelete();
         DB::disableQueryLog();
 
-        $this->assertSame(3 + $this->resetDatabaseQuery, count(DB::getQueryLog())); //avoid detach permissions on permissions
+        $this->assertSame(3 + $this->resetDatabaseQuery, count(DB::getQueryLog())); // avoid detach permissions on permissions
 
         $permission = Permission::withTrashed()->find($permission_id);
 

@@ -112,7 +112,7 @@ abstract class TestCase extends Orchestra
     {
         $app['config']->set('permission.register_permission_check_method', true);
         $app['config']->set('permission.teams', $this->hasTeams);
-        $app['config']->set('permission.testing', true); //fix sqlite
+        $app['config']->set('permission.testing', true); // fix sqlite
         $app['config']->set('permission.column_names.model_morph_key', 'model_test_id');
         $app['config']->set('permission.column_names.team_foreign_key', 'team_test_id');
         $app['config']->set('database.default', 'sqlite');
@@ -143,8 +143,8 @@ abstract class TestCase extends Orchestra
 
         // FOR MANUAL TESTING OF ALTERNATE CACHE STORES:
         // $app['config']->set('cache.default', 'array');
-        //Laravel supports: array, database, file
-        //requires extensions: apc, memcached, redis, dynamodb, octane
+        // Laravel supports: array, database, file
+        // requires extensions: apc, memcached, redis, dynamodb, octane
     }
 
     /**
@@ -282,7 +282,7 @@ abstract class TestCase extends Orchestra
         });
     }
 
-    ////// TEST HELPERS
+    // //// TEST HELPERS
     public function runMiddleware($middleware, $permission, $guard = null, bool $client = false)
     {
         $request = new Request;
