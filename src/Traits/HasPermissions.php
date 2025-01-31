@@ -155,7 +155,7 @@ trait HasPermissions
                 $permission = $permission->value;
             }
 
-            $method = is_int($permission) || PermissionRegistrar::isUid($permission) ? 'findById' : 'findByName';
+            $method = is_numeric($permission) || PermissionRegistrar::isUid($permission) ? 'findById' : 'findByName';
 
             return $this->getPermissionClass()::{$method}($permission, $this->getDefaultGuardName());
         }, Arr::wrap($permissions));
@@ -175,7 +175,7 @@ trait HasPermissions
             $permission = $permission->value;
         }
 
-        if (is_int($permission) || PermissionRegistrar::isUid($permission)) {
+        if (is_numeric($permission) || PermissionRegistrar::isUid($permission)) {
             $permission = $this->getPermissionClass()::findById(
                 $permission,
                 $guardName ?? $this->getDefaultGuardName()
@@ -460,7 +460,7 @@ trait HasPermissions
      */
     public function revokePermissionTo($permission)
     {
-        $this->permissions()->detach($this->getStoredPermission($permission));
+        $this->permissions()->detach($this->collectPermissions($permission));
 
         if (is_a($this, Role::class)) {
             $this->forgetCachedPermissions();
@@ -488,7 +488,7 @@ trait HasPermissions
             $permissions = $permissions->value;
         }
 
-        if (is_int($permissions) || PermissionRegistrar::isUid($permissions)) {
+        if (is_numeric($permissions) || PermissionRegistrar::isUid($permissions)) {
             return $this->getPermissionClass()::findById($permissions, $this->getDefaultGuardName());
         }
 
