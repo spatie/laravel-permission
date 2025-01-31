@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Tests;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Http\Request;
@@ -110,6 +111,7 @@ abstract class TestCase extends Orchestra
      */
     protected function getEnvironmentSetUp($app)
     {
+        Model::preventLazyLoading();
         $app['config']->set('permission.register_permission_check_method', true);
         $app['config']->set('permission.teams', $this->hasTeams);
         $app['config']->set('permission.testing', true); // fix sqlite

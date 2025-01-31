@@ -323,7 +323,8 @@ trait HasPermissions
     {
         $permission = $this->filterPermission($permission);
 
-        return $this->permissions->contains($permission->getKeyName(), $permission->getKey());
+        return $this->loadMissing('permissions')->permissions
+            ->contains($permission->getKeyName(), $permission->getKey());
     }
 
     /**

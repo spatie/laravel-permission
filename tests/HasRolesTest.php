@@ -2,7 +2,9 @@
 
 namespace Spatie\Permission\Tests;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
@@ -856,4 +858,37 @@ class HasRolesTest extends TestCase
 
         $this->assertTrue($user->hasRole('testRole'));
     }
+
+    /** @test */
+    public function it_can_be_given_a_role_on_permission_when_lazy_loading_is_restricted()
+    {
+        $this->assertTrue(Model::preventsLazyLoading());
+
+        try {
+            $testPermission = app(Permission::class)->with('roles')->get()->first();
+
+            $testPermission->assignRole('testRole');
+
+            $this->assertTrue($testPermission->hasRole('testRole'));
+        } catch (Exception $e) {
+            $this->fail('Lazy loading detected in the givePermissionTo method: ' . $e->getMessage());
+        }
+    }
+
+    /** @test */
+    public function it_can_be_given_a_role_on_user_when_lazy_loading_is_restricted()
+    {
+        $this->assertTrue(Model::preventsLazyLoading());
+
+        try {
+            User::create(['email' => 'other@user.com']);
+            $user = User::with('roles')->get()->first();
+            $user->assignRole('testRole');
+
+            $this->assertTrue($user->hasRole('testRole'));
+        } catch (Exception $e) {
+            $this->fail('Lazy loading detected in the givePermissionTo method: ' . $e->getMessage());
+        }
+    }
+
 }
