@@ -871,7 +871,7 @@ class HasRolesTest extends TestCase
 
             $this->assertTrue($testPermission->hasRole('testRole'));
         } catch (Exception $e) {
-            $this->fail('Lazy loading detected in the givePermissionTo method: ' . $e->getMessage());
+            $this->fail('Lazy loading detected in the givePermissionTo method: '.$e->getMessage());
         }
     }
 
@@ -887,8 +887,7 @@ class HasRolesTest extends TestCase
 
             $this->assertTrue($user->hasRole('testRole'));
         } catch (Exception $e) {
-            $this->fail('Lazy loading detected in the givePermissionTo method: ' . $e->getMessage());
+            $this->fail('Lazy loading detected in the givePermissionTo method: '.$e->getMessage());
         }
     }
-
 }

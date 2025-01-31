@@ -2,8 +2,8 @@
 
 namespace Spatie\Permission\Tests;
 
-use Illuminate\Database\Eloquent\Model;
 use DB;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
@@ -779,7 +779,7 @@ class HasPermissionsTest extends TestCase
 
             $this->assertTrue($testRole->hasPermissionTo('edit-articles'));
         } catch (Exception $e) {
-            $this->fail('Lazy loading detected in the givePermissionTo method: ' . $e->getMessage());
+            $this->fail('Lazy loading detected in the givePermissionTo method: '.$e->getMessage());
         }
     }
 
@@ -796,7 +796,7 @@ class HasPermissionsTest extends TestCase
 
             $this->assertTrue($testUser->hasPermissionTo('edit-articles'));
         } catch (Exception $e) {
-            $this->fail('Lazy loading detected in the givePermissionTo method: ' . $e->getMessage());
+            $this->fail('Lazy loading detected in the givePermissionTo method: '.$e->getMessage());
         }
     }
 }
