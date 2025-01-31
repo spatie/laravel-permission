@@ -9,7 +9,7 @@ Choose the version of this package that suits your Laravel version.
 
 Package Version | Laravel Version
 ----------------|-----------
-   ^6.0         |  8,9,10,11 (PHP 8.0+)
+   ^6.0         |  8,9,10,11,12 (PHP 8.0+)
    ^5.8         |  7,8,9,10
    ^5.7         |  7,8,9
    ^5.4-^5.6    |  7,8
@@ -28,14 +28,7 @@ Package Version | Laravel Version
 
         composer require spatie/laravel-permission
 
-4. Optional: The service provider will automatically get registered. Or you may manually add the service provider in your `config/app.php` file:
-
-    ```
-    'providers' => [
-        // ...
-        Spatie\Permission\PermissionServiceProvider::class,
-    ];
-    ```
+4. Optional: The **`Spatie\Permission\PermissionServiceProvider::class`** service provider will automatically get registered. Or you may manually add the service provider to the array in your `bootstrap/providers.php` (or `config/app.php` in Laravel 10 or older) file.
 
 5. **You should publish** [the migration](https://github.com/spatie/laravel-permission/blob/main/database/migrations/create_permission_tables.php.stub) and the [`config/permission.php` config file](https://github.com/spatie/laravel-permission/blob/main/config/permission.php) with:
 

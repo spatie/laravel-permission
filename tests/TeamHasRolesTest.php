@@ -39,9 +39,9 @@ class TeamHasRolesTest extends HasRolesTest
     /** @test */
     public function it_can_assign_same_and_different_roles_on_same_user_different_teams()
     {
-        app(Role::class)->create(['name' => 'testRole3']); //team_test_id = 1 by main class
+        app(Role::class)->create(['name' => 'testRole3']); // team_test_id = 1 by main class
         app(Role::class)->create(['name' => 'testRole3', 'team_test_id' => 2]);
-        app(Role::class)->create(['name' => 'testRole4', 'team_test_id' => null]); //global role
+        app(Role::class)->create(['name' => 'testRole4', 'team_test_id' => null]); // global role
 
         $testRole3Team1 = app(Role::class)->where(['name' => 'testRole3', 'team_test_id' => 1])->first();
         $testRole3Team2 = app(Role::class)->where(['name' => 'testRole3', 'team_test_id' => 2])->first();
@@ -66,7 +66,7 @@ class TeamHasRolesTest extends HasRolesTest
 
         $this->testUser->assignRole('testRole3', 'testRole4');
         $this->assertTrue($this->testUser->hasExactRoles(['testRole', 'testRole2', 'testRole3', 'testRole4']));
-        $this->assertTrue($this->testUser->hasRole($testRole3Team1)); //testRole3 team=1
+        $this->assertTrue($this->testUser->hasRole($testRole3Team1)); // testRole3 team=1
         $this->assertTrue($this->testUser->hasRole($testRole4NoTeam)); // global role team=null
 
         setPermissionsTeamId(2);
@@ -77,7 +77,7 @@ class TeamHasRolesTest extends HasRolesTest
             $this->testUser->getRoleNames()->sort()->values()
         );
         $this->assertTrue($this->testUser->hasExactRoles(['testRole', 'testRole3']));
-        $this->assertTrue($this->testUser->hasRole($testRole3Team2)); //testRole3 team=2
+        $this->assertTrue($this->testUser->hasRole($testRole3Team2)); // testRole3 team=2
         $this->testUser->assignRole('testRole4');
         $this->assertTrue($this->testUser->hasExactRoles(['testRole', 'testRole3', 'testRole4']));
         $this->assertTrue($this->testUser->hasRole($testRole4NoTeam)); // global role team=null

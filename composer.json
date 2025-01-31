@@ -23,16 +23,16 @@
     "homepage": "https://github.com/spatie/laravel-permission",
     "require": {
         "php": "^8.0",
-        "illuminate/auth": "^8.12|^9.0|^10.0|^11.0",
-        "illuminate/container": "^8.12|^9.0|^10.0|^11.0",
-        "illuminate/contracts": "^8.12|^9.0|^10.0|^11.0",
-        "illuminate/database": "^8.12|^9.0|^10.0|^11.0"
+        "illuminate/auth": "^8.12|^9.0|^10.0|^11.0|^12.0",
+        "illuminate/container": "^8.12|^9.0|^10.0|^11.0|^12.0",
+        "illuminate/contracts": "^8.12|^9.0|^10.0|^11.0|^12.0",
+        "illuminate/database": "^8.12|^9.0|^10.0|^11.0|^12.0"
     },
     "require-dev": {
-        "larastan/larastan": "^1.0|^2.0",
         "laravel/passport": "^11.0|^12.0",
-        "orchestra/testbench": "^6.23|^7.0|^8.0|^9.0",
-        "phpunit/phpunit": "^9.4|^10.1"
+        "laravel/pint": "^1.0",
+        "orchestra/testbench": "^6.23|^7.0|^8.0|^9.0|^10.0",
+        "phpunit/phpunit": "^9.4|^10.1|^11.5"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -65,7 +65,7 @@
     },
     "scripts": {
         "test": "phpunit",
-        "format": "php-cs-fixer fix --allow-risky=yes",
-        "analyse": "phpstan analyse"
+        "format": "pint",
+        "analyse": "echo 'Checking dependencies...' && composer require --dev larastan/larastan && phpstan analyse"
     }
 }

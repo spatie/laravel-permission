@@ -654,7 +654,7 @@ class HasPermissionsTest extends TestCase
         $this->testUser->syncPermissions($this->testUserPermission, $permission2);
         DB::disableQueryLog();
 
-        $this->assertSame(2, count(DB::getQueryLog())); //avoid unnecessary sqls
+        $this->assertSame(2, count(DB::getQueryLog())); // avoid unnecessary sqls
     }
 
     /** @test */
@@ -676,7 +676,7 @@ class HasPermissionsTest extends TestCase
 
         $this->assertTrue($user2->fresh()->hasPermissionTo('edit-articles'));
         $this->assertFalse($user2->fresh()->hasPermissionTo('edit-news'));
-        $this->assertSame(2, count(DB::getQueryLog())); //avoid unnecessary sync
+        $this->assertSame(2, count(DB::getQueryLog())); // avoid unnecessary sync
     }
 
     /** @test */
@@ -698,7 +698,7 @@ class HasPermissionsTest extends TestCase
 
         $this->assertTrue($user2->fresh()->hasPermissionTo('edit-articles'));
         $this->assertFalse($user2->fresh()->hasPermissionTo('edit-news'));
-        $this->assertSame(2, count(DB::getQueryLog())); //avoid unnecessary sync
+        $this->assertSame(2, count(DB::getQueryLog())); // avoid unnecessary sync
     }
 
     /** @test */

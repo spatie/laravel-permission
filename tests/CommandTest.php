@@ -149,7 +149,7 @@ class CommandTest extends TestCase
 
         $AddTeamsFields = require $matchingFiles[count($matchingFiles) - 1];
         $AddTeamsFields->up();
-        $AddTeamsFields->up(); //test upgrade teams migration fresh
+        $AddTeamsFields->up(); // test upgrade teams migration fresh
 
         Role::create(['name' => 'new-role', 'team_test_id' => 1]);
         $role = Role::where('name', 'new-role')->first();
