@@ -3,8 +3,12 @@
 namespace Spatie\Permission\Tests;
 
 use DB;
+use Illuminate\Support\Facades\Event;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
+use Spatie\Permission\Events\PermissionAttached;
+use Spatie\Permission\Events\PermissionDetached;
+use Spatie\Permission\Events\RoleAttached;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Tests\TestModels\SoftDeletingUser;
@@ -764,5 +768,43 @@ class HasPermissionsTest extends TestCase
         $response->assertJson([
             'status' => false,
         ]);
+    }
+
+    /** @test */
+    public function it_fires_an_event_when_a_permission_is_added()
+    {
+        Event::fake();
+
+        $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
+
+        $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-news'])
+            ->pluck($this->testUserPermission->getKeyName())
+            ->toArray();
+
+        Event::assertDispatched(PermissionAttached::class, function ($event) use ($ids) {
+            return $event->model instanceof User
+                && $event->model->hasPermissionTo('edit-news')
+                && $event->model->hasPermissionTo('edit-articles')
+                && $ids === $event->permissionIds;
+        });
+    }
+
+    /** @test */
+    public function it_fires_an_event_when_a_permission_is_removed()
+    {
+        Event::fake();
+
+        $permissions = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-news'])->get();
+
+        $this->testUser->givePermissionTo($permissions);
+
+        $this->testUser->revokePermissionTo($permissions);
+
+        Event::assertDispatched(PermissionDetached::class, function ($event) use ($permissions) {
+            return $event->model instanceof User
+                && !$event->model->hasPermissionTo('edit-news')
+                && !$event->model->hasPermissionTo('edit-articles')
+                && $event->permission === $permissions;
+        });
     }
 }
