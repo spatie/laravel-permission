@@ -127,10 +127,6 @@ trait HasRoles
                 }
 
                 $role = $this->getStoredRole($role);
-                // @phpstan-ignore-next-line
-                if (! $role instanceof Role) {
-                    return $array;
-                }
 
                 if (! in_array($role->getKey(), $array)) {
                     $this->ensureModelSharesGuard($role);

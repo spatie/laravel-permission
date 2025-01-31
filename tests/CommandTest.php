@@ -200,7 +200,7 @@ class CommandTest extends TestCase
         app(\Spatie\Permission\PermissionRegistrar::class)->initializeCache();
 
         Artisan::call('about');
-        $output = Artisan::output();
+        $output = str_replace("\r\n", "\n", Artisan::output());
 
         $pattern = '/Spatie Permissions[ .\n]*Features Enabled[ .]*Default[ .\n]*Version/';
         if (method_exists($this, 'assertMatchesRegularExpression')) {
@@ -225,7 +225,7 @@ class CommandTest extends TestCase
         config()->set('permission.teams', true);
 
         Artisan::call('about');
-        $output = Artisan::output();
+        $output = str_replace("\r\n", "\n", Artisan::output());
 
         $pattern = '/Spatie Permissions[ .\n]*Features Enabled[ .]*Teams[ .\n]*Version/';
         if (method_exists($this, 'assertMatchesRegularExpression')) {
