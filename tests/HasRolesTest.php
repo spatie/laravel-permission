@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Tests;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
@@ -861,6 +862,8 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_can_be_given_a_role_on_permission_when_lazy_loading_is_restricted()
     {
+        $this->assertTrue(Model::preventsLazyLoading());
+
         try {
             $testPermission = app(Permission::class)->with('roles')->get()->first();
 
@@ -875,6 +878,8 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_can_be_given_a_role_on_user_when_lazy_loading_is_restricted()
     {
+        $this->assertTrue(Model::preventsLazyLoading());
+
         try {
             User::create(['email' => 'other@user.com']);
             $user = User::with('roles')->get()->first();
