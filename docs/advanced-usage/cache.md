@@ -68,7 +68,9 @@ Laravel Tip: If you are leveraging a caching service such as `redis` or `memcach
 
 To prevent other applications from accidentally using/changing your cached data, it is prudent to set your own cache `prefix` in Laravel's `/config/cache.php` to something unique for each application which shares the same caching service.
 
-Most multi-tenant "packages" take care of this for you when switching tenants. If you are switching cache keys / store during a request lifecycle in such multi-tenancy environments, please be sure to reinitialize the cache of the `PermissionRegistrar` so that your updated `CacheStore` is used for caching.
+Most multi-tenant "packages" take care of this for you when switching tenants. 
+
+Tip: Most parts of your multitenancy app will relate to a single tenant during a given request lifecycle, so the following step will not be needed: However, in the less-common situation where your app might be switching between multiple tenants during a single request lifecycle (specifically: where changing the cache key/prefix (such as when switching between tenants) or switching the cache store), then after switching tenants or changing the cache configuration you will need to reinitialize the cache of the `PermissionRegistrar` so that the updated `CacheStore` and cache configuration are used.
 
 ```php
 app()->make(\Spatie\Permission\PermissionRegistrar::class)->initializeCache();
