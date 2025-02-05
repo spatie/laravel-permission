@@ -66,9 +66,13 @@ We recommend not changing the cache "key" name. Usually changing it is a bad ide
 
 Laravel Tip: If you are leveraging a caching service such as `redis` or `memcached` and there are other sites running on your server, you could run into cache clashes between apps. 
 
-To prevent other applications from accidentally using/changing your cached data, it is prudent to set your own cache `prefix` in Laravel's `/config/cache.php` to something unique for each application which shares the same caching service.
+To prevent other applications from accidentally using/changing your cached data, it is prudent to set your own cache `prefix` in Laravel's `/config/cache.php` to something unique for each application which shares the same caching service. 
 
-Most multi-tenant "packages" take care of this for you when switching tenants.
+Most multi-tenant "packages" take care of this for you when switching tenants. If you are switching cache keys / store during a request lifecycle in such multi-tenancy environments, please be sure to reinitialize the cache of the `PermissionRegistrar` so that your updated `CacheStore` is used for caching.
+
+```php
+app()->make(\Spatie\Permission\PermissionRegistrar::class)->initializeCache();
+```
 
 
 ### Custom Cache Store
