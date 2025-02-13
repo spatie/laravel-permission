@@ -4,11 +4,13 @@ namespace Spatie\Permission\Tests;
 
 use Illuminate\Contracts\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Access\Gate;
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Tests\TestModels\Content;
 
 class PolicyTest extends TestCase
 {
     /** @test */
+    #[Test]
     public function policy_methods_and_before_intercepts_can_allow_and_deny()
     {
         $record1 = Content::create(['content' => 'special admin content']);

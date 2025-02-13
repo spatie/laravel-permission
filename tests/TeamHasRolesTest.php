@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Tests;
 
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Tests\TestModels\User;
 
@@ -11,6 +12,7 @@ class TeamHasRolesTest extends HasRolesTest
     protected $hasTeams = true;
 
     /** @test */
+    #[Test]
     public function it_deletes_pivot_table_entries_when_deleting_models()
     {
         $user1 = User::create(['email' => 'user2@test.com']);
@@ -37,6 +39,7 @@ class TeamHasRolesTest extends HasRolesTest
     }
 
     /** @test */
+    #[Test]
     public function it_can_assign_same_and_different_roles_on_same_user_different_teams()
     {
         app(Role::class)->create(['name' => 'testRole3']); // team_test_id = 1 by main class
@@ -84,6 +87,7 @@ class TeamHasRolesTest extends HasRolesTest
     }
 
     /** @test */
+    #[Test]
     public function it_can_sync_or_remove_roles_without_detach_on_different_teams()
     {
         app(Role::class)->create(['name' => 'testRole3', 'team_test_id' => 2]);
@@ -118,6 +122,7 @@ class TeamHasRolesTest extends HasRolesTest
     }
 
     /** @test */
+    #[Test]
     public function it_can_scope_users_on_different_teams()
     {
         User::all()->each(fn ($item) => $item->delete());
