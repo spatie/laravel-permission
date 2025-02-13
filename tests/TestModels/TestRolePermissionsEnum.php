@@ -2,6 +2,8 @@
 
 namespace Spatie\Permission\Tests\TestModels;
 
+use Illuminate\Support\Str;
+
 /**
  * Enum example
  *
@@ -28,6 +30,8 @@ enum TestRolePermissionsEnum: string
     case EDITOR = 'editor';
     case USERMANAGER = 'user-manager';
     case ADMIN = 'administrator';
+    case CASTED_ENUM_1 = 'casted_enum-1';
+    case CASTED_ENUM_2 = 'casted_enum-2';
 
     case VIEWARTICLES = 'view articles';
     case EDITARTICLES = 'edit articles';
@@ -51,6 +55,8 @@ enum TestRolePermissionsEnum: string
 
             self::VIEWARTICLES => 'View Articles',
             self::EDITARTICLES => 'Edit Articles',
+
+            default => Str::words($this->name)
         };
     }
 }

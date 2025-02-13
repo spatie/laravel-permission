@@ -22,7 +22,16 @@ You can use `@can`, `@cannot`, `@canany`, and `@guest` to test for permission-re
 
 When using a permission-name associated with permissions created in this package, you can use `@can('permission-name', 'guard_name')` if you need to check against a specific guard.
 
+Example:
+```php
+@can('edit articles', 'guard_name')
+  //
+@endcan
+```
+
 You can also use `@haspermission('permission-name')` or `@haspermission('permission-name', 'guard_name')` in similar fashion. With corresponding `@endhaspermission`.
+
+There is no `@hasanypermission` directive: use `@canany` instead.
 
 
 ## Roles 

@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property string|null $guard_name
  *
  * @mixin \Spatie\Permission\Models\Role
+ *
+ * @phpstan-require-extends \Spatie\Permission\Models\Role
  */
 interface Role
 {
@@ -42,7 +44,7 @@ interface Role
     /**
      * Determine if the user may perform the given permission.
      *
-     * @param  string|\Spatie\Permission\Contracts\Permission  $permission
+     * @param  string|int|\Spatie\Permission\Contracts\Permission|\BackedEnum  $permission
      */
     public function hasPermissionTo($permission, ?string $guardName): bool;
 }

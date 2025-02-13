@@ -75,8 +75,8 @@ return [
         /*
          * Change this if you want to name the related pivots other than defaults
          */
-        'role_pivot_key' => null, //default 'role_id',
-        'permission_pivot_key' => null, //default 'permission_id',
+        'role_pivot_key' => null, // default 'role_id',
+        'permission_pivot_key' => null, // default 'permission_id',
 
         /*
          * Change this if you want to name the related model primary key other than
@@ -104,9 +104,8 @@ return [
     'register_permission_check_method' => true,
 
     /*
-     * When set to true, the Spatie\Permission\Listeners\OctaneReloadPermissions listener will be registered
-     * on the Laravel\Octane\Events\OperationTerminated event, this will refresh permissions on every
-     * TickTerminated, TaskTerminated and RequestTerminated
+     * When set to true, Laravel\Octane\Events\OperationTerminated event listener will be registered
+     * this will refresh permissions on every TickTerminated, TaskTerminated and RequestTerminated
      * NOTE: This should not be needed in most cases, but an Octane/Vapor combination benefited from it.
      */
     'register_octane_reset_listener' => false,
@@ -122,6 +121,11 @@ return [
      */
 
     'teams' => false,
+
+    /*
+     * The class to use to resolve the permissions team id
+     */
+    'team_resolver' => \Spatie\Permission\DefaultTeamResolver::class,
 
     /*
      * Passport Client Credentials Grant

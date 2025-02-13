@@ -9,7 +9,7 @@ Choose the version of this package that suits your Laravel version.
 
 Package Version | Laravel Version
 ----------------|-----------
-   ^6.0         |  8,9,10 (PHP 8.0+)
+   ^6.0         |  8,9,10,11,12 (PHP 8.0+)
    ^5.8         |  7,8,9,10
    ^5.7         |  7,8,9
    ^5.4-^5.6    |  7,8
@@ -28,14 +28,7 @@ Package Version | Laravel Version
 
         composer require spatie/laravel-permission
 
-4. Optional: The service provider will automatically get registered. Or you may manually add the service provider in your `config/app.php` file:
-
-    ```
-    'providers' => [
-        // ...
-        Spatie\Permission\PermissionServiceProvider::class,
-    ];
-    ```
+4. Optional: The **`Spatie\Permission\PermissionServiceProvider::class`** service provider will automatically get registered. Or you may manually add the service provider to the array in your `bootstrap/providers.php` (or `config/app.php` in Laravel 10 or older) file.
 
 5. **You should publish** [the migration](https://github.com/spatie/laravel-permission/blob/main/database/migrations/create_permission_tables.php.stub) and the [`config/permission.php` config file](https://github.com/spatie/laravel-permission/blob/main/config/permission.php) with:
 
@@ -52,6 +45,8 @@ Package Version | Laravel Version
        - and (optional) you may set `team_foreign_key` name in the config file if you want to use a custom foreign key in your database for teams
 
    - **If you are using MySQL 8**, look at the migration files for notes about MySQL 8 to set/limit the index key length, and edit accordingly. If you get `ERROR: 1071 Specified key was too long` then you need to do this.
+
+   - **If you are using CACHE_STORE=database**, be sure to [install Laravel's cache migration](https://laravel.com/docs/cache#prerequisites-database), else you will encounter cache errors.
 
 7. **Clear your config cache**. This package requires access to the `permission` config settings in order to run migrations. If you've been caching configurations locally, clear your config cache with either of these commands:
 

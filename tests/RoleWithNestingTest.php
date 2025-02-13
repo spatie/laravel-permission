@@ -2,6 +2,8 @@
 
 namespace Spatie\Permission\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Tests\TestModels\Role;
 
 class RoleWithNestingTest extends TestCase
@@ -10,10 +12,10 @@ class RoleWithNestingTest extends TestCase
     protected $useCustomModels = true;
 
     /** @var Role[] */
-    protected $parent_roles = [];
+    protected array $parent_roles = [];
 
     /** @var Role[] */
-    protected $child_roles = [];
+    protected array $child_roles = [];
 
     protected function setUp(): void
     {
@@ -62,12 +64,14 @@ class RoleWithNestingTest extends TestCase
     /** @test
      * @dataProvider roles_list
      */
+    #[DataProvider('roles_list')]
+    #[Test]
     public function it_returns_correct_withCount_of_nested_roles($role_group, $index, $relation, $expectedCount)
     {
         $role = $this->$role_group[$index];
         $count_field_name = sprintf('%s_count', $relation);
 
-        $actualCount = intval(Role::withCount($relation)->find($role->getKey())->$count_field_name);
+        $actualCount = (int) Role::withCount($relation)->find($role->getKey())->$count_field_name;
 
         $this->assertSame(
             $expectedCount,
@@ -76,7 +80,7 @@ class RoleWithNestingTest extends TestCase
         );
     }
 
-    public function roles_list()
+    public static function roles_list()
     {
         return [
             ['parent_roles', 'has_no_children', 'children', 0],

@@ -16,8 +16,10 @@ Let's say that your application uses access tokens for authentication and when i
 
 You could, for example, create a `Gate::before()` method call to handle this:
 
-**app/Providers/AuthServiceProvider.php**
+**app/Providers/AuthServiceProvider.php** (or maybe `AppServiceProvider.php` since Laravel 11)
 ```php
+use Illuminate\Support\Facades\Gate;
+
 public function boot()
 {
     ...

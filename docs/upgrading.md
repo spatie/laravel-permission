@@ -7,9 +7,9 @@ weight: 6
 
 ALL upgrades of this package should follow these steps:
 
-1. Composer. Upgrading between major versions of this package always require the usual Composer steps:
+1. Composer. Upgrading between major versions of this package always requires the usual Composer steps:
    - Update your `composer.json` to specify the new major version, for example: `^6.0`
-   - Then run `composer update`. 
+   - Then run `composer update spatie/laravel-permission`. 
 
 2. Migrations. Compare the `migration` file stubs in the NEW version of this package against the migrations you've already run inside your app. If necessary, create a new migration (by hand) to apply any new database changes.
 
@@ -32,16 +32,16 @@ There are a few breaking-changes when upgrading to v6, but most of them won't af
 
 For guidance with upgrading your extended models, your migrations, your routes, etc, see the **Upgrade Essentials** section at the top of this file.
 
-1. Due to the improved ULID/UUID/GUID support, any package methods which accept a Permission or Role `id` must pass that `id` as an `integer`. If you pass it as a numeric string, the functions will attempt to lookup the role/permission as a string. In such cases you may see errors such as `There is no permission named '123' for guard 'web'.` (where `'123'` is being treated as a string because it was passed as a string instead of as an integer). This also applies to arrays of id's: if it's an array of strings we will do a lookup on the name instead of on the id. **This will mostly only affect UI pages** because an HTML Request is received as string data. **The solution is simple:** if you're passing integers to a form field, then convert them back to integers when using that field's data for calling functions to grant/assign/sync/remove/revoke permissions and roles. One way to convert an array of permissions `id`'s from strings to integers is: `collect($validated['permission'])->map(fn($val)=>(int)$val)`
+1. Due to the improved ULID/UUID/GUID support, any package methods which accept a Permission or Role `id` must pass that `id` as an `integer`. If you pass it as a numeric string, the functions will attempt to look up the role/permission as a string. In such cases, you may see errors such as `There is no permission named '123' for guard 'web'.` (where `'123'` is being treated as a string because it was passed as a string instead of as an integer). This also applies to arrays of id's: if it's an array of strings we will do a lookup on the name instead of on the id. **This will mostly only affect UI pages** because an HTML Request is received as string data. **The solution is simple:** if you're passing integers to a form field, then convert them back to integers when using that field's data for calling functions to grant/assign/sync/remove/revoke permissions and roles. One way to convert an array of permissions `id`'s from strings to integers is: `collect($validated['permission'])->map(fn($val)=>(int)$val)`
 
 2. If you have overridden the `getPermissionClass()` or `getRoleClass()` methods or have custom Models, you will need to revisit those customizations. See PR #2368 for details. 
 eg: if you have a custom model you will need to make changes, including accessing the model using `$this->permissionClass::` syntax (eg: using `::` instead of `->`) in all the overridden methods that make use of the models.
 
-    Be sure to compare your custom models with originals to see what else may have changed.
+    Be sure to compare your custom models with the originals to see what else may have changed.
 
-3. Model and Contract/Interface updates. The Role and Permission Models and Contracts/Interfaces have been updated with syntax changes to method signatures. Update any models you have extended, or contracts implemented, accordingly. See PR #2380 and #2480 for some of the specifics. 
+3. Model and Contract/Interface updates. The Role and Permission Models and Contracts/Interfaces have been updated with syntax changes to method signatures. Update any models you have extended, or contracts implemented, accordingly. See PR [#2380](https://github.com/spatie/laravel-permission/pull/2380) and [#2480](https://github.com/spatie/laravel-permission/pull/2480) for some of the specifics. 
 
-4. Migrations WILL need to be upgraded. (They have been updated to anonymous-class syntax that was introduced in Laravel 8, AND some structural coding changes in the registrar class changed the way we extracted configuration settings in the migration files.) There are no changes to the package's structure since v5, so if you had not customized it from the original then replacing the contents of the file should be enough. (Usually the only customization is if you've switched to UUIDs or customized MySQL index name lengths.)
+4. Migrations WILL need to be upgraded. (They have been updated to anonymous-class syntax that was introduced in Laravel 8, AND some structural coding changes in the registrar class changed the way we extracted configuration settings in the migration files.) There are no changes to the package's structure since v5, so if you had not customized it from the original then replacing the contents of the file should be enough. (Usually, the only customization is if you've switched to UUIDs or customized MySQL index name lengths.)
 **If you get the following error, it means your migration file needs upgrading: `Error: Access to undeclared static property Spatie\Permission\PermissionRegistrar::$pivotPermission`**
 
 5. MIDDLEWARE:
@@ -52,7 +52,7 @@ eg: if you have a custom model you will need to make changes, including accessin
 
     3. In the unlikely event that you have customized the Wildcard Permissions feature by extending the `WildcardPermission` model, please note that the public interface has changed significantly and you will need to update your extended model with the new method signatures.
 
-6. Test suites. If you have tests which manually clear the permission cache and re-register permissions, you no longer need to call `\Spatie\Permission\PermissionRegistrar::class)->registerPermissions();`. In fact, **calls to `->registerPermissions()` MUST be deleted from your tests**. 
+6. Test suites. If you have tests that manually clear the permission cache and re-register permissions, you no longer need to call `\Spatie\Permission\PermissionRegistrar::class)->registerPermissions();`. In fact, **calls to `->registerPermissions()` MUST be deleted from your tests**. 
     
     (Calling `app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();` after creating roles and permissions in migrations and factories and seeders is still okay and encouraged.) 
 

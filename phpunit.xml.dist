@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="vendor/autoload.php" backupGlobals="false" backupStaticAttributes="false" colors="true" verbose="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" stopOnFailure="false" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
-  <coverage>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.4/phpunit.xsd"
+>
+  <source>
     <include>
       <directory suffix=".php">src/</directory>
     </include>
-  </coverage>
+  </source>
   <testsuites>
     <testsuite name="Permissions Test Suite">
       <directory>tests</directory>
@@ -12,7 +16,8 @@
   </testsuites>
   <php>
     <env name="CACHE_DRIVER" value="array"/>
-    <env name="APP_KEY" value="base64:W99w+5JYz8SVGf5sx17gmPR6uoNCtWiEVc+9qu8iGEg="/> <!-- Required for Passport client -->
-    <ini name="memory_limit" value="512M" />
+    <!-- APP_KEY required for Passport client -->
+    <env name="APP_KEY" value="base64:W99w+5JYz8SVGf5sx17gmPR6uoNCtWiEVc+9qu8iGEg="/>
+    <ini name="memory_limit" value="512M"/>
   </php>
 </phpunit>

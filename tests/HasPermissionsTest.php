@@ -3,6 +3,9 @@
 namespace Spatie\Permission\Tests;
 
 use DB;
+use Illuminate\Database\Eloquent\Model;
+use PHPUnit\Framework\Attributes\RequiresPhp;
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
@@ -13,6 +16,7 @@ use Spatie\Permission\Tests\TestModels\User;
 class HasPermissionsTest extends TestCase
 {
     /** @test */
+    #[Test]
     public function it_can_assign_a_permission_to_a_user()
     {
         $this->testUser->givePermissionTo($this->testUserPermission);
@@ -21,6 +25,21 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
+    public function it_can_assign_a_permission_to_a_user_with_a_non_default_guard()
+    {
+        $testUserPermission = app(Permission::class)->create([
+            'name' => 'edit-articles',
+            'guard_name' => 'api',
+        ]);
+
+        $this->testUser->givePermissionTo($testUserPermission);
+
+        $this->assertTrue($this->testUser->hasPermissionTo($testUserPermission));
+    }
+
+    /** @test */
+    #[Test]
     public function it_throws_an_exception_when_assigning_a_permission_that_does_not_exist()
     {
         $this->expectException(PermissionDoesNotExist::class);
@@ -29,6 +48,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_throws_an_exception_when_assigning_a_permission_to_a_user_from_a_different_guard()
     {
         $this->expectException(GuardDoesNotMatch::class);
@@ -41,6 +61,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_revoke_a_permission_from_a_user()
     {
         $this->testUser->givePermissionTo($this->testUserPermission);
@@ -57,6 +78,8 @@ class HasPermissionsTest extends TestCase
      *
      * @requires PHP >= 8.1
      */
+    #[RequiresPhp('>= 8.1')]
+    #[Test]
     public function it_can_assign_and_remove_a_permission_using_enums()
     {
         $enum = TestModels\TestRolePermissionsEnum::VIEWARTICLES;
@@ -81,6 +104,8 @@ class HasPermissionsTest extends TestCase
      *
      * @requires PHP >= 8.1
      */
+    #[RequiresPhp('>= 8.1')]
+    #[Test]
     public function it_can_scope_users_using_enums()
     {
         $enum1 = TestModels\TestRolePermissionsEnum::VIEWARTICLES;
@@ -108,6 +133,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_scope_users_using_a_string()
     {
         User::all()->each(fn ($item) => $item->delete());
@@ -128,6 +154,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_scope_users_using_a_int()
     {
         User::all()->each(fn ($item) => $item->delete());
@@ -148,6 +175,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_scope_users_using_a_string_int()
     {
         User::all()->each(fn ($item) => $item->delete());
@@ -171,6 +199,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_scope_users_using_an_array()
     {
         User::all()->each(fn ($item) => $item->delete());
@@ -192,6 +221,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_scope_users_using_a_collection()
     {
         User::all()->each(fn ($item) => $item->delete());
@@ -213,6 +243,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_scope_users_using_an_object()
     {
         User::all()->each(fn ($item) => $item->delete());
@@ -231,6 +262,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_scope_users_without_direct_permissions_only_role()
     {
         User::all()->each(fn ($item) => $item->delete());
@@ -250,6 +282,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_scope_users_with_only_direct_permission()
     {
         User::all()->each(fn ($item) => $item->delete());
@@ -267,16 +300,18 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_throws_an_exception_when_calling_hasPermissionTo_with_an_invalid_type()
     {
         $user = User::create(['email' => 'user1@test.com']);
 
         $this->expectException(PermissionDoesNotExist::class);
 
-        $user->hasPermissionTo(new \stdClass());
+        $user->hasPermissionTo(new \stdClass);
     }
 
     /** @test */
+    #[Test]
     public function it_throws_an_exception_when_calling_hasPermissionTo_with_null()
     {
         $user = User::create(['email' => 'user1@test.com']);
@@ -287,16 +322,18 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_throws_an_exception_when_calling_hasDirectPermission_with_an_invalid_type()
     {
         $user = User::create(['email' => 'user1@test.com']);
 
         $this->expectException(PermissionDoesNotExist::class);
 
-        $user->hasDirectPermission(new \stdClass());
+        $user->hasDirectPermission(new \stdClass);
     }
 
     /** @test */
+    #[Test]
     public function it_throws_an_exception_when_calling_hasDirectPermission_with_null()
     {
         $user = User::create(['email' => 'user1@test.com']);
@@ -307,6 +344,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_throws_an_exception_when_trying_to_scope_a_non_existing_permission()
     {
         $this->expectException(PermissionDoesNotExist::class);
@@ -319,6 +357,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_throws_an_exception_when_trying_to_scope_a_permission_from_another_guard()
     {
         $this->expectException(PermissionDoesNotExist::class);
@@ -339,6 +378,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_doesnt_detach_permissions_when_user_soft_deleting()
     {
         $user = SoftDeletingUser::create(['email' => 'test@example.com']);
@@ -351,6 +391,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_give_and_revoke_multiple_permissions()
     {
         $this->testUserRole->givePermissionTo(['edit-articles', 'edit-news']);
@@ -363,6 +404,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_give_and_revoke_permissions_models_array()
     {
         $models = [app(Permission::class)::where('name', 'edit-articles')->first(), app(Permission::class)::where('name', 'edit-news')->first()];
@@ -377,6 +419,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_give_and_revoke_permissions_models_collection()
     {
         $models = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-news'])->get();
@@ -391,12 +434,14 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_determine_that_the_user_does_not_have_a_permission()
     {
         $this->assertFalse($this->testUser->hasPermissionTo('edit-articles'));
     }
 
     /** @test */
+    #[Test]
     public function it_throws_an_exception_when_the_permission_does_not_exist()
     {
         $this->expectException(PermissionDoesNotExist::class);
@@ -405,6 +450,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_throws_an_exception_when_the_permission_does_not_exist_for_this_guard()
     {
         $this->expectException(PermissionDoesNotExist::class);
@@ -413,14 +459,16 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_reject_a_user_that_does_not_have_any_permissions_at_all()
     {
-        $user = new User();
+        $user = new User;
 
         $this->assertFalse($user->hasPermissionTo('edit-articles'));
     }
 
     /** @test */
+    #[Test]
     public function it_can_determine_that_the_user_has_any_of_the_permissions_directly()
     {
         $this->assertFalse($this->testUser->hasAnyPermission('edit-articles'));
@@ -438,6 +486,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_determine_that_the_user_has_any_of_the_permissions_directly_using_an_array()
     {
         $this->assertFalse($this->testUser->hasAnyPermission(['edit-articles']));
@@ -454,6 +503,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_determine_that_the_user_has_any_of_the_permissions_via_role()
     {
         $this->testUserRole->givePermissionTo('edit-articles');
@@ -465,6 +515,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_determine_that_the_user_has_all_of_the_permissions_directly()
     {
         $this->testUser->givePermissionTo('edit-articles', 'edit-news');
@@ -478,6 +529,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_determine_that_the_user_has_all_of_the_permissions_directly_using_an_array()
     {
         $this->assertFalse($this->testUser->hasAllPermissions(['edit-articles', 'edit-news']));
@@ -494,6 +546,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_determine_that_the_user_has_all_of_the_permissions_via_role()
     {
         $this->testUserRole->givePermissionTo('edit-articles', 'edit-news');
@@ -504,6 +557,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_determine_that_user_has_direct_permission()
     {
         $this->testUser->givePermissionTo('edit-articles');
@@ -522,6 +576,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_list_all_the_permissions_via_roles_of_user()
     {
         $roleModel = app(Role::class);
@@ -537,6 +592,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_list_all_the_coupled_permissions_both_directly_and_via_roles()
     {
         $this->testUser->givePermissionTo('edit-news');
@@ -551,6 +607,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_sync_multiple_permissions()
     {
         $this->testUser->givePermissionTo('edit-news');
@@ -565,6 +622,18 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
+    public function it_can_avoid_sync_duplicated_permissions()
+    {
+        $this->testUser->syncPermissions('edit-articles', 'edit-blog', 'edit-blog');
+
+        $this->assertTrue($this->testUser->hasDirectPermission('edit-articles'));
+
+        $this->assertTrue($this->testUser->hasDirectPermission('edit-blog'));
+    }
+
+    /** @test */
+    #[Test]
     public function it_can_sync_multiple_permissions_by_id()
     {
         $this->testUser->givePermissionTo('edit-news');
@@ -581,6 +650,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function sync_permission_ignores_null_inputs()
     {
         $this->testUser->givePermissionTo('edit-news');
@@ -599,6 +669,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function sync_permission_error_does_not_detach_permissions()
     {
         $this->testUser->givePermissionTo('edit-news');
@@ -611,6 +682,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_does_not_remove_already_associated_permissions_when_assigning_new_permissions()
     {
         $this->testUser->givePermissionTo('edit-news');
@@ -621,6 +693,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_does_not_throw_an_exception_when_assigning_a_permission_that_is_already_assigned()
     {
         $this->testUser->givePermissionTo('edit-news');
@@ -631,11 +704,13 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_sync_permissions_to_a_model_that_is_not_persisted()
     {
         $user = new User(['email' => 'test@user.com']);
         $user->syncPermissions('edit-articles');
         $user->save();
+        $user->save(); // test save same model twice
 
         $this->assertTrue($user->hasPermissionTo('edit-articles'));
 
@@ -645,6 +720,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_does_not_run_unnecessary_sqls_when_assigning_new_permissions()
     {
         $permission2 = app(Permission::class)->where('name', ['edit-news'])->first();
@@ -653,10 +729,11 @@ class HasPermissionsTest extends TestCase
         $this->testUser->syncPermissions($this->testUserPermission, $permission2);
         DB::disableQueryLog();
 
-        $this->assertSame(2, count(DB::getQueryLog())); //avoid unnecessary sqls
+        $this->assertSame(2, count(DB::getQueryLog())); // avoid unnecessary sqls
     }
 
     /** @test */
+    #[Test]
     public function calling_givePermissionTo_before_saving_object_doesnt_interfere_with_other_objects()
     {
         $user = new User(['email' => 'test@user.com']);
@@ -675,10 +752,11 @@ class HasPermissionsTest extends TestCase
 
         $this->assertTrue($user2->fresh()->hasPermissionTo('edit-articles'));
         $this->assertFalse($user2->fresh()->hasPermissionTo('edit-news'));
-        $this->assertSame(2, count(DB::getQueryLog())); //avoid unnecessary sync
+        $this->assertSame(2, count(DB::getQueryLog())); // avoid unnecessary sync
     }
 
     /** @test */
+    #[Test]
     public function calling_syncPermissions_before_saving_object_doesnt_interfere_with_other_objects()
     {
         $user = new User(['email' => 'test@user.com']);
@@ -697,10 +775,11 @@ class HasPermissionsTest extends TestCase
 
         $this->assertTrue($user2->fresh()->hasPermissionTo('edit-articles'));
         $this->assertFalse($user2->fresh()->hasPermissionTo('edit-news'));
-        $this->assertSame(2, count(DB::getQueryLog())); //avoid unnecessary sync
+        $this->assertSame(2, count(DB::getQueryLog())); // avoid unnecessary sync
     }
 
     /** @test */
+    #[Test]
     public function it_can_retrieve_permission_names()
     {
         $this->testUser->givePermissionTo('edit-news', 'edit-articles');
@@ -711,6 +790,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_check_many_direct_permissions()
     {
         $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
@@ -721,6 +801,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_check_if_there_is_any_of_the_direct_permissions_given()
     {
         $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
@@ -730,6 +811,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_check_permission_based_on_logged_in_user_guard()
     {
         $this->testUser->givePermissionTo(app(Permission::class)::create([
@@ -744,6 +826,7 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_reject_permission_based_on_logged_in_user_guard()
     {
         $unassignedPermission = app(Permission::class)::create([
@@ -763,5 +846,40 @@ class HasPermissionsTest extends TestCase
         $response->assertJson([
             'status' => false,
         ]);
+    }
+
+    /** @test */
+    #[Test]
+    public function it_can_be_given_a_permission_on_role_when_lazy_loading_is_restricted()
+    {
+        $this->assertTrue(Model::preventsLazyLoading());
+
+        try {
+            $testRole = app(Role::class)->with('permissions')->get()->first();
+
+            $testRole->givePermissionTo('edit-articles');
+
+            $this->assertTrue($testRole->hasPermissionTo('edit-articles'));
+        } catch (Exception $e) {
+            $this->fail('Lazy loading detected in the givePermissionTo method: '.$e->getMessage());
+        }
+    }
+
+    /** @test */
+    #[Test]
+    public function it_can_be_given_a_permission_on_user_when_lazy_loading_is_restricted()
+    {
+        $this->assertTrue(Model::preventsLazyLoading());
+
+        try {
+            User::create(['email' => 'other@user.com']);
+            $testUser = User::with('permissions')->get()->first();
+
+            $testUser->givePermissionTo('edit-articles');
+
+            $this->assertTrue($testUser->hasPermissionTo('edit-articles'));
+        } catch (Exception $e) {
+            $this->fail('Lazy loading detected in the givePermissionTo method: '.$e->getMessage());
+        }
     }
 }

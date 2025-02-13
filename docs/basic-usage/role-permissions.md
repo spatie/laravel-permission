@@ -172,8 +172,3 @@ All these responses are collections of `Spatie\Permission\Models\Permission` obj
 If we follow the previous example, the first response will be a collection with the `delete article` permission and 
 the second will be a collection with the `edit article` permission and the third will contain both.
 
-
-
-## NOTE about using permission names in policies
-
-When calling `authorize()` for a policy method, if you have a permission named the same as one of those policy methods, your permission "name" will take precedence and not fire the policy. For this reason it may be wise to avoid naming your permissions the same as the methods in your policy. While you can define your own method names, you can read more about the defaults Laravel offers in Laravel's documentation at [Writing Policies](https://laravel.com/docs/authorization#writing-policies).

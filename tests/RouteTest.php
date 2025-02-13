@@ -2,9 +2,12 @@
 
 namespace Spatie\Permission\Tests;
 
+use PHPUnit\Framework\Attributes\Test;
+
 class RouteTest extends TestCase
 {
     /** @test */
+    #[Test]
     public function test_role_function()
     {
         $router = $this->getRouter();
@@ -17,6 +20,7 @@ class RouteTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function test_permission_function()
     {
         $router = $this->getRouter();
@@ -29,6 +33,7 @@ class RouteTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function test_role_and_permission_function_together()
     {
         $router = $this->getRouter();

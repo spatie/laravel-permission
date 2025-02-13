@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Tests;
 
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\PermissionAlreadyExists;
 use Spatie\Permission\Tests\TestModels\User;
@@ -9,6 +10,7 @@ use Spatie\Permission\Tests\TestModels\User;
 class PermissionTest extends TestCase
 {
     /** @test */
+    #[Test]
     public function it_get_user_models_using_with()
     {
         $this->testUser->givePermissionTo($this->testUserPermission);
@@ -23,6 +25,7 @@ class PermissionTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_throws_an_exception_when_the_permission_already_exists()
     {
         $this->expectException(PermissionAlreadyExists::class);
@@ -32,6 +35,7 @@ class PermissionTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_belongs_to_a_guard()
     {
         $permission = app(Permission::class)->create(['name' => 'can-edit', 'guard_name' => 'admin']);
@@ -40,6 +44,7 @@ class PermissionTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_belongs_to_the_default_guard_by_default()
     {
         $this->assertEquals(
@@ -49,6 +54,7 @@ class PermissionTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_has_user_models_of_the_right_class()
     {
         $this->testAdmin->givePermissionTo($this->testAdminPermission);
@@ -61,10 +67,23 @@ class PermissionTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_is_retrievable_by_id()
     {
         $permission_by_id = app(Permission::class)->findById($this->testUserPermission->id);
 
         $this->assertEquals($this->testUserPermission->id, $permission_by_id->id);
+    }
+
+    /** @test */
+    #[Test]
+    public function it_can_delete_hydrated_permissions()
+    {
+        $this->reloadPermissions();
+
+        $permission = app(Permission::class)->findByName($this->testUserPermission->name);
+        $permission->delete();
+
+        $this->assertCount(0, app(Permission::class)->where($this->testUserPermission->getKeyName(), $this->testUserPermission->getKey())->get());
     }
 }

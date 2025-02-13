@@ -3,6 +3,7 @@ composer.lock
 vendor
 tests/temp
 .idea
+.phpunit.cache
 .phpunit.result.cache
 .php-cs-fixer.cache
 tests/CreatePermissionCustomTables.php

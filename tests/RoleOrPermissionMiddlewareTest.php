@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
 use InvalidArgumentException;
 use Laravel\Passport\Passport;
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
 use Spatie\Permission\Tests\TestModels\UserWithoutHasRoles;
@@ -23,10 +24,11 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     {
         parent::setUp();
 
-        $this->roleOrPermissionMiddleware = new RoleOrPermissionMiddleware();
+        $this->roleOrPermissionMiddleware = new RoleOrPermissionMiddleware;
     }
 
     /** @test */
+    #[Test]
     public function a_guest_cannot_access_a_route_protected_by_the_role_or_permission_middleware()
     {
         $this->assertEquals(
@@ -36,6 +38,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_user_can_access_a_route_protected_by_permission_or_role_middleware_if_has_this_permission_or_role()
     {
         Auth::login($this->testUser);
@@ -70,6 +73,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_client_can_access_a_route_protected_by_permission_or_role_middleware_if_has_this_permission_or_role(): void
     {
         if ($this->getLaravelVersion() < 9) {
@@ -108,6 +112,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_super_admin_user_can_access_a_route_protected_by_permission_or_role_middleware()
     {
         Auth::login($this->testUser);
@@ -123,6 +128,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_user_can_not_access_a_route_protected_by_permission_or_role_middleware_if_have_not_has_roles_trait()
     {
         $userWithoutHasRoles = UserWithoutHasRoles::create(['email' => 'test_not_has_roles@user.com']);
@@ -136,6 +142,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_user_can_not_access_a_route_protected_by_permission_or_role_middleware_if_have_not_this_permission_and_role()
     {
         Auth::login($this->testUser);
@@ -152,6 +159,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_client_can_not_access_a_route_protected_by_permission_or_role_middleware_if_have_not_this_permission_and_role(): void
     {
         if ($this->getLaravelVersion() < 9) {
@@ -172,13 +180,14 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function use_not_existing_custom_guard_in_role_or_permission()
     {
         $class = null;
 
         try {
-            $this->roleOrPermissionMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
+            $this->roleOrPermissionMiddleware->handle(new Request, function () {
+                return (new Response)->setContent('<html></html>');
             }, 'testRole', 'xxx');
         } catch (InvalidArgumentException $e) {
             $class = get_class($e);
@@ -188,6 +197,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function user_can_not_access_permission_or_role_with_guard_admin_while_login_using_default_guard()
     {
         Auth::login($this->testUser);
@@ -202,6 +212,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function client_can_not_access_permission_or_role_with_guard_admin_while_login_using_default_guard(): void
     {
         if ($this->getLaravelVersion() < 9) {
@@ -220,6 +231,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function user_can_access_permission_or_role_with_guard_admin_while_login_using_admin_guard()
     {
         Auth::guard('admin')->login($this->testAdmin);
@@ -234,6 +246,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_required_permissions_or_roles_can_be_fetched_from_the_exception()
     {
         Auth::login($this->testUser);
@@ -242,8 +255,8 @@ class RoleOrPermissionMiddlewareTest extends TestCase
         $requiredRolesOrPermissions = [];
 
         try {
-            $this->roleOrPermissionMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
+            $this->roleOrPermissionMiddleware->handle(new Request, function () {
+                return (new Response)->setContent('<html></html>');
             }, 'some-permission|some-role');
         } catch (UnauthorizedException $e) {
             $message = $e->getMessage();
@@ -255,6 +268,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_required_permissions_or_roles_can_be_displayed_in_the_exception()
     {
         Auth::login($this->testUser);
@@ -264,8 +278,8 @@ class RoleOrPermissionMiddlewareTest extends TestCase
         $message = null;
 
         try {
-            $this->roleOrPermissionMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
+            $this->roleOrPermissionMiddleware->handle(new Request, function () {
+                return (new Response)->setContent('<html></html>');
             }, 'some-permission|some-role');
         } catch (UnauthorizedException $e) {
             $message = $e->getMessage();
@@ -275,6 +289,7 @@ class RoleOrPermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_middleware_can_be_created_with_static_using_method()
     {
         $this->assertSame(

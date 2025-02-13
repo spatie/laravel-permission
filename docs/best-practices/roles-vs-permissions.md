@@ -32,3 +32,6 @@ Summary:
 Sometimes certain groups of `route` rules may make best sense to group them around a `role`, but still, whenever possible, there is less overhead used if you can check against a specific `permission` instead.
 
 
+### FURTHER READING:
+
+[@joelclermont](https://github.com/joelclermont) at [masteringlaravel.io](https://masteringlaravel.io/daily) offers similar guidance in his post about [Treating Feature Access As Data, Not Code](https://masteringlaravel.io/daily/2025-01-09-treat-feature-access-as-data-not-code)

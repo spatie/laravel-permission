@@ -43,9 +43,27 @@ This package publishes a `config/permission.php` file. If you already have a fil
 
 ## Schema Limitation in MySQL
 
-MySQL 8.0 limits index keys to 1000 characters. This package publishes a migration which combines multiple columns in single index. With `utf8mb4` the 4-bytes-per-character requirement of `mb4` means the max length of the columns in the hybrid index can only be `125` characters.
+Potential error message: "1071 Specified key was too long; max key length is 1000 bytes"
 
-Thus in your AppServiceProvider you will need to set `Schema::defaultStringLength(125)`. [See the Laravel Docs for instructions](https://laravel.com/docs/migrations#index-lengths-mysql-mariadb).
+MySQL 8.0 limits index key lengths, which might be too short for some compound indexes used by this package.
+This package publishes a migration which combines multiple columns in a single index. With `utf8mb4` the 4-bytes-per-character requirement of `mb4` means the total length of the columns in the hybrid index can only be `25%` of that maximum index length.
+
+- MyISAM tables limit the index to 1000 characters (which is only 250 total chars in `utf8mb4`)
+- InnoDB tables using ROW_FORMAT of 'Redundant' or 'Compact' limit the index to 767 characters (which is only 191 total chars in `utf8mb4`)
+- InnoDB tables using ROW_FORMAT of 'Dynamic' or 'Compressed' have a 3072 character limit (which is 768 total chars in `utf8mb4`).
+
+Depending on your MySQL or MariaDB configuration, you may implement one of the following approaches:
+
+1. Ideally, configure the database to use InnoDB by default, and use ROW FORMAT of 'Dynamic' by default for all new tables. (See [MySQL](https://dev.mysql.com/doc/refman/8.0/en/innodb-limits.html) and [MariaDB](https://mariadb.com/kb/en/innodb-dynamic-row-format/) docs.)
+
+2. OR if your app doesn't require a longer default, in your AppServiceProvider you can set `Schema::defaultStringLength(125)`. [See the Laravel Docs for instructions](https://laravel.com/docs/migrations#index-lengths-mysql-mariadb). This will have Laravel set all strings to 125 characters by default.
+
+3. OR you could edit the migration and specify a shorter length for 4 fields. Then in your app be sure to manually impose validation limits on any form fields related to these fields. 
+There are 2 instances of this code snippet where you can explicitly set the length.:
+```php
+    $table->string('name');       // For MyISAM use string('name', 225); // (or 166 for InnoDB with Redundant/Compact row format)
+    $table->string('guard_name'); // For MyISAM use string('guard_name', 25);
+```
 
 ## Note for apps using UUIDs/ULIDs/GUIDs
 

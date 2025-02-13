@@ -2,7 +2,9 @@
 
 namespace Spatie\Permission\Tests;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
@@ -21,10 +23,10 @@ use Spatie\Permission\Tests\TestModels\User;
 
 abstract class TestCase extends Orchestra
 {
-    /** @var \Spatie\Permission\Tests\User */
+    /** @var \Spatie\Permission\Tests\TestModels\User */
     protected $testUser;
 
-    /** @var \Spatie\Permission\Tests\Admin */
+    /** @var \Spatie\Permission\Tests\TestModels\Admin */
     protected $testAdmin;
 
     /** @var \Spatie\Permission\Models\Role */
@@ -79,6 +81,15 @@ abstract class TestCase extends Orchestra
         $this->setUpRoutes();
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        if (method_exists(AboutCommand::class, 'flushState')) {
+            AboutCommand::flushState();
+        }
+    }
+
     /**
      * @param  \Illuminate\Foundation\Application  $app
      * @return array
@@ -100,9 +111,10 @@ abstract class TestCase extends Orchestra
      */
     protected function getEnvironmentSetUp($app)
     {
+        Model::preventLazyLoading();
         $app['config']->set('permission.register_permission_check_method', true);
         $app['config']->set('permission.teams', $this->hasTeams);
-        $app['config']->set('permission.testing', true); //fix sqlite
+        $app['config']->set('permission.testing', true); // fix sqlite
         $app['config']->set('permission.column_names.model_morph_key', 'model_test_id');
         $app['config']->set('permission.column_names.team_foreign_key', 'team_test_id');
         $app['config']->set('database.default', 'sqlite');
@@ -133,8 +145,8 @@ abstract class TestCase extends Orchestra
 
         // FOR MANUAL TESTING OF ALTERNATE CACHE STORES:
         // $app['config']->set('cache.default', 'array');
-        //Laravel supports: array, database, file
-        //requires extensions: apc, memcached, redis, dynamodb, octane
+        // Laravel supports: array, database, file
+        // requires extensions: apc, memcached, redis, dynamodb, octane
     }
 
     /**
@@ -203,8 +215,12 @@ abstract class TestCase extends Orchestra
         $app['config']->set('permission.use_passport_client_credentials', true);
         $app['config']->set('auth.guards.api', ['driver' => 'passport', 'provider' => 'users']);
 
-        $this->artisan('migrate');
-        $this->artisan('passport:install');
+        // mimic passport:install (must load migrations using our own call to loadMigrationsFrom() else rollbacks won't occur, and migrations will be left in skeleton directory
+        $this->artisan('passport:keys');
+        $this->loadMigrationsFrom(__DIR__.'/../vendor/laravel/passport/database/migrations/');
+        $provider = in_array('users', array_keys(config('auth.providers'))) ? 'users' : null;
+        $this->artisan('passport:client', ['--personal' => true, '--name' => config('app.name').' Personal Access Client']);
+        $this->artisan('passport:client', ['--password' => true, '--name' => config('app.name').' Password Grant Client', '--provider' => $provider]);
 
         $this->testClient = Client::create(['name' => 'Test', 'redirect' => 'https://example.com', 'personal_access_client' => 0, 'password_client' => 0, 'revoked' => 0]);
         $this->testClientRole = $app[Role::class]->create(['name' => 'clientRole', 'guard_name' => 'api']);
@@ -268,7 +284,7 @@ abstract class TestCase extends Orchestra
         });
     }
 
-    ////// TEST HELPERS
+    // //// TEST HELPERS
     public function runMiddleware($middleware, $permission, $guard = null, bool $client = false)
     {
         $request = new Request;
@@ -278,7 +294,7 @@ abstract class TestCase extends Orchestra
 
         try {
             return $middleware->handle($request, function () {
-                return (new Response())->setContent('<html></html>');
+                return (new Response)->setContent('<html></html>');
             }, $permission, $guard)->status();
         } catch (UnauthorizedException $e) {
             return $e->getStatusCode();
@@ -298,7 +314,7 @@ abstract class TestCase extends Orchestra
     public function getRouteResponse()
     {
         return function () {
-            return (new Response())->setContent('<html></html>');
+            return (new Response)->setContent('<html></html>');
         };
     }
 

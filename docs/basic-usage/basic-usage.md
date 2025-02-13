@@ -98,11 +98,11 @@ The scope can accept a string, a `\Spatie\Permission\Models\Permission` object o
 Since Role and Permission models are extended from Eloquent models, basic Eloquent calls can be used as well:
 
 ```php
-$all_users_with_all_their_roles = User::with('roles')->get();
-$all_users_with_all_their_direct_permissions = User::with('permissions')->get();
-$all_roles_in_database = Role::all()->pluck('name');
-$users_without_any_roles = User::doesntHave('roles')->get();
-$all_roles_except_a_and_b = Role::whereNotIn('name', ['role A', 'role B'])->get();
+$allUsersWithAllTheirRoles = User::with('roles')->get();
+$allUsersWithAllTheirDirectPermissions = User::with('permissions')->get();
+$allRolesInDatabase = Role::all()->pluck('name');
+$usersWithoutAnyRoles = User::doesntHave('roles')->get();
+$allRolesExceptAandB = Role::whereNotIn('name', ['role A', 'role B'])->get();
 ```
 
 ## Counting Users Having A Role

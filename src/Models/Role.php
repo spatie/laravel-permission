@@ -95,7 +95,7 @@ class Role extends Model implements RoleContract
      *
      * @throws RoleDoesNotExist
      */
-    public static function findByName(string $name, string $guardName = null): RoleContract
+    public static function findByName(string $name, ?string $guardName = null): RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
@@ -113,11 +113,11 @@ class Role extends Model implements RoleContract
      *
      * @return RoleContract|Role
      */
-    public static function findById(int|string $id, string $guardName = null): RoleContract
+    public static function findById(int|string $id, ?string $guardName = null): RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $role = static::findByParam([(new static())->getKeyName() => $id, 'guard_name' => $guardName]);
+        $role = static::findByParam([(new static)->getKeyName() => $id, 'guard_name' => $guardName]);
 
         if (! $role) {
             throw RoleDoesNotExist::withId($id, $guardName);
@@ -131,7 +131,7 @@ class Role extends Model implements RoleContract
      *
      * @return RoleContract|Role
      */
-    public static function findOrCreate(string $name, string $guardName = null): RoleContract
+    public static function findOrCreate(string $name, ?string $guardName = null): RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
@@ -172,11 +172,11 @@ class Role extends Model implements RoleContract
     /**
      * Determine if the role may perform the given permission.
      *
-     * @param  string|int|Permission|\BackedEnum  $permission
+     * @param  string|int|\Spatie\Permission\Contracts\Permission|\BackedEnum  $permission
      *
      * @throws PermissionDoesNotExist|GuardDoesNotMatch
      */
-    public function hasPermissionTo($permission, string $guardName = null): bool
+    public function hasPermissionTo($permission, ?string $guardName = null): bool
     {
         if ($this->getWildcardClass()) {
             return $this->hasWildcardPermission($permission, $guardName);
@@ -185,9 +185,10 @@ class Role extends Model implements RoleContract
         $permission = $this->filterPermission($permission, $guardName);
 
         if (! $this->getGuardNames()->contains($permission->guard_name)) {
-            throw GuardDoesNotMatch::create($permission->guard_name, $guardName ?? $this->getGuardNames());
+            throw GuardDoesNotMatch::create($permission->guard_name, $guardName ? collect([$guardName]) : $this->getGuardNames());
         }
 
-        return $this->permissions->contains($permission->getKeyName(), $permission->getKey());
+        return $this->loadMissing('permissions')->permissions
+            ->contains($permission->getKeyName(), $permission->getKey());
     }
 }
