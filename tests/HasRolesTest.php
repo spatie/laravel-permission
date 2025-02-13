@@ -147,6 +147,43 @@ class HasRolesTest extends TestCase
 
     /** @test */
     #[Test]
+    public function it_can_assign_and_remove_a_role_using_different_datatypes()
+    {
+        $this->assertFalse($this->testUser->hasRole('testRole'));
+
+        $this->testUser->assignRole(1);
+        $this->assertTrue($this->testUser->hasRole('testRole'));
+        $this->testUser->removeRole(1);
+        $this->assertFalse($this->testUser->hasRole('testRole'));
+
+        $this->testUser->assignRole('1');
+        $this->assertTrue($this->testUser->hasRole('testRole'));
+        $this->testUser->removeRole('1');
+        $this->assertFalse($this->testUser->hasRole('testRole'));
+
+        $this->testUser->assignRole($this->testUserRole);
+        $this->assertTrue($this->testUser->hasRole('testRole'));
+        $this->testUser->removeRole($this->testUserRole);
+        $this->assertFalse($this->testUser->hasRole('testRole'));
+
+        $this->testUser->assignRole([1]);
+        $this->assertTrue($this->testUser->hasRole('testRole'));
+        $this->testUser->removeRole([1]);
+        $this->assertFalse($this->testUser->hasRole('testRole'));
+
+        $this->testUser->assignRole(['1']);
+        $this->assertTrue($this->testUser->hasRole('testRole'));
+        $this->testUser->removeRole(['1']);
+        $this->assertFalse($this->testUser->hasRole('testRole'));
+
+        $this->testUser->assignRole([$this->testUserRole]);
+        $this->assertTrue($this->testUser->hasRole('testRole'));
+        $this->testUser->removeRole([$this->testUserRole]);
+        $this->assertFalse($this->testUser->hasRole('testRole'));
+    }
+
+    /** @test */
+    #[Test]
     public function it_removes_a_role_and_returns_roles()
     {
         $this->testUser->assignRole('testRole');
@@ -480,6 +517,34 @@ class HasRolesTest extends TestCase
         $user2->assignRole('testRole2');
 
         $scopedUsers = User::role('testRole')->get();
+
+        $this->assertEquals(1, $scopedUsers->count());
+    }
+
+    /** @test */
+    #[Test]
+    public function it_can_scope_users_using_a_int()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1->assignRole(1);
+        $user2->assignRole(2);
+
+        $scopedUsers = User::role(1)->get();
+
+        $this->assertEquals(1, $scopedUsers->count());
+    }
+
+    /** @test */
+    #[Test]
+    public function it_can_scope_users_using_a_string_int()
+    {
+        $user1 = User::create(['email' => 'user1@test.com']);
+        $user2 = User::create(['email' => 'user2@test.com']);
+        $user1->assignRole('1');
+        $user2->assignRole('2');
+
+        $scopedUsers = User::role('1')->get();
 
         $this->assertEquals(1, $scopedUsers->count());
     }
