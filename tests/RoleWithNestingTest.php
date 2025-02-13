@@ -2,6 +2,8 @@
 
 namespace Spatie\Permission\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Tests\TestModels\Role;
 
 class RoleWithNestingTest extends TestCase
@@ -62,6 +64,8 @@ class RoleWithNestingTest extends TestCase
     /** @test
      * @dataProvider roles_list
      */
+    #[DataProvider('roles_list')]
+    #[Test]
     public function it_returns_correct_withCount_of_nested_roles($role_group, $index, $relation, $expectedCount)
     {
         $role = $this->$role_group[$index];

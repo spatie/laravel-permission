@@ -2,7 +2,9 @@
 
 namespace Spatie\Permission\Tests\TestModels;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Role extends \Spatie\Permission\Models\Role
 {
@@ -17,10 +19,7 @@ class Role extends \Spatie\Permission\Models\Role
 
     const HIERARCHY_TABLE = 'roles_hierarchy';
 
-    /**
-     * @return string|\BackedEnum
-     */
-    public function getNameAttribute()
+    public function getNameAttribute(): \BackedEnum|string
     {
         $name = $this->attributes['name'];
 
@@ -31,10 +30,7 @@ class Role extends \Spatie\Permission\Models\Role
         return $name;
     }
 
-    /**
-     * @return BelongsToMany
-     */
-    public function parents()
+    public function parents(): BelongsToMany
     {
         return $this->belongsToMany(
             static::class,
@@ -43,10 +39,7 @@ class Role extends \Spatie\Permission\Models\Role
             'parent_id');
     }
 
-    /**
-     * @return BelongsToMany
-     */
-    public function children()
+    public function children(): BelongsToMany
     {
         return $this->belongsToMany(
             static::class,
@@ -58,19 +51,19 @@ class Role extends \Spatie\Permission\Models\Role
     protected static function boot()
     {
         parent::boot();
-        static::creating(function ($model) {
+        static::creating(static function ($model) {
             if (empty($model->{$model->getKeyName()})) {
-                $model->{$model->getKeyName()} = \Str::uuid()->toString();
+                $model->{$model->getKeyName()} = Str::uuid()->toString();
             }
         });
     }
 
-    public function getIncrementing()
+    public function getIncrementing(): bool
     {
         return false;
     }
 
-    public function getKeyType()
+    public function getKeyType(): string
     {
         return 'string';
     }

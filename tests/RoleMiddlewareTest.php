@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use InvalidArgumentException;
 use Laravel\Passport\Passport;
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Tests\TestModels\UserWithoutHasRoles;
@@ -26,6 +27,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_guest_cannot_access_a_route_protected_by_rolemiddleware()
     {
         $this->assertEquals(
@@ -35,6 +37,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_user_cannot_access_a_route_protected_by_role_middleware_of_another_guard()
     {
         Auth::login($this->testUser);
@@ -48,6 +51,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_client_cannot_access_a_route_protected_by_role_middleware_of_another_guard(): void
     {
         if ($this->getLaravelVersion() < 9) {
@@ -65,6 +69,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_user_can_access_a_route_protected_by_role_middleware_if_have_this_role()
     {
         Auth::login($this->testUser);
@@ -78,6 +83,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_client_can_access_a_route_protected_by_role_middleware_if_have_this_role(): void
     {
         if ($this->getLaravelVersion() < 9) {
@@ -95,6 +101,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_user_can_access_a_route_protected_by_this_role_middleware_if_have_one_of_the_roles()
     {
         Auth::login($this->testUser);
@@ -113,6 +120,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_client_can_access_a_route_protected_by_this_role_middleware_if_have_one_of_the_roles(): void
     {
         if ($this->getLaravelVersion() < 9) {
@@ -135,6 +143,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_user_cannot_access_a_route_protected_by_the_role_middleware_if_have_not_has_roles_trait()
     {
         $userWithoutHasRoles = UserWithoutHasRoles::create(['email' => 'test_not_has_roles@user.com']);
@@ -148,6 +157,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_user_cannot_access_a_route_protected_by_the_role_middleware_if_have_a_different_role()
     {
         Auth::login($this->testUser);
@@ -161,6 +171,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_client_cannot_access_a_route_protected_by_the_role_middleware_if_have_a_different_role(): void
     {
         if ($this->getLaravelVersion() < 9) {
@@ -178,6 +189,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_user_cannot_access_a_route_protected_by_role_middleware_if_have_not_roles()
     {
         Auth::login($this->testUser);
@@ -189,6 +201,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_client_cannot_access_a_route_protected_by_role_middleware_if_have_not_roles(): void
     {
         if ($this->getLaravelVersion() < 9) {
@@ -204,6 +217,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_user_cannot_access_a_route_protected_by_role_middleware_if_role_is_undefined()
     {
         Auth::login($this->testUser);
@@ -215,6 +229,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_client_cannot_access_a_route_protected_by_role_middleware_if_role_is_undefined(): void
     {
         if ($this->getLaravelVersion() < 9) {
@@ -230,6 +245,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_required_roles_can_be_fetched_from_the_exception()
     {
         Auth::login($this->testUser);
@@ -251,6 +267,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_required_roles_can_be_displayed_in_the_exception()
     {
         Auth::login($this->testUser);
@@ -270,6 +287,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function use_not_existing_custom_guard_in_role()
     {
         $class = null;
@@ -286,6 +304,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function user_can_not_access_role_with_guard_admin_while_login_using_default_guard()
     {
         Auth::login($this->testUser);
@@ -299,6 +318,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function client_can_not_access_role_with_guard_admin_while_login_using_default_guard(): void
     {
         if ($this->getLaravelVersion() < 9) {
@@ -316,6 +336,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function user_can_access_role_with_guard_admin_while_login_using_admin_guard()
     {
         Auth::guard('admin')->login($this->testAdmin);
@@ -329,6 +350,7 @@ class RoleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_middleware_can_be_created_with_static_using_method()
     {
         $this->assertSame(

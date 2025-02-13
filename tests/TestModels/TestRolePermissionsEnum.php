@@ -2,6 +2,8 @@
 
 namespace Spatie\Permission\Tests\TestModels;
 
+use Illuminate\Support\Str;
+
 /**
  * Enum example
  *
@@ -53,6 +55,8 @@ enum TestRolePermissionsEnum: string
 
             self::VIEWARTICLES => 'View Articles',
             self::EDITARTICLES => 'Edit Articles',
+
+            default => Str::words($this->name)
         };
     }
 }

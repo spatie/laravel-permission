@@ -2,6 +2,105 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 6.13.0 - 2025-02-05
+
+### What's Changed
+
+* LazyLoading: Explicitly call `loadMissing('permissions')` when the relation is needed, and test with `Model::preventLazyLoading()` by @erikn69 in https://github.com/spatie/laravel-permission/pull/2776
+* [Docs] Add instructions to reinitialize cache for multi-tenancy key settings when updating multiple tenants in a single request cycle, by @sudkumar in https://github.com/spatie/laravel-permission/pull/2804
+
+### New Contributors
+
+* @sudkumar made their first contribution in https://github.com/spatie/laravel-permission/pull/2804
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/6.12.0...6.13.0
+
+## 6.12.0 - 2025-01-31
+
+### What's Changed
+
+* Support Laravel 12
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/6.11.0...6.12.0
+
+## 6.11.0 - 2025-01-30
+
+### What's Changed
+
+* Add configurable team resolver for permission team id (helpful for Jetstream, etc) by @adrenallen in https://github.com/spatie/laravel-permission/pull/2790
+
+### Internals
+
+* Replace php-cs-fixer with Laravel Pint by @bobbrodie in https://github.com/spatie/laravel-permission/pull/2780
+
+### Documentation Updates
+
+* [Docs] Include namespace in example in uuid.md by @ken-tam in https://github.com/spatie/laravel-permission/pull/2764
+* [Docs] Include Laravel 11 example in exceptions.md by @frankliniwobi in https://github.com/spatie/laravel-permission/pull/2768
+* [Docs] Fix typo in code example in passport.md by @m3skalina in https://github.com/spatie/laravel-permission/pull/2782
+* [Docs] Correct username in new-app.md by @trippodi in https://github.com/spatie/laravel-permission/pull/2785
+* [Docs] Add composer specificity by @imanghafoori1 in https://github.com/spatie/laravel-permission/pull/2772
+* [Docs] Update installation-laravel.md to fix providers.php location. by @curiousteam in https://github.com/spatie/laravel-permission/pull/2796
+
+### New Contributors
+
+* @ken-tam made their first contribution in https://github.com/spatie/laravel-permission/pull/2764
+* @frankliniwobi made their first contribution in https://github.com/spatie/laravel-permission/pull/2768
+* @bobbrodie made their first contribution in https://github.com/spatie/laravel-permission/pull/2780
+* @m3skalina made their first contribution in https://github.com/spatie/laravel-permission/pull/2782
+* @trippodi made their first contribution in https://github.com/spatie/laravel-permission/pull/2785
+* @imanghafoori1 made their first contribution in https://github.com/spatie/laravel-permission/pull/2772
+* @curiousteam made their first contribution in https://github.com/spatie/laravel-permission/pull/2796
+* @adrenallen made their first contribution in https://github.com/spatie/laravel-permission/pull/2790
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/6.10.1...6.11.0
+
+## 6.10.1 - 2024-11-08
+
+### What's Changed
+
+* Fix #2749 regression bug in `6.10.0` : "Can no longer delete permissions" by @erikn69 in https://github.com/spatie/laravel-permission/pull/2759
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/6.10.0...6.10.1
+
+## 6.10.0 - 2024-11-05
+
+### What's Changed
+
+* Fix `GuardDoesNotMatch should accept collection` by @erikn69 in https://github.com/spatie/laravel-permission/pull/2748
+* Improve performance for hydrated collections by @inserve-paul in https://github.com/spatie/laravel-permission/pull/2749
+* Only show error if `cache key exists` and `forgetCachedPermissions` fails by @erikn69 in https://github.com/spatie/laravel-permission/pull/2707
+* Remove v5 cache fallback alias by @drbyte in https://github.com/spatie/laravel-permission/pull/2754
+* Include `Larastan` in `dev` by @drbyte in https://github.com/spatie/laravel-permission/pull/2755
+
+#### Docs
+
+* [Docs example] Check for 'all' or 'any' permissions before specific permissions by @ceilidhboy in https://github.com/spatie/laravel-permission/pull/2694
+* [Docs] Fix typo in uuid.md by @levizoesch in https://github.com/spatie/laravel-permission/pull/2705
+* [Docs] Upgrade Guide - Add PR links to upgrade guide by @mraheelkhan in https://github.com/spatie/laravel-permission/pull/2716
+* [Docs] use more modern syntax for nullable return type by @galangaidilakbar in https://github.com/spatie/laravel-permission/pull/2719
+* [Docs] camelCase variable naming in example by @KamilWojtalak in https://github.com/spatie/laravel-permission/pull/2723
+* [Docs] Update using-policies.md by @marcleonhard in https://github.com/spatie/laravel-permission/pull/2741
+* [Docs] Example of pushing custom middleware before SubstituteBindings middleware by @WyattCast44 in https://github.com/spatie/laravel-permission/pull/2740
+
+#### Other
+
+* PHP 8.4 tests by @erikn69 in https://github.com/spatie/laravel-permission/pull/2747
+* Fix comment typo by @machacekmartin in https://github.com/spatie/laravel-permission/pull/2753
+
+### New Contributors
+
+* @ceilidhboy made their first contribution in https://github.com/spatie/laravel-permission/pull/2694
+* @levizoesch made their first contribution in https://github.com/spatie/laravel-permission/pull/2705
+* @galangaidilakbar made their first contribution in https://github.com/spatie/laravel-permission/pull/2719
+* @KamilWojtalak made their first contribution in https://github.com/spatie/laravel-permission/pull/2723
+* @marcleonhard made their first contribution in https://github.com/spatie/laravel-permission/pull/2741
+* @WyattCast44 made their first contribution in https://github.com/spatie/laravel-permission/pull/2740
+* @inserve-paul made their first contribution in https://github.com/spatie/laravel-permission/pull/2749
+* @machacekmartin made their first contribution in https://github.com/spatie/laravel-permission/pull/2753
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/6.9.0...6.10.0
+
 ## 6.9.0 - 2024-06-22
 
 ### What's Changed
@@ -845,6 +944,11 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
+
+
+
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -892,6 +996,11 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
+
+
+
+
 
 
 
