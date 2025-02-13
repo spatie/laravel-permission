@@ -14,8 +14,6 @@ class Client extends BaseClient implements AuthorizableContract
 
     /**
      * Required to make clear that the client requires the api guard
-     *
-     * @var string
      */
-    protected $guard_name = 'api';
+    protected string $guard_name = 'api';
 }

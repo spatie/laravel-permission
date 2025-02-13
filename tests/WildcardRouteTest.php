@@ -2,9 +2,12 @@
 
 namespace Spatie\Permission\Tests;
 
+use PHPUnit\Framework\Attributes\Test;
+
 class WildcardRouteTest extends TestCase
 {
     /** @test */
+    #[Test]
     public function test_permission_function()
     {
         app('config')->set('permission.enable_wildcard_permission', true);
@@ -19,6 +22,7 @@ class WildcardRouteTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function test_role_and_permission_function_together()
     {
         app('config')->set('permission.enable_wildcard_permission', true);

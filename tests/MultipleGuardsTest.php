@@ -4,6 +4,7 @@ namespace Spatie\Permission\Tests;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Tests\TestModels\Manager;
 
@@ -37,6 +38,7 @@ class MultipleGuardsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_give_a_permission_to_a_model_that_is_used_by_multiple_guards()
     {
         $this->testUser->givePermissionTo(app(Permission::class)::create([
@@ -55,6 +57,7 @@ class MultipleGuardsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_gate_can_grant_permission_to_a_user_by_passing_a_guard_name()
     {
         $this->testUser->givePermissionTo(app(Permission::class)::create([
@@ -96,6 +99,7 @@ class MultipleGuardsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_honour_guardName_function_on_model_for_overriding_guard_name_property()
     {
         $user = Manager::create(['email' => 'manager@test.com']);

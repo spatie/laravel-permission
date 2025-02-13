@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
 use InvalidArgumentException;
 use Laravel\Passport\Passport;
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middleware\PermissionMiddleware;
@@ -28,6 +29,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_guest_cannot_access_a_route_protected_by_the_permission_middleware()
     {
         $this->assertEquals(
@@ -37,6 +39,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_user_cannot_access_a_route_protected_by_the_permission_middleware_of_a_different_guard()
     {
         // These permissions are created fresh here in reverse order of guard being applied, so they are not "found first" in the db lookup when matching
@@ -75,6 +78,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_client_cannot_access_a_route_protected_by_the_permission_middleware_of_a_different_guard(): void
     {
         if ($this->getLaravelVersion() < 9) {
@@ -101,6 +105,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_super_admin_user_can_access_a_route_protected_by_permission_middleware()
     {
         Auth::login($this->testUser);
@@ -116,6 +121,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_user_can_access_a_route_protected_by_permission_middleware_if_have_this_permission()
     {
         Auth::login($this->testUser);
@@ -129,6 +135,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_client_can_access_a_route_protected_by_permission_middleware_if_have_this_permission(): void
     {
         if ($this->getLaravelVersion() < 9) {
@@ -146,6 +153,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_user_can_access_a_route_protected_by_this_permission_middleware_if_have_one_of_the_permissions()
     {
         Auth::login($this->testUser);
@@ -164,6 +172,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_client_can_access_a_route_protected_by_this_permission_middleware_if_have_one_of_the_permissions(): void
     {
         if ($this->getLaravelVersion() < 9) {
@@ -186,6 +195,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_user_cannot_access_a_route_protected_by_the_permission_middleware_if_have_not_has_roles_trait()
     {
         $userWithoutHasRoles = UserWithoutHasRoles::create(['email' => 'test_not_has_roles@user.com']);
@@ -199,6 +209,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_user_cannot_access_a_route_protected_by_the_permission_middleware_if_have_a_different_permission()
     {
         Auth::login($this->testUser);
@@ -212,6 +223,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_client_cannot_access_a_route_protected_by_the_permission_middleware_if_have_a_different_permission(): void
     {
         if ($this->getLaravelVersion() < 9) {
@@ -229,6 +241,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_user_cannot_access_a_route_protected_by_permission_middleware_if_have_not_permissions()
     {
         Auth::login($this->testUser);
@@ -240,6 +253,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_client_cannot_access_a_route_protected_by_permission_middleware_if_have_not_permissions(): void
     {
         if ($this->getLaravelVersion() < 9) {
@@ -255,6 +269,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_user_can_access_a_route_protected_by_permission_middleware_if_has_permission_via_role()
     {
         Auth::login($this->testUser);
@@ -274,6 +289,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_client_can_access_a_route_protected_by_permission_middleware_if_has_permission_via_role(): void
     {
         if ($this->getLaravelVersion() < 9) {
@@ -297,6 +313,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_required_permissions_can_be_fetched_from_the_exception()
     {
         Auth::login($this->testUser);
@@ -318,6 +335,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_required_permissions_can_be_displayed_in_the_exception()
     {
         Auth::login($this->testUser);
@@ -337,6 +355,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function use_not_existing_custom_guard_in_permission()
     {
         $class = null;
@@ -353,6 +372,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function user_can_not_access_permission_with_guard_admin_while_login_using_default_guard()
     {
         Auth::login($this->testUser);
@@ -366,6 +386,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function client_can_not_access_permission_with_guard_admin_while_login_using_default_guard(): void
     {
         if ($this->getLaravelVersion() < 9) {
@@ -383,6 +404,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function user_can_access_permission_with_guard_admin_while_login_using_admin_guard()
     {
         Auth::guard('admin')->login($this->testAdmin);
@@ -396,6 +418,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_middleware_can_be_created_with_static_using_method()
     {
         $this->assertSame(

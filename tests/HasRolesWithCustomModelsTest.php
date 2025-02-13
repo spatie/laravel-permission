@@ -4,6 +4,7 @@ namespace Spatie\Permission\Tests;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Tests\TestModels\Admin;
 use Spatie\Permission\Tests\TestModels\Role;
 
@@ -25,12 +26,14 @@ class HasRolesWithCustomModelsTest extends HasRolesTest
     }
 
     /** @test */
+    #[Test]
     public function it_can_use_custom_model_role()
     {
         $this->assertSame(get_class($this->testUserRole), Role::class);
     }
 
     /** @test */
+    #[Test]
     public function it_doesnt_detach_permissions_when_soft_deleting()
     {
         $this->testUserRole->givePermissionTo($this->testUserPermission);
@@ -47,6 +50,7 @@ class HasRolesWithCustomModelsTest extends HasRolesTest
     }
 
     /** @test */
+    #[Test]
     public function it_doesnt_detach_users_when_soft_deleting()
     {
         $this->testUser->assignRole($this->testUserRole);
@@ -63,6 +67,7 @@ class HasRolesWithCustomModelsTest extends HasRolesTest
     }
 
     /** @test */
+    #[Test]
     public function it_does_detach_permissions_and_users_when_force_deleting()
     {
         $role_id = $this->testUserRole->getKey();
@@ -83,6 +88,7 @@ class HasRolesWithCustomModelsTest extends HasRolesTest
     }
 
     /** @test */
+    #[Test]
     public function it_should_touch_when_assigning_new_roles()
     {
         Carbon::setTestNow('2021-07-19 10:13:14');

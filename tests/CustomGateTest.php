@@ -3,6 +3,7 @@
 namespace Spatie\Permission\Tests;
 
 use Illuminate\Contracts\Auth\Access\Gate;
+use PHPUnit\Framework\Attributes\Test;
 
 class CustomGateTest extends TestCase
 {
@@ -14,6 +15,7 @@ class CustomGateTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_doesnt_register_the_method_for_checking_permissions_on_the_gate()
     {
         $this->testUser->givePermissionTo('edit-articles');
@@ -23,6 +25,7 @@ class CustomGateTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_authorize_using_custom_method_for_checking_permissions()
     {
         app(Gate::class)->define('edit-articles', function () {

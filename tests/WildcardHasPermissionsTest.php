@@ -2,6 +2,8 @@
 
 namespace Spatie\Permission\Tests;
 
+use PHPUnit\Framework\Attributes\RequiresPhp;
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Exceptions\WildcardPermissionInvalidArgument;
 use Spatie\Permission\Exceptions\WildcardPermissionNotProperlyFormatted;
@@ -12,6 +14,7 @@ use Spatie\Permission\Tests\TestModels\WildcardPermission;
 class WildcardHasPermissionsTest extends TestCase
 {
     /** @test */
+    #[Test]
     public function it_can_check_wildcard_permission()
     {
         app('config')->set('permission.enable_wildcard_permission', true);
@@ -32,6 +35,7 @@ class WildcardHasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_check_wildcard_permission_for_a_non_default_guard()
     {
         app('config')->set('permission.enable_wildcard_permission', true);
@@ -52,6 +56,7 @@ class WildcardHasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_check_wildcard_permission_from_instance_without_explicit_guard_argument()
     {
         app('config')->set('permission.enable_wildcard_permission', true);
@@ -77,6 +82,8 @@ class WildcardHasPermissionsTest extends TestCase
      *
      * @requires PHP >= 8.1
      */
+    #[RequiresPhp('>= 8.1')]
+    #[Test]
     public function it_can_assign_wildcard_permissions_using_enums()
     {
         app('config')->set('permission.enable_wildcard_permission', true);
@@ -114,6 +121,7 @@ class WildcardHasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_check_wildcard_permissions_via_roles()
     {
         app('config')->set('permission.enable_wildcard_permission', true);
@@ -137,6 +145,7 @@ class WildcardHasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_check_custom_wildcard_permission()
     {
         app('config')->set('permission.enable_wildcard_permission', true);
@@ -160,6 +169,7 @@ class WildcardHasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_check_custom_wildcard_permissions_via_roles()
     {
         app('config')->set('permission.enable_wildcard_permission', true);
@@ -186,6 +196,7 @@ class WildcardHasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_check_non_wildcard_permissions()
     {
         app('config')->set('permission.enable_wildcard_permission', true);
@@ -204,6 +215,7 @@ class WildcardHasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_verify_complex_wildcard_permissions()
     {
         app('config')->set('permission.enable_wildcard_permission', true);
@@ -224,6 +236,7 @@ class WildcardHasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_throws_exception_when_wildcard_permission_is_not_properly_formatted()
     {
         app('config')->set('permission.enable_wildcard_permission', true);
@@ -240,6 +253,7 @@ class WildcardHasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_verify_permission_instances_not_assigned_to_user()
     {
         app('config')->set('permission.enable_wildcard_permission', true);
@@ -258,6 +272,7 @@ class WildcardHasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_verify_permission_instances_assigned_to_user()
     {
         app('config')->set('permission.enable_wildcard_permission', true);
@@ -276,6 +291,7 @@ class WildcardHasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_verify_integers_as_strings()
     {
         app('config')->set('permission.enable_wildcard_permission', true);
@@ -290,6 +306,7 @@ class WildcardHasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_throws_exception_when_permission_has_invalid_arguments()
     {
         app('config')->set('permission.enable_wildcard_permission', true);
@@ -302,6 +319,7 @@ class WildcardHasPermissionsTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_throws_exception_when_permission_id_not_exists()
     {
         app('config')->set('permission.enable_wildcard_permission', true);

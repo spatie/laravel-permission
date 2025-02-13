@@ -8,5 +8,5 @@ class SoftDeletingUser extends User
 {
     use SoftDeletes;
 
-    protected $guard_name = 'web';
+    protected string $guard_name = 'web';
 }
