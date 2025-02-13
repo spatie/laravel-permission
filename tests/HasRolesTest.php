@@ -10,6 +10,7 @@ use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
+use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Tests\TestModels\Admin;
 use Spatie\Permission\Tests\TestModels\SoftDeletingUser;
 use Spatie\Permission\Tests\TestModels\User;
@@ -390,7 +391,10 @@ class HasRolesTest extends TestCase
         $this->testUser->syncRoles($this->testUserRole, $role2);
         DB::disableQueryLog();
 
-        $this->assertSame(2, count(DB::getQueryLog())); // avoid unnecessary sqls
+        // necessary queries count depends on whether teams is enabled, because teams reloads roles relation
+        $necessaryQueriesCount = app(PermissionRegistrar::class)->teams ? 3 : 2;
+
+        $this->assertCount($necessaryQueriesCount, DB::getQueryLog());
     }
 
     /** @test */
