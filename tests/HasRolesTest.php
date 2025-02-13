@@ -362,10 +362,10 @@ class HasRolesTest extends TestCase
         $this->testUser->syncRoles($this->testUserRole, $role2);
         DB::disableQueryLog();
 
-        // necesssary queries count depends on whether we use teams or not
+        // necessary queries count depends on whether teams is enabled, because teams reloads roles relation
         $necessaryQueriesCount = app(PermissionRegistrar::class)->teams ? 3 : 2;
 
-        $this->assertSame($necessaryQueriesCount, count(DB::getQueryLog())); // avoid unnecessary sqls
+        $this->assertCount($necessaryQueriesCount, DB::getQueryLog());
     }
 
     /** @test */
