@@ -74,7 +74,6 @@ class Guard
                     return null;
                 }
 
-                // Fetch the model for this guard
                 return static::getProviderModel($guard['provider']);
             })
             ->filter(fn ($model) => $class === $model)
@@ -96,7 +95,6 @@ class Guard
             return null;
         }
 
-        // Use the new getProviderModel method to fetch the model
         return static::getProviderModel($provider);
     }
 
