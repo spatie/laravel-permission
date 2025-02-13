@@ -2,6 +2,22 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 6.14.0 - 2025-02-13
+
+### What's Changed
+
+* LDAP model lookup from Auth Provider by @crossplatformconsulting in https://github.com/spatie/laravel-permission/pull/2750
+
+### Internals
+
+* Add PHPUnit annotations, for future compatibility with PHPUnit 12 by @drbyte in https://github.com/spatie/laravel-permission/pull/2806
+
+### New Contributors
+
+* @crossplatformconsulting made their first contribution in https://github.com/spatie/laravel-permission/pull/2750
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/6.13.0...6.14.0
+
 ## 6.13.0 - 2025-02-05
 
 ### What's Changed
@@ -949,6 +965,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -996,6 +1013,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
