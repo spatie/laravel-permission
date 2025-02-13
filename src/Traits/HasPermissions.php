@@ -9,6 +9,8 @@ use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Contracts\Wildcard;
+use Spatie\Permission\Events\PermissionAttached;
+use Spatie\Permission\Events\PermissionDetached;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Exceptions\WildcardPermissionInvalidArgument;
@@ -423,6 +425,8 @@ trait HasPermissions
             $this->forgetCachedPermissions();
         }
 
+        event(new PermissionAttached($this->getModel(), $permissions));
+
         $this->forgetWildcardPermissionIndex();
 
         return $this;
@@ -460,11 +464,15 @@ trait HasPermissions
      */
     public function revokePermissionTo($permission)
     {
-        $this->permissions()->detach($this->getStoredPermission($permission));
+        $storedPermission = $this->getStoredPermission($permission);
+
+        $this->permissions()->detach($storedPermission);
 
         if (is_a($this, Role::class)) {
             $this->forgetCachedPermissions();
         }
+
+        event(new PermissionDetached($this->getModel(), $storedPermission));
 
         $this->forgetWildcardPermissionIndex();
 

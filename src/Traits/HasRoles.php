@@ -8,6 +8,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
+use Spatie\Permission\Events\RoleAttached;
+use Spatie\Permission\Events\RoleDetached;
 use Spatie\Permission\PermissionRegistrar;
 
 trait HasRoles
@@ -176,6 +178,8 @@ trait HasRoles
             $this->forgetCachedPermissions();
         }
 
+        event(new RoleAttached($this->getModel(), $roles));
+
         return $this;
     }
 
@@ -186,13 +190,17 @@ trait HasRoles
      */
     public function removeRole($role)
     {
-        $this->roles()->detach($this->getStoredRole($role));
+        $storedRole = $this->getStoredRole($role);
+
+        $this->roles()->detach($storedRole);
 
         $this->unsetRelation('roles');
 
         if (is_a($this, Permission::class)) {
             $this->forgetCachedPermissions();
         }
+
+        event(new RoleDetached($this->getModel(), $storedRole));
 
         return $this;
     }
