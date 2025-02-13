@@ -40,9 +40,6 @@ class Guard
 
     /**
      * Get the model class associated with a given provider.
-     *
-     * @param  string  $provider
-     * @return string|null
      */
     protected static function getProviderModel(string $provider): ?string
     {
@@ -70,7 +67,7 @@ class Guard
     {
         return collect(config('auth.guards'))
             ->map(function ($guard) {
-                if (!isset($guard['provider'])) {
+                if (! isset($guard['provider'])) {
                     return null;
                 }
 
@@ -82,16 +79,13 @@ class Guard
 
     /**
      * Get the model associated with a given guard name.
-     *
-     * @param  string  $guard
-     * @return string|null
      */
     public static function getModelForGuard(string $guard): ?string
     {
         // Get the provider configuration for the given guard
         $provider = config("auth.guards.{$guard}.provider");
 
-        if (!$provider) {
+        if (! $provider) {
             return null;
         }
 

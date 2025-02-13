@@ -1,9 +1,6 @@
 <?php
 
 if (! function_exists('getModelForGuard')) {
-    /**
-     * @return string|null
-     */
     function getModelForGuard(string $guard): ?string
     {
         return Spatie\Permission\Guard::getModelForGuard($guard);
