@@ -937,7 +937,7 @@ class HasRolesTest extends TestCase
             return $event->model instanceof User
                 && $event->model->hasRole('testRole')
                 && $event->model->hasRole('testRole2')
-                && $event->roleIds === $roleIds;
+                && $event->rolesOrIds === $roleIds;
         });
     }
 
@@ -955,7 +955,7 @@ class HasRolesTest extends TestCase
         Event::assertDispatched(RoleDetached::class, function ($event) {
             return $event->model instanceof User
                 && !$event->model->hasRole('testRole')
-                && $event->role->name === 'testRole';
+                && $event->rolesOrIds->name === 'testRole';
         });
     }
   
