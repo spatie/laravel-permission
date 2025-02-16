@@ -4,10 +4,13 @@ namespace Spatie\Permission\Tests;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
+use Spatie\Permission\Events\RoleAttached;
+use Spatie\Permission\Events\RoleDetached;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Tests\TestModels\Admin;
@@ -917,6 +920,45 @@ class HasRolesTest extends TestCase
         $this->assertTrue($user->hasRole('testRole'));
     }
 
+    /** @test */
+    #[Test]
+    public function it_fires_an_event_when_a_role_is_added()
+    {
+        Event::fake();
+        app('config')->set('permission.events_enabled', true);
+        
+        $this->testUser->assignRole(['testRole', 'testRole2']);
+
+        $roleIds = app(Role::class)::whereIn('name', ['testRole', 'testRole2'])
+            ->pluck($this->testUserRole->getKeyName())
+            ->toArray();
+
+        Event::assertDispatched(RoleAttached::class, function ($event) use ($roleIds) {
+            return $event->model instanceof User
+                && $event->model->hasRole('testRole')
+                && $event->model->hasRole('testRole2')
+                && $event->rolesOrIds === $roleIds;
+        });
+    }
+
+    /** @test */
+    #[Test]
+    public function it_fires_an_event_when_a_role_is_removed()
+    {
+        Event::fake();
+        app('config')->set('permission.events_enabled', true);
+        
+        $this->testUser->assignRole('testRole');
+
+        $this->testUser->removeRole('testRole');
+
+        Event::assertDispatched(RoleDetached::class, function ($event) {
+            return $event->model instanceof User
+                && !$event->model->hasRole('testRole')
+                && $event->rolesOrIds->name === 'testRole';
+        });
+    }
+  
     /** @test */
     #[Test]
     public function it_can_be_given_a_role_on_permission_when_lazy_loading_is_restricted()

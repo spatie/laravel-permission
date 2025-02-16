@@ -3,11 +3,15 @@
 namespace Spatie\Permission\Tests;
 
 use DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Database\Eloquent\Model;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
+use Spatie\Permission\Events\PermissionAttached;
+use Spatie\Permission\Events\PermissionDetached;
+use Spatie\Permission\Events\RoleAttached;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Tests\TestModels\SoftDeletingUser;
@@ -824,6 +828,64 @@ class HasPermissionsTest extends TestCase
         ]);
     }
 
+    /** @test */
+    #[Test]
+    public function it_fires_an_event_when_a_permission_is_added()
+    {
+        Event::fake();
+        app('config')->set('permission.events_enabled', true);
+        
+        $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
+
+        $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-news'])
+            ->pluck($this->testUserPermission->getKeyName())
+            ->toArray();
+
+        Event::assertDispatched(PermissionAttached::class, function ($event) use ($ids) {
+            return $event->model instanceof User
+                && $event->model->hasPermissionTo('edit-news')
+                && $event->model->hasPermissionTo('edit-articles')
+                && $ids === $event->permissionsOrIds;
+        });
+    }
+
+    /** @test */
+    #[Test]
+    public function it_does_not_fire_an_event_when_events_are_not_enabled()
+    {
+        Event::fake();
+        app('config')->set('permission.events_enabled', false);
+        
+        $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
+
+        $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-news'])
+            ->pluck($this->testUserPermission->getKeyName())
+            ->toArray();
+
+        Event::assertNotDispatched(PermissionAttached::class);
+    }
+
+    /** @test */
+    #[Test]
+    public function it_fires_an_event_when_a_permission_is_removed()
+    {
+        Event::fake();
+        app('config')->set('permission.events_enabled', true);
+        
+        $permissions = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-news'])->get();
+
+        $this->testUser->givePermissionTo($permissions);
+
+        $this->testUser->revokePermissionTo($permissions);
+
+        Event::assertDispatched(PermissionDetached::class, function ($event) use ($permissions) {
+            return $event->model instanceof User
+                && !$event->model->hasPermissionTo('edit-news')
+                && !$event->model->hasPermissionTo('edit-articles')
+                && $event->permissionsOrIds === $permissions;
+        });
+    }
+  
     /** @test */
     #[Test]
     public function it_can_be_given_a_permission_on_role_when_lazy_loading_is_restricted()
