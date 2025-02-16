@@ -13,6 +13,8 @@ If you are using PHP 8.1+ you can implement Enums as native types.
 
 Internally, Enums implicitly implement `\BackedEnum`, which is how this package recognizes that you're passing an Enum.
 
+NOTE: Presently (version 6) this package does not support using `$casts` to specify enums on the `Permission` model. You can still use enums to reference things as shown below, just without declaring it in a `$casts` property.
+
 
 ## Code Requirements
 

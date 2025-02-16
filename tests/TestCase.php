@@ -23,10 +23,10 @@ use Spatie\Permission\Tests\TestModels\User;
 
 abstract class TestCase extends Orchestra
 {
-    /** @var \Spatie\Permission\Tests\User */
+    /** @var \Spatie\Permission\Tests\TestModels\User */
     protected $testUser;
 
-    /** @var \Spatie\Permission\Tests\Admin */
+    /** @var \Spatie\Permission\Tests\TestModels\Admin */
     protected $testAdmin;
 
     /** @var \Spatie\Permission\Models\Role */

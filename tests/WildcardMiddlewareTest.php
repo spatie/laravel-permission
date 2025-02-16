@@ -5,6 +5,7 @@ namespace Spatie\Permission\Tests;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use Spatie\Permission\Middleware\RoleMiddleware;
@@ -33,6 +34,7 @@ class WildcardMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_guest_cannot_access_a_route_protected_by_the_permission_middleware()
     {
         $this->assertEquals(
@@ -42,6 +44,7 @@ class WildcardMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_user_can_access_a_route_protected_by_permission_middleware_if_have_this_permission()
     {
         Auth::login($this->testUser);
@@ -57,6 +60,7 @@ class WildcardMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_user_can_access_a_route_protected_by_this_permission_middleware_if_have_one_of_the_permissions()
     {
         Auth::login($this->testUser);
@@ -77,6 +81,7 @@ class WildcardMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_user_cannot_access_a_route_protected_by_the_permission_middleware_if_have_a_different_permission()
     {
         Auth::login($this->testUser);
@@ -92,6 +97,7 @@ class WildcardMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_user_cannot_access_a_route_protected_by_permission_middleware_if_have_not_permissions()
     {
         Auth::login($this->testUser);
@@ -103,6 +109,7 @@ class WildcardMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_user_can_access_a_route_protected_by_permission_or_role_middleware_if_has_this_permission_or_role()
     {
         Auth::login($this->testUser);
@@ -139,6 +146,7 @@ class WildcardMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_required_permissions_can_be_fetched_from_the_exception()
     {
         Auth::login($this->testUser);

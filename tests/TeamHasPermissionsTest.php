@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Tests;
 
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Tests\TestModels\User;
 
 class TeamHasPermissionsTest extends HasPermissionsTest
@@ -10,6 +11,7 @@ class TeamHasPermissionsTest extends HasPermissionsTest
     protected $hasTeams = true;
 
     /** @test */
+    #[Test]
     public function it_can_assign_same_and_different_permission_on_same_user_on_different_teams()
     {
         setPermissionsTeamId(1);
@@ -38,6 +40,7 @@ class TeamHasPermissionsTest extends HasPermissionsTest
     }
 
     /** @test */
+    #[Test]
     public function it_can_list_all_the_coupled_permissions_both_directly_and_via_roles_on_same_user_on_different_teams()
     {
         $this->testUserRole->givePermissionTo('edit-articles');
@@ -68,6 +71,7 @@ class TeamHasPermissionsTest extends HasPermissionsTest
     }
 
     /** @test */
+    #[Test]
     public function it_can_sync_or_remove_permission_without_detach_on_different_teams()
     {
         setPermissionsTeamId(1);
@@ -99,6 +103,7 @@ class TeamHasPermissionsTest extends HasPermissionsTest
     }
 
     /** @test */
+    #[Test]
     public function it_can_scope_users_on_different_teams()
     {
         $user1 = User::create(['email' => 'user1@test.com']);

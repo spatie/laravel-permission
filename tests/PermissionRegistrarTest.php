@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Tests;
 
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 use Spatie\Permission\Contracts\Role as RoleContract;
 use Spatie\Permission\Models\Permission as SpatiePermission;
@@ -13,6 +14,7 @@ use Spatie\Permission\Tests\TestModels\Role as TestRole;
 class PermissionRegistrarTest extends TestCase
 {
     /** @test */
+    #[Test]
     public function it_can_clear_loaded_permissions_collection()
     {
         $reflectedClass = new \ReflectionClass(app(PermissionRegistrar::class));
@@ -29,6 +31,7 @@ class PermissionRegistrarTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_check_uids()
     {
         $uids = [
@@ -72,6 +75,7 @@ class PermissionRegistrarTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_get_permission_class()
     {
         $this->assertSame(SpatiePermission::class, app(PermissionRegistrar::class)->getPermissionClass());
@@ -79,6 +83,7 @@ class PermissionRegistrarTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_change_permission_class()
     {
         $this->assertSame(SpatiePermission::class, config('permission.models.permission'));
@@ -93,6 +98,7 @@ class PermissionRegistrarTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_get_role_class()
     {
         $this->assertSame(SpatieRole::class, app(PermissionRegistrar::class)->getRoleClass());
@@ -100,6 +106,7 @@ class PermissionRegistrarTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_change_role_class()
     {
         $this->assertSame(SpatieRole::class, config('permission.models.role'));
@@ -114,6 +121,7 @@ class PermissionRegistrarTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_change_team_id()
     {
         $team_id = '00000000-0000-0000-0000-000000000000';
