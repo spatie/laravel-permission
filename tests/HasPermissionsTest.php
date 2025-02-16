@@ -833,7 +833,8 @@ class HasPermissionsTest extends TestCase
     public function it_fires_an_event_when_a_permission_is_added()
     {
         Event::fake();
-
+        app('config')->set('permission.events_enabled', true);
+        
         $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
 
         $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-news'])
@@ -850,10 +851,27 @@ class HasPermissionsTest extends TestCase
 
     /** @test */
     #[Test]
+    public function it_does_not_fire_an_event_when_events_are_not_enabled()
+    {
+        Event::fake();
+        app('config')->set('permission.events_enabled', false);
+        
+        $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
+
+        $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-news'])
+            ->pluck($this->testUserPermission->getKeyName())
+            ->toArray();
+
+        Event::assertNotDispatched(PermissionAttached::class);
+    }
+
+    /** @test */
+    #[Test]
     public function it_fires_an_event_when_a_permission_is_removed()
     {
         Event::fake();
-
+        app('config')->set('permission.events_enabled', true);
+        
         $permissions = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-news'])->get();
 
         $this->testUser->givePermissionTo($permissions);
