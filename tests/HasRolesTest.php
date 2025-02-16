@@ -393,7 +393,9 @@ class HasRolesTest extends TestCase
         $this->testUser->syncRoles($this->testUserRole, $role2);
         DB::disableQueryLog();
 
-        $this->assertSame(2, count(DB::getQueryLog())); // avoid unnecessary sqls
+        $necessaryQueriesCount = 2;
+
+        $this->assertCount($necessaryQueriesCount, DB::getQueryLog());
     }
 
     /** @test */

@@ -708,7 +708,9 @@ class HasPermissionsTest extends TestCase
         $this->testUser->syncPermissions($this->testUserPermission, $permission2);
         DB::disableQueryLog();
 
-        $this->assertSame(2, count(DB::getQueryLog())); // avoid unnecessary sqls
+        $necessaryQueriesCount = 2;
+
+        $this->assertCount($necessaryQueriesCount, DB::getQueryLog());
     }
 
     /** @test */
