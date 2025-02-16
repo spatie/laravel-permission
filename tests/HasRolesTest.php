@@ -13,6 +13,7 @@ use Spatie\Permission\Events\RoleAttached;
 use Spatie\Permission\Events\RoleDetached;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
+use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Tests\TestModels\Admin;
 use Spatie\Permission\Tests\TestModels\SoftDeletingUser;
 use Spatie\Permission\Tests\TestModels\User;
@@ -394,6 +395,11 @@ class HasRolesTest extends TestCase
         DB::disableQueryLog();
 
         $necessaryQueriesCount = 2;
+      
+        // Teams reloads relation, adding an extra query
+        if (app(PermissionRegistrar::class)->teams) {
+            $necessaryQueriesCount++;
+        }
 
         $this->assertCount($necessaryQueriesCount, DB::getQueryLog());
     }

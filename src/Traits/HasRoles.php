@@ -154,6 +154,11 @@ trait HasRoles
             [app(PermissionRegistrar::class)->teamsKey => getPermissionsTeamId()] : [];
 
         if ($model->exists) {
+            if (app(PermissionRegistrar::class)->teams) {
+                // explicit reload in case team has been changed since last load
+                $this->load('roles');
+            }
+
             $currentRoles = $this->roles->map(fn ($role) => $role->getKey())->toArray();
 
             $this->roles()->attach(array_diff($roles, $currentRoles), $teamPivot);

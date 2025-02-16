@@ -55,6 +55,11 @@ class TeamHasRolesTest extends HasRolesTest
         setPermissionsTeamId(1);
         $this->testUser->assignRole('testRole', 'testRole2');
 
+        // explicit load of roles to assert no mismatch
+        // when same role assigned in diff teams
+        // while old team's roles are loaded 
+        $this->testUser->load('roles');
+
         setPermissionsTeamId(2);
         $this->testUser->assignRole('testRole', 'testRole3');
 
