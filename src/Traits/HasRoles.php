@@ -178,7 +178,9 @@ trait HasRoles
             $this->forgetCachedPermissions();
         }
 
-        event(new RoleAttached($this->getModel(), $roles));
+        if (config('permission.events_enabled')) {
+            event(new RoleAttached($this->getModel(), $roles));
+        }
 
         return $this;
     }
@@ -200,7 +202,9 @@ trait HasRoles
             $this->forgetCachedPermissions();
         }
 
-        event(new RoleDetached($this->getModel(), $storedRole));
+        if (config('permission.events_enabled')) {
+            event(new RoleDetached($this->getModel(), $storedRole));
+        }
 
         return $this;
     }
