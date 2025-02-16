@@ -925,7 +925,8 @@ class HasRolesTest extends TestCase
     public function it_fires_an_event_when_a_role_is_added()
     {
         Event::fake();
-
+        app('config')->set('permission.events_enabled', true);
+        
         $this->testUser->assignRole(['testRole', 'testRole2']);
 
         $roleIds = app(Role::class)::whereIn('name', ['testRole', 'testRole2'])
@@ -945,7 +946,8 @@ class HasRolesTest extends TestCase
     public function it_fires_an_event_when_a_role_is_removed()
     {
         Event::fake();
-
+        app('config')->set('permission.events_enabled', true);
+        
         $this->testUser->assignRole('testRole');
 
         $this->testUser->removeRole('testRole');
