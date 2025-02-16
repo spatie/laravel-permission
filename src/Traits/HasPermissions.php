@@ -425,7 +425,9 @@ trait HasPermissions
             $this->forgetCachedPermissions();
         }
 
-        event(new PermissionAttached($this->getModel(), $permissions));
+        if (config('permission.events_enabled')) {
+            event(new PermissionAttached($this->getModel(), $permissions));
+        }
 
         $this->forgetWildcardPermissionIndex();
 
@@ -472,7 +474,9 @@ trait HasPermissions
             $this->forgetCachedPermissions();
         }
 
-        event(new PermissionDetached($this->getModel(), $storedPermission));
+        if (config('permission.events_enabled')) {
+            event(new PermissionDetached($this->getModel(), $storedPermission));
+        }
 
         $this->forgetWildcardPermissionIndex();
 
