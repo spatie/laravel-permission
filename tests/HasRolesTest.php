@@ -395,7 +395,7 @@ class HasRolesTest extends TestCase
         DB::disableQueryLog();
 
         $necessaryQueriesCount = 2;
-      
+
         // Teams reloads relation, adding an extra query
         if (app(PermissionRegistrar::class)->teams) {
             $necessaryQueriesCount++;
