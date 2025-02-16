@@ -845,7 +845,7 @@ class HasPermissionsTest extends TestCase
             return $event->model instanceof User
                 && $event->model->hasPermissionTo('edit-news')
                 && $event->model->hasPermissionTo('edit-articles')
-                && $ids === $event->permissionIds;
+                && $ids === $event->permissionsOrIds;
         });
     }
 
@@ -882,7 +882,7 @@ class HasPermissionsTest extends TestCase
             return $event->model instanceof User
                 && !$event->model->hasPermissionTo('edit-news')
                 && !$event->model->hasPermissionTo('edit-articles')
-                && $event->permission === $permissions;
+                && $event->permissionsOrIds === $permissions;
         });
     }
   
