@@ -3,15 +3,14 @@
 namespace Spatie\Permission\Tests;
 
 use DB;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Events\PermissionAttached;
 use Spatie\Permission\Events\PermissionDetached;
-use Spatie\Permission\Events\RoleAttached;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Tests\TestModels\SoftDeletingUser;
@@ -834,7 +833,7 @@ class HasPermissionsTest extends TestCase
     {
         Event::fake();
         app('config')->set('permission.events_enabled', true);
-        
+
         $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
 
         $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-news'])
@@ -855,7 +854,7 @@ class HasPermissionsTest extends TestCase
     {
         Event::fake();
         app('config')->set('permission.events_enabled', false);
-        
+
         $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
 
         $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-news'])
@@ -871,7 +870,7 @@ class HasPermissionsTest extends TestCase
     {
         Event::fake();
         app('config')->set('permission.events_enabled', true);
-        
+
         $permissions = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-news'])->get();
 
         $this->testUser->givePermissionTo($permissions);
@@ -880,12 +879,12 @@ class HasPermissionsTest extends TestCase
 
         Event::assertDispatched(PermissionDetached::class, function ($event) use ($permissions) {
             return $event->model instanceof User
-                && !$event->model->hasPermissionTo('edit-news')
-                && !$event->model->hasPermissionTo('edit-articles')
+                && ! $event->model->hasPermissionTo('edit-news')
+                && ! $event->model->hasPermissionTo('edit-articles')
                 && $event->permissionsOrIds === $permissions;
         });
     }
-  
+
     /** @test */
     #[Test]
     public function it_can_be_given_a_permission_on_role_when_lazy_loading_is_restricted()

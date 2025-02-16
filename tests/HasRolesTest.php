@@ -926,7 +926,7 @@ class HasRolesTest extends TestCase
     {
         Event::fake();
         app('config')->set('permission.events_enabled', true);
-        
+
         $this->testUser->assignRole(['testRole', 'testRole2']);
 
         $roleIds = app(Role::class)::whereIn('name', ['testRole', 'testRole2'])
@@ -947,18 +947,18 @@ class HasRolesTest extends TestCase
     {
         Event::fake();
         app('config')->set('permission.events_enabled', true);
-        
+
         $this->testUser->assignRole('testRole');
 
         $this->testUser->removeRole('testRole');
 
         Event::assertDispatched(RoleDetached::class, function ($event) {
             return $event->model instanceof User
-                && !$event->model->hasRole('testRole')
+                && ! $event->model->hasRole('testRole')
                 && $event->rolesOrIds->name === 'testRole';
         });
     }
-  
+
     /** @test */
     #[Test]
     public function it_can_be_given_a_role_on_permission_when_lazy_loading_is_restricted()
