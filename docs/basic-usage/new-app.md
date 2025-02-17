@@ -19,8 +19,9 @@ laravel new mypermissionsdemo
 # (Choose Laravel Breeze, choose Blade with Alpine)
 # (choose your own dark-mode-support choice)
 # (choose your desired testing framework)
-# (say Yes to initialize a Git repo, so that you can track your code changes)
+# (If offered, say Yes to initialize a Git repo, so that you can track your code changes)
 # (Choose SQLite)
+# (say Yes to run default database migrations)
 
 cd mypermissionsdemo
 
@@ -52,7 +53,7 @@ If you didn't install Laravel Breeze or Jetstream, add Laravel's basic auth scaf
 ```php
 composer require laravel/ui --dev
 php artisan ui bootstrap --auth
-# npm install && npm run prod
+# npm install && npm run build
 git add . && git commit -m "Setup auth scaffold"
 ```
 
