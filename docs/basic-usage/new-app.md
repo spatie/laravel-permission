@@ -16,16 +16,17 @@ If you're new to Laravel or to any of the concepts mentioned here, you can learn
 ```sh
 cd ~/Sites
 laravel new mypermissionsdemo
-# (Choose Laravel Breeze, choose Blade with Alpine)
-# (choose your own dark-mode-support choice)
-# (choose your desired testing framework)
+# (No Starter Kit is needed, but you could go with Livewire or Breeze/Jetstream, with Laravel's Built-In-Auth; or use Bootstrap using laravel/ui described later, below)
+# (You might be asked to select a dark-mode-support choice)
+# (Choose your desired testing framework: Pest or PHPUnit)
 # (If offered, say Yes to initialize a Git repo, so that you can track your code changes)
-# (Choose SQLite)
-# (say Yes to run default database migrations)
+# (If offered a database selection, choose SQLite, because it is simplest for test scenarios)
+# (If prompted, say Yes to run default database migrations)
+# (If prompted, say Yes to run npm install and related commands)
 
 cd mypermissionsdemo
 
-# the following git commands are not needed if you Initialized a git repo while "laravel new" was running above:
+# The following git commands are not needed if you Initialized a git repo while "laravel new" was running above:
 git init
 git add .
 git commit -m "Fresh Laravel Install"
@@ -49,7 +50,8 @@ sed -i '' $'s/use HasApiTokens, HasFactory, Notifiable;/use HasApiTokens, HasFac
 git add . && git commit -m "Add HasRoles trait"
 ```
 
-If you didn't install Laravel Breeze or Jetstream, add Laravel's basic auth scaffolding:
+If you didn't install a Starter Kit like Livewire or Breeze or Jetstream, add Laravel's basic auth scaffolding:
+This Auth scaffolding will make it simpler to provide login capability for a test/demo user, and test roles/permissions with them.
 ```php
 composer require laravel/ui --dev
 php artisan ui bootstrap --auth
