@@ -37,23 +37,23 @@ class User extends Authenticatable
 }
 ```
 
-## Must not have a [role] or [roles] property, nor a [roles()] method
+## Must not have a [role] or [roles] property/relation, nor a [roles()] method
 
-Your `User` model/object MUST NOT have a `role` or `roles` property (or field in the database by that name), nor a `roles()` method on it. Those will interfere with the properties and methods added by the `HasRoles` trait provided by this package, thus causing unexpected outcomes when this package's methods are used to inspect roles and permissions.
+Your `User` model/object MUST NOT have a `role` or `roles` property (or field in the database by that name), nor a `roles()` method on it (nor a `roles` relation). Those will interfere with the properties and methods and relations added by the `HasRoles` trait provided by this package, thus causing unexpected outcomes when this package's methods are used to inspect roles and permissions.
 
-## Must not have a [permission] or [permissions] property, nor a [permissions()] method
+## Must not have a [permission] or [permissions] property/relation, nor a [permissions()] method
 
-Your `User` model/object MUST NOT have a `permission` or `permissions` property (or field in the database by that name), nor a `permissions()` method on it. Those will interfere with the properties and methods added by the `HasPermissions` trait provided by this package (which is invoked via the `HasRoles` trait).
+Your `User` model/object MUST NOT have a `permission` or `permissions` property (or field in the database by that name), nor a `permissions()` method on it (nor a `permissions` relation). Those will interfere with the properties and methods and relations added by the `HasPermissions` trait provided by this package (which is invoked via the `HasRoles` trait).
 
 ## Config file
 
 This package publishes a `config/permission.php` file. If you already have a file by that name, you must rename or remove it, as it will conflict with this package. You could optionally merge your own values with those required by this package, as long as the keys that this package expects are present. See the source file for more details.
 
-## Schema Limitation in MySQL
+## Database Schema Limitations
 
 Potential error message: "1071 Specified key was too long; max key length is 1000 bytes"
 
-MySQL 8.0 limits index key lengths, which might be too short for some compound indexes used by this package.
+MySQL 8.0+ limits index key lengths, which might be too short for some compound indexes used by this package.
 This package publishes a migration which combines multiple columns in a single index. With `utf8mb4` the 4-bytes-per-character requirement of `mb4` means the total length of the columns in the hybrid index can only be `25%` of that maximum index length.
 
 - MyISAM tables limit the index to 1000 characters (which is only 250 total chars in `utf8mb4`)
@@ -64,7 +64,7 @@ Depending on your MySQL or MariaDB configuration, you may implement one of the f
 
 1. Ideally, configure the database to use InnoDB by default, and use ROW FORMAT of 'Dynamic' by default for all new tables. (See [MySQL](https://dev.mysql.com/doc/refman/8.0/en/innodb-limits.html) and [MariaDB](https://mariadb.com/kb/en/innodb-dynamic-row-format/) docs.)
 
-2. OR if your app doesn't require a longer default, in your AppServiceProvider you can set `Schema::defaultStringLength(125)`. [See the Laravel Docs for instructions](https://laravel.com/docs/migrations#index-lengths-mysql-mariadb). This will have Laravel set all strings to 125 characters by default.
+2. OR if your app doesn't require a longer default, in your AppServiceProvider you can set `Schema::defaultStringLength(125)`. [See the Laravel Docs for instructions](https://laravel.com/docs/10.x/migrations#index-lengths-mysql-mariadb). This will have Laravel set all strings to 125 characters by default.
 
 3. OR you could edit the migration and specify a shorter length for 4 fields. Then in your app be sure to manually impose validation limits on any form fields related to these fields. 
 There are 2 instances of this code snippet where you can explicitly set the length.:
