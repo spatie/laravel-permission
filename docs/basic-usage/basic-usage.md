@@ -55,7 +55,7 @@ $permission->removeRole($role);
 ```
 
 ## Guard Name
-If you're using multiple guards then the `guard_name` attribute must be set as well. Read about it in the [using multiple guards](./multiple-guards) section of the readme.
+If you're using multiple guards then the `guard_name` attribute must be set as well. Read about it in the [using multiple guards](./multiple-guards) documentation.
 
 ## Get Permissions For A User
 The `HasRoles` trait adds Eloquent relationships to your models, which can be accessed directly or used as a base query:
@@ -108,7 +108,7 @@ $allRolesExceptAandB = Role::whereNotIn('name', ['role A', 'role B'])->get();
 ## Counting Users Having A Role
 One way to count all users who have a certain role is by filtering the collection of all Users with their Roles:
 ```php
-$superAdminCount = User::with('roles')->get()->filter(
-    fn ($user) => $user->roles->where('name', 'Super Admin')->toArray()
+$managersCount = User::with('roles')->get()->filter(
+    fn ($user) => $user->roles->where('name', 'Manager')->toArray()
 )->count();
 ```
