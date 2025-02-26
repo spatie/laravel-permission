@@ -434,4 +434,22 @@ class PermissionMiddlewareTest extends TestCase
             PermissionMiddleware::using(['edit-articles', 'edit-news'])
         );
     }
+
+    /** @test */
+    #[Test]
+    public function the_middleware_can_handle_enum_based_permissions()
+    {
+        $this->assertSame(
+            'Spatie\Permission\Middleware\PermissionMiddleware:view articles',
+            PermissionMiddleware::using(TestModels\TestRolePermissionsEnum::VIEWARTICLES)
+        );
+        $this->assertEquals(
+            'Spatie\Permission\Middleware\PermissionMiddleware:view articles,my-guard',
+            PermissionMiddleware::using(TestModels\TestRolePermissionsEnum::VIEWARTICLES, 'my-guard')
+        );
+        $this->assertEquals(
+            'Spatie\Permission\Middleware\PermissionMiddleware:view articles|edit articles',
+            PermissionMiddleware::using([TestModels\TestRolePermissionsEnum::VIEWARTICLES, TestModels\TestRolePermissionsEnum::EDITARTICLES])
+        );
+    }
 }

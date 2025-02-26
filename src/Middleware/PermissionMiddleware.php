@@ -42,13 +42,25 @@ class PermissionMiddleware
     /**
      * Specify the permission and guard for the middleware.
      *
-     * @param  array|string  $permission
+     * @param  array|string|\BackedEnum  $permission
      * @param  string|null  $guard
      * @return string
      */
     public static function using($permission, $guard = null)
     {
-        $permissionString = is_string($permission) ? $permission : implode('|', $permission);
+        // Convert Enum to its value if an Enum is passed
+        if ($permission instanceof \BackedEnum) {
+            $permission = $permission->value;
+        }
+
+        // Convert array of permissions (including Enum values) to a string
+        if (is_array($permission)) {
+            $permission = array_map(fn ($p) => $p instanceof \BackedEnum ? $p->value : $p, $permission);
+            $permissionString = implode('|', $permission);
+        } else {
+            $permissionString = (string) $permission;
+        }
+
         $args = is_null($guard) ? $permissionString : "$permissionString,$guard";
 
         return static::class.':'.$args;
