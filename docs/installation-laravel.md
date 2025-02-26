@@ -5,18 +5,7 @@ weight: 4
 
 ## Laravel Version Compatibility
 
-Choose the version of this package that suits your Laravel version.
-
-Package Version | Laravel Version
-----------------|-----------
-   ^6.0         |  8,9,10,11,12 (PHP 8.0+)
-   ^5.8         |  7,8,9,10
-   ^5.7         |  7,8,9
-   ^5.4-^5.6    |  7,8
-   5.0-5.3      |  6,7,8
-   ^4           |  6,7,8
-   ^3           |  5.8
-   
+See the "Prerequisites" documentation page for compatibility details.
 
 ## Installing
 
