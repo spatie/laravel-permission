@@ -3,10 +3,18 @@ title: Prerequisites
 weight: 3
 ---
 
-## Laravel Version
+## Laravel Version Compatibility
 
-This package can be used in Laravel 6 or higher. Check the "Installing on Laravel" page for package versions compatible with various Laravel versions.
-
+Laravel Version | Package Version
+----------------|-----------
+ 8,9,10,11,12   |  `^6.0`  (PHP 8.0+)
+ 7,8,9,10       |  `^5.8`
+ 7,8,9          |  `^5.7`
+ 7,8            |  `^5.4`-`^5.6`
+ 6,7,8          |  `^5.0`-`^5.3`
+ 6,7,8          |  `^4`
+ 5.8            |  `^3`
+   
 ## User Model / Contract/Interface
 
 This package uses Laravel's Gate layer to provide Authorization capabilities.
