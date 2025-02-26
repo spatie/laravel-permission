@@ -5,11 +5,11 @@ weight: 2
 
 ## Best Practice
 
-It's better to assign permissions to Roles, and then assign Roles to Users.
+INSTEAD OF DIRECT PERMISSIONS, it is better to assign permissions to Roles, and then assign Roles to Users.
 
 See the [Roles vs Permissions](../best-practices/roles-vs-permissions) section of the docs for a deeper explanation.
 
-HOWEVER, If you have reason to directly assign individual permissions to specific users (instead of to roles assigned to those users), you can do that as described below:
+HOWEVER, If you have reason to directly assign individual permissions to specific users (instead of to roles which are assigned to those users), you can do that as well:
 
 ## Direct Permissions to Users
 
@@ -46,7 +46,7 @@ Like all permissions assigned via roles, you can check if a user has a permissio
 $user->can('edit articles');
 ```
 
-NOTE: The following `hasPermissionTo`, `hasAnyPermission`, `hasAllPermissions` functions do not support Super-Admin functionality. Use `can`, `canAny`, `canAll` instead.
+> NOTE: The following `hasPermissionTo`, `hasAnyPermission`, `hasAllPermissions` functions do not support Super-Admin functionality. Use `can`, `canAny`, `canAll` instead.
 
 You can check if a user has a permission:
 
