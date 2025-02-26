@@ -7,7 +7,7 @@ NOTE: Lumen is **not** officially supported by this package. And Lumen is no lon
 
 However, the following are some steps which may help get you started.
 
-Lumen installation instructions can be found in the [Lumen documentation](https://lumen.laravel.com/docs/master).
+Lumen installation instructions can be found in the [Lumen documentation](https://lumen.laravel.com/docs).
 
 ## Installing
 
