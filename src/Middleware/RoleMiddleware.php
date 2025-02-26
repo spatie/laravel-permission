@@ -42,13 +42,24 @@ class RoleMiddleware
     /**
      * Specify the role and guard for the middleware.
      *
-     * @param  array|string  $role
+     * @param  array|string|\BackedEnum  $role
      * @param  string|null  $guard
      * @return string
      */
     public static function using($role, $guard = null)
     {
-        $roleString = is_string($role) ? $role : implode('|', $role);
+        // Convert Enum to its value if an Enum is passed
+        if ($role instanceof \BackedEnum) {
+            $role = $role->value;
+        }
+
+        if (is_array($role)) {
+            $role = array_map(fn ($r) => $r instanceof \BackedEnum ? $r->value : $r, $role);
+            $roleString = implode('|', $role);
+        } else {
+            $roleString = (string) $role;
+        }
+        
         $args = is_null($guard) ? $roleString : "$roleString,$guard";
 
         return static::class.':'.$args;

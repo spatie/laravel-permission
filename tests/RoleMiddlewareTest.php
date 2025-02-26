@@ -366,4 +366,22 @@ class RoleMiddlewareTest extends TestCase
             RoleMiddleware::using(['testAdminRole', 'anotherRole'])
         );
     }
+
+    /** @test */
+    #[Test]
+    public function the_middleware_can_handle_enum_based_roles()
+    {
+        $this->assertSame(
+            'Spatie\Permission\Middleware\RoleMiddleware:writer',
+            RoleMiddleware::using(TestModels\TestRolePermissionsEnum::WRITER)
+        );
+        $this->assertEquals(
+            'Spatie\Permission\Middleware\RoleMiddleware:writer,my-guard',
+            RoleMiddleware::using(TestModels\TestRolePermissionsEnum::WRITER, 'my-guard')
+        );
+        $this->assertEquals(
+            'Spatie\Permission\Middleware\RoleMiddleware:writer|editor',
+            RoleMiddleware::using([TestModels\TestRolePermissionsEnum::WRITER, TestModels\TestRolePermissionsEnum::EDITOR])
+        );
+    }
 }
