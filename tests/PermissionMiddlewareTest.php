@@ -467,6 +467,9 @@ class PermissionMiddlewareTest extends TestCase
     #[Test]
     public function the_middleware_can_handle_enum_based_permissions_with_handle_method()
     {
+        app(Permission::class)->create(['name' => TestModels\TestRolePermissionsEnum::VIEWARTICLES]);
+        app(Permission::class)->create(['name' => TestModels\TestRolePermissionsEnum::EDITARTICLES]);
+
         Auth::login($this->testUser);
         $this->testUser->givePermissionTo(TestModels\TestRolePermissionsEnum::VIEWARTICLES);
         
