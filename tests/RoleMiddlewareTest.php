@@ -367,7 +367,12 @@ class RoleMiddlewareTest extends TestCase
         );
     }
 
-    /** @test */
+    /**
+     * @test
+     *
+     * @requires PHP >= 8.1
+     */
+    #[RequiresPhp('>= 8.1')]
     #[Test]
     public function the_middleware_can_handle_enum_based_roles()
     {
