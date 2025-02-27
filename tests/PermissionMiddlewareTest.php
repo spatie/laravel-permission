@@ -442,7 +442,7 @@ class PermissionMiddlewareTest extends TestCase
      */
     #[RequiresPhp('>= 8.1')]
     #[Test]
-    public function the_middleware_can_handle_enum_based_permissions()
+    public function the_middleware_can_handle_enum_based_permissions_with_static_using_method()
     {
         $this->assertSame(
             'Spatie\Permission\Middleware\PermissionMiddleware:view articles',
@@ -455,6 +455,31 @@ class PermissionMiddlewareTest extends TestCase
         $this->assertEquals(
             'Spatie\Permission\Middleware\PermissionMiddleware:view articles|edit articles',
             PermissionMiddleware::using([TestModels\TestRolePermissionsEnum::VIEWARTICLES, TestModels\TestRolePermissionsEnum::EDITARTICLES])
+        );
+    }
+
+    /**
+     * @test
+     *
+     * @requires PHP >= 8.1
+     */
+    #[RequiresPhp('>= 8.1')]
+    #[Test]
+    public function the_middleware_can_handle_enum_based_permissions_with_handle_method()
+    {
+        Auth::login($this->testUser);
+        $this->testUser->givePermissionTo(TestModels\TestRolePermissionsEnum::VIEWARTICLES);
+        
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->permissionMiddleware, TestModels\TestRolePermissionsEnum::VIEWARTICLES)
+        );
+
+        $this->testUser->givePermissionTo(TestModels\TestRolePermissionsEnum::EDITARTICLES);
+        
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->permissionMiddleware, [TestModels\TestRolePermissionsEnum::VIEWARTICLES, TestModels\TestRolePermissionsEnum::EDITARTICLES])
         );
     }
 }
