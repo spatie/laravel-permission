@@ -28,9 +28,7 @@ class PermissionMiddleware
             throw UnauthorizedException::missingTraitHasRoles($user);
         }
 
-        $permissions = is_array($permission)
-            ? $permission
-            : explode('|', $permission);
+        $permissions = explode('|', self::parsePermissionsToString($permission));
 
         if (! $user->canAny($permissions)) {
             throw UnauthorizedException::forPermissions($permissions);
@@ -42,15 +40,42 @@ class PermissionMiddleware
     /**
      * Specify the permission and guard for the middleware.
      *
-     * @param  array|string  $permission
+     * @param  array|string|\BackedEnum  $permission
      * @param  string|null  $guard
      * @return string
      */
     public static function using($permission, $guard = null)
     {
-        $permissionString = is_string($permission) ? $permission : implode('|', $permission);
+        // Convert Enum to its value if an Enum is passed
+        if ($permission instanceof \BackedEnum) {
+            $permission = $permission->value;
+        }
+
+        $permissionString = self::parsePermissionsToString($permission);
+
         $args = is_null($guard) ? $permissionString : "$permissionString,$guard";
 
         return static::class.':'.$args;
+    }
+
+    /**
+     * Convert array or string of permissions to string representation.
+     *
+     * @return string
+     */
+    protected static function parsePermissionsToString(array|string|\BackedEnum $permission)
+    {
+        // Convert Enum to its value if an Enum is passed
+        if ($permission instanceof \BackedEnum) {
+            $permission = $permission->value;
+        }
+
+        if (is_array($permission)) {
+            $permission = array_map(fn ($r) => $r instanceof \BackedEnum ? $r->value : $r, $permission);
+
+            return implode('|', $permission);
+        }
+
+        return (string) $permission;
     }
 }
