@@ -404,18 +404,18 @@ class RoleMiddlewareTest extends TestCase
          app(Role::class)->create(['name' => TestModels\TestRolePermissionsEnum::EDITOR->value]);
 
          Auth::login($this->testUser);
-         $this->testUser->givePermissionTo(TestModels\TestRolePermissionsEnum::WRITER);
+         $this->testUser->assignRole(TestModels\TestRolePermissionsEnum::WRITER);
 
          $this->assertEquals(
              200,
-             $this->runMiddleware($this->permissionMiddleware, TestModels\TestRolePermissionsEnum::WRITER)
+             $this->runMiddleware($this->roleMiddleware, TestModels\TestRolePermissionsEnum::WRITER)
          );
 
-         $this->testUser->givePermissionTo(TestModels\TestRolePermissionsEnum::EDITOR);
+         $this->testUser->assignRole(TestModels\TestRolePermissionsEnum::EDITOR);
 
          $this->assertEquals(
              200,
-             $this->runMiddleware($this->permissionMiddleware, [TestModels\TestRolePermissionsEnum::WRITER, TestModels\TestRolePermissionsEnum::EDITOR])
+             $this->runMiddleware($this->roleMiddleware, [TestModels\TestRolePermissionsEnum::WRITER, TestModels\TestRolePermissionsEnum::EDITOR])
          );
      }
 }
