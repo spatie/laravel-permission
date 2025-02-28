@@ -70,6 +70,9 @@ abstract class TestCase extends Orchestra
 
         // Note: this also flushes the cache from within the migration
         $this->setUpDatabase($this->app);
+
+        $this->setUpBaseTestPermissions($this->app);
+
         if ($this->hasTeams) {
             setPermissionsTeamId(1);
         }
@@ -92,9 +95,8 @@ abstract class TestCase extends Orchestra
 
     /**
      * @param  \Illuminate\Foundation\Application  $app
-     * @return array
      */
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return $this->getLaravelVersion() < 9 ? [
             PermissionServiceProvider::class,
@@ -196,13 +198,25 @@ abstract class TestCase extends Orchestra
 
         $this->testUser = User::create(['email' => 'test@user.com']);
         $this->testAdmin = Admin::create(['email' => 'admin@user.com']);
+    }
+
+    /**
+     * Set up initial roles and permissions used in many tests
+     *
+     * @param  \Illuminate\Foundation\Application  $app
+     */
+    protected function setUpBaseTestPermissions($app): void
+    {
         $this->testUserRole = $app[Role::class]->create(['name' => 'testRole']);
         $app[Role::class]->create(['name' => 'testRole2']);
         $this->testAdminRole = $app[Role::class]->create(['name' => 'testAdminRole', 'guard_name' => 'admin']);
         $this->testUserPermission = $app[Permission::class]->create(['name' => 'edit-articles']);
         $app[Permission::class]->create(['name' => 'edit-news']);
         $app[Permission::class]->create(['name' => 'edit-blog']);
-        $this->testAdminPermission = $app[Permission::class]->create(['name' => 'admin-permission', 'guard_name' => 'admin']);
+        $this->testAdminPermission = $app[Permission::class]->create([
+            'name' => 'admin-permission',
+            'guard_name' => 'admin',
+        ]);
         $app[Permission::class]->create(['name' => 'Edit News']);
     }
 
