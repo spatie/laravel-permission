@@ -56,7 +56,7 @@ enum TestRolePermissionsEnum: string
             self::VIEWARTICLES => 'View Articles',
             self::EDITARTICLES => 'Edit Articles',
 
-            default => Str::words($this->name)
+            default => Str::words($this->value),
         };
     }
 }
