@@ -391,31 +391,31 @@ class RoleMiddlewareTest extends TestCase
         );
     }
 
-     /**
-      * @test
-      *
-      * @requires PHP >= 8.1
-      */
-     #[RequiresPhp('>= 8.1')]
-     #[Test]
-     public function the_middleware_can_handle_enum_based_roles_with_handle_method()
-     {
-         app(Role::class)->create(['name' => TestModels\TestRolePermissionsEnum::WRITER->value]);
-         app(Role::class)->create(['name' => TestModels\TestRolePermissionsEnum::EDITOR->value]);
+    /**
+     * @test
+     *
+     * @requires PHP >= 8.1
+     */
+    #[RequiresPhp('>= 8.1')]
+    #[Test]
+    public function the_middleware_can_handle_enum_based_roles_with_handle_method()
+    {
+        app(Role::class)->create(['name' => TestModels\TestRolePermissionsEnum::WRITER->value]);
+        app(Role::class)->create(['name' => TestModels\TestRolePermissionsEnum::EDITOR->value]);
 
-         Auth::login($this->testUser);
-         $this->testUser->assignRole(TestModels\TestRolePermissionsEnum::WRITER);
+        Auth::login($this->testUser);
+        $this->testUser->assignRole(TestModels\TestRolePermissionsEnum::WRITER);
 
-         $this->assertEquals(
-             200,
-             $this->runMiddleware($this->roleMiddleware, TestModels\TestRolePermissionsEnum::WRITER)
-         );
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->roleMiddleware, TestModels\TestRolePermissionsEnum::WRITER)
+        );
 
-         $this->testUser->assignRole(TestModels\TestRolePermissionsEnum::EDITOR);
+        $this->testUser->assignRole(TestModels\TestRolePermissionsEnum::EDITOR);
 
-         $this->assertEquals(
-             200,
-             $this->runMiddleware($this->roleMiddleware, [TestModels\TestRolePermissionsEnum::WRITER, TestModels\TestRolePermissionsEnum::EDITOR])
-         );
-     }
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->roleMiddleware, [TestModels\TestRolePermissionsEnum::WRITER, TestModels\TestRolePermissionsEnum::EDITOR])
+        );
+    }
 }

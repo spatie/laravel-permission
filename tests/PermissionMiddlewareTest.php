@@ -472,14 +472,14 @@ class PermissionMiddlewareTest extends TestCase
 
         Auth::login($this->testUser);
         $this->testUser->givePermissionTo(TestModels\TestRolePermissionsEnum::VIEWARTICLES);
-        
+
         $this->assertEquals(
             200,
             $this->runMiddleware($this->permissionMiddleware, TestModels\TestRolePermissionsEnum::VIEWARTICLES)
         );
 
         $this->testUser->givePermissionTo(TestModels\TestRolePermissionsEnum::EDITARTICLES);
-        
+
         $this->assertEquals(
             200,
             $this->runMiddleware($this->permissionMiddleware, [TestModels\TestRolePermissionsEnum::VIEWARTICLES, TestModels\TestRolePermissionsEnum::EDITARTICLES])
