@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Config;
 use InvalidArgumentException;
 use Laravel\Passport\Passport;
 use PHPUnit\Framework\Attributes\Test;
+use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Tests\TestModels\UserWithoutHasRoles;
@@ -399,8 +400,8 @@ class RoleMiddlewareTest extends TestCase
      #[Test]
      public function the_middleware_can_handle_enum_based_roles_with_handle_method()
      {
-         app(Permission::class)->create(['name' => TestModels\TestRolePermissionsEnum::WRITER->value]);
-         app(Permission::class)->create(['name' => TestModels\TestRolePermissionsEnum::EDITOR->value]);
+         app(Role::class)->create(['name' => TestModels\TestRolePermissionsEnum::WRITER->value]);
+         app(Role::class)->create(['name' => TestModels\TestRolePermissionsEnum::EDITOR->value]);
 
          Auth::login($this->testUser);
          $this->testUser->givePermissionTo(TestModels\TestRolePermissionsEnum::WRITER);
