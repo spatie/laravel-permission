@@ -374,7 +374,7 @@ class RoleMiddlewareTest extends TestCase
      */
     #[RequiresPhp('>= 8.1')]
     #[Test]
-    public function the_middleware_can_handle_enum_based_roles()
+    public function the_middleware_can_handle_enum_based_roles_with_static_using_method()
     {
         $this->assertSame(
             'Spatie\Permission\Middleware\RoleMiddleware:writer',
@@ -389,4 +389,32 @@ class RoleMiddlewareTest extends TestCase
             RoleMiddleware::using([TestModels\TestRolePermissionsEnum::WRITER, TestModels\TestRolePermissionsEnum::EDITOR])
         );
     }
+
+     /**
+      * @test
+      *
+      * @requires PHP >= 8.1
+      */
+     #[RequiresPhp('>= 8.1')]
+     #[Test]
+     public function the_middleware_can_handle_enum_based_roles_with_handle_method()
+     {
+         app(Permission::class)->create(['name' => TestModels\TestRolePermissionsEnum::WRITER->value]);
+         app(Permission::class)->create(['name' => TestModels\TestRolePermissionsEnum::EDITOR->value]);
+
+         Auth::login($this->testUser);
+         $this->testUser->givePermissionTo(TestModels\TestRolePermissionsEnum::WRITER);
+
+         $this->assertEquals(
+             200,
+             $this->runMiddleware($this->permissionMiddleware, TestModels\TestRolePermissionsEnum::WRITER)
+         );
+
+         $this->testUser->givePermissionTo(TestModels\TestRolePermissionsEnum::EDITOR);
+
+         $this->assertEquals(
+             200,
+             $this->runMiddleware($this->permissionMiddleware, [TestModels\TestRolePermissionsEnum::WRITER, TestModels\TestRolePermissionsEnum::EDITOR])
+         );
+     }
 }
