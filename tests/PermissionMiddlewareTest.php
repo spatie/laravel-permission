@@ -434,4 +434,55 @@ class PermissionMiddlewareTest extends TestCase
             PermissionMiddleware::using(['edit-articles', 'edit-news'])
         );
     }
+
+    /**
+     * @test
+     *
+     * @requires PHP >= 8.1
+     */
+    #[RequiresPhp('>= 8.1')]
+    #[Test]
+    public function the_middleware_can_handle_enum_based_permissions_with_static_using_method()
+    {
+        $this->assertSame(
+            'Spatie\Permission\Middleware\PermissionMiddleware:view articles',
+            PermissionMiddleware::using(TestModels\TestRolePermissionsEnum::VIEWARTICLES)
+        );
+        $this->assertEquals(
+            'Spatie\Permission\Middleware\PermissionMiddleware:view articles,my-guard',
+            PermissionMiddleware::using(TestModels\TestRolePermissionsEnum::VIEWARTICLES, 'my-guard')
+        );
+        $this->assertEquals(
+            'Spatie\Permission\Middleware\PermissionMiddleware:view articles|edit articles',
+            PermissionMiddleware::using([TestModels\TestRolePermissionsEnum::VIEWARTICLES, TestModels\TestRolePermissionsEnum::EDITARTICLES])
+        );
+    }
+
+    /**
+     * @test
+     *
+     * @requires PHP >= 8.1
+     */
+    #[RequiresPhp('>= 8.1')]
+    #[Test]
+    public function the_middleware_can_handle_enum_based_permissions_with_handle_method()
+    {
+        app(Permission::class)->create(['name' => TestModels\TestRolePermissionsEnum::VIEWARTICLES->value]);
+        app(Permission::class)->create(['name' => TestModels\TestRolePermissionsEnum::EDITARTICLES->value]);
+
+        Auth::login($this->testUser);
+        $this->testUser->givePermissionTo(TestModels\TestRolePermissionsEnum::VIEWARTICLES);
+        
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->permissionMiddleware, TestModels\TestRolePermissionsEnum::VIEWARTICLES)
+        );
+
+        $this->testUser->givePermissionTo(TestModels\TestRolePermissionsEnum::EDITARTICLES);
+        
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->permissionMiddleware, [TestModels\TestRolePermissionsEnum::VIEWARTICLES, TestModels\TestRolePermissionsEnum::EDITARTICLES])
+        );
+    }
 }

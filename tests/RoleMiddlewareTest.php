@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Config;
 use InvalidArgumentException;
 use Laravel\Passport\Passport;
 use PHPUnit\Framework\Attributes\Test;
+use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Tests\TestModels\UserWithoutHasRoles;
@@ -366,4 +367,55 @@ class RoleMiddlewareTest extends TestCase
             RoleMiddleware::using(['testAdminRole', 'anotherRole'])
         );
     }
+
+    /**
+     * @test
+     *
+     * @requires PHP >= 8.1
+     */
+    #[RequiresPhp('>= 8.1')]
+    #[Test]
+    public function the_middleware_can_handle_enum_based_roles_with_static_using_method()
+    {
+        $this->assertSame(
+            'Spatie\Permission\Middleware\RoleMiddleware:writer',
+            RoleMiddleware::using(TestModels\TestRolePermissionsEnum::WRITER)
+        );
+        $this->assertEquals(
+            'Spatie\Permission\Middleware\RoleMiddleware:writer,my-guard',
+            RoleMiddleware::using(TestModels\TestRolePermissionsEnum::WRITER, 'my-guard')
+        );
+        $this->assertEquals(
+            'Spatie\Permission\Middleware\RoleMiddleware:writer|editor',
+            RoleMiddleware::using([TestModels\TestRolePermissionsEnum::WRITER, TestModels\TestRolePermissionsEnum::EDITOR])
+        );
+    }
+
+     /**
+      * @test
+      *
+      * @requires PHP >= 8.1
+      */
+     #[RequiresPhp('>= 8.1')]
+     #[Test]
+     public function the_middleware_can_handle_enum_based_roles_with_handle_method()
+     {
+         app(Role::class)->create(['name' => TestModels\TestRolePermissionsEnum::WRITER->value]);
+         app(Role::class)->create(['name' => TestModels\TestRolePermissionsEnum::EDITOR->value]);
+
+         Auth::login($this->testUser);
+         $this->testUser->assignRole(TestModels\TestRolePermissionsEnum::WRITER);
+
+         $this->assertEquals(
+             200,
+             $this->runMiddleware($this->roleMiddleware, TestModels\TestRolePermissionsEnum::WRITER)
+         );
+
+         $this->testUser->assignRole(TestModels\TestRolePermissionsEnum::EDITOR);
+
+         $this->assertEquals(
+             200,
+             $this->runMiddleware($this->roleMiddleware, [TestModels\TestRolePermissionsEnum::WRITER, TestModels\TestRolePermissionsEnum::EDITOR])
+         );
+     }
 }
