@@ -2,8 +2,10 @@
 
 namespace Spatie\Permission;
 
+use Illuminate\Contracts\Auth\Access\Authorizable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class Guard
 {
@@ -11,8 +13,7 @@ class Guard
      * Return a collection of guard names suitable for the $model,
      * as indicated by the presence of a $guard_name property or a guardName() method on the model.
      *
-     * @param string|Model $model model class object or name
-     * @return Collection
+     * @param  string|Model  $model  model class object or name
      */
     public static function getNames($model): Collection
     {
@@ -38,6 +39,22 @@ class Guard
     }
 
     /**
+     * Get the model class associated with a given provider.
+     */
+    protected static function getProviderModel(string $provider): ?string
+    {
+        // Get the provider configuration
+        $providerConfig = config("auth.providers.{$provider}");
+
+        // Handle LDAP provider or standard Eloquent provider
+        if (isset($providerConfig['driver']) && $providerConfig['driver'] === 'ldap') {
+            return $providerConfig['database']['model'] ?? null;
+        }
+
+        return $providerConfig['model'] ?? null;
+    }
+
+    /**
      * Get list of relevant guards for the $class model based on config(auth) settings.
      *
      * Lookup flow:
@@ -45,9 +62,6 @@ class Guard
      * - filter for provider models matching the model $class being checked (important for Lumen)
      * - keys() gives just the names of the matched guards
      * - return collection of guard names
-     *
-     * @param string $class
-     * @return Collection
      */
     protected static function getConfigAuthGuards(string $class): Collection
     {
@@ -57,18 +71,31 @@ class Guard
                     return null;
                 }
 
-                return config("auth.providers.{$guard['provider']}.model");
+                return static::getProviderModel($guard['provider']);
             })
-            ->filter(function ($model) use ($class) {
-                return $class === $model;
-            })
+            ->filter(fn ($model) => $class === $model)
             ->keys();
+    }
+
+    /**
+     * Get the model associated with a given guard name.
+     */
+    public static function getModelForGuard(string $guard): ?string
+    {
+        // Get the provider configuration for the given guard
+        $provider = config("auth.guards.{$guard}.provider");
+
+        if (! $provider) {
+            return null;
+        }
+
+        return static::getProviderModel($provider);
     }
 
     /**
      * Lookup a guard name relevant for the $class model and the current user.
      *
-     * @param string|Model $class model class object or name
+     * @param  string|Model  $class  model class object or name
      * @return string guard name
      */
     public static function getDefaultName($class): string
@@ -83,5 +110,35 @@ class Guard
         }
 
         return $possible_guards->first() ?: $default;
+    }
+
+    /**
+     * Lookup a passport guard
+     */
+    public static function getPassportClient($guard): ?Authorizable
+    {
+        $guards = collect(config('auth.guards'))->where('driver', 'passport');
+
+        if (! $guards->count()) {
+            return null;
+        }
+
+        $authGuard = Auth::guard($guards->keys()[0]);
+
+        if (! \method_exists($authGuard, 'client')) {
+            return null;
+        }
+
+        $client = $authGuard->client();
+
+        if (! $guard || ! $client) {
+            return $client;
+        }
+
+        if (self::getNames($client)->contains($guard)) {
+            return $client;
+        }
+
+        return null;
     }
 }

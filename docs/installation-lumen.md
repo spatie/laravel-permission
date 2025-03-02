@@ -3,9 +3,13 @@ title: Installation in Lumen
 weight: 5
 ---
 
-NOTE: Lumen is **not** officially supported by this package. However, the following are some steps which may help get you started.
+NOTE: Lumen is **not** officially supported by this package. And Lumen is no longer under active development.
 
-Lumen installation instructions can be found in the [Lumen documentation](https://lumen.laravel.com/docs/main).
+However, the following are some steps which may help get you started.
+
+Lumen installation instructions can be found in the [Lumen documentation](https://lumen.laravel.com/docs).
+
+## Installing
 
 Install the permissions package via Composer:
 
@@ -27,17 +31,19 @@ You will also need the `config/auth.php` file. If you don't already have it, cop
 cp vendor/laravel/lumen-framework/config/auth.php config/auth.php
 ```
 
-Then, in `bootstrap/app.php`, uncomment the `auth` middleware, and register this package's middleware:
+Next, if you wish to use this package's middleware, clone whichever ones you want from `Spatie\Permission\Middleware` namespace into your own `App\Http\Middleware` namespace AND replace the `canAny()` call with `hasAnyPermission()` (because Lumen doesn't support `canAny()`).
+
+Then, in `bootstrap/app.php`, uncomment the `auth` middleware, and register the middleware you've created. For example:
 
 ```php
 $app->routeMiddleware([
     'auth'       => App\Http\Middleware\Authenticate::class,
-    'permission' => Spatie\Permission\Middlewares\PermissionMiddleware::class,
-    'role'       => Spatie\Permission\Middlewares\RoleMiddleware::class,
+    'permission' => App\Http\Middleware\PermissionMiddleware::class, // cloned from Spatie\Permission\Middleware
+    'role'       => App\Http\Middleware\RoleMiddleware::class,  // cloned from Spatie\Permission\Middleware
 ]);
 ```
 
-... and in the same file, in the ServiceProviders section, register the package configuration, service provider, and cache alias:
+... and also in `bootstrap/app.php`, in the ServiceProviders section, register the package configuration, service provider, and cache alias:
 
 ```php
 $app->configure('permission');
@@ -61,15 +67,15 @@ php artisan migrate
 ```
 
 ---
-### User Model
-NOTE: Remember that Laravel's authorization layer requires that your `User` model implement the `Illuminate\Contracts\Auth\Access\Authorizable` contract. In Lumen you will then also need to use the `Laravel\Lumen\Auth\Authorizable` trait.
+## User Model
+NOTE: Remember that Laravel's authorization layer requires that your `User` model implement the `Illuminate\Contracts\Auth\Access\Authorizable` contract. In Lumen you will then also need to use the `Laravel\Lumen\Auth\Authorizable` trait. Note that Lumen does not support the `User::canAny()` authorization method.
 
 ---
-### User Table
+## User Table
 NOTE: If you are working with a fresh install of Lumen, then you probably also need a migration file for your Users table. You can create your own, or you can copy a basic one from Laravel:
 
-[https://github.com/laravel/laravel/blob/main/database/migrations/2014_10_12_000000_create_users_table.php](https://github.com/laravel/laravel/blob/main/database/migrations/2014_10_12_000000_create_users_table.php)
+[https://github.com/laravel/laravel/blob/master/database/migrations/0001_01_01_000000_create_users_table.php](https://github.com/laravel/laravel/blob/master/database/migrations/0001_01_01_000000_create_users_table.php)
 
 (You will need to run `php artisan migrate` after adding this file.)
 
-Remember to update your UserFactory.php to match the fields in the migration you create/copy.
+Remember to update your `UserFactory.php` to match the fields in the migration you create/copy.

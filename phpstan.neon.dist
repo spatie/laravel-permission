@@ -1,0 +1,19 @@
+includes:
+    - ./vendor/larastan/larastan/extension.neon
+    - phpstan-baseline.neon
+
+parameters:
+    level: 5
+    paths:
+        - src
+        - config
+        - database/migrations/create_permission_tables.php.stub
+        - database/migrations/add_teams_fields.php.stub
+    tmpDir: build/phpstan
+    checkOctaneCompatibility: true
+
+    ignoreErrors:
+        - '#Unsafe usage of new static#'
+        # wildcard permissions:
+        - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::getWildcardClass#'
+        - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::getAllPermissions#'

@@ -1,24 +1,27 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\PermissionRegistrar;
+use Spatie\Permission\Tests\TestModels\User;
 
 class CacheTest extends TestCase
 {
     protected $cache_init_count = 0;
+
     protected $cache_load_count = 0;
+
     protected $cache_run_count = 2; // roles lookup, permissions lookup
-    protected $cache_relations_count = 1;
 
     protected $registrar;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -40,6 +43,7 @@ class CacheTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_cache_the_permissions()
     {
         $this->resetQueryCount();
@@ -50,6 +54,7 @@ class CacheTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_flushes_the_cache_when_creating_a_permission()
     {
         app(Permission::class)->create(['name' => 'new']);
@@ -62,6 +67,7 @@ class CacheTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_flushes_the_cache_when_updating_a_permission()
     {
         $permission = app(Permission::class)->create(['name' => 'new']);
@@ -77,6 +83,7 @@ class CacheTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_flushes_the_cache_when_creating_a_role()
     {
         app(Role::class)->create(['name' => 'new']);
@@ -89,6 +96,7 @@ class CacheTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_flushes_the_cache_when_updating_a_role()
     {
         $role = app(Role::class)->create(['name' => 'new']);
@@ -104,6 +112,7 @@ class CacheTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function removing_a_permission_from_a_user_should_not_flush_the_cache()
     {
         $this->testUser->givePermissionTo('edit-articles');
@@ -120,6 +129,7 @@ class CacheTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function removing_a_role_from_a_user_should_not_flush_the_cache()
     {
         $this->testUser->assignRole('testRole');
@@ -136,6 +146,7 @@ class CacheTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_flushes_the_cache_when_removing_a_role_from_a_permission()
     {
         $this->testUserPermission->assignRole('testRole');
@@ -152,6 +163,7 @@ class CacheTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_flushes_the_cache_when_assign_a_permission_to_a_role()
     {
         $this->testUserRole->givePermissionTo('edit-articles');
@@ -164,6 +176,7 @@ class CacheTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function user_creation_should_not_flush_the_cache()
     {
         $this->registrar->getPermissions();
@@ -179,6 +192,7 @@ class CacheTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_flushes_the_cache_when_giving_a_permission_to_a_role()
     {
         $this->testUserRole->givePermissionTo($this->testUserPermission);
@@ -191,14 +205,16 @@ class CacheTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function has_permission_to_should_use_the_cache()
     {
         $this->testUserRole->givePermissionTo(['edit-articles', 'edit-news', 'Edit News']);
         $this->testUser->assignRole('testRole');
+        $this->testUser->loadMissing('roles', 'permissions'); // load relations
 
         $this->resetQueryCount();
         $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
-        $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count + $this->cache_relations_count);
+        $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
 
         $this->resetQueryCount();
         $this->assertTrue($this->testUser->hasPermissionTo('edit-news'));
@@ -214,16 +230,18 @@ class CacheTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_cache_should_differentiate_by_guard_name()
     {
         $this->expectException(PermissionDoesNotExist::class);
 
         $this->testUserRole->givePermissionTo(['edit-articles', 'web']);
         $this->testUser->assignRole('testRole');
+        $this->testUser->loadMissing('roles', 'permissions'); // load relations
 
         $this->resetQueryCount();
         $this->assertTrue($this->testUser->hasPermissionTo('edit-articles', 'web'));
-        $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count + $this->cache_relations_count);
+        $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
 
         $this->resetQueryCount();
         $this->assertFalse($this->testUser->hasPermissionTo('edit-articles', 'admin'));
@@ -231,10 +249,12 @@ class CacheTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function get_all_permissions_should_use_the_cache()
     {
         $this->testUserRole->givePermissionTo($expected = ['edit-articles', 'edit-news']);
         $this->testUser->assignRole('testRole');
+        $this->testUser->loadMissing('roles.permissions', 'permissions'); // load relations
 
         $this->resetQueryCount();
         $this->registrar->getPermissions();
@@ -244,10 +264,11 @@ class CacheTest extends TestCase
         $actual = $this->testUser->getAllPermissions()->pluck('name')->sort()->values();
         $this->assertEquals($actual, collect($expected));
 
-        $this->assertQueryCount(2);
+        $this->assertQueryCount(0);
     }
 
     /** @test */
+    #[Test]
     public function get_all_permissions_should_not_over_hydrate_roles()
     {
         $this->testUserRole->givePermissionTo(['edit-articles', 'edit-news']);
@@ -259,6 +280,7 @@ class CacheTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_reset_the_cache_with_artisan_command()
     {
         Artisan::call('permission:create-permission', ['name' => 'new-permission']);

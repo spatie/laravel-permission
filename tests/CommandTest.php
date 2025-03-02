@@ -1,14 +1,18 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
+use Composer\InstalledVersions;
+use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\Facades\Artisan;
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class CommandTest extends TestCase
 {
     /** @test */
+    #[Test]
     public function it_can_create_a_role()
     {
         Artisan::call('permission:create-role', ['name' => 'new-role']);
@@ -18,6 +22,7 @@ class CommandTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_create_a_role_with_a_specific_guard()
     {
         Artisan::call('permission:create-role', [
@@ -31,6 +36,7 @@ class CommandTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_create_a_permission()
     {
         Artisan::call('permission:create-permission', ['name' => 'new-permission']);
@@ -39,6 +45,7 @@ class CommandTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_create_a_permission_with_a_specific_guard()
     {
         Artisan::call('permission:create-permission', [
@@ -52,6 +59,7 @@ class CommandTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_create_a_role_and_permissions_at_same_time()
     {
         Artisan::call('permission:create-role', [
@@ -66,6 +74,7 @@ class CommandTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_create_a_role_without_duplication()
     {
         Artisan::call('permission:create-role', ['name' => 'new-role']);
@@ -76,6 +85,7 @@ class CommandTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_create_a_permission_without_duplication()
     {
         Artisan::call('permission:create-permission', ['name' => 'new-permission']);
@@ -85,8 +95,12 @@ class CommandTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_show_permission_tables()
     {
+        Role::where('name', 'testRole2')->delete();
+        Role::create(['name' => 'testRole_2']);
+
         Artisan::call('permission:show');
 
         $output = Artisan::output();
@@ -94,14 +108,13 @@ class CommandTest extends TestCase
         $this->assertTrue(strpos($output, 'Guard: web') !== false);
         $this->assertTrue(strpos($output, 'Guard: admin') !== false);
 
+        // |               | testRole | testRole_2 |
+        // | edit-articles |  ·       |  ·         |
         if (method_exists($this, 'assertMatchesRegularExpression')) {
-            // |               | testRole | testRole2 |
-            $this->assertMatchesRegularExpression('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|/', $output);
-
-            // | edit-articles |  ·       |  ·        |
+            $this->assertMatchesRegularExpression('/\|\s+\|\s+testRole\s+\|\s+testRole_2\s+\|/', $output);
             $this->assertMatchesRegularExpression('/\|\s+edit-articles\s+\|\s+·\s+\|\s+·\s+\|/', $output);
         } else { // phpUnit 9/8
-            $this->assertRegExp('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|/', $output);
+            $this->assertRegExp('/\|\s+\|\s+testRole\s+\|\s+testRole_2\s+\|/', $output);
             $this->assertRegExp('/\|\s+edit-articles\s+\|\s+·\s+\|\s+·\s+\|/', $output);
         }
 
@@ -121,6 +134,7 @@ class CommandTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_show_permissions_for_guard()
     {
         Artisan::call('permission:show', ['guard' => 'web']);
@@ -132,6 +146,7 @@ class CommandTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_setup_teams_upgrade()
     {
         config()->set('permission.teams', true);
@@ -143,9 +158,9 @@ class CommandTest extends TestCase
         $matchingFiles = glob(database_path('migrations/*_add_teams_fields.php'));
         $this->assertTrue(count($matchingFiles) > 0);
 
-        include_once $matchingFiles[count($matchingFiles) - 1];
-        (new \AddTeamsFields())->up();
-        (new \AddTeamsFields())->up(); //test upgrade teams migration fresh
+        $AddTeamsFields = require $matchingFiles[count($matchingFiles) - 1];
+        $AddTeamsFields->up();
+        $AddTeamsFields->up(); // test upgrade teams migration fresh
 
         Role::create(['name' => 'new-role', 'team_test_id' => 1]);
         $role = Role::where('name', 'new-role')->first();
@@ -159,25 +174,78 @@ class CommandTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_show_roles_by_teams()
     {
         config()->set('permission.teams', true);
         app(\Spatie\Permission\PermissionRegistrar::class)->initializeCache();
 
-        Role::create(['name' => 'testRoleTeam', 'team_test_id' => 1]);
-        Role::create(['name' => 'testRoleTeam', 'team_test_id' => 2]); // same name different team
+        Role::where('name', 'testRole2')->delete();
+        Role::create(['name' => 'testRole_2']);
+        Role::create(['name' => 'testRole_Team', 'team_test_id' => 1]);
+        Role::create(['name' => 'testRole_Team', 'team_test_id' => 2]); // same name different team
         Artisan::call('permission:show');
 
         $output = Artisan::output();
 
-        // |    | Team ID: NULL        | Team ID: 1   | Team ID: 2   |
-        // |    | testRole | testRole2 | testRoleTeam | testRoleTeam |
+        // |    | Team ID: NULL         | Team ID: 1    | Team ID: 2    |
+        // |    | testRole | testRole_2 | testRole_Team | testRole_Team |
         if (method_exists($this, 'assertMatchesRegularExpression')) {
             $this->assertMatchesRegularExpression('/\|\s+\|\s+Team ID: NULL\s+\|\s+Team ID: 1\s+\|\s+Team ID: 2\s+\|/', $output);
-            $this->assertMatchesRegularExpression('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|\s+testRoleTeam\s+\|\s+testRoleTeam\s+\|/', $output);
+            $this->assertMatchesRegularExpression('/\|\s+\|\s+testRole\s+\|\s+testRole_2\s+\|\s+testRole_Team\s+\|\s+testRole_Team\s+\|/', $output);
         } else { // phpUnit 9/8
             $this->assertRegExp('/\|\s+\|\s+Team ID: NULL\s+\|\s+Team ID: 1\s+\|\s+Team ID: 2\s+\|/', $output);
-            $this->assertRegExp('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|\s+testRoleTeam\s+\|\s+testRoleTeam\s+\|/', $output);
+            $this->assertRegExp('/\|\s+\|\s+testRole\s+\|\s+testRole_2\s+\|\s+testRole_Team\s+\|\s+testRole_Team\s+\|/', $output);
+        }
+    }
+
+    /** @test */
+    #[Test]
+    public function it_can_respond_to_about_command_with_default()
+    {
+        if (! class_exists(InstalledVersions::class) || ! class_exists(AboutCommand::class)) {
+            $this->markTestSkipped();
+        }
+        if (! method_exists(AboutCommand::class, 'flushState')) {
+            $this->markTestSkipped();
+        }
+
+        app(\Spatie\Permission\PermissionRegistrar::class)->initializeCache();
+
+        Artisan::call('about');
+        $output = str_replace("\r\n", "\n", Artisan::output());
+
+        $pattern = '/Spatie Permissions[ .\n]*Features Enabled[ .]*Default[ .\n]*Version/';
+        if (method_exists($this, 'assertMatchesRegularExpression')) {
+            $this->assertMatchesRegularExpression($pattern, $output);
+        } else { // phpUnit 9/8
+            $this->assertRegExp($pattern, $output);
+        }
+    }
+
+    /** @test */
+    #[Test]
+    public function it_can_respond_to_about_command_with_teams()
+    {
+        if (! class_exists(InstalledVersions::class) || ! class_exists(AboutCommand::class)) {
+            $this->markTestSkipped();
+        }
+        if (! method_exists(AboutCommand::class, 'flushState')) {
+            $this->markTestSkipped();
+        }
+
+        app(\Spatie\Permission\PermissionRegistrar::class)->initializeCache();
+
+        config()->set('permission.teams', true);
+
+        Artisan::call('about');
+        $output = str_replace("\r\n", "\n", Artisan::output());
+
+        $pattern = '/Spatie Permissions[ .\n]*Features Enabled[ .]*Teams[ .\n]*Version/';
+        if (method_exists($this, 'assertMatchesRegularExpression')) {
+            $this->assertMatchesRegularExpression($pattern, $output);
+        } else { // phpUnit 9/8
+            $this->assertRegExp($pattern, $output);
         }
     }
 }

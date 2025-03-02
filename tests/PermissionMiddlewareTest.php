@@ -1,28 +1,35 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Gate;
 use InvalidArgumentException;
+use Laravel\Passport\Passport;
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\UnauthorizedException;
-use Spatie\Permission\Middlewares\PermissionMiddleware;
+use Spatie\Permission\Middleware\PermissionMiddleware;
+use Spatie\Permission\Tests\TestModels\UserWithoutHasRoles;
 
 class PermissionMiddlewareTest extends TestCase
 {
     protected $permissionMiddleware;
 
-    public function setUp(): void
+    protected $usePassport = true;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->permissionMiddleware = new PermissionMiddleware();
+        $this->permissionMiddleware = new PermissionMiddleware;
     }
 
     /** @test */
+    #[Test]
     public function a_guest_cannot_access_a_route_protected_by_the_permission_middleware()
     {
         $this->assertEquals(
@@ -32,6 +39,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function a_user_cannot_access_a_route_protected_by_the_permission_middleware_of_a_different_guard()
     {
         // These permissions are created fresh here in reverse order of guard being applied, so they are not "found first" in the db lookup when matching
@@ -70,6 +78,50 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
+    public function a_client_cannot_access_a_route_protected_by_the_permission_middleware_of_a_different_guard(): void
+    {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
+        // These permissions are created fresh here in reverse order of guard being applied, so they are not "found first" in the db lookup when matching
+        app(Permission::class)->create(['name' => 'admin-permission2', 'guard_name' => 'web']);
+        $p1 = app(Permission::class)->create(['name' => 'admin-permission2', 'guard_name' => 'api']);
+
+        Passport::actingAsClient($this->testClient, ['*']);
+
+        $this->testClient->givePermissionTo($p1);
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->permissionMiddleware, 'admin-permission2', 'api', true)
+        );
+
+        $this->assertEquals(
+            403,
+            $this->runMiddleware($this->permissionMiddleware, 'edit-articles2', 'web', true)
+        );
+    }
+
+    /** @test */
+    #[Test]
+    public function a_super_admin_user_can_access_a_route_protected_by_permission_middleware()
+    {
+        Auth::login($this->testUser);
+
+        Gate::before(function ($user, $ability) {
+            return $user->getKey() === $this->testUser->getKey() ? true : null;
+        });
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->permissionMiddleware, 'edit-articles')
+        );
+    }
+
+    /** @test */
+    #[Test]
     public function a_user_can_access_a_route_protected_by_permission_middleware_if_have_this_permission()
     {
         Auth::login($this->testUser);
@@ -83,6 +135,25 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
+    public function a_client_can_access_a_route_protected_by_permission_middleware_if_have_this_permission(): void
+    {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
+        Passport::actingAsClient($this->testClient, ['*'], 'api');
+
+        $this->testClient->givePermissionTo('edit-posts');
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->permissionMiddleware, 'edit-posts', null, true)
+        );
+    }
+
+    /** @test */
+    #[Test]
     public function a_user_can_access_a_route_protected_by_this_permission_middleware_if_have_one_of_the_permissions()
     {
         Auth::login($this->testUser);
@@ -101,6 +172,44 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
+    public function a_client_can_access_a_route_protected_by_this_permission_middleware_if_have_one_of_the_permissions(): void
+    {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
+        Passport::actingAsClient($this->testClient, ['*']);
+
+        $this->testClient->givePermissionTo('edit-posts');
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->permissionMiddleware, 'edit-news|edit-posts', null, true)
+        );
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->permissionMiddleware, ['edit-news', 'edit-posts'], null, true)
+        );
+    }
+
+    /** @test */
+    #[Test]
+    public function a_user_cannot_access_a_route_protected_by_the_permission_middleware_if_have_not_has_roles_trait()
+    {
+        $userWithoutHasRoles = UserWithoutHasRoles::create(['email' => 'test_not_has_roles@user.com']);
+
+        Auth::login($userWithoutHasRoles);
+
+        $this->assertEquals(
+            403,
+            $this->runMiddleware($this->permissionMiddleware, 'edit-news')
+        );
+    }
+
+    /** @test */
+    #[Test]
     public function a_user_cannot_access_a_route_protected_by_the_permission_middleware_if_have_a_different_permission()
     {
         Auth::login($this->testUser);
@@ -114,6 +223,25 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
+    public function a_client_cannot_access_a_route_protected_by_the_permission_middleware_if_have_a_different_permission(): void
+    {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
+        Passport::actingAsClient($this->testClient, ['*']);
+
+        $this->testClient->givePermissionTo('edit-posts');
+
+        $this->assertEquals(
+            403,
+            $this->runMiddleware($this->permissionMiddleware, 'edit-news', null, true)
+        );
+    }
+
+    /** @test */
+    #[Test]
     public function a_user_cannot_access_a_route_protected_by_permission_middleware_if_have_not_permissions()
     {
         Auth::login($this->testUser);
@@ -125,6 +253,23 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
+    public function a_client_cannot_access_a_route_protected_by_permission_middleware_if_have_not_permissions(): void
+    {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
+        Passport::actingAsClient($this->testClient, ['*']);
+
+        $this->assertEquals(
+            403,
+            $this->runMiddleware($this->permissionMiddleware, 'edit-articles|edit-posts', null, true)
+        );
+    }
+
+    /** @test */
+    #[Test]
     public function a_user_can_access_a_route_protected_by_permission_middleware_if_has_permission_via_role()
     {
         Auth::login($this->testUser);
@@ -144,6 +289,31 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
+    public function a_client_can_access_a_route_protected_by_permission_middleware_if_has_permission_via_role(): void
+    {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
+        Passport::actingAsClient($this->testClient, ['*']);
+
+        $this->assertEquals(
+            403,
+            $this->runMiddleware($this->permissionMiddleware, 'edit-articles', null, true)
+        );
+
+        $this->testClientRole->givePermissionTo('edit-posts');
+        $this->testClient->assignRole('clientRole');
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->permissionMiddleware, 'edit-posts', null, true)
+        );
+    }
+
+    /** @test */
+    #[Test]
     public function the_required_permissions_can_be_fetched_from_the_exception()
     {
         Auth::login($this->testUser);
@@ -152,8 +322,8 @@ class PermissionMiddlewareTest extends TestCase
         $requiredPermissions = [];
 
         try {
-            $this->permissionMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
+            $this->permissionMiddleware->handle(new Request, function () {
+                return (new Response)->setContent('<html></html>');
             }, 'some-permission');
         } catch (UnauthorizedException $e) {
             $message = $e->getMessage();
@@ -165,6 +335,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_required_permissions_can_be_displayed_in_the_exception()
     {
         Auth::login($this->testUser);
@@ -173,8 +344,8 @@ class PermissionMiddlewareTest extends TestCase
         $message = null;
 
         try {
-            $this->permissionMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
+            $this->permissionMiddleware->handle(new Request, function () {
+                return (new Response)->setContent('<html></html>');
             }, 'some-permission');
         } catch (UnauthorizedException $e) {
             $message = $e->getMessage();
@@ -184,13 +355,14 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function use_not_existing_custom_guard_in_permission()
     {
         $class = null;
 
         try {
-            $this->permissionMiddleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
+            $this->permissionMiddleware->handle(new Request, function () {
+                return (new Response)->setContent('<html></html>');
             }, 'edit-articles', 'xxx');
         } catch (InvalidArgumentException $e) {
             $class = get_class($e);
@@ -200,6 +372,7 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function user_can_not_access_permission_with_guard_admin_while_login_using_default_guard()
     {
         Auth::login($this->testUser);
@@ -213,6 +386,25 @@ class PermissionMiddlewareTest extends TestCase
     }
 
     /** @test */
+    #[Test]
+    public function client_can_not_access_permission_with_guard_admin_while_login_using_default_guard(): void
+    {
+        if ($this->getLaravelVersion() < 9) {
+            $this->markTestSkipped('requires laravel >= 9');
+        }
+
+        Passport::actingAsClient($this->testClient, ['*']);
+
+        $this->testClient->givePermissionTo('edit-posts');
+
+        $this->assertEquals(
+            403,
+            $this->runMiddleware($this->permissionMiddleware, 'edit-posts', 'admin', true)
+        );
+    }
+
+    /** @test */
+    #[Test]
     public function user_can_access_permission_with_guard_admin_while_login_using_admin_guard()
     {
         Auth::guard('admin')->login($this->testAdmin);
@@ -225,14 +417,72 @@ class PermissionMiddlewareTest extends TestCase
         );
     }
 
-    protected function runMiddleware($middleware, $permission, $guard = null)
+    /** @test */
+    #[Test]
+    public function the_middleware_can_be_created_with_static_using_method()
     {
-        try {
-            return $middleware->handle(new Request(), function () {
-                return (new Response())->setContent('<html></html>');
-            }, $permission, $guard)->status();
-        } catch (UnauthorizedException $e) {
-            return $e->getStatusCode();
-        }
+        $this->assertSame(
+            'Spatie\Permission\Middleware\PermissionMiddleware:edit-articles',
+            PermissionMiddleware::using('edit-articles')
+        );
+        $this->assertEquals(
+            'Spatie\Permission\Middleware\PermissionMiddleware:edit-articles,my-guard',
+            PermissionMiddleware::using('edit-articles', 'my-guard')
+        );
+        $this->assertEquals(
+            'Spatie\Permission\Middleware\PermissionMiddleware:edit-articles|edit-news',
+            PermissionMiddleware::using(['edit-articles', 'edit-news'])
+        );
+    }
+
+    /**
+     * @test
+     *
+     * @requires PHP >= 8.1
+     */
+    #[RequiresPhp('>= 8.1')]
+    #[Test]
+    public function the_middleware_can_handle_enum_based_permissions_with_static_using_method()
+    {
+        $this->assertSame(
+            'Spatie\Permission\Middleware\PermissionMiddleware:view articles',
+            PermissionMiddleware::using(TestModels\TestRolePermissionsEnum::VIEWARTICLES)
+        );
+        $this->assertEquals(
+            'Spatie\Permission\Middleware\PermissionMiddleware:view articles,my-guard',
+            PermissionMiddleware::using(TestModels\TestRolePermissionsEnum::VIEWARTICLES, 'my-guard')
+        );
+        $this->assertEquals(
+            'Spatie\Permission\Middleware\PermissionMiddleware:view articles|edit articles',
+            PermissionMiddleware::using([TestModels\TestRolePermissionsEnum::VIEWARTICLES, TestModels\TestRolePermissionsEnum::EDITARTICLES])
+        );
+    }
+
+    /**
+     * @test
+     *
+     * @requires PHP >= 8.1
+     */
+    #[RequiresPhp('>= 8.1')]
+    #[Test]
+    public function the_middleware_can_handle_enum_based_permissions_with_handle_method()
+    {
+        app(Permission::class)->create(['name' => TestModels\TestRolePermissionsEnum::VIEWARTICLES->value]);
+        app(Permission::class)->create(['name' => TestModels\TestRolePermissionsEnum::EDITARTICLES->value]);
+
+        Auth::login($this->testUser);
+        $this->testUser->givePermissionTo(TestModels\TestRolePermissionsEnum::VIEWARTICLES);
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->permissionMiddleware, TestModels\TestRolePermissionsEnum::VIEWARTICLES)
+        );
+
+        $this->testUser->givePermissionTo(TestModels\TestRolePermissionsEnum::EDITARTICLES);
+
+        $this->assertEquals(
+            200,
+            $this->runMiddleware($this->permissionMiddleware, [TestModels\TestRolePermissionsEnum::VIEWARTICLES, TestModels\TestRolePermissionsEnum::EDITARTICLES])
+        );
     }
 }

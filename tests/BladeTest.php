@@ -1,13 +1,14 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
-use Artisan;
+use Illuminate\Support\Facades\Artisan;
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Contracts\Role;
 
 class BladeTest extends TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -21,14 +22,17 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function all_blade_directives_will_evaluate_false_when_there_is_nobody_logged_in()
     {
         $permission = 'edit-articles';
         $role = 'writer';
         $roles = [$role];
         $elserole = 'na';
+        $elsepermission = 'na';
 
         $this->assertEquals('does not have permission', $this->renderView('can', ['permission' => $permission]));
+        $this->assertEquals('does not have permission', $this->renderView('haspermission', compact('permission', 'elsepermission')));
         $this->assertEquals('does not have role', $this->renderView('role', compact('role', 'elserole')));
         $this->assertEquals('does not have role', $this->renderView('hasRole', compact('role', 'elserole')));
         $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', compact('roles')));
@@ -38,16 +42,19 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function all_blade_directives_will_evaluate_false_when_somebody_without_roles_or_permissions_is_logged_in()
     {
         $permission = 'edit-articles';
         $role = 'writer';
         $roles = 'writer';
         $elserole = 'na';
+        $elsepermission = 'na';
 
         auth()->setUser($this->testUser);
 
-        $this->assertEquals('does not have permission', $this->renderView('can', ['permission' => $permission]));
+        $this->assertEquals('does not have permission', $this->renderView('can', compact('permission')));
+        $this->assertEquals('does not have permission', $this->renderView('haspermission', compact('permission', 'elsepermission')));
         $this->assertEquals('does not have role', $this->renderView('role', compact('role', 'elserole')));
         $this->assertEquals('does not have role', $this->renderView('hasRole', compact('role', 'elserole')));
         $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', compact('roles')));
@@ -55,16 +62,19 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function all_blade_directives_will_evaluate_false_when_somebody_with_another_guard_is_logged_in()
     {
         $permission = 'edit-articles';
         $role = 'writer';
         $roles = 'writer';
         $elserole = 'na';
+        $elsepermission = 'na';
 
         auth('admin')->setUser($this->testAdmin);
 
         $this->assertEquals('does not have permission', $this->renderView('can', compact('permission')));
+        $this->assertEquals('does not have permission', $this->renderView('haspermission', compact('permission', 'elsepermission')));
         $this->assertEquals('does not have role', $this->renderView('role', compact('role', 'elserole')));
         $this->assertEquals('does not have role', $this->renderView('hasRole', compact('role', 'elserole')));
         $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', compact('roles')));
@@ -73,6 +83,38 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
+    public function the_can_directive_can_accept_a_guard_name()
+    {
+        $user = $this->getWriter();
+        $user->givePermissionTo('edit-articles');
+        auth()->setUser($user);
+
+        $permission = 'edit-articles';
+        $guard = 'web';
+        $this->assertEquals('has permission', $this->renderView('can', compact('permission', 'guard')));
+        $guard = 'admin';
+        $this->assertEquals('does not have permission', $this->renderView('can', compact('permission', 'guard')));
+
+        auth()->logout();
+
+        // log in as the Admin with the permission-via-role
+        $this->testAdmin->givePermissionTo($this->testAdminPermission);
+        $user = $this->testAdmin;
+        auth()->setUser($user);
+
+        $permission = 'edit-articles';
+        $guard = 'web';
+        $this->assertEquals('does not have permission', $this->renderView('can', compact('permission', 'guard')));
+
+        $permission = 'admin-permission';
+        $guard = 'admin';
+        $this->assertTrue($this->testAdmin->checkPermissionTo($permission, $guard));
+        $this->assertEquals('has permission', $this->renderView('can', compact('permission', 'guard')));
+    }
+
+    /** @test */
+    #[Test]
     public function the_can_directive_will_evaluate_true_when_the_logged_in_user_has_the_permission()
     {
         $user = $this->getWriter();
@@ -85,6 +127,32 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
+    public function the_haspermission_directive_will_evaluate_true_when_the_logged_in_user_has_the_permission()
+    {
+        $user = $this->getWriter();
+
+        $permission = 'edit-articles';
+        $user->givePermissionTo('edit-articles');
+
+        auth()->setUser($user);
+
+        $this->assertEquals('has permission', $this->renderView('haspermission', compact('permission')));
+
+        $guard = 'admin';
+        $elsepermission = 'na';
+        $this->assertEquals('does not have permission', $this->renderView('haspermission', compact('permission', 'elsepermission', 'guard')));
+
+        $this->testAdminRole->givePermissionTo($this->testAdminPermission);
+        $this->testAdmin->assignRole($this->testAdminRole);
+        auth('admin')->setUser($this->testAdmin);
+        $guard = 'admin';
+        $permission = 'admin-permission';
+        $this->assertEquals('has permission', $this->renderView('haspermission', compact('permission', 'guard', 'elsepermission')));
+    }
+
+    /** @test */
+    #[Test]
     public function the_role_directive_will_evaluate_true_when_the_logged_in_user_has_the_role()
     {
         auth()->setUser($this->getWriter());
@@ -93,6 +161,7 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_elserole_directive_will_evaluate_true_when_the_logged_in_user_has_the_role()
     {
         auth()->setUser($this->getMember());
@@ -101,6 +170,7 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_role_directive_will_evaluate_true_when_the_logged_in_user_has_the_role_for_the_given_guard()
     {
         auth('admin')->setUser($this->getSuperAdmin());
@@ -109,6 +179,7 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_hasrole_directive_will_evaluate_true_when_the_logged_in_user_has_the_role()
     {
         auth()->setUser($this->getWriter());
@@ -117,6 +188,7 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_hasrole_directive_will_evaluate_true_when_the_logged_in_user_has_the_role_for_the_given_guard()
     {
         auth('admin')->setUser($this->getSuperAdmin());
@@ -125,6 +197,7 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_unlessrole_directive_will_evaluate_true_when_the_logged_in_user_does_not_have_the_role()
     {
         auth()->setUser($this->getWriter());
@@ -133,6 +206,7 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_unlessrole_directive_will_evaluate_true_when_the_logged_in_user_does_not_have_the_role_for_the_given_guard()
     {
         auth('admin')->setUser($this->getSuperAdmin());
@@ -142,6 +216,7 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_hasanyrole_directive_will_evaluate_false_when_the_logged_in_user_does_not_have_any_of_the_required_roles()
     {
         $roles = ['writer', 'intern'];
@@ -153,6 +228,7 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_hasanyrole_directive_will_evaluate_true_when_the_logged_in_user_does_have_some_of_the_required_roles()
     {
         $roles = ['member', 'writer', 'intern'];
@@ -164,6 +240,7 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_hasanyrole_directive_will_evaluate_true_when_the_logged_in_user_does_have_some_of_the_required_roles_for_the_given_guard()
     {
         $roles = ['super-admin', 'moderator'];
@@ -175,6 +252,7 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_hasanyrole_directive_will_evaluate_true_when_the_logged_in_user_does_have_some_of_the_required_roles_in_pipe()
     {
         $guard = 'admin';
@@ -185,6 +263,7 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_hasanyrole_directive_will_evaluate_false_when_the_logged_in_user_doesnt_have_some_of_the_required_roles_in_pipe()
     {
         $guard = '';
@@ -195,6 +274,7 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_hasallroles_directive_will_evaluate_false_when_the_logged_in_user_does_not_have_all_required_roles()
     {
         $roles = ['member', 'writer'];
@@ -206,6 +286,7 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_hasallroles_directive_will_evaluate_true_when_the_logged_in_user_does_have_all_required_roles()
     {
         $roles = ['member', 'writer'];
@@ -221,6 +302,7 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_hasallroles_directive_will_evaluate_true_when_the_logged_in_user_does_have_all_required_roles_for_the_given_guard()
     {
         $roles = ['super-admin', 'moderator'];
@@ -236,6 +318,7 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_hasallroles_directive_will_evaluate_true_when_the_logged_in_user_does_have_all_required_roles_in_pipe()
     {
         $guard = 'admin';
@@ -250,6 +333,7 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_hasallroles_directive_will_evaluate_false_when_the_logged_in_user_doesnt_have_all_required_roles_in_pipe()
     {
         $guard = '';
@@ -263,6 +347,7 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_hasallroles_directive_will_evaluate_true_when_the_logged_in_user_does_have_all_required_roles_in_array()
     {
         $guard = 'admin';
@@ -277,6 +362,7 @@ class BladeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_hasallroles_directive_will_evaluate_false_when_the_logged_in_user_doesnt_have_all_required_roles_in_array()
     {
         $guard = '';

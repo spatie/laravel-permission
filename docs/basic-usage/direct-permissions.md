@@ -3,6 +3,18 @@ title: Direct Permissions
 weight: 2
 ---
 
+## Best Practice
+
+INSTEAD OF DIRECT PERMISSIONS, it is better to assign permissions to Roles, and then assign Roles to Users.
+
+See the [Roles vs Permissions](../best-practices/roles-vs-permissions) section of the docs for a deeper explanation.
+
+HOWEVER, If you have reason to directly assign individual permissions to specific users (instead of to roles which are assigned to those users), you can do that as well:
+
+## Direct Permissions to Users
+
+### Giving/Revoking direct permissions
+
 A permission can be given to any user:
 
 ```php
@@ -26,6 +38,15 @@ Or revoke & add new permissions in one go:
 ```php
 $user->syncPermissions(['edit articles', 'delete articles']);
 ```
+
+## Checking Direct Permissions
+Like all permissions assigned via roles, you can check if a user has a permission by using Laravel's default `can` function. This will also allow you to use Super-Admin features provided by Laravel's Gate:
+
+```php
+$user->can('edit articles');
+```
+
+> NOTE: The following `hasPermissionTo`, `hasAnyPermission`, `hasAllPermissions` functions do not support Super-Admin functionality. Use `can`, `canAny`, `canAll` instead.
 
 You can check if a user has a permission:
 
@@ -57,11 +78,4 @@ You may also pass integers to lookup by permission id
 
 ```php
 $user->hasAnyPermission(['edit articles', 1, 5]);
-```
-
-Saved permissions will be registered with the `Illuminate\Auth\Access\Gate` class for the default guard. So you can
-check if a user has a permission with Laravel's default `can` function:
-
-```php
-$user->can('edit articles');
 ```

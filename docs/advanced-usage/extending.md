@@ -3,14 +3,51 @@ title: Extending
 weight: 4
 ---
 
+## Adding fields to your models
+You can add your own migrations to make changes to the role/permission tables, as you would for adding/changing fields in any other tables in your Laravel project.
+
+Following that, you can add any necessary logic for interacting with those fields into your custom/extended Models.
+
+Here is an example of adding a 'description' field to your Permissions and Roles tables:
+
+```sh
+php artisan make:migration add_description_to_permissions_tables
+```
+And in the migration file:
+```php
+public function up()
+{
+    Schema::table('permissions', function (Blueprint $table) {
+        $table->string('description')->nullable();
+    });
+    Schema::table('roles', function (Blueprint $table) {
+        $table->string('description')->nullable();
+    });
+}
+```
+
+Semi-Related article: [Adding Extra Fields To Pivot Table](https://quickadminpanel.com/blog/laravel-belongstomany-add-extra-fields-to-pivot-table/) (video)
+
+## Adding a description to roles and permissions
+A common question is "how do I add a description for my roles or permissions?".
+
+By default, a 'description' field is not included in this package, to keep the model memory usage low, because not every app has a need for displayed descriptions.
+
+But you are free to add it yourself if you wish. You can use the example above.
+
+### Multiple Language Descriptions
+
+If you need your 'description' to support multiple languages, simply use Laravel's built-in language features. You might prefer to rename the 'description' field in these migration examples from 'description' to 'description_key' for clarity.
+
+
 ## Extending User Models
 Laravel's authorization features are available in models which implement the `Illuminate\Foundation\Auth\Access\Authorizable` trait. 
 
-By default Laravel does this in `\App\User` by extending `Illuminate\Foundation\Auth\User`, in which the trait and `Illuminate\Contracts\Auth\Access\Authorizable` contract are declared.
+By default Laravel does this in `\App\Models\User` by extending `Illuminate\Foundation\Auth\User`, in which the trait and `Illuminate\Contracts\Auth\Access\Authorizable` contract are declared.
 
 If you are creating your own User models and wish Authorization features to be available, you need to implement `Illuminate\Contracts\Auth\Access\Authorizable` in one of those ways as well.
 
-#### Child User Models
+## Child User Models
 
 Due to the nature of polymorphism and Eloquent's hard-coded mapping of model names in the database, setting relationships for child models that inherit permissions of the parent can be difficult (even near impossible depending on app requirements, especially when attempting to do inverse mappings). However, one thing you might consider if you need the child model to never have its own permissions/roles but to only use its parent's permissions/roles, is to [override the `getMorphClass` method on the model](https://github.com/laravel/framework/issues/17830#issuecomment-345619085).
 
@@ -57,14 +94,4 @@ In the rare case that you have need to REPLACE the existing `Role` or `Permissio
 - Your `Role` model needs to implement the `Spatie\Permission\Contracts\Role` contract
 - Your `Permission` model needs to implement the `Spatie\Permission\Contracts\Permission` contract
 - You need to update `config/permission.php` to specify your namespaced model
-
-
-## Adding fields to your models
-You can add your own migrations to make changes to the role/permission tables, as you would for adding/changing fields in any other tables in your Laravel project.
-
-Following that, you can add any necessary logic for interacting with those fields into your custom/extended Models.
-
-Related article: [Adding Extra Fields To Pivot Table](https://quickadminpanel.com/blog/laravel-belongstomany-add-extra-fields-to-pivot-table/) (video)
-
-
 

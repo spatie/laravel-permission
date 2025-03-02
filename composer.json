@@ -1,6 +1,7 @@
 {
     "name": "spatie/laravel-permission",
-    "description": "Permission handling for Laravel 6.0 and up",
+    "description": "Permission handling for Laravel 8.0 and up",
+    "license": "MIT",
     "keywords": [
         "spatie",
         "laravel",
@@ -11,8 +12,6 @@
         "rbac",
         "security"
     ],
-    "homepage": "https://github.com/spatie/laravel-permission",
-    "license": "MIT",
     "authors": [
         {
             "name": "Freek Van der Herten",
@@ -21,18 +20,22 @@
             "role": "Developer"
         }
     ],
+    "homepage": "https://github.com/spatie/laravel-permission",
     "require": {
-        "php" : "^7.3|^8.0|^8.1",
-        "illuminate/auth": "^7.0|^8.0|^9.0",
-        "illuminate/container": "^7.0|^8.0|^9.0",
-        "illuminate/contracts": "^7.0|^8.0|^9.0",
-        "illuminate/database": "^7.0|^8.0|^9.0"
+        "php": "^8.0",
+        "illuminate/auth": "^8.12|^9.0|^10.0|^11.0|^12.0",
+        "illuminate/container": "^8.12|^9.0|^10.0|^11.0|^12.0",
+        "illuminate/contracts": "^8.12|^9.0|^10.0|^11.0|^12.0",
+        "illuminate/database": "^8.12|^9.0|^10.0|^11.0|^12.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^5.0|^6.0|^7.0",
-        "phpunit/phpunit": "^9.4",
-        "predis/predis": "^1.1"
+        "laravel/passport": "^11.0|^12.0",
+        "laravel/pint": "^1.0",
+        "orchestra/testbench": "^6.23|^7.0|^8.0|^9.0|^10.0",
+        "phpunit/phpunit": "^9.4|^10.1|^11.5"
     },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "Spatie\\Permission\\": "src"
@@ -43,26 +46,26 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Spatie\\Permission\\Test\\": "tests"
+            "Spatie\\Permission\\Tests\\": "tests"
         }
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Spatie\\Permission\\PermissionServiceProvider"
-            ]
-        },
-        "branch-alias": {
-            "dev-main": "5.x-dev",
-            "dev-master": "5.x-dev"
-        }
-    },
-    "scripts": {
-        "test": "phpunit"
     },
     "config": {
         "sort-packages": true
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    "extra": {
+        "branch-alias": {
+            "dev-main": "6.x-dev",
+            "dev-master": "6.x-dev"
+        },
+        "laravel": {
+            "providers": [
+                "Spatie\\Permission\\PermissionServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "format": "pint",
+        "analyse": "echo 'Checking dependencies...' && composer require --dev larastan/larastan && phpstan analyse"
+    }
 }

@@ -1,12 +1,13 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Spatie\Permission\Tests;
 
-use Illuminate\Http\Response;
+use PHPUnit\Framework\Attributes\Test;
 
 class WildcardRouteTest extends TestCase
 {
     /** @test */
+    #[Test]
     public function test_permission_function()
     {
         app('config')->set('permission.enable_wildcard_permission', true);
@@ -14,13 +15,14 @@ class WildcardRouteTest extends TestCase
         $router = $this->getRouter();
 
         $router->get('permission-test', $this->getRouteResponse())
-                ->name('permission.test')
-                ->permission(['articles.edit', 'articles.save']);
+            ->name('permission.test')
+            ->permission(['articles.edit', 'articles.save']);
 
         $this->assertEquals(['permission:articles.edit|articles.save'], $this->getLastRouteMiddlewareFromRouter($router));
     }
 
     /** @test */
+    #[Test]
     public function test_role_and_permission_function_together()
     {
         app('config')->set('permission.enable_wildcard_permission', true);
@@ -28,9 +30,9 @@ class WildcardRouteTest extends TestCase
         $router = $this->getRouter();
 
         $router->get('role-permission-test', $this->getRouteResponse())
-                ->name('role-permission.test')
-                ->role('superadmin|admin')
-                ->permission('user.create|user.edit');
+            ->name('role-permission.test')
+            ->role('superadmin|admin')
+            ->permission('user.create|user.edit');
 
         $this->assertEquals(
             [
@@ -39,22 +41,5 @@ class WildcardRouteTest extends TestCase
             ],
             $this->getLastRouteMiddlewareFromRouter($router)
         );
-    }
-
-    protected function getLastRouteMiddlewareFromRouter($router)
-    {
-        return last($router->getRoutes()->get())->middleware();
-    }
-
-    protected function getRouter()
-    {
-        return app('router');
-    }
-
-    protected function getRouteResponse()
-    {
-        return function () {
-            return (new Response())->setContent('<html></html>');
-        };
     }
 }
