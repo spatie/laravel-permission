@@ -156,7 +156,7 @@ class CommandTest extends TestCase
             ->assertExitCode(0);
 
         $matchingFiles = glob(database_path('migrations/*_add_teams_fields.php'));
-        $this->assertTrue(count($matchingFiles) > 0);
+        $this->assertNotEmpty($matchingFiles);
 
         $AddTeamsFields = require $matchingFiles[count($matchingFiles) - 1];
         $AddTeamsFields->up();

@@ -261,7 +261,7 @@ trait HasPermissions
     {
         try {
             return $this->hasPermissionTo($permission, $guardName);
-        } catch (PermissionDoesNotExist $e) {
+        } catch (PermissionDoesNotExist) {
             return false;
         }
     }

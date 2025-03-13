@@ -112,13 +112,13 @@ class HasRolesTest extends TestCase
     {
         $enum1 = TestModels\TestRolePermissionsEnum::USERMANAGER;
         $enum2 = TestModels\TestRolePermissionsEnum::WRITER;
-        $role1 = app(Role::class)->findOrCreate($enum1->value, 'web');
-        $role2 = app(Role::class)->findOrCreate($enum2->value, 'web');
+        app(Role::class)->findOrCreate($enum1->value, 'web');
+        app(Role::class)->findOrCreate($enum2->value, 'web');
 
         User::all()->each(fn ($item) => $item->delete());
-        $user1 = User::create(['email' => 'user1@test.com']);
+        User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
-        $user3 = User::create(['email' => 'user3@test.com']);
+        User::create(['email' => 'user3@test.com']);
 
         // assign only one user to a role
         $user2->assignRole($enum1);
