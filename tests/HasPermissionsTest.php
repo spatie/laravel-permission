@@ -87,7 +87,7 @@ class HasPermissionsTest extends TestCase
     {
         $enum = TestModels\TestRolePermissionsEnum::VIEWARTICLES;
 
-        $permission = app(Permission::class)->findOrCreate($enum->value, 'web');
+        app(Permission::class)->findOrCreate($enum->value, 'web');
 
         $this->testUser->givePermissionTo($enum);
 
@@ -113,13 +113,13 @@ class HasPermissionsTest extends TestCase
     {
         $enum1 = TestModels\TestRolePermissionsEnum::VIEWARTICLES;
         $enum2 = TestModels\TestRolePermissionsEnum::EDITARTICLES;
-        $permission1 = app(Permission::class)->findOrCreate($enum1->value, 'web');
-        $permission2 = app(Permission::class)->findOrCreate($enum2->value, 'web');
+        app(Permission::class)->findOrCreate($enum1->value, 'web');
+        app(Permission::class)->findOrCreate($enum2->value, 'web');
 
         User::all()->each(fn ($item) => $item->delete());
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
-        $user3 = User::create(['email' => 'user3@test.com']);
+        User::create(['email' => 'user3@test.com']);
         $user1->givePermissionTo([$enum1, $enum2]);
         $this->testUserRole->givePermissionTo($enum2);
         $user2->assignRole('testRole');
@@ -142,7 +142,7 @@ class HasPermissionsTest extends TestCase
         User::all()->each(fn ($item) => $item->delete());
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
-        $user3 = User::create(['email' => 'user3@test.com']);
+        User::create(['email' => 'user3@test.com']);
         $user1->givePermissionTo(['edit-articles', 'edit-news']);
         $this->testUserRole->givePermissionTo('edit-articles');
         $user2->assignRole('testRole');
@@ -163,7 +163,7 @@ class HasPermissionsTest extends TestCase
         User::all()->each(fn ($item) => $item->delete());
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
-        $user3 = User::create(['email' => 'user3@test.com']);
+        User::create(['email' => 'user3@test.com']);
         $user1->givePermissionTo([1, 2]);
         $this->testUserRole->givePermissionTo(1);
         $user2->assignRole('testRole');
@@ -267,7 +267,7 @@ class HasPermissionsTest extends TestCase
         User::all()->each(fn ($item) => $item->delete());
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
-        $user3 = User::create(['email' => 'user3@test.com']);
+        User::create(['email' => 'user3@test.com']);
         $user1->givePermissionTo(['edit-news']);
         $user2->givePermissionTo(['edit-articles', 'edit-news']);
 
@@ -810,7 +810,7 @@ class HasPermissionsTest extends TestCase
     #[Test]
     public function it_can_reject_permission_based_on_logged_in_user_guard()
     {
-        $unassignedPermission = app(Permission::class)::create([
+        app(Permission::class)::create([
             'name' => 'do_that',
             'guard_name' => 'api',
         ]);
@@ -859,7 +859,7 @@ class HasPermissionsTest extends TestCase
 
         $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
 
-        $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-news'])
+        app(Permission::class)::whereIn('name', ['edit-articles', 'edit-news'])
             ->pluck($this->testUserPermission->getKeyName())
             ->toArray();
 

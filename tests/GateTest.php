@@ -67,7 +67,7 @@ class GateTest extends TestCase
     {
         $enum = TestModels\TestRolePermissionsEnum::VIEWARTICLES;
 
-        $permission = app(Permission::class)->findOrCreate($enum->value, 'web');
+        app(Permission::class)->findOrCreate($enum->value, 'web');
 
         $this->assertFalse($this->testUser->can($enum->value));
         $this->assertFalse($this->testUser->canAny([$enum->value, 'some other permission']));
