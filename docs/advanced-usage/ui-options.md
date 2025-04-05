@@ -29,3 +29,5 @@ If you decide you need a UI, even if it's not for creating/editing role/permissi
 
 
 - [LiveWire Base Admin Panel](https://github.com/aliqasemzadeh/bap) User management by [AliQasemzadeh](https://github.com/aliqasemzadeh)
+
+- [JetAdmin](https://github.com/aliqasemzadeh/jetadmin) JetAdmin use laravel livewire starter kit and manage permissions. [AliQasemzadeh](https://github.com/aliqasemzadeh)
