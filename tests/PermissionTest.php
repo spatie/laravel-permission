@@ -5,6 +5,7 @@ namespace Spatie\Permission\Tests;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\PermissionAlreadyExists;
+use Spatie\Permission\Tests\TestModels\TestRolePermissionsEnum;
 use Spatie\Permission\Tests\TestModels\User;
 
 class PermissionTest extends TestCase
@@ -85,5 +86,26 @@ class PermissionTest extends TestCase
         $permission->delete();
 
         $this->assertCount(0, app(Permission::class)->where($this->testUserPermission->getKeyName(), $this->testUserPermission->getKey())->get());
+    }
+
+    /** @test */
+    #[Test]
+    public function it_can_find_or_create_permission_by_enum()
+    {
+        $permission = app(Permission::class)::findOrCreate(TestRolePermissionsEnum::VIEWARTICLES);
+
+        $this->assertEquals(TestRolePermissionsEnum::VIEWARTICLES->value, $permission->name);
+    }
+
+    /** @test */
+    #[Test]
+    public function it_can_find_permission_by_enum_name()
+    {
+        $permission = app(Permission::class)::create(['name' => TestRolePermissionsEnum::VIEWARTICLES]);
+        $foundPermission = app(Permission::class)::findByName(TestRolePermissionsEnum::VIEWARTICLES);
+
+        $this->assertEquals($permission->getKey(), $foundPermission->getKey());
+        $this->assertEquals(TestRolePermissionsEnum::VIEWARTICLES->value, $foundPermission->name);
+        $this->assertEquals($permission->name, $foundPermission->name);
     }
 }
