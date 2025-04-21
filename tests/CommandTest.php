@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Artisan;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Tests\TestModels\User;
 
 class CommandTest extends TestCase
 {
@@ -247,5 +248,63 @@ class CommandTest extends TestCase
         } else { // phpUnit 9/8
             $this->assertRegExp($pattern, $output);
         }
+    }
+
+    /** @test */
+    #[Test]
+    public function test_is_assign_role_to_user()
+    {
+        $user = User::first();
+
+        Artisan::call('permission:assign-role', [
+            'name' => 'testRole',
+            'userId' => $user->id,
+            'guard' => 'web',
+            'userModelNamespace' => User::class,
+        ]);
+
+        $output = Artisan::output();
+
+        $this->assertStringContainsString('Role `testRole` assigned to user ID '.$user->id.' successfully.', $output);
+        $this->assertCount(1, Role::where('name', 'testRole')->get());
+        $this->assertCount(1, $user->roles);
+        $this->assertTrue($user->hasRole('testRole'));
+    }
+
+    /** @test */
+    #[Test]
+    public function test_assigning_role_fails_when_user_not_found()
+    {
+
+        Artisan::call('permission:assign-role', [
+            'name' => 'testRole',
+            'userId' => 99999,
+            'guard' => 'web',
+            'userModelNamespace' => User::class,
+        ]);
+
+        $output = Artisan::output();
+
+        $this->assertStringContainsString('User with ID 99999 not found.', $output);
+    }
+
+    /** @test */
+    #[Test]
+    public function test_assigning_role_fails_when_namspace_not_existed()
+    {
+        $user = User::first();
+
+        $userModelClass = 'App\Models\NonExistentUser';
+
+        Artisan::call('permission:assign-role', [
+            'name' => 'testRole',
+            'userId' => $user->id,
+            'guard' => 'web',
+            'userModelNamespace' => $userModelClass,
+        ]);
+
+        $output = Artisan::output();
+
+        $this->assertStringContainsString("User model class [{$userModelClass}] does not exist.", $output);
     }
 }

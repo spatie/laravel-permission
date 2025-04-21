@@ -89,6 +89,7 @@ class PermissionServiceProvider extends ServiceProvider
             Commands\CreatePermission::class,
             Commands\Show::class,
             Commands\UpgradeForTeams::class,
+            Commands\AssignRole::class,
         ]);
     }
 
