@@ -7,7 +7,7 @@ weight: 2
 
 You may discover that it is best to flush this package's cache **BEFORE seeding, to avoid cache conflict errors**.
 
-And if you use the `WithoutModelEvents` trait in your seeders, flush it **AFTER creating any roles/permissions as well, before assigning or granting them.**.
+And if you use the `WithoutModelEvents` trait in your seeders, flush it **AFTER creating any roles/permissions as well, before assigning or granting them**.
 
 ```php
 // reset cached roles and permissions
