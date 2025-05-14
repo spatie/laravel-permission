@@ -2,6 +2,28 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 6.18.0 - 2025-05-14
+
+### What's Changed
+
+* refactor exception throwing in migration file to use throw_if() by @ccaioadriano in https://github.com/spatie/laravel-permission/pull/2819
+* Fix: Example in config comment includes `permission.` prefix on `wildcard_permission` key by @jerrens in https://github.com/spatie/laravel-permission/pull/2835
+* Fix commented config key typo by @erikn69 in https://github.com/spatie/laravel-permission/pull/2844
+* Remove `collectPermissions` that is not being assigned by @JHWelch in https://github.com/spatie/laravel-permission/pull/2840
+* [Docs] Update multiple-guards.md by @Ken-vdE in https://github.com/spatie/laravel-permission/pull/2836
+* [Docs] Remove extra period by @coreyhn in https://github.com/spatie/laravel-permission/pull/2841
+* Add JetAdmin as UI Option. by @aliqasemzadeh in https://github.com/spatie/laravel-permission/pull/2814
+
+### New Contributors
+
+* @ccaioadriano made their first contribution in https://github.com/spatie/laravel-permission/pull/2819
+* @coreyhn made their first contribution in https://github.com/spatie/laravel-permission/pull/2841
+* @jerrens made their first contribution in https://github.com/spatie/laravel-permission/pull/2835
+* @Ken-vdE made their first contribution in https://github.com/spatie/laravel-permission/pull/2836
+* @JHWelch made their first contribution in https://github.com/spatie/laravel-permission/pull/2840
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/6.17.0...6.18.0
+
 ## 6.17.0 - 2025-04-09
 
 ### What's Changed
@@ -1007,6 +1029,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -1054,6 +1077,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
