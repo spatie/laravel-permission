@@ -305,7 +305,7 @@ trait HasPermissions
     /**
      * Determine if the model has, via roles, the given permission.
      */
-    protected function hasPermissionViaRole(Permission $permission): bool
+    public function hasPermissionViaRole(Permission $permission): bool
     {
         if (is_a($this, Role::class)) {
             return false;
