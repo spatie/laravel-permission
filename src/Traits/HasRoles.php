@@ -238,6 +238,8 @@ trait HasRoles
      */
     public function hasRole($roles, ?string $guard = null): bool
     {
+        $roleKey = $this->getRoleKey();
+
         $this->loadMissing('roles');
 
         if (is_string($roles) && strpos($roles, '|') !== false) {
@@ -249,7 +251,7 @@ trait HasRoles
 
             return $this->roles
                 ->when($guard, fn ($q) => $q->where('guard_name', $guard))
-                ->pluck('name')
+                ->pluck($roleKey)
                 ->contains(function ($name) use ($roles) {
                     /** @var string|\BackedEnum $name */
                     if ($name instanceof \BackedEnum) {
@@ -270,8 +272,8 @@ trait HasRoles
 
         if (is_string($roles)) {
             return $guard
-                ? $this->roles->where('guard_name', $guard)->contains('name', $roles)
-                : $this->roles->contains('name', $roles);
+                ? $this->roles->where('guard_name', $guard)->contains($roleKey, $roles)
+                : $this->roles->contains($roleKey, $roles);
         }
 
         if ($roles instanceof Role) {
@@ -314,6 +316,8 @@ trait HasRoles
      */
     public function hasAllRoles($roles, ?string $guard = null): bool
     {
+        $roleKey = $this->getRoleKey();
+
         $this->loadMissing('roles');
 
         if ($roles instanceof \BackedEnum) {
@@ -332,16 +336,16 @@ trait HasRoles
             return $this->roles->contains($roles->getKeyName(), $roles->getKey());
         }
 
-        $roles = collect()->make($roles)->map(function ($role) {
+        $roles = collect()->make($roles)->map(function ($role) use ($roleKey) {
             if ($role instanceof \BackedEnum) {
                 return $role->value;
             }
 
-            return $role instanceof Role ? $role->name : $role;
+            return $role instanceof Role ? $role->{$roleKey} : $role;
         });
 
         $roleNames = $guard
-            ? $this->roles->where('guard_name', $guard)->pluck('name')
+            ? $this->roles->where('guard_name', $guard)->pluck($roleKey)
             : $this->getRoleNames();
 
         $roleNames = $roleNames->transform(function ($roleName) {
@@ -362,6 +366,8 @@ trait HasRoles
      */
     public function hasExactRoles($roles, ?string $guard = null): bool
     {
+        $roleKey = $this->getRoleKey();
+
         $this->loadMissing('roles');
 
         if (is_string($roles) && strpos($roles, '|') !== false) {
@@ -373,10 +379,10 @@ trait HasRoles
         }
 
         if ($roles instanceof Role) {
-            $roles = [$roles->name];
+            $roles = [$roles->{$roleKey}];
         }
 
-        $roles = collect()->make($roles)->map(fn ($role) => $role instanceof Role ? $role->name : $role
+        $roles = collect()->make($roles)->map(fn ($role) => $role instanceof Role ? $role->{$roleKey} : $role
         );
 
         return $this->roles->count() == $roles->count() && $this->hasAllRoles($roles, $guard);
@@ -390,11 +396,17 @@ trait HasRoles
         return $this->permissions;
     }
 
+    /**
+     * Return all role identifiers for the model.
+     *
+     * Note: This respects the configured 'role_identifier' column (e.g., 'name' or 'slug'),
+     * even though the method name is 'getRoleNames' for backward compatibility.
+     */
     public function getRoleNames(): Collection
     {
         $this->loadMissing('roles');
 
-        return $this->roles->pluck('name');
+        return $this->roles->pluck($this->getRoleKey());
     }
 
     protected function getStoredRole($role): Role
@@ -408,7 +420,7 @@ trait HasRoles
         }
 
         if (is_string($role)) {
-            return $this->getRoleClass()::findByName($role, $this->getDefaultGuardName());
+            return $this->getRoleClass()::findByKey($role, $this->getDefaultGuardName());
         }
 
         return $role;
@@ -435,4 +447,10 @@ trait HasRoles
 
         return explode('|', trim($pipeString, $quoteCharacter));
     }
+
+    protected function getRoleKey(): string
+    {
+        return config('permission.role_identifier', 'name');
+    }
+
 }

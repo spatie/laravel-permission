@@ -127,6 +127,28 @@ class Role extends Model implements RoleContract
     }
 
     /**
+     * Find a role by its configured key (e.g. name or slug) and guard name.
+     *
+     * @return RoleContract|Role
+     *
+     * @throws RoleDoesNotExist
+     */
+    public static function findByKey(string $value, ?string $guardName = null): RoleContract
+    {
+        $guardName = $guardName ?? Guard::getDefaultName(static::class);
+        $key = config('permission.role_identifier', 'name');
+
+        $role = static::findByParam([$key => $value, 'guard_name' => $guardName]);
+
+        if (! $role) {
+            throw RoleDoesNotExist::named($value, $guardName);
+        }
+
+        return $role;
+    }
+
+
+    /**
      * Find or create role by its name (and optionally guardName).
      *
      * @return RoleContract|Role

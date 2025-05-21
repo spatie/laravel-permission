@@ -46,6 +46,56 @@ class HasRolesTest extends TestCase
         $role = app(Role::class)->findOrCreate('testRoleInWebGuard2', 'web');
         $this->assertFalse($this->testUser->hasRole($role));
     }
+    
+    /** @test */
+    #[Test]
+    public function test_has_role_with_default_identifier()
+    {
+        config(['permission.role_identifier' => 'name']);
+
+        $user = User::create(['email' => 'user1@example.com']);
+
+        app(Role::class)->create(['name' => 'Editor', 'slug' => 'editor', 'guard_name' => 'web']);
+
+        $user->assignRole('Editor');
+
+        $this->assertTrue($user->hasRole('Editor'));
+        $this->assertFalse($user->hasRole('editor')); // slug shouldn't work
+    }
+
+    /** @test */
+    #[Test]
+    public function test_has_role_with_slug_identifier()
+    {
+        config(['permission.role_identifier' => 'slug']);
+
+        $user = User::create(['email' => 'user2@example.com']);
+
+        app(Role::class)->create(['name' => 'Editor', 'slug' => 'editor', 'guard_name' => 'web']);
+
+        $user->assignRole('editor');
+
+        $this->assertTrue($user->hasRole('editor'));
+        $this->assertFalse($user->hasRole('Editor')); // name shouldn't work
+    }
+
+    /** @test */
+    #[Test]
+    public function test_has_all_roles_with_slug_identifier()
+    {
+        config(['permission.role_identifier' => 'slug']);
+
+        $user = User::create(['email' => 'user3@example.com']);
+
+        app(Role::class)->create(['name' => 'Admin', 'slug' => 'admin', 'guard_name' => 'web']);
+        app(Role::class)->create(['name' => 'Manager', 'slug' => 'manager', 'guard_name' => 'web']);
+
+        $user->assignRole('admin', 'manager');
+
+        $this->assertTrue($user->hasAllRoles(['admin', 'manager']));
+        $this->assertTrue($user->hasExactRoles(['admin', 'manager']));
+        $this->assertFalse($user->hasExactRoles(['admin']));
+    }
 
     /**
      * @test
