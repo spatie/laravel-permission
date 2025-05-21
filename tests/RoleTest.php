@@ -12,6 +12,7 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Tests\TestModels\Admin;
 use Spatie\Permission\Tests\TestModels\RuntimeRole;
+use Spatie\Permission\Tests\TestModels\TestRolePermissionsEnum;
 use Spatie\Permission\Tests\TestModels\User;
 
 class RoleTest extends TestCase
@@ -317,5 +318,26 @@ class RoleTest extends TestCase
         $this->assertTrue($this->testUser->hasRole('test-role'));
         $this->assertInstanceOf(RuntimeRole::class, $this->testUser->roles[0]);
         $this->assertSame('test-role', $this->testUser->roles[0]->name);
+    }
+
+    /** @test */
+    #[Test]
+    public function it_can_find_or_create_role_by_enum()
+    {
+        $permission = app(Role::class)::findOrCreate(TestRolePermissionsEnum::ADMIN);
+
+        $this->assertEquals(TestRolePermissionsEnum::ADMIN->value, $permission->name);
+    }
+
+    /** @test */
+    #[Test]
+    public function it_can_find_role_by_enum_name()
+    {
+        $role = app(Role::class)::create(['name' => TestRolePermissionsEnum::ADMIN]);
+        $foundRole = app(Role::class)::findByName(TestRolePermissionsEnum::ADMIN);
+
+        $this->assertEquals($role->getKey(), $foundRole->getKey());
+        $this->assertEquals(TestRolePermissionsEnum::ADMIN->value, $foundRole->name);
+        $this->assertEquals($role->name, $foundRole->name);
     }
 }
