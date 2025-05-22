@@ -235,9 +235,14 @@ trait HasRoles
      * Determine if the model has (one of) the given role(s).
      *
      * @param  string|int|array|Role|Collection|\BackedEnum  $roles
+     * @throws \TypeError if called with multiple arguments instead of an array
      */
     public function hasRole($roles, ?string $guard = null): bool
     {
+        // Detect incorrect usage: more than one argument passed (e.g. hasRole('admin', 'super'))
+        if (func_num_args() > 2) {
+            throw new \TypeError('hasRole() expects a single argument (string, array, Role, Collection, or BackedEnum). For multiple roles, pass an array.');
+        }
         $this->loadMissing('roles');
 
         if (is_string($roles) && strpos($roles, '|') !== false) {
