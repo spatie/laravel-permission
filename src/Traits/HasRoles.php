@@ -91,7 +91,17 @@ trait HasRoles
                 $role = $role->value;
             }
 
-            $method = is_int($role) || PermissionRegistrar::isUid($role) ? 'findById' : 'findByName';
+            $roleIdentifier = $this->getRoleIdentifier();
+
+            $method = '';
+
+            if (is_int($role) || PermissionRegistrar::isUid($role)) {
+                $method = 'findById';
+            } else if ($roleIdentifier !== 'name') {
+                $method = 'findByIdentifier';
+            } else {
+                $method = 'findByName';
+            }
 
             return $this->getRoleClass()::{$method}($role, $guard ?: $this->getDefaultGuardName());
         }, Arr::wrap($roles));
@@ -238,7 +248,7 @@ trait HasRoles
      */
     public function hasRole($roles, ?string $guard = null): bool
     {
-        $roleKey = $this->getRoleKey();
+        $roleKey = $this->getRoleIdentifier();
 
         $this->loadMissing('roles');
 
@@ -316,7 +326,7 @@ trait HasRoles
      */
     public function hasAllRoles($roles, ?string $guard = null): bool
     {
-        $roleKey = $this->getRoleKey();
+        $roleKey = $this->getRoleIdentifier();
 
         $this->loadMissing('roles');
 
@@ -366,7 +376,7 @@ trait HasRoles
      */
     public function hasExactRoles($roles, ?string $guard = null): bool
     {
-        $roleKey = $this->getRoleKey();
+        $roleKey = $this->getRoleIdentifier();
 
         $this->loadMissing('roles');
 
@@ -406,7 +416,7 @@ trait HasRoles
     {
         $this->loadMissing('roles');
 
-        return $this->roles->pluck($this->getRoleKey());
+        return $this->roles->pluck($this->getRoleIdentifier());
     }
 
     protected function getStoredRole($role): Role
@@ -420,7 +430,7 @@ trait HasRoles
         }
 
         if (is_string($role)) {
-            return $this->getRoleClass()::findByKey($role, $this->getDefaultGuardName());
+            return $this->getRoleClass()::findByIdentifier($role, $this->getDefaultGuardName());
         }
 
         return $role;
@@ -448,7 +458,7 @@ trait HasRoles
         return explode('|', trim($pipeString, $quoteCharacter));
     }
 
-    protected function getRoleKey(): string
+    protected function getRoleIdentifier(): string
     {
         return config('permission.role_identifier', 'name');
     }
