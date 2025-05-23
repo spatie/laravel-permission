@@ -223,7 +223,6 @@ trait HasRoles
     public function syncRoles(...$roles)
     {
         if ($this->getModel()->exists) {
-            $this->collectRoles($roles);
             $this->roles()->detach();
             $this->setRelation('roles', collect());
         }
