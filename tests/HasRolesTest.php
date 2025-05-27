@@ -320,6 +320,23 @@ class HasRolesTest extends TestCase
 
     /** @test */
     #[Test]
+    public function it_can_avoid_detach_on_role_that_does_not_exist_sync()
+    {
+        $this->testUser->syncRoles('testRole');
+
+        try {
+            $this->testUser->syncRoles('role-does-not-exist');
+            $this->fail('Expected RoleDoesNotExist exception was not thrown.');
+        } catch (RoleDoesNotExist $e){
+            //
+        }
+
+        $this->assertTrue($this->testUser->hasRole('testRole'));
+        $this->assertFalse($this->testUser->hasRole('role-does-not-exist'));
+    }
+
+    /** @test */
+    #[Test]
     public function it_can_sync_multiple_roles()
     {
         $this->testUser->syncRoles('testRole', 'testRole2');
