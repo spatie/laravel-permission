@@ -620,7 +620,7 @@ class HasPermissionsTest extends TestCase
         try {
             $this->testUser->syncPermissions('permission-does-not-exist');
             $this->fail('Expected PermissionDoesNotExist exception was not thrown.');
-        } catch (PermissionDoesNotExist $e){
+        } catch (PermissionDoesNotExist $e) {
             //
         }
 

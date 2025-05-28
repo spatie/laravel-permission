@@ -327,7 +327,7 @@ class HasRolesTest extends TestCase
         try {
             $this->testUser->syncRoles('role-does-not-exist');
             $this->fail('Expected RoleDoesNotExist exception was not thrown.');
-        } catch (RoleDoesNotExist $e){
+        } catch (RoleDoesNotExist $e) {
             //
         }
 
