@@ -190,6 +190,7 @@ abstract class TestCase extends Orchestra
 
             $schema->table(config('permission.table_names.roles'), function (Blueprint $table) {
                 $table->softDeletes();
+                $table->string("slug")->unique()->nullable();
             });
             $schema->table(config('permission.table_names.permissions'), function (Blueprint $table) {
                 $table->softDeletes();
