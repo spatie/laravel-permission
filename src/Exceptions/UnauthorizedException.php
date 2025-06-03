@@ -16,7 +16,7 @@ class UnauthorizedException extends HttpException
         $message = __('User does not have the right roles.');
 
         if (config('permission.display_role_in_exception')) {
-            $message .= ' ' . __('Necessary roles are :roles', ['roles' => implode(', ', $roles)]);
+            $message .= ' '.__('Necessary roles are :roles', ['roles' => implode(', ', $roles)]);
         }
 
         $exception = new static(403, $message, null, []);
@@ -30,7 +30,7 @@ class UnauthorizedException extends HttpException
         $message = __('User does not have the right permissions.');
 
         if (config('permission.display_permission_in_exception')) {
-            $message .= ' ' . __('Necessary permissions are :permissions', ['permissions' => implode(', ', $permissions)]);
+            $message .= ' '.__('Necessary permissions are :permissions', ['permissions' => implode(', ', $permissions)]);
         }
 
         $exception = new static(403, $message, null, []);
@@ -44,7 +44,7 @@ class UnauthorizedException extends HttpException
         $message = __('User does not have any of the necessary access rights.');
 
         if (config('permission.display_permission_in_exception') && config('permission.display_role_in_exception')) {
-            $message .= ' ' . __('Necessary roles or permissions are :values', ['values' => implode(', ', $rolesOrPermissions)]);
+            $message .= ' '.__('Necessary roles or permissions are :values', ['values' => implode(', ', $rolesOrPermissions)]);
         }
 
         $exception = new static(403, $message, null, []);
