@@ -26,7 +26,14 @@ return [
 
         'role' => Spatie\Permission\Models\Role::class,
 
-    ],
+    ],    
+    
+    /*
+     * This option defines which column on the roles table is used to identify a role
+     * when checking things like $user->hasRole('admin').
+     * By default, it uses 'name', but you can change this to 'slug' or any other unique column.
+     */
+    'role_identifier' => 'name',
 
     'table_names' => [
 
