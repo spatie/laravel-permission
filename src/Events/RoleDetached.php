@@ -18,8 +18,8 @@ class RoleDetached
     use SerializesModels;
 
     /**
-     * Internally the HasRoles trait passes $rolesOrIds as a single  Eloquent record
-     * Theoretically one could register the event to other places with an array etc
+     * Internally the HasRoles trait passes an array of role ids (eg: int's or uuid's)
+     * Theoretically one could register the event to other places passing other types
      * So a Listener should inspect the type of $rolesOrIds received before using.
      *
      * @param  array|int[]|string[]|Role|Role[]|Collection  $rolesOrIds
