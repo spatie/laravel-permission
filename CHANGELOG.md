@@ -2,6 +2,20 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 6.21.0 - 2025-07-23
+
+### What's Changed
+
+* Allow removing multiple roles with the `removeRole` method by @TobMoeller in https://github.com/spatie/laravel-permission/pull/2859
+* [Docs] Correct middleware order for documentation example in `teams-permissions.md` by @dualklip in https://github.com/spatie/laravel-permission/pull/2863
+
+### New Contributors
+
+* @dualklip made their first contribution in https://github.com/spatie/laravel-permission/pull/2863
+* @TobMoeller made their first contribution in https://github.com/spatie/laravel-permission/pull/2859
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/6.20.0...6.21.0
+
 ## 6.20.0 - 2025-06-14
 
 ### What's Changed
@@ -1053,6 +1067,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -1100,6 +1115,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
