@@ -5,6 +5,7 @@ namespace Spatie\Permission\Tests;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\Test;
+use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Tests\TestModels\Admin;
 use Spatie\Permission\Tests\TestModels\Role;
 
@@ -105,5 +106,48 @@ class HasRolesWithCustomModelsTest extends HasRolesTest
 
         $this->assertSame('2021-07-20 19:13:14', $role1->refresh()->updated_at->format('Y-m-d H:i:s'));
         $this->assertSame('2021-07-20 19:13:14', $role2->refresh()->updated_at->format('Y-m-d H:i:s'));
+    }
+    
+    /** @test */
+    #[Test]
+    public function it_can_assign_and_remove_a_role_with_custom_identifier()
+    {
+        config(['permission.role_identifier' => 'slug']);
+
+        app(Role::class)->create(['name' => 'Editor', 'slug' => 'editor', 'guard_name' => 'web']);
+        app(Role::class)->create(['name' => 'Writer', 'slug' => 'writer', 'guard_name' => 'web']);
+
+        $this->assertFalse($this->testUser->hasRole('editor'));
+        $this->assertFalse($this->testUser->hasRole('Editor'));
+
+        $this->testUser->assignRole('editor');
+        $this->testUser->assignRole('writer');
+
+        $this->assertTrue($this->testUser->hasRole('editor'));
+        $this->assertFalse($this->testUser->hasRole('Editor'));
+
+        $this->assertTrue($this->testUser->hasAllRoles(['editor']));
+        $this->assertTrue($this->testUser->hasAllRoles(['editor', 'writer']));
+        $this->assertFalse($this->testUser->hasAllRoles(['editor', 'writer', 'not exist']));
+
+        $this->assertTrue($this->testUser->hasExactRoles(['editor', 'writer']));
+        $this->assertFalse($this->testUser->hasExactRoles(['editor']));
+
+        $this->testUser->removeRole('editor');
+
+        $this->assertFalse($this->testUser->hasRole('editor'));
+    }
+    
+    /** @test */
+    #[Test]
+    public function it_throws_an_exception_when_assigning_a_role_by_name_when_identifier_is_not_name()
+    {
+        config(['permission.role_identifier' => 'slug']);
+
+        app(Role::class)->create(['name' => 'Editor', 'slug' => 'editor', 'guard_name' => 'web']);
+
+        $this->expectException(RoleDoesNotExist::class);
+
+        $this->testUser->assignRole('Editor');
     }
 }
