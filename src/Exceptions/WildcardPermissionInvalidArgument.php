@@ -8,6 +8,6 @@ class WildcardPermissionInvalidArgument extends InvalidArgumentException
 {
     public static function create()
     {
-        return new static('Wildcard permission must be string, permission id or permission instance');
+        return new static(__('Wildcard permission must be string, permission id or permission instance'));
     }
 }

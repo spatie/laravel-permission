@@ -148,7 +148,7 @@ abstract class TestCase extends Orchestra
         // FOR MANUAL TESTING OF ALTERNATE CACHE STORES:
         // $app['config']->set('cache.default', 'array');
         // Laravel supports: array, database, file
-        // requires extensions: apc, memcached, redis, dynamodb, octane
+        // requires extensions: memcached, redis, dynamodb, octane
     }
 
     /**

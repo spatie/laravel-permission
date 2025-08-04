@@ -20,7 +20,8 @@ Note that this package requires you to register a permission name (same for role
 If your app structure does NOT differentiate between guards when it comes to roles/permissions, (ie: if ALL your roles/permissions are the SAME for ALL guards), you can override the `getDefaultGuardName` function by adding it to your User model, and specifying your desired `$guard_name`. Then you only need to create roles/permissions for that single `$guard_name`, not duplicating them. The example here sets it to `web`, but use whatever your application's default is:
 
 ```php
-    protected function getDefaultGuardName(): string { return 'web'; }
+    protected string $guard_name = 'web';
+    protected function getDefaultGuardName(): string { return $this->guard_name; }
 ````
 
 

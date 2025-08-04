@@ -2,7 +2,9 @@
 
 namespace Spatie\Permission\Tests;
 
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\Test;
+use Spatie\Permission\Tests\TestModels\TestRolePermissionsEnum;
 
 class RouteTest extends TestCase
 {
@@ -47,6 +49,68 @@ class RouteTest extends TestCase
             [
                 'role:superadmin|admin',
                 'permission:create user|edit user',
+            ],
+            $this->getLastRouteMiddlewareFromRouter($router)
+        );
+    }
+
+    /**
+     * @test
+     *
+     * @requires PHP 8.1.0
+     */
+    #[RequiresPhp('>= 8.1.0')]
+    #[Test]
+    public function test_role_function_with_backed_enum()
+    {
+        $router = $this->getRouter();
+
+        $router->get('role-test.enum', $this->getRouteResponse())
+            ->name('role.test.enum')
+            ->role(TestRolePermissionsEnum::USERMANAGER);
+
+        $this->assertEquals(['role:'.TestRolePermissionsEnum::USERMANAGER->value], $this->getLastRouteMiddlewareFromRouter($router));
+    }
+
+    /**
+     * @test
+     *
+     * @requires PHP 8.1.0
+     */
+    #[RequiresPhp('>= 8.1.0')]
+    #[Test]
+    public function test_permission_function_with_backed_enum()
+    {
+        $router = $this->getRouter();
+
+        $router->get('permission-test.enum', $this->getRouteResponse())
+            ->name('permission.test.enum')
+            ->permission(TestRolePermissionsEnum::WRITER);
+
+        $expected = ['permission:'.TestRolePermissionsEnum::WRITER->value];
+        $this->assertEquals($expected, $this->getLastRouteMiddlewareFromRouter($router));
+    }
+
+    /**
+     * @test
+     *
+     * @requires PHP 8.1.0
+     */
+    #[RequiresPhp('>= 8.1.0')]
+    #[Test]
+    public function test_role_and_permission_function_together_with_backed_enum()
+    {
+        $router = $this->getRouter();
+
+        $router->get('roles-permissions-test.enum', $this->getRouteResponse())
+            ->name('roles-permissions.test.enum')
+            ->role([TestRolePermissionsEnum::USERMANAGER, TestRolePermissionsEnum::ADMIN])
+            ->permission([TestRolePermissionsEnum::WRITER, TestRolePermissionsEnum::EDITOR]);
+
+        $this->assertEquals(
+            [
+                'role:'.TestRolePermissionsEnum::USERMANAGER->value.'|'.TestRolePermissionsEnum::ADMIN->value,
+                'permission:'.TestRolePermissionsEnum::WRITER->value.'|'.TestRolePermissionsEnum::EDITOR->value,
             ],
             $this->getLastRouteMiddlewareFromRouter($router)
         );

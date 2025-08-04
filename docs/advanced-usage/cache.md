@@ -46,6 +46,9 @@ php artisan permission:cache-reset
 ```
 (This command is effectively an alias for `artisan cache:forget spatie.permission.cache` but respects the package config as well.)
 
+## Octane cache reset
+In many cases Octane will not need additional cache resets; however, if you find that cache results are stale or crossing over between requests, you can force a cache flush upon every Octane reset cycle by editing the `/config/permission.php` and setting `register_octane_reset_listener` to true.
+
 ## Cache Configuration Settings
 
 This package allows you to customize cache-related operations via its config file. In most cases the defaults are fine; however, in a multitenancy situation you may wish to do some cache-prefix overrides when switching tenants. See below for more details.

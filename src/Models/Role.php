@@ -27,7 +27,7 @@ class Role extends Model implements RoleContract
 
     public function __construct(array $attributes = [])
     {
-        $attributes['guard_name'] = $attributes['guard_name'] ?? config('auth.defaults.guard');
+        $attributes['guard_name'] ??= Guard::getDefaultName(static::class);
 
         parent::__construct($attributes);
 
@@ -42,7 +42,7 @@ class Role extends Model implements RoleContract
      */
     public static function create(array $attributes = [])
     {
-        $attributes['guard_name'] = $attributes['guard_name'] ?? Guard::getDefaultName(static::class);
+        $attributes['guard_name'] ??= Guard::getDefaultName(static::class);
 
         $attributes['name'] = $attributes['name'] instanceof \BackedEnum
             ? $attributes['name']->value
@@ -105,7 +105,7 @@ class Role extends Model implements RoleContract
             $name = $name->value;
         }
 
-        $guardName = $guardName ?? Guard::getDefaultName(static::class);
+        $guardName ??= Guard::getDefaultName(static::class);
 
         $role = static::findByParam(['name' => $name, 'guard_name' => $guardName]);
 
@@ -123,7 +123,7 @@ class Role extends Model implements RoleContract
      */
     public static function findById(int|string $id, ?string $guardName = null): RoleContract
     {
-        $guardName = $guardName ?? Guard::getDefaultName(static::class);
+        $guardName ??= Guard::getDefaultName(static::class);
 
         $role = static::findByParam([(new static)->getKeyName() => $id, 'guard_name' => $guardName]);
 
@@ -145,7 +145,7 @@ class Role extends Model implements RoleContract
             $name = $name->value;
         }
 
-        $guardName = $guardName ?? Guard::getDefaultName(static::class);
+        $guardName ??= Guard::getDefaultName(static::class);
 
         $role = static::findByParam(['name' => $name, 'guard_name' => $guardName]);
 

@@ -181,42 +181,62 @@ class HasRolesTest extends TestCase
 
     /** @test */
     #[Test]
-    public function it_can_assign_a_role_using_an_object()
+    public function it_can_assign_and_remove_a_role_using_an_object()
     {
         $this->testUser->assignRole($this->testUserRole);
 
         $this->assertTrue($this->testUser->hasRole($this->testUserRole));
+
+        $this->testUser->removeRole($this->testUserRole);
+
+        $this->assertFalse($this->testUser->hasRole($this->testUserRole));
     }
 
     /** @test */
     #[Test]
-    public function it_can_assign_a_role_using_an_id()
+    public function it_can_assign_and_remove_a_role_using_an_id()
     {
         $this->testUser->assignRole($this->testUserRole->getKey());
 
         $this->assertTrue($this->testUser->hasRole($this->testUserRole));
+
+        $this->testUser->removeRole($this->testUserRole->getKey());
+
+        $this->assertFalse($this->testUser->hasRole($this->testUserRole));
     }
 
     /** @test */
     #[Test]
-    public function it_can_assign_multiple_roles_at_once()
+    public function it_can_assign_and_remove_multiple_roles_at_once()
     {
         $this->testUser->assignRole($this->testUserRole->getKey(), 'testRole2');
 
         $this->assertTrue($this->testUser->hasRole('testRole'));
 
         $this->assertTrue($this->testUser->hasRole('testRole2'));
+
+        $this->testUser->removeRole($this->testUserRole->getKey(), 'testRole2');
+
+        $this->assertFalse($this->testUser->hasRole('testRole'));
+
+        $this->assertFalse($this->testUser->hasRole('testRole2'));
     }
 
     /** @test */
     #[Test]
-    public function it_can_assign_multiple_roles_using_an_array()
+    public function it_can_assign_and_remove_multiple_roles_using_an_array()
     {
         $this->testUser->assignRole([$this->testUserRole->getKey(), 'testRole2']);
 
         $this->assertTrue($this->testUser->hasRole('testRole'));
 
         $this->assertTrue($this->testUser->hasRole('testRole2'));
+
+        $this->testUser->removeRole([$this->testUserRole->getKey(), 'testRole2']);
+
+        $this->assertFalse($this->testUser->hasRole('testRole'));
+
+        $this->assertFalse($this->testUser->hasRole('testRole2'));
     }
 
     /** @test */
@@ -316,6 +336,23 @@ class HasRolesTest extends TestCase
         $this->assertTrue($this->testUser->hasRole('testRole'));
 
         $this->assertTrue($this->testUser->hasRole('testRole2'));
+    }
+
+    /** @test */
+    #[Test]
+    public function it_can_avoid_detach_on_role_that_does_not_exist_sync()
+    {
+        $this->testUser->syncRoles('testRole');
+
+        try {
+            $this->testUser->syncRoles('role-does-not-exist');
+            $this->fail('Expected RoleDoesNotExist exception was not thrown.');
+        } catch (RoleDoesNotExist $e) {
+            //
+        }
+
+        $this->assertTrue($this->testUser->hasRole('testRole'));
+        $this->assertFalse($this->testUser->hasRole('role-does-not-exist'));
     }
 
     /** @test */
@@ -956,14 +993,19 @@ class HasRolesTest extends TestCase
         Event::fake();
         app('config')->set('permission.events_enabled', true);
 
-        $this->testUser->assignRole('testRole');
+        $this->testUser->assignRole('testRole', 'testRole2');
 
-        $this->testUser->removeRole('testRole');
+        $this->testUser->removeRole('testRole', 'testRole2');
 
-        Event::assertDispatched(RoleDetached::class, function ($event) {
+        $roleIds = app(Role::class)::whereIn('name', ['testRole', 'testRole2'])
+            ->pluck($this->testUserRole->getKeyName())
+            ->toArray();
+
+        Event::assertDispatched(RoleDetached::class, function ($event) use ($roleIds) {
             return $event->model instanceof User
                 && ! $event->model->hasRole('testRole')
-                && $event->rolesOrIds->name === 'testRole';
+                && ! $event->model->hasRole('testRole2')
+                && $event->rolesOrIds === $roleIds;
         });
     }
 

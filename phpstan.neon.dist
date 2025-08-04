@@ -17,3 +17,6 @@ parameters:
         # wildcard permissions:
         - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::getWildcardClass#'
         - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::getAllPermissions#'
+        # contract checks:
+        - '#Call to function is_a\(\) with (.*) and ''Spatie\\\\Permission\\\\Contracts\\\\Permission'' will always evaluate to true\.$#'
+        - '#Call to function is_a\(\) with (.*) and ''Spatie\\\\Permission\\\\Contracts\\\\Role'' will always evaluate to true\.$#'
