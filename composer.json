@@ -32,8 +32,7 @@
         "laravel/passport": "^11.0|^12.0",
         "laravel/pint": "^1.0",
         "orchestra/testbench": "^6.23|^7.0|^8.0|^9.0|^10.0",
-        "phpunit/phpunit": "^9.4|^10.1|^11.5",
-        "roave/security-advisories": "dev-latest"
+        "phpunit/phpunit": "^9.4|^10.1|^11.5"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
