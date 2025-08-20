@@ -205,63 +205,21 @@ trait HasRoles
      *
      * @param  string|int|array|Role|Collection|\BackedEnum  $roles
      */
-    public function hasRole($roles, ?string $guard = null): bool
+     public function hasRole($roles): bool
     {
-        $this->loadMissing('roles');
-
-        if (is_string($roles) && strpos($roles, '|') !== false) {
-            $roles = $this->convertPipeToArray($roles);
+        if (\is_string($roles) && str_contains($roles, '|')) {
+            $roles = \explode('|', $roles);
         }
 
-        if ($roles instanceof \BackedEnum) {
-            $roles = $roles->value;
-
-            return $this->roles
-                ->when($guard, fn ($q) => $q->where('guard_name', $guard))
-                ->pluck('name')
-                ->contains(function ($name) use ($roles) {
-                    /** @var string|\BackedEnum $name */
-                    if ($name instanceof \BackedEnum) {
-                        return $name->value == $roles;
-                    }
-
-                    return $name == $roles;
-                });
+        if (\is_string($roles) || $roles instanceof Role) {
+            return $this->roles->contains('name', $roles->name ?? $roles);
         }
 
-        if (is_int($roles) || PermissionRegistrar::isUid($roles)) {
-            $key = (new ($this->getRoleClass())())->getKeyName();
+        $roles = collect()->make($roles)->map(function ($role) {
+            return $role instanceof Role ? $role->name : $role;
+        });
 
-            return $guard
-                ? $this->roles->where('guard_name', $guard)->contains($key, $roles)
-                : $this->roles->contains($key, $roles);
-        }
-
-        if (is_string($roles)) {
-            return $guard
-                ? $this->roles->where('guard_name', $guard)->contains('name', $roles)
-                : $this->roles->contains('name', $roles);
-        }
-
-        if ($roles instanceof Role) {
-            return $this->roles->contains($roles->getKeyName(), $roles->getKey());
-        }
-
-        if (is_array($roles)) {
-            foreach ($roles as $role) {
-                if ($this->hasRole($role, $guard)) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        if ($roles instanceof Collection) {
-            return $roles->intersect($guard ? $this->roles->where('guard_name', $guard) : $this->roles)->isNotEmpty();
-        }
-
-        throw new \TypeError('Unsupported type for $roles parameter to hasRole().');
+        return !$roles->intersect($this->roles->pluck('name'))->isEmpty();
     }
 
     /**
