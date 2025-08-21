@@ -47,7 +47,24 @@ trait HasRoles
      */
     public function roles(): BelongsToMany|\Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsToMany(config('permission.models.role'));
+        $relation = $this->morphToMany(
+            config('permission.models.role'),
+            'model',
+            config('permission.table_names.model_has_roles'),
+            config('permission.column_names.model_morph_key'),
+            app(PermissionRegistrar::class)->pivotRole
+        );
+
+        if (! app(PermissionRegistrar::class)->teams) {
+            return $relation;
+        }
+
+        $teamsKey = app(PermissionRegistrar::class)->teamsKey;
+        $relation->withPivot($teamsKey);
+        $teamField = config('permission.table_names.roles').'.'.$teamsKey;
+
+        return $relation->wherePivot($teamsKey, getPermissionsTeamId())
+            ->where(fn ($q) => $q->whereNull($teamField)->orWhere($teamField, getPermissionsTeamId()));
     }
 
     /**
