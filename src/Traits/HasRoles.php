@@ -225,8 +225,15 @@ trait HasRoles
     {
         if ($this->getModel()->exists) {
             $this->collectRoles($roles);
-            $this->roles()->detach();
-            $this->setRelation('roles', collect());
+            if (config('permission.events_enabled')) {
+                $currentRoles = $this->roles()->get();
+                if ($currentRoles->isNotEmpty()) {
+                    $this->removeRole($currentRoles);
+                }
+            } else {
+                $this->roles()->detach();
+                $this->setRelation('roles', collect());
+            }
         }
 
         return $this->assignRole($roles);

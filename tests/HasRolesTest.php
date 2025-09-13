@@ -1042,4 +1042,43 @@ class HasRolesTest extends TestCase
             $this->fail('Lazy loading detected in the givePermissionTo method: '.$e->getMessage());
         }
     }
+
+    /** @test */
+    #[Test]
+    public function it_fires_detach_event_when_syncing_roles()
+    {
+        Event::fake([RoleDetached::class, RoleAttached::class]);
+        app('config')->set('permission.events_enabled', true);
+
+        $this->testUser->assignRole('testRole', 'testRole2');
+
+        app(Role::class)->create(['name' => 'testRole3']);
+
+        $this->testUser->syncRoles('testRole3');
+
+        $this->assertFalse($this->testUser->hasRole('testRole'));
+        $this->assertFalse($this->testUser->hasRole('testRole2'));
+        $this->assertTrue($this->testUser->hasRole('testRole3'));
+
+        $removedRoleIds = app(Role::class)::whereIn('name', ['testRole', 'testRole2'])
+            ->pluck($this->testUserRole->getKeyName())
+            ->toArray();
+
+        Event::assertDispatched(RoleDetached::class, function ($event) use ($removedRoleIds) {
+            return $event->model instanceof User
+                && ! $event->model->hasRole('testRole')
+                && ! $event->model->hasRole('testRole2')
+                && $event->rolesOrIds === $removedRoleIds;
+        });
+
+        $attachedRoleIds = app(Role::class)::whereIn('name', ['testRole3'])
+            ->pluck($this->testUserRole->getKeyName())
+            ->toArray();
+
+        Event::assertDispatched(RoleAttached::class, function ($event) use ($attachedRoleIds) {
+            return $event->model instanceof User
+                && $event->model->hasRole('testRole3')
+                && $event->rolesOrIds === $attachedRoleIds;
+        });
+    }
 }
