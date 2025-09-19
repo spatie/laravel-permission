@@ -398,7 +398,7 @@ trait HasRoles
         return $this->roles->pluck('name');
     }
 
-    protected function getStoredRole($role): Role
+    protected function getStoredRole($role): static
     {
         if ($role instanceof \BackedEnum) {
             $role = $role->value;
@@ -412,7 +412,11 @@ trait HasRoles
             return $this->getRoleClass()::findByName($role, $this->getDefaultGuardName());
         }
 
-        return $role;
+        if ($role instanceof Role) {
+            return $role;
+        }
+
+        throw new \TypeError('Unsupported type');
     }
 
     protected function convertPipeToArray(string $pipeString)
