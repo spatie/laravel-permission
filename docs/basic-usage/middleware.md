@@ -22,7 +22,7 @@ This package comes with `RoleMiddleware`, `PermissionMiddleware` and `RoleOrPerm
 
 You can register their aliases for easy reference elsewhere in your app:
 
-In Laravel 11 open `/bootstrap/app.php` and register them there:
+In Laravel 11+ open `/bootstrap/app.php` and register them there:
 
 ```php
     ->withMiddleware(function (Middleware $middleware) {

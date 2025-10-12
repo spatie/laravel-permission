@@ -77,12 +77,15 @@ class AppServiceProvider extends ServiceProvider
         $kernel = app()->make(Kernel::class);
 
         $kernel->addToMiddlewarePriorityBefore(
-            SubstituteBindings::class,
             YourCustomMiddlewareClass::class,
+            SubstituteBindings::class,
         );
     }
 }
 ```
+### Using LiveWire? 
+
+You may need to register your team middleware as Persisted in Livewire. See [Livewire docs: Configuring Persistent Middleware](https://livewire.laravel.com/docs/security#configuring-persistent-middleware)
 
 ## Roles Creating
 
@@ -99,7 +102,7 @@ Role::create(['name' => 'reader', 'team_id' => 1]);
 Role::create(['name' => 'reviewer']);
 ```
 
-## Roles/Permissions Assignment & Removal
+## Roles/Permissions Assignment and Removal
 
 The role/permission assignment and removal for teams are the same as without teams, but they take the global `team_id` which is set on login.
 

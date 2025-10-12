@@ -46,7 +46,7 @@ Like all permissions assigned via roles, you can check if a user has a permissio
 $user->can('edit articles');
 ```
 
-> NOTE: The following `hasPermissionTo`, `hasAnyPermission`, `hasAllPermissions` functions do not support Super-Admin functionality. Use `can`, `canAny`, `canAll` instead.
+> NOTE: The following `hasPermissionTo`, `hasAnyPermission`, `hasAllPermissions` functions do not support Super-Admin functionality. Use `can`, `canAny` instead.
 
 You can check if a user has a permission:
 

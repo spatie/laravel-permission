@@ -613,6 +613,23 @@ class HasPermissionsTest extends TestCase
 
     /** @test */
     #[Test]
+    public function it_can_avoid_detach_on_permission_that_does_not_exist_sync()
+    {
+        $this->testUser->syncPermissions('edit-articles');
+
+        try {
+            $this->testUser->syncPermissions('permission-does-not-exist');
+            $this->fail('Expected PermissionDoesNotExist exception was not thrown.');
+        } catch (PermissionDoesNotExist $e) {
+            //
+        }
+
+        $this->assertTrue($this->testUser->hasDirectPermission('edit-articles'));
+        $this->assertFalse($this->testUser->checkPermissionTo('permission-does-not-exist'));
+    }
+
+    /** @test */
+    #[Test]
     public function it_can_sync_multiple_permissions_by_id()
     {
         $this->testUser->givePermissionTo('edit-news');

@@ -148,7 +148,7 @@ abstract class TestCase extends Orchestra
         // FOR MANUAL TESTING OF ALTERNATE CACHE STORES:
         // $app['config']->set('cache.default', 'array');
         // Laravel supports: array, database, file
-        // requires extensions: apc, memcached, redis, dynamodb, octane
+        // requires extensions: memcached, redis, dynamodb, octane
     }
 
     /**
@@ -230,7 +230,7 @@ abstract class TestCase extends Orchestra
         $app['config']->set('auth.guards.api', ['driver' => 'passport', 'provider' => 'users']);
 
         // mimic passport:install (must load migrations using our own call to loadMigrationsFrom() else rollbacks won't occur, and migrations will be left in skeleton directory
-        $this->artisan('passport:keys');
+        // $this->artisan('passport:keys');
         $this->loadMigrationsFrom(__DIR__.'/../vendor/laravel/passport/database/migrations/');
         $provider = in_array('users', array_keys(config('auth.providers'))) ? 'users' : null;
         $this->artisan('passport:client', ['--personal' => true, '--name' => config('app.name').' Personal Access Client']);
