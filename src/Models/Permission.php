@@ -5,6 +5,7 @@ namespace Spatie\Permission\Models;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use InvalidArgumentException;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 use Spatie\Permission\Exceptions\PermissionAlreadyExists;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
@@ -35,6 +36,82 @@ class Permission extends Model implements PermissionContract
     }
 
     /**
+     * Boot the model and add validation on model events.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($model) {
+            $model->validateAttributes();
+        });
+    }
+
+    /**
+     * Validate permission attributes to prevent security issues.
+     *
+     * @throws InvalidArgumentException
+     */
+    protected function validateAttributes(): void
+    {
+        // Validate name field
+        if (isset($this->attributes['name'])) {
+            $name = $this->attributes['name'];
+
+            // Check if name is a string
+            if (! is_string($name)) {
+                throw new InvalidArgumentException('Permission name must be a string.');
+            }
+
+            // Trim and check for empty name
+            $name = trim($name);
+            if (empty($name)) {
+                throw new InvalidArgumentException('Permission name cannot be empty.');
+            }
+
+            // Check name length (prevent excessively long names)
+            if (strlen($name) > 255) {
+                throw new InvalidArgumentException('Permission name cannot exceed 255 characters.');
+            }
+
+            // Sanitize name - remove control characters and null bytes
+            $sanitized = preg_replace('/[\x00-\x1F\x7F]/u', '', $name);
+
+            if ($sanitized !== $name) {
+                throw new InvalidArgumentException('Permission name contains invalid characters.');
+            }
+
+            // Store the trimmed name
+            $this->attributes['name'] = $name;
+        }
+
+        // Validate guard_name field
+        if (isset($this->attributes['guard_name'])) {
+            $guardName = $this->attributes['guard_name'];
+
+            if (! is_string($guardName)) {
+                throw new InvalidArgumentException('Guard name must be a string.');
+            }
+
+            $guardName = trim($guardName);
+            if (empty($guardName)) {
+                throw new InvalidArgumentException('Guard name cannot be empty.');
+            }
+
+            if (strlen($guardName) > 255) {
+                throw new InvalidArgumentException('Guard name cannot exceed 255 characters.');
+            }
+
+            // Validate guard name format (alphanumeric, dash, underscore only)
+            if (! preg_match('/^[a-zA-Z0-9_-]+$/', $guardName)) {
+                throw new InvalidArgumentException('Guard name must contain only alphanumeric characters, dashes, and underscores.');
+            }
+
+            $this->attributes['guard_name'] = $guardName;
+        }
+    }
+
+    /**
      * @return PermissionContract|Permission
      *
      * @throws PermissionAlreadyExists
@@ -57,11 +134,13 @@ class Permission extends Model implements PermissionContract
      */
     public function roles(): BelongsToMany
     {
+        $registrar = app(PermissionRegistrar::class);
+
         return $this->belongsToMany(
             config('permission.models.role'),
             config('permission.table_names.role_has_permissions'),
-            app(PermissionRegistrar::class)->pivotPermission,
-            app(PermissionRegistrar::class)->pivotRole
+            $registrar->pivotPermission,
+            $registrar->pivotRole
         );
     }
 
@@ -70,11 +149,13 @@ class Permission extends Model implements PermissionContract
      */
     public function users(): BelongsToMany
     {
+        $registrar = app(PermissionRegistrar::class);
+
         return $this->morphedByMany(
             getModelForGuard($this->attributes['guard_name'] ?? config('auth.defaults.guard')),
             'model',
             config('permission.table_names.model_has_permissions'),
-            app(PermissionRegistrar::class)->pivotPermission,
+            $registrar->pivotPermission,
             config('permission.column_names.model_morph_key')
         );
     }
