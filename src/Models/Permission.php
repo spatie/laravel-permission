@@ -152,7 +152,7 @@ class Permission extends Model implements PermissionContract
         $registrar = app(PermissionRegistrar::class);
 
         return $this->morphedByMany(
-            getModelForGuard($this->attributes['guard_name'] ?? config('auth.defaults.guard')),
+            getModelForGuard($this->guard_name ?? Guard::getDefaultName(static::class)),
             'model',
             config('permission.table_names.model_has_permissions'),
             $registrar->pivotPermission,
