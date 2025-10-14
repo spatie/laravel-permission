@@ -207,24 +207,16 @@ class PermissionRegistrar
             // Another thread is loading, wait and retry
             usleep(10000); // Wait 10ms
 
-            // Recursive retry with loaded permissions check
-            if ($this->permissions) {
-                return;
-            }
+            // After wait, recursively check again if permissions were loaded
+            $this->loadPermissions();
 
-            // If still not loaded after wait, proceed normally
-            // The cache->remember() will handle cache-level locking
+            return;
         }
 
         // Set loading flag to prevent concurrent loads
         $this->isLoadingPermissions = true;
 
         try {
-            // Double-check after acquiring lock
-            if ($this->permissions) {
-                return;
-            }
-
             $this->permissions = $this->cache->remember(
                 $this->cacheKey, $this->cacheExpirationTime, fn () => $this->getSerializedPermissionsForCache()
             );
