@@ -252,7 +252,7 @@ class CommandTest extends TestCase
 
     /** @test */
     #[Test]
-    public function test_is_assign_role_to_user()
+    public function it_can_assign_role_to_user()
     {
         $user = User::first();
 
@@ -273,7 +273,7 @@ class CommandTest extends TestCase
 
     /** @test */
     #[Test]
-    public function test_assigning_role_fails_when_user_not_found()
+    public function it_fails_to_assign_role_when_user_not_found()
     {
 
         Artisan::call('permission:assign-role', [
@@ -290,7 +290,7 @@ class CommandTest extends TestCase
 
     /** @test */
     #[Test]
-    public function test_assigning_role_fails_when_namspace_not_existed()
+    public function it_fails_to_assign_role_when_namespace_invalid()
     {
         $user = User::first();
 
