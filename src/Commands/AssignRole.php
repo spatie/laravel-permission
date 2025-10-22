@@ -13,7 +13,7 @@ class AssignRole extends Command
         {guard? : The name of the guard}
         {userModelNamespace=App\Models\User : The fully qualified class name of the user model}';
 
-    protected $description = 'Assign a role to a user';
+    protected $description = 'Assign a role to a user. (Note: does not support Teams.)';
 
     public function handle()
     {
