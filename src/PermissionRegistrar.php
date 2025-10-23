@@ -194,7 +194,7 @@ class PermissionRegistrar
      * Thread-safe implementation to prevent race conditions in concurrent environments
      * (e.g., Laravel Octane, Swoole, parallel requests)
      */
-    private function loadPermissions(): void
+    private function loadPermissions(int $retries = 0): void
     {
         // First check (without lock) - fast path for already loaded permissions
         if ($this->permissions) {
@@ -203,12 +203,13 @@ class PermissionRegistrar
 
         // Prevent concurrent loading using a flag-based lock
         // This protects against cache stampede and duplicate database queries
-        if ($this->isLoadingPermissions) {
+        if ($this->isLoadingPermissions && $retries < 10) {
             // Another thread is loading, wait and retry
             usleep(10000); // Wait 10ms
+            $retries++;
 
             // After wait, recursively check again if permissions were loaded
-            $this->loadPermissions();
+            $this->loadPermissions($retries);
 
             return;
         }
