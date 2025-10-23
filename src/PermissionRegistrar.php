@@ -49,6 +49,8 @@ class PermissionRegistrar
 
     private array $wildcardPermissionsIndex = [];
 
+    private bool $isLoadingPermissions = false;
+
     /**
      * PermissionRegistrar constructor.
      */
@@ -172,6 +174,7 @@ class PermissionRegistrar
     {
         $this->permissions = null;
         $this->wildcardPermissionsIndex = [];
+        $this->isLoadingPermissions = false;
     }
 
     /**
@@ -187,24 +190,49 @@ class PermissionRegistrar
     /**
      * Load permissions from cache
      * And turns permissions array into a \Illuminate\Database\Eloquent\Collection
+     *
+     * Thread-safe implementation to prevent race conditions in concurrent environments
+     * (e.g., Laravel Octane, Swoole, parallel requests)
      */
-    private function loadPermissions(): void
+    private function loadPermissions(int $retries = 0): void
     {
+        // First check (without lock) - fast path for already loaded permissions
         if ($this->permissions) {
             return;
         }
 
-        $this->permissions = $this->cache->remember(
-            $this->cacheKey, $this->cacheExpirationTime, fn () => $this->getSerializedPermissionsForCache()
-        );
+        // Prevent concurrent loading using a flag-based lock
+        // This protects against cache stampede and duplicate database queries
+        if ($this->isLoadingPermissions && $retries < 10) {
+            // Another thread is loading, wait and retry
+            usleep(10000); // Wait 10ms
+            $retries++;
 
-        $this->alias = $this->permissions['alias'];
+            // After wait, recursively check again if permissions were loaded
+            $this->loadPermissions($retries);
 
-        $this->hydrateRolesCache();
+            return;
+        }
 
-        $this->permissions = $this->getHydratedPermissionCollection();
+        // Set loading flag to prevent concurrent loads
+        $this->isLoadingPermissions = true;
 
-        $this->cachedRoles = $this->alias = $this->except = [];
+        try {
+            $this->permissions = $this->cache->remember(
+                $this->cacheKey, $this->cacheExpirationTime, fn () => $this->getSerializedPermissionsForCache()
+            );
+
+            $this->alias = $this->permissions['alias'];
+
+            $this->hydrateRolesCache();
+
+            $this->permissions = $this->getHydratedPermissionCollection();
+
+            $this->cachedRoles = $this->alias = $this->except = [];
+        } finally {
+            // Always release the loading flag, even if an exception occurs
+            $this->isLoadingPermissions = false;
+        }
     }
 
     /**
