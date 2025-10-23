@@ -36,6 +36,19 @@ class Role extends Model implements RoleContract
     }
 
     /**
+     * Boot the model and add validation on model events.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($model) {
+            $model->validateNameAttribute();
+            $model->validateGuardNameAttribute();
+        });
+    }
+
+    /**
      * @return RoleContract|Role
      *
      * @throws RoleAlreadyExists
@@ -44,9 +57,11 @@ class Role extends Model implements RoleContract
     {
         $attributes['guard_name'] ??= Guard::getDefaultName(static::class);
 
+        $registrar = app(PermissionRegistrar::class);
         $params = ['name' => $attributes['name'], 'guard_name' => $attributes['guard_name']];
-        if (app(PermissionRegistrar::class)->teams) {
-            $teamsKey = app(PermissionRegistrar::class)->teamsKey;
+
+        if ($registrar->teams) {
+            $teamsKey = $registrar->teamsKey;
 
             if (array_key_exists($teamsKey, $attributes)) {
                 $params[$teamsKey] = $attributes[$teamsKey];
@@ -54,6 +69,7 @@ class Role extends Model implements RoleContract
                 $attributes[$teamsKey] = getPermissionsTeamId();
             }
         }
+
         if (static::findByParam($params)) {
             throw RoleAlreadyExists::create($attributes['name'], $attributes['guard_name']);
         }
@@ -66,11 +82,13 @@ class Role extends Model implements RoleContract
      */
     public function permissions(): BelongsToMany
     {
+        $registrar = app(PermissionRegistrar::class);
+
         return $this->belongsToMany(
             config('permission.models.permission'),
             config('permission.table_names.role_has_permissions'),
-            app(PermissionRegistrar::class)->pivotRole,
-            app(PermissionRegistrar::class)->pivotPermission
+            $registrar->pivotRole,
+            $registrar->pivotPermission
         );
     }
 
@@ -79,11 +97,13 @@ class Role extends Model implements RoleContract
      */
     public function users(): BelongsToMany
     {
+        $registrar = app(PermissionRegistrar::class);
+
         return $this->morphedByMany(
-            getModelForGuard($this->attributes['guard_name'] ?? config('auth.defaults.guard')),
+            getModelForGuard($this->guard_name ?? Guard::getDefaultName(static::class)),
             'model',
             config('permission.table_names.model_has_roles'),
-            app(PermissionRegistrar::class)->pivotRole,
+            $registrar->pivotRole,
             config('permission.column_names.model_morph_key')
         );
     }
@@ -138,7 +158,14 @@ class Role extends Model implements RoleContract
         $role = static::findByParam(['name' => $name, 'guard_name' => $guardName]);
 
         if (! $role) {
-            return static::query()->create(['name' => $name, 'guard_name' => $guardName] + (app(PermissionRegistrar::class)->teams ? [app(PermissionRegistrar::class)->teamsKey => getPermissionsTeamId()] : []));
+            $registrar = app(PermissionRegistrar::class);
+            $attributes = ['name' => $name, 'guard_name' => $guardName];
+
+            if ($registrar->teams) {
+                $attributes[$registrar->teamsKey] = getPermissionsTeamId();
+            }
+
+            return static::query()->create($attributes);
         }
 
         return $role;
@@ -152,9 +179,10 @@ class Role extends Model implements RoleContract
     protected static function findByParam(array $params = []): ?RoleContract
     {
         $query = static::query();
+        $registrar = app(PermissionRegistrar::class);
 
-        if (app(PermissionRegistrar::class)->teams) {
-            $teamsKey = app(PermissionRegistrar::class)->teamsKey;
+        if ($registrar->teams) {
+            $teamsKey = $registrar->teamsKey;
 
             $query->where(fn ($q) => $q->whereNull($teamsKey)
                 ->orWhere($teamsKey, $params[$teamsKey] ?? getPermissionsTeamId())

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Contracts\Wildcard;
@@ -589,5 +590,87 @@ trait HasPermissions
         }
 
         return false;
+    }
+
+    /**
+     * Validate the name attribute.
+     *
+     * @throws InvalidArgumentException
+     */
+    protected function validateNameAttribute(): void
+    {
+        if (! isset($this->attributes['name'])) {
+            return;
+        }
+
+        $name = $this->attributes['name'];
+
+        // Check if name is a string
+        if (! is_string($name)) {
+            throw new InvalidArgumentException($this->getModelType().' name must be a string.');
+        }
+
+        // Trim and check for empty name
+        $name = trim($name);
+        if (empty($name)) {
+            throw new InvalidArgumentException($this->getModelType().' name cannot be empty.');
+        }
+
+        // Check name length (prevent excessively long names)
+        if (strlen($name) > 255) {
+            throw new InvalidArgumentException($this->getModelType().' name cannot exceed 255 characters.');
+        }
+
+        // Sanitize name - remove control characters and null bytes
+        $sanitized = preg_replace('/[\x00-\x1F\x7F]/u', '', $name);
+
+        if ($sanitized !== $name) {
+            throw new InvalidArgumentException($this->getModelType().' name contains invalid characters.');
+        }
+
+        // Store the trimmed name
+        $this->attributes['name'] = $name;
+    }
+
+    /**
+     * Validate the guard_name attribute.
+     *
+     * @throws InvalidArgumentException
+     */
+    protected function validateGuardNameAttribute(): void
+    {
+        if (! isset($this->attributes['guard_name'])) {
+            return;
+        }
+
+        $guardName = $this->attributes['guard_name'];
+
+        if (! is_string($guardName)) {
+            throw new InvalidArgumentException('Guard name must be a string.');
+        }
+
+        $guardName = trim($guardName);
+        if (empty($guardName)) {
+            throw new InvalidArgumentException('Guard name cannot be empty.');
+        }
+
+        if (strlen($guardName) > 255) {
+            throw new InvalidArgumentException('Guard name cannot exceed 255 characters.');
+        }
+
+        // Validate guard name format (alphanumeric, dash, underscore only)
+        if (! preg_match('/^[a-zA-Z0-9_-]+$/', $guardName)) {
+            throw new InvalidArgumentException('Guard name must contain only alphanumeric characters, dashes, and underscores.');
+        }
+
+        $this->attributes['guard_name'] = $guardName;
+    }
+
+    /**
+     * Get the model type name for error messages.
+     */
+    protected function getModelType(): string
+    {
+        return class_basename($this);
     }
 }

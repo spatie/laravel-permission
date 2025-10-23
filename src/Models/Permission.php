@@ -35,6 +35,19 @@ class Permission extends Model implements PermissionContract
     }
 
     /**
+     * Boot the model and add validation on model events.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($model) {
+            $model->validateNameAttribute();
+            $model->validateGuardNameAttribute();
+        });
+    }
+
+    /**
      * @return PermissionContract|Permission
      *
      * @throws PermissionAlreadyExists
@@ -57,11 +70,13 @@ class Permission extends Model implements PermissionContract
      */
     public function roles(): BelongsToMany
     {
+        $registrar = app(PermissionRegistrar::class);
+
         return $this->belongsToMany(
             config('permission.models.role'),
             config('permission.table_names.role_has_permissions'),
-            app(PermissionRegistrar::class)->pivotPermission,
-            app(PermissionRegistrar::class)->pivotRole
+            $registrar->pivotPermission,
+            $registrar->pivotRole
         );
     }
 
@@ -70,11 +85,13 @@ class Permission extends Model implements PermissionContract
      */
     public function users(): BelongsToMany
     {
+        $registrar = app(PermissionRegistrar::class);
+
         return $this->morphedByMany(
-            getModelForGuard($this->attributes['guard_name'] ?? config('auth.defaults.guard')),
+            getModelForGuard($this->guard_name ?? Guard::getDefaultName(static::class)),
             'model',
             config('permission.table_names.model_has_permissions'),
-            app(PermissionRegistrar::class)->pivotPermission,
+            $registrar->pivotPermission,
             config('permission.column_names.model_morph_key')
         );
     }
