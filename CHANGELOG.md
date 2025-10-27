@@ -2,6 +2,29 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 6.22.0 - 2025-10-27
+
+### What's Changed
+
+* Dispatch RoleDetached on syncRoles when events are enabled by @josedaian in https://github.com/spatie/laravel-permission/pull/2869
+* Refactor exception handling in migration stub by @alisalehi1380 in https://github.com/spatie/laravel-permission/pull/2886
+* Fix TOCTOU race condition in permission loading for concurrent (Octane etc) environments by @imhayatunnabi in https://github.com/spatie/laravel-permission/pull/2883
+* Add assign-role command by @sediqzada94 in https://github.com/spatie/laravel-permission/pull/2834
+* Test PHP 8.5 by @erikn69 in https://github.com/spatie/laravel-permission/pull/2880
+* Bump stefanzweifel/git-auto-commit-action from 6 to 7 by @dependabot[bot] in https://github.com/spatie/laravel-permission/pull/2882
+* Update issue template by @AlexVanderbist in https://github.com/spatie/laravel-permission/pull/2875
+* Bump actions/checkout from 4 to 5 by @dependabot[bot] in https://github.com/spatie/laravel-permission/pull/2870
+* Quick Panel (TALL Flowbite Starter Kit) by @aliqasemzadeh in https://github.com/spatie/laravel-permission/pull/2881
+
+### New Contributors
+
+* @josedaian made their first contribution in https://github.com/spatie/laravel-permission/pull/2869
+* @alisalehi1380 made their first contribution in https://github.com/spatie/laravel-permission/pull/2886
+* @imhayatunnabi made their first contribution in https://github.com/spatie/laravel-permission/pull/2883
+* @sediqzada94 made their first contribution in https://github.com/spatie/laravel-permission/pull/2834
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/6.21.0...6.22.0
+
 ## 6.21.0 - 2025-07-23
 
 ### What's Changed
@@ -1068,6 +1091,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -1115,6 +1139,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
