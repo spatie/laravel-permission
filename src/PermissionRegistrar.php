@@ -246,6 +246,10 @@ class PermissionRegistrar
 
         $permissions = $this->permissions->$method(static function ($permission) use ($params) {
             foreach ($params as $attr => $value) {
+                if ($value instanceof \BackedEnum) {
+                    $value = $value->value;
+                }
+
                 if ($permission->getAttribute($attr) != $value) {
                     return false;
                 }
