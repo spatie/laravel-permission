@@ -151,6 +151,7 @@ class Role extends Model implements RoleContract
                 $teamsKey = $registrar->teamsKey;
                 $attributes[$teamsKey] = getPermissionsTeamId();
             }
+
             return static::query()->create($attributes);
         }
 
