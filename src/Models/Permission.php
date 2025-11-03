@@ -57,11 +57,13 @@ class Permission extends Model implements PermissionContract
      */
     public function roles(): BelongsToMany
     {
+        $registrar = app(PermissionRegistrar::class);
+
         return $this->belongsToMany(
             config('permission.models.role'),
             config('permission.table_names.role_has_permissions'),
-            app(PermissionRegistrar::class)->pivotPermission,
-            app(PermissionRegistrar::class)->pivotRole
+            $registrar->pivotPermission,
+            $registrar->pivotRole
         );
     }
 

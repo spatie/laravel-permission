@@ -45,8 +45,11 @@ class Role extends Model implements RoleContract
         $attributes['guard_name'] ??= Guard::getDefaultName(static::class);
 
         $params = ['name' => $attributes['name'], 'guard_name' => $attributes['guard_name']];
-        if (app(PermissionRegistrar::class)->teams) {
-            $teamsKey = app(PermissionRegistrar::class)->teamsKey;
+
+        $registrar = app(PermissionRegistrar::class);
+
+        if ($registrar->teams) {
+            $teamsKey = $registrar->teamsKey;
 
             if (array_key_exists($teamsKey, $attributes)) {
                 $params[$teamsKey] = $attributes[$teamsKey];
@@ -54,6 +57,7 @@ class Role extends Model implements RoleContract
                 $attributes[$teamsKey] = getPermissionsTeamId();
             }
         }
+
         if (static::findByParam($params)) {
             throw RoleAlreadyExists::create($attributes['name'], $attributes['guard_name']);
         }
@@ -66,11 +70,13 @@ class Role extends Model implements RoleContract
      */
     public function permissions(): BelongsToMany
     {
+        $registrar = app(PermissionRegistrar::class);
+
         return $this->belongsToMany(
             config('permission.models.permission'),
             config('permission.table_names.role_has_permissions'),
-            app(PermissionRegistrar::class)->pivotRole,
-            app(PermissionRegistrar::class)->pivotPermission
+            $registrar->pivotRole,
+            $registrar->pivotPermission
         );
     }
 
@@ -135,10 +141,18 @@ class Role extends Model implements RoleContract
     {
         $guardName ??= Guard::getDefaultName(static::class);
 
-        $role = static::findByParam(['name' => $name, 'guard_name' => $guardName]);
+        $attributes = ['name' => $name, 'guard_name' => $guardName];
+
+        $role = static::findByParam($attributes);
 
         if (! $role) {
-            return static::query()->create(['name' => $name, 'guard_name' => $guardName] + (app(PermissionRegistrar::class)->teams ? [app(PermissionRegistrar::class)->teamsKey => getPermissionsTeamId()] : []));
+            $registrar = app(PermissionRegistrar::class);
+            if ($registrar->teams) {
+                $teamsKey = $registrar->teamsKey;
+                $attributes[$teamsKey] = getPermissionsTeamId();
+            }
+
+            return static::query()->create($attributes);
         }
 
         return $role;
@@ -153,8 +167,10 @@ class Role extends Model implements RoleContract
     {
         $query = static::query();
 
-        if (app(PermissionRegistrar::class)->teams) {
-            $teamsKey = app(PermissionRegistrar::class)->teamsKey;
+        $registrar = app(PermissionRegistrar::class);
+
+        if ($registrar->teams) {
+            $teamsKey = $registrar->teamsKey;
 
             $query->where(fn ($q) => $q->whereNull($teamsKey)
                 ->orWhere($teamsKey, $params[$teamsKey] ?? getPermissionsTeamId())
