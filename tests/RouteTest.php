@@ -115,4 +115,69 @@ class RouteTest extends TestCase
             $this->getLastRouteMiddlewareFromRouter($router)
         );
     }
+
+    /** @test */
+    #[Test]
+    public function test_role_or_permission_function()
+    {
+        $router = $this->getRouter();
+
+        $router->get('role-or-permission-test', $this->getRouteResponse())
+            ->name('role-or-permission.test')
+            ->roleOrPermission('admin|edit articles');
+
+        $this->assertEquals(['role_or_permission:admin|edit articles'], $this->getLastRouteMiddlewareFromRouter($router));
+    }
+
+    /** @test */
+    #[Test]
+    public function test_role_or_permission_function_with_array()
+    {
+        $router = $this->getRouter();
+
+        $router->get('role-or-permission-array-test', $this->getRouteResponse())
+            ->name('role-or-permission-array.test')
+            ->roleOrPermission(['admin', 'edit articles']);
+
+        $this->assertEquals(['role_or_permission:admin|edit articles'], $this->getLastRouteMiddlewareFromRouter($router));
+    }
+
+    /**
+     * @test
+     *
+     * @requires PHP 8.1.0
+     */
+    #[RequiresPhp('>= 8.1.0')]
+    #[Test]
+    public function test_role_or_permission_function_with_backed_enum()
+    {
+        $router = $this->getRouter();
+
+        $router->get('role-or-permission-test.enum', $this->getRouteResponse())
+            ->name('role-or-permission.test.enum')
+            ->roleOrPermission(TestRolePermissionsEnum::USERMANAGER);
+
+        $this->assertEquals(['role_or_permission:'.TestRolePermissionsEnum::USERMANAGER->value], $this->getLastRouteMiddlewareFromRouter($router));
+    }
+
+    /**
+     * @test
+     *
+     * @requires PHP 8.1.0
+     */
+    #[RequiresPhp('>= 8.1.0')]
+    #[Test]
+    public function test_role_or_permission_function_with_backed_enum_array()
+    {
+        $router = $this->getRouter();
+
+        $router->get('role-or-permission-array-test.enum', $this->getRouteResponse())
+            ->name('role-or-permission-array.test.enum')
+            ->roleOrPermission([TestRolePermissionsEnum::USERMANAGER, TestRolePermissionsEnum::EDITARTICLES]); // @phpstan-ignore-line
+
+        $this->assertEquals(
+            ['role_or_permission:'.TestRolePermissionsEnum::USERMANAGER->value.'|'.TestRolePermissionsEnum::EDITARTICLES->value], // @phpstan-ignore-line
+            $this->getLastRouteMiddlewareFromRouter($router)
+        );
+    }
 }

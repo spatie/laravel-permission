@@ -164,6 +164,14 @@ class PermissionServiceProvider extends ServiceProvider
             /** @var Route $this */
             return $this->middleware('permission:'.implode('|', $permissions));
         });
+
+        Route::macro('roleOrPermission', function ($rolesOrPermissions = []) {
+            $rolesOrPermissions = Arr::wrap($rolesOrPermissions);
+            $rolesOrPermissions = array_map(fn ($item) => $item instanceof \BackedEnum ? $item->value : $item, $rolesOrPermissions);
+
+            /** @var Route $this */
+            return $this->middleware('role_or_permission:'.implode('|', $rolesOrPermissions));
+        });
     }
 
     /**
