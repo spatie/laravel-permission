@@ -28,9 +28,7 @@ class RoleOrPermissionMiddleware
             throw UnauthorizedException::missingTraitHasRoles($user);
         }
 
-        $rolesOrPermissions = is_array($roleOrPermission)
-            ? $roleOrPermission
-            : explode('|', $roleOrPermission);
+        $rolesOrPermissions = explode('|', self::parseRoleOrPermissionToString($roleOrPermission));
 
         if (! $user->canAny($rolesOrPermissions) && ! $user->hasAnyRole($rolesOrPermissions)) {
             throw UnauthorizedException::forRolesOrPermissions($rolesOrPermissions);
@@ -42,15 +40,36 @@ class RoleOrPermissionMiddleware
     /**
      * Specify the role or permission and guard for the middleware.
      *
-     * @param  array|string  $roleOrPermission
+     * @param  array|string|\BackedEnum  $roleOrPermission
      * @param  string|null  $guard
      * @return string
      */
     public static function using($roleOrPermission, $guard = null)
     {
-        $roleOrPermissionString = is_string($roleOrPermission) ? $roleOrPermission : implode('|', $roleOrPermission);
+        $roleOrPermissionString = self::parseRoleOrPermissionToString($roleOrPermission);
         $args = is_null($guard) ? $roleOrPermissionString : "$roleOrPermissionString,$guard";
 
         return static::class.':'.$args;
+    }
+
+    /**
+     * Convert array or string of roles/permissions to string representation.
+     *
+     * @return string
+     */
+    protected static function parseRoleOrPermissionToString(array|string|\BackedEnum $roleOrPermission)
+    {
+        // Convert Enum to its value if an Enum is passed
+        if ($roleOrPermission instanceof \BackedEnum) {
+            $roleOrPermission = $roleOrPermission->value;
+        }
+
+        if (is_array($roleOrPermission)) {
+            $roleOrPermission = array_map(fn ($r) => $r instanceof \BackedEnum ? $r->value : $r, $roleOrPermission);
+
+            return implode('|', $roleOrPermission);
+        }
+
+        return (string) $roleOrPermission;
     }
 }
