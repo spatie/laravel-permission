@@ -131,4 +131,40 @@ class TeamHasPermissionsTest extends HasPermissionsTest
         $this->assertEquals(1, $scopedUsers1Team1->count());
         $this->assertEquals(0, $scopedUsers2Team1->count());
     }
+
+    /** @test */
+    #[Test]
+    public function it_allows_direct_database_insertion_with_null_team_foreign_key_for_permissions()
+    {
+        // Test that the database schema actually allows NULL in model_has_permissions pivot table
+        // This is a direct test of the migration fix for issue #2888
+        // This would fail if team_foreign_key was NOT NULL
+        
+        $teamKey = config('permission.column_names.team_foreign_key');
+        $pivotKey = config('permission.column_names.permission_pivot_key') ?? 'permission_id';
+        $modelKey = config('permission.column_names.model_morph_key');
+        
+        $permission = \Spatie\Permission\Models\Permission::create(['name' => 'direct-test-permission']);
+        
+        // Directly insert into pivot table with NULL team_foreign_key
+        // This tests that the column is actually nullable in the database
+        \DB::table('model_has_permissions')->insert([
+            $pivotKey => $permission->id,
+            $modelKey => $this->testUser->id,
+            'model_type' => get_class($this->testUser),
+            $teamKey => null, // This should not throw an error
+        ]);
+        
+        // Verify the insertion worked - the database schema allows NULL
+        $this->assertDatabaseHas('model_has_permissions', [
+            $pivotKey => $permission->id,
+            $modelKey => $this->testUser->id,
+            $teamKey => null,
+        ]);
+        
+        // Note: The query logic checks pivot team_foreign_key against getPermissionsTeamId()
+        // So NULL in pivot won't match unless team ID is also NULL
+        // This test verifies the schema allows NULL, which is the core fix for issue #2888
+        // The actual assignment logic (givePermissionTo) will set the team ID in the pivot table
+    }
 }
