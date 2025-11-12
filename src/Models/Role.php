@@ -62,6 +62,24 @@ class Role extends Model implements RoleContract
             throw RoleAlreadyExists::create($attributes['name'], $attributes['guard_name']);
         }
 
+        // Check for case-insensitive duplicate
+        $query = static::query()
+            ->whereRaw('LOWER(name) = ?', [strtolower($attributes['name'])])
+            ->where('guard_name', $attributes['guard_name']);
+
+        if ($registrar->teams) {
+            $teamsKey = $registrar->teamsKey;
+            $query->where(fn ($q) => $q->whereNull($teamsKey)
+                ->orWhere($teamsKey, $params[$teamsKey] ?? getPermissionsTeamId())
+            );
+        }
+
+        $existing = $query->first();
+
+        if ($existing) {
+            throw RoleAlreadyExists::create($attributes['name'], $attributes['guard_name']);
+        }
+
         return static::query()->create($attributes);
     }
 
