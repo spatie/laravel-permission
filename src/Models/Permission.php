@@ -50,11 +50,12 @@ class Permission extends Model implements PermissionContract
         }
 
         // Check for case-insensitive duplicate
-        $existing = static::where('guard_name', $attributes['guard_name'])
-            ->get()
-            ->first(function ($item) use ($attributes) {
-                return strtolower($item->name) === strtolower($attributes['name']);
-            });
+        $lowerName = strtolower($attributes['name']);
+        $guardName = $attributes['guard_name'];
+
+        $existing = static::all()->first(function ($item) use ($lowerName, $guardName) {
+            return $item->guard_name === $guardName && strtolower($item->name) === $lowerName;
+        });
 
         if ($existing) {
             throw PermissionAlreadyExists::create($attributes['name'], $attributes['guard_name']);
