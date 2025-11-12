@@ -62,6 +62,27 @@ class Role extends Model implements RoleContract
             throw RoleAlreadyExists::create($attributes['name'], $attributes['guard_name']);
         }
 
+        // Check for case-insensitive duplicate - simple approach
+        if (config('permission.check_case_insensitive_duplicates', true)) {
+            $lowerName = strtolower($attributes['name']);
+            $guardName = $attributes['guard_name'];
+
+            $searchParams = ['guard_name' => $guardName];
+            if ($registrar->teams) {
+                $teamsKey = $registrar->teamsKey;
+                $searchParams[$teamsKey] = $params[$teamsKey] ?? getPermissionsTeamId();
+            }
+
+            $allRoles = static::query()->where($searchParams)->get();
+
+            foreach ($allRoles as $existingRole) {
+                $existingName = $existingRole->getAttribute('name');
+                if (strtolower($existingName) === $lowerName && $existingName !== $attributes['name']) {
+                    throw RoleAlreadyExists::create($attributes['name'], $attributes['guard_name']);
+                }
+            }
+        }
+
         return static::query()->create($attributes);
     }
 

@@ -246,14 +246,7 @@ class PermissionRegistrar
 
         $permissions = $this->permissions->$method(static function ($permission) use ($params) {
             foreach ($params as $attr => $value) {
-                $permissionValue = $permission->getAttribute($attr);
-
-                // Case-insensitive comparison for 'name' attribute
-                if ($attr === 'name' && is_string($value) && is_string($permissionValue)) {
-                    if (strtolower($permissionValue) !== strtolower($value)) {
-                        return false;
-                    }
-                } elseif ($permissionValue != $value) {
+                if ($permission->getAttribute($attr) != $value) {
                     return false;
                 }
             }
