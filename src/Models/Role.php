@@ -63,7 +63,6 @@ class Role extends Model implements RoleContract
         }
 
         // Check for case-insensitive duplicate
-        /** @var \Illuminate\Database\Eloquent\Builder<static> $query */
         $query = static::query()
             ->whereRaw('LOWER(name) = ?', [strtolower($attributes['name'])])
             ->where('guard_name', $attributes['guard_name']);

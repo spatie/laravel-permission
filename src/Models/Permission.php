@@ -50,12 +50,10 @@ class Permission extends Model implements PermissionContract
         }
 
         // Check for case-insensitive duplicate
-        /** @var \Illuminate\Database\Eloquent\Builder<static> $query */
-        $query = static::query()
+        $existing = static::query()
             ->whereRaw('LOWER(name) = ?', [strtolower($attributes['name'])])
-            ->where('guard_name', $attributes['guard_name']);
-
-        $existing = $query->first();
+            ->where('guard_name', $attributes['guard_name'])
+            ->first();
 
         if ($existing) {
             throw PermissionAlreadyExists::create($attributes['name'], $attributes['guard_name']);
