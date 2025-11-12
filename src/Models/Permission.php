@@ -50,9 +50,8 @@ class Permission extends Model implements PermissionContract
         }
 
         // Check for case-insensitive duplicate
-        $existing = static::query()
-            ->whereRaw('LOWER(name) = ?', [strtolower($attributes['name'])])
-            ->where('guard_name', $attributes['guard_name'])
+        $existing = static::where('guard_name', $attributes['guard_name'])
+            ->whereRaw('LOWER(name) = LOWER(?)', [$attributes['name']])
             ->first();
 
         if ($existing) {
