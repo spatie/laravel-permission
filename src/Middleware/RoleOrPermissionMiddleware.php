@@ -65,7 +65,9 @@ class RoleOrPermissionMiddleware
         }
 
         if (is_array($roleOrPermission)) {
-            $roleOrPermission = array_map(fn ($r) => $r instanceof \BackedEnum ? $r->value : $r, $roleOrPermission);
+            $roleOrPermission = array_map(function ($r): string {
+                return $r instanceof \BackedEnum ? $r->value : (string) $r;
+            }, $roleOrPermission);
 
             return implode('|', $roleOrPermission);
         }
