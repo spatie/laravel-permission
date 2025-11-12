@@ -63,23 +63,20 @@ class Role extends Model implements RoleContract
         }
 
         // Check for case-insensitive duplicate
-        $lowerName = strtolower($attributes['name']);
-        $guardName = $attributes['guard_name'];
+        $roleClass = get_class(new static);
+        $query = app($roleClass)->where('guard_name', $attributes['guard_name']);
 
-        $existing = static::all()->first(function ($item) use ($lowerName, $guardName, $registrar, $params) {
-            if ($item->guard_name !== $guardName || strtolower($item->name) !== $lowerName) {
-                return false;
-            }
+        if ($registrar->teams) {
+            $teamsKey = $registrar->teamsKey;
+            $teamId = $params[$teamsKey] ?? getPermissionsTeamId();
+            $query = $query->where(function ($q) use ($teamsKey, $teamId) {
+                $q->whereNull($teamsKey)->orWhere($teamsKey, $teamId);
+            });
+        }
 
-            if ($registrar->teams) {
-                $teamsKey = $registrar->teamsKey;
-                $teamId = $params[$teamsKey] ?? getPermissionsTeamId();
-                $itemTeamId = $item->$teamsKey;
-                return $itemTeamId === null || $itemTeamId === $teamId;
-            }
-
-            return true;
-        });
+        $existing = $query->get()->filter(function ($item) use ($attributes) {
+            return strtolower($item->name) === strtolower($attributes['name']);
+        })->first();
 
         if ($existing) {
             throw RoleAlreadyExists::create($attributes['name'], $attributes['guard_name']);
