@@ -23,6 +23,11 @@ use Spatie\Permission\Tests\TestModels\User;
 
 abstract class TestCase extends Orchestra
 {
+    // Polyfill for older Orchestra Testbench versions in prefer-lowest CI matrix
+    // that expect a static $latestResponse property on the base TestCase.
+    // Newer versions manage this internally; declaring it here is harmless.
+    public static $latestResponse;
+
     /** @var \Spatie\Permission\Tests\TestModels\User */
     protected $testUser;
 

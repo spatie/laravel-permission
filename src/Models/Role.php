@@ -85,8 +85,20 @@ class Role extends Model implements RoleContract
      */
     public function users(): BelongsToMany
     {
+        $guard = $this->attributes['guard_name'] ?? config('auth.defaults.guard');
+        $modelClass = getModelForGuard($guard);
+
+        if (! is_string($modelClass) || $modelClass === '') {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    "Guard '%s' is not configured with an associated provider model.",
+                    (string) $guard
+                )
+            );
+        }
+
         return $this->morphedByMany(
-            getModelForGuard($this->attributes['guard_name'] ?? config('auth.defaults.guard')),
+            $modelClass,
             'model',
             config('permission.table_names.model_has_roles'),
             app(PermissionRegistrar::class)->pivotRole,

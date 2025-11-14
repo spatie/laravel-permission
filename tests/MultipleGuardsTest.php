@@ -100,6 +100,20 @@ class MultipleGuardsTest extends TestCase
 
     /** @test */
     #[Test]
+    public function it_does_not_treat_non_guard_strings_as_guard_arguments()
+    {
+        $this->testUser->givePermissionTo(app(Permission::class)::create([
+            'name' => 'do_misc',
+            'guard_name' => 'web',
+        ]));
+
+        $this->assertTrue($this->testUser->can('do_misc', 'notAGuardName'));
+        
+        $this->assertFalse($this->testUser->can('do_misc', 'admin'));
+    }
+
+    /** @test */
+    #[Test]
     public function it_can_honour_guardName_function_on_model_for_overriding_guard_name_property()
     {
         $user = Manager::create(['email' => 'manager@test.com']);

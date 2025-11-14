@@ -902,6 +902,28 @@ class HasRolesTest extends TestCase
 
     /** @test */
     #[Test]
+    public function has_exact_roles_honours_guard_and_ignores_extra_roles_on_other_guards()
+    {
+        $this->testUser->assignRole('testRole');
+        $apiRole = app(Role::class)->create(['name' => 'apiRole', 'guard_name' => 'api']);
+        $this->testUser->assignRole($apiRole);
+
+        $this->assertTrue($this->testUser->hasExactRoles('testRole', 'web'));
+    }
+
+    /** @test */
+    #[Test]
+    public function role_users_relation_throws_when_guard_has_no_configured_model()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $badRole = app(Role::class)->create(['name' => 'badRole', 'guard_name' => 'missing']);
+
+        $badRole->users();
+    }
+
+    /** @test */
+    #[Test]
     public function it_can_determine_that_a_user_does_not_have_a_role_from_another_guard()
     {
         $this->assertFalse($this->testUser->hasRole('testAdminRole'));
