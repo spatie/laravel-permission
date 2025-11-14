@@ -384,10 +384,13 @@ trait HasRoles
             $roles = [$roles->name];
         }
 
-        $roles = collect()->make($roles)->map(fn ($role) => $role instanceof Role ? $role->name : $role
-        );
+        $roles = collect()->make($roles)->map(fn ($role) => $role instanceof Role ? $role->name : $role);
 
-        return $this->roles->count() == $roles->count() && $this->hasAllRoles($roles, $guard);
+        $currentCount = $guard
+            ? $this->roles->where('guard_name', $guard)->count()
+            : $this->roles->count();
+
+        return $currentCount == $roles->count() && $this->hasAllRoles($roles, $guard);
     }
 
     /**
