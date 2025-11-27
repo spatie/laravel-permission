@@ -51,7 +51,7 @@ return new class extends Migration
                 $table->primary([$pivotPermission, $columnNames['model_morph_key'], 'model_type'],
                     'model_has_permissions_permission_model_type_primary');
                 $table->unique([$columnNames['team_foreign_key'], $pivotPermission, $columnNames['model_morph_key'], 'model_type'],
-                    'model_has_permissions_team_foreign_key_permission_model_type_unique');
+                    'model_has_permissions_team_fk_permission_model_type_unique');
                 if (DB::getDriverName() !== 'sqlite') {
                     $table->foreign($pivotPermission)
                         ->references('id')->on($tableNames['permissions'])->onDelete('cascade');
