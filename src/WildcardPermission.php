@@ -43,7 +43,7 @@ class WildcardPermission implements Wildcard
     protected function buildIndex(array $index, array $parts, string $permission): array
     {
         if (empty($parts)) {
-            $index[null] = true;
+            $index[''] = true;
 
             return $index;
         }
