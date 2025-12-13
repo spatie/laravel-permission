@@ -2,6 +2,21 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 6.24.0 - 2025-12-13
+
+### What's Changed
+
+* Add BackedEnum Support to RoleOrPermissionMiddleware by @imhayatunnabi in https://github.com/spatie/laravel-permission/pull/2890
+* Add Missing roleOrPermission() route macro by @imhayatunnabi in https://github.com/spatie/laravel-permission/pull/2893
+* PHP 8.5: Fix deprecated usage of `null` as array key by @jnoordsij in https://github.com/spatie/laravel-permission/pull/2904
+
+### Internals/Testing
+
+* Skip prefer-lowest dependency version for Laravel 11 by @drbyte in https://github.com/spatie/laravel-permission/pull/2903
+* Bump actions/checkout from 5 to 6 by @dependabot[bot] in https://github.com/spatie/laravel-permission/pull/2901
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/6.23.0...6.24.0
+
 ## 6.23.0 - 2025-11-03
 
 ### What's Changed
@@ -1101,6 +1116,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -1148,6 +1164,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
