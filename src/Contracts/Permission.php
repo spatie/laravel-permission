@@ -26,7 +26,7 @@ interface Permission
      *
      * @throws \Spatie\Permission\Exceptions\PermissionDoesNotExist
      */
-    public static function findByName(string $name, ?string $guardName): self;
+    public static function findByName(string|\BackedEnum $name, ?string $guardName): self;
 
     /**
      * Find a permission by its id.
@@ -39,5 +39,5 @@ interface Permission
     /**
      * Find or Create a permission by its name and guard name.
      */
-    public static function findOrCreate(string $name, ?string $guardName): self;
+    public static function findOrCreate(string|\BackedEnum $name, ?string $guardName): self;
 }

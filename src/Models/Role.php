@@ -44,6 +44,10 @@ class Role extends Model implements RoleContract
     {
         $attributes['guard_name'] ??= Guard::getDefaultName(static::class);
 
+        $attributes['name'] = $attributes['name'] instanceof \BackedEnum
+            ? $attributes['name']->value
+            : $attributes['name'];
+
         $params = ['name' => $attributes['name'], 'guard_name' => $attributes['guard_name']];
 
         $registrar = app(PermissionRegistrar::class);
@@ -101,8 +105,12 @@ class Role extends Model implements RoleContract
      *
      * @throws RoleDoesNotExist
      */
-    public static function findByName(string $name, ?string $guardName = null): RoleContract
+    public static function findByName(string|\BackedEnum $name, ?string $guardName = null): RoleContract
     {
+        if ($name instanceof \BackedEnum) {
+            $name = $name->value;
+        }
+
         $guardName ??= Guard::getDefaultName(static::class);
 
         $role = static::findByParam(['name' => $name, 'guard_name' => $guardName]);
@@ -137,8 +145,12 @@ class Role extends Model implements RoleContract
      *
      * @return RoleContract|Role
      */
-    public static function findOrCreate(string $name, ?string $guardName = null): RoleContract
+    public static function findOrCreate(string|\BackedEnum $name, ?string $guardName = null): RoleContract
     {
+        if ($name instanceof \BackedEnum) {
+            $name = $name->value;
+        }
+
         $guardName ??= Guard::getDefaultName(static::class);
 
         $attributes = ['name' => $name, 'guard_name' => $guardName];
@@ -188,7 +200,7 @@ class Role extends Model implements RoleContract
     /**
      * Determine if the role may perform the given permission.
      *
-     * @param  string|int|\Spatie\Permission\Contracts\Permission|\BackedEnum  $permission
+     * @param string|int|\Spatie\Permission\Contracts\Permission|\BackedEnum $permission
      *
      * @throws PermissionDoesNotExist|GuardDoesNotMatch
      */
@@ -201,7 +213,10 @@ class Role extends Model implements RoleContract
         $permission = $this->filterPermission($permission, $guardName);
 
         if (! $this->getGuardNames()->contains($permission->guard_name)) {
-            throw GuardDoesNotMatch::create($permission->guard_name, $guardName ? collect([$guardName]) : $this->getGuardNames());
+            throw GuardDoesNotMatch::create(
+                $permission->guard_name,
+                $guardName ? collect([$guardName]) : $this->getGuardNames()
+            );
         }
 
         return $this->loadMissing('permissions')->permissions
