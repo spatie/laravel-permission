@@ -157,11 +157,14 @@ When we call
 You can examine all of these permissions:
 
 ```php
-// Direct permissions
+// Direct permissions assigned to the user
 $user->getDirectPermissions() // Or $user->permissions;
 
-// Permissions inherited from the user's roles
+// Permissions inherited from the user's roles (may contain duplicates)
 $user->getPermissionsViaRoles();
+
+// Unique permissions inherited from the user's roles
+$user->getUniquePermissionsViaRoles();
 
 // All permissions which apply on the user (inherited and direct)
 $user->getAllPermissions();

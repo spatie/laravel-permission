@@ -344,6 +344,16 @@ trait HasPermissions
     }
 
     /**
+     * Return all unique permissions the model has via roles.
+     */
+    public function getUniquePermissionsViaRoles(): Collection
+    {
+        return $this->getPermissionsViaRoles()
+            ->unique(fn ($permission) => $permission->getKey())
+            ->values();
+    }
+
+    /**
      * Return all the permissions the model has, both directly and via roles.
      */
     public function getAllPermissions(): Collection

@@ -572,6 +572,22 @@ class HasPermissionsTest extends TestCase
 
     /** @test */
     #[Test]
+    public function it_can_list_all_the_unique_permissions_via_roles_of_user()
+    {
+        $roleModel = app(Role::class);
+        $roleModel->findByName('testRole2')->givePermissionTo(['edit-news', 'edit-articles']);
+
+        $this->testUserRole->givePermissionTo('edit-articles');
+        $this->testUser->assignRole('testRole', 'testRole2');
+
+        $this->assertEquals(
+            collect(['edit-articles', 'edit-news']),
+            $this->testUser->getUniquePermissionsViaRoles()->pluck('name')->sort()->values()
+        );
+    }
+
+    /** @test */
+    #[Test]
     public function it_can_list_all_the_coupled_permissions_both_directly_and_via_roles()
     {
         $this->testUser->givePermissionTo('edit-news');
