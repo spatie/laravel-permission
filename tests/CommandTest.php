@@ -307,4 +307,22 @@ class CommandTest extends TestCase
 
         $this->assertStringContainsString("User model class [{$userModelClass}] does not exist.", $output);
     }
+
+    /** @test */
+    #[Test]
+    public function it_warns_when_assigning_role_with_team_id_but_teams_disabled()
+    {
+        $user = User::first();
+
+        Artisan::call('permission:assign-role', [
+            'name' => 'testRole',
+            'userId' => $user->id,
+            'userModelNamespace' => User::class,
+            '--team-id' => 1,
+        ]);
+
+        $output = Artisan::output();
+
+        $this->assertStringContainsString('Teams feature disabled', $output);
+    }
 }
