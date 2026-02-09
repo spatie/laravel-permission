@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 6.24.1 - 2026-02-09
+
+### What's Changed
+
+* Add team support to permission:assign-role command by @freekmurze in https://github.com/spatie/laravel-permission/pull/2910
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/6.24.0...6.24.1
+
 ## 6;24.1 - 2026-02-09
 
 ### What's Changed
@@ -1126,6 +1134,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -1173,6 +1182,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
