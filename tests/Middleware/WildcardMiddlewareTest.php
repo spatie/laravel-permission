@@ -8,6 +8,7 @@ use Spatie\Permission\Middleware\PermissionMiddleware;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
 use Spatie\Permission\Models\Permission;
+
 beforeEach(function () {
     $this->roleMiddleware = new RoleMiddleware;
     $this->permissionMiddleware = new PermissionMiddleware;

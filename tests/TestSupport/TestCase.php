@@ -19,8 +19,8 @@ use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\PermissionServiceProvider;
 use Spatie\Permission\Tests\TestSupport\TestModels\Admin;
 use Spatie\Permission\Tests\TestSupport\TestModels\Client;
-use Spatie\Permission\Tests\TestSupport\TestModels\User;
 use Spatie\Permission\Tests\TestSupport\TestModels\Role as TestRole;
+use Spatie\Permission\Tests\TestSupport\TestModels\User;
 
 class TestCase extends Orchestra
 {

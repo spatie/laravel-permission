@@ -1,7 +1,7 @@
 <?php
 
-use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Guard;
+use Spatie\Permission\PermissionRegistrar;
 
 if (! function_exists('getModelForGuard')) {
     function getModelForGuard(string $guard): ?string
