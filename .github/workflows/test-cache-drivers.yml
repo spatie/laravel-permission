@@ -37,31 +37,31 @@ jobs:
 
       - name: Execute tests - memcached cache driver
         run: |
-          vendor/bin/phpunit
+          vendor/bin/pest
         env:
           CACHE_DRIVER: memcached
 
       - name: Execute tests - redis cache driver
         run: |
-          vendor/bin/phpunit
+          vendor/bin/pest
         env:
           CACHE_DRIVER: redis
           REDIS_PORT: ${{ job.services.redis.ports['6379'] }}
 
       - name: Execute tests - database cache driver
         run: |
-          vendor/bin/phpunit
+          vendor/bin/pest
         env:
           CACHE_DRIVER: database
 
       - name: Execute tests - file cache driver
         run: |
-          vendor/bin/phpunit
+          vendor/bin/pest
         env:
           CACHE_DRIVER: file
 
       - name: Execute tests - array cache driver
         run: |
-          vendor/bin/phpunit
+          vendor/bin/pest
         env:
           CACHE_DRIVER: array
