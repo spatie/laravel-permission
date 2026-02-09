@@ -1,409 +1,314 @@
 <?php
 
-namespace Spatie\Permission\Tests;
-
 use Illuminate\Support\Facades\Artisan;
-use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Contracts\Role;
+use Spatie\Permission\Tests\TestCase;
 
-class BladeTest extends TestCase
+uses(TestCase::class);
+
+function renderView(string $view, array $parameters): string
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
+    Artisan::call('view:clear');
 
-        $roleModel = app(Role::class);
+    return trim((string) view($view)->with($parameters));
+}
 
-        $roleModel->create(['name' => 'member']);
-        $roleModel->create(['name' => 'writer']);
-        $roleModel->create(['name' => 'intern']);
-        $roleModel->create(['name' => 'super-admin', 'guard_name' => 'admin']);
-        $roleModel->create(['name' => 'moderator', 'guard_name' => 'admin']);
-    }
+beforeEach(function () {
+    $roleModel = app(Role::class);
 
-    /** @test */
-    #[Test]
-    public function all_blade_directives_will_evaluate_false_when_there_is_nobody_logged_in()
-    {
-        $permission = 'edit-articles';
-        $role = 'writer';
-        $roles = [$role];
-        $elserole = 'na';
-        $elsepermission = 'na';
+    $roleModel->create(['name' => 'member']);
+    $roleModel->create(['name' => 'writer']);
+    $roleModel->create(['name' => 'intern']);
+    $roleModel->create(['name' => 'super-admin', 'guard_name' => 'admin']);
+    $roleModel->create(['name' => 'moderator', 'guard_name' => 'admin']);
 
-        $this->assertEquals('does not have permission', $this->renderView('can', ['permission' => $permission]));
-        $this->assertEquals('does not have permission', $this->renderView('haspermission', compact('permission', 'elsepermission')));
-        $this->assertEquals('does not have role', $this->renderView('role', compact('role', 'elserole')));
-        $this->assertEquals('does not have role', $this->renderView('hasRole', compact('role', 'elserole')));
-        $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', compact('roles')));
-        $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', ['roles' => implode('|', $roles)]));
-        $this->assertEquals('does not have any of the given roles', $this->renderView('hasAnyRole', compact('roles')));
-        $this->assertEquals('does not have any of the given roles', $this->renderView('hasAnyRole', ['roles' => implode('|', $roles)]));
-    }
-
-    /** @test */
-    #[Test]
-    public function all_blade_directives_will_evaluate_false_when_somebody_without_roles_or_permissions_is_logged_in()
-    {
-        $permission = 'edit-articles';
-        $role = 'writer';
-        $roles = 'writer';
-        $elserole = 'na';
-        $elsepermission = 'na';
-
-        auth()->setUser($this->testUser);
-
-        $this->assertEquals('does not have permission', $this->renderView('can', compact('permission')));
-        $this->assertEquals('does not have permission', $this->renderView('haspermission', compact('permission', 'elsepermission')));
-        $this->assertEquals('does not have role', $this->renderView('role', compact('role', 'elserole')));
-        $this->assertEquals('does not have role', $this->renderView('hasRole', compact('role', 'elserole')));
-        $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', compact('roles')));
-        $this->assertEquals('does not have any of the given roles', $this->renderView('hasAnyRole', compact('roles')));
-    }
-
-    /** @test */
-    #[Test]
-    public function all_blade_directives_will_evaluate_false_when_somebody_with_another_guard_is_logged_in()
-    {
-        $permission = 'edit-articles';
-        $role = 'writer';
-        $roles = 'writer';
-        $elserole = 'na';
-        $elsepermission = 'na';
-
-        auth('admin')->setUser($this->testAdmin);
-
-        $this->assertEquals('does not have permission', $this->renderView('can', compact('permission')));
-        $this->assertEquals('does not have permission', $this->renderView('haspermission', compact('permission', 'elsepermission')));
-        $this->assertEquals('does not have role', $this->renderView('role', compact('role', 'elserole')));
-        $this->assertEquals('does not have role', $this->renderView('hasRole', compact('role', 'elserole')));
-        $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', compact('roles')));
-        $this->assertEquals('does not have any of the given roles', $this->renderView('hasAnyRole', compact('roles')));
-        $this->assertEquals('does not have any of the given roles', $this->renderView('hasAnyRole', compact('roles')));
-    }
-
-    /** @test */
-    #[Test]
-    public function the_can_directive_can_accept_a_guard_name()
-    {
-        $user = $this->getWriter();
-        $user->givePermissionTo('edit-articles');
-        auth()->setUser($user);
-
-        $permission = 'edit-articles';
-        $guard = 'web';
-        $this->assertEquals('has permission', $this->renderView('can', compact('permission', 'guard')));
-        $guard = 'admin';
-        $this->assertEquals('does not have permission', $this->renderView('can', compact('permission', 'guard')));
-
-        auth()->logout();
-
-        // log in as the Admin with the permission-via-role
-        $this->testAdmin->givePermissionTo($this->testAdminPermission);
-        $user = $this->testAdmin;
-        auth()->setUser($user);
-
-        $permission = 'edit-articles';
-        $guard = 'web';
-        $this->assertEquals('does not have permission', $this->renderView('can', compact('permission', 'guard')));
-
-        $permission = 'admin-permission';
-        $guard = 'admin';
-        $this->assertTrue($this->testAdmin->checkPermissionTo($permission, $guard));
-        $this->assertEquals('has permission', $this->renderView('can', compact('permission', 'guard')));
-    }
-
-    /** @test */
-    #[Test]
-    public function the_can_directive_will_evaluate_true_when_the_logged_in_user_has_the_permission()
-    {
-        $user = $this->getWriter();
-
-        $user->givePermissionTo('edit-articles');
-
-        auth()->setUser($user);
-
-        $this->assertEquals('has permission', $this->renderView('can', ['permission' => 'edit-articles']));
-    }
-
-    /** @test */
-    #[Test]
-    public function the_haspermission_directive_will_evaluate_true_when_the_logged_in_user_has_the_permission()
-    {
-        $user = $this->getWriter();
-
-        $permission = 'edit-articles';
-        $user->givePermissionTo('edit-articles');
-
-        auth()->setUser($user);
-
-        $this->assertEquals('has permission', $this->renderView('haspermission', compact('permission')));
-
-        $guard = 'admin';
-        $elsepermission = 'na';
-        $this->assertEquals('does not have permission', $this->renderView('haspermission', compact('permission', 'elsepermission', 'guard')));
-
-        $this->testAdminRole->givePermissionTo($this->testAdminPermission);
-        $this->testAdmin->assignRole($this->testAdminRole);
-        auth('admin')->setUser($this->testAdmin);
-        $guard = 'admin';
-        $permission = 'admin-permission';
-        $this->assertEquals('has permission', $this->renderView('haspermission', compact('permission', 'guard', 'elsepermission')));
-    }
-
-    /** @test */
-    #[Test]
-    public function the_role_directive_will_evaluate_true_when_the_logged_in_user_has_the_role()
-    {
-        auth()->setUser($this->getWriter());
-
-        $this->assertEquals('has role', $this->renderView('role', ['role' => 'writer', 'elserole' => 'na']));
-    }
-
-    /** @test */
-    #[Test]
-    public function the_elserole_directive_will_evaluate_true_when_the_logged_in_user_has_the_role()
-    {
-        auth()->setUser($this->getMember());
-
-        $this->assertEquals('has else role', $this->renderView('role', ['role' => 'writer', 'elserole' => 'member']));
-    }
-
-    /** @test */
-    #[Test]
-    public function the_role_directive_will_evaluate_true_when_the_logged_in_user_has_the_role_for_the_given_guard()
-    {
-        auth('admin')->setUser($this->getSuperAdmin());
-
-        $this->assertEquals('has role for guard', $this->renderView('guardRole', ['role' => 'super-admin', 'guard' => 'admin']));
-    }
-
-    /** @test */
-    #[Test]
-    public function the_hasrole_directive_will_evaluate_true_when_the_logged_in_user_has_the_role()
-    {
-        auth()->setUser($this->getWriter());
-
-        $this->assertEquals('has role', $this->renderView('hasRole', ['role' => 'writer']));
-    }
-
-    /** @test */
-    #[Test]
-    public function the_hasrole_directive_will_evaluate_true_when_the_logged_in_user_has_the_role_for_the_given_guard()
-    {
-        auth('admin')->setUser($this->getSuperAdmin());
-
-        $this->assertEquals('has role', $this->renderView('guardHasRole', ['role' => 'super-admin', 'guard' => 'admin']));
-    }
-
-    /** @test */
-    #[Test]
-    public function the_unlessrole_directive_will_evaluate_true_when_the_logged_in_user_does_not_have_the_role()
-    {
-        auth()->setUser($this->getWriter());
-
-        $this->assertEquals('does not have role', $this->renderView('unlessrole', ['role' => 'another']));
-    }
-
-    /** @test */
-    #[Test]
-    public function the_unlessrole_directive_will_evaluate_true_when_the_logged_in_user_does_not_have_the_role_for_the_given_guard()
-    {
-        auth('admin')->setUser($this->getSuperAdmin());
-
-        $this->assertEquals('does not have role', $this->renderView('guardunlessrole', ['role' => 'another', 'guard' => 'admin']));
-        $this->assertEquals('does not have role', $this->renderView('guardunlessrole', ['role' => 'super-admin', 'guard' => 'web']));
-    }
-
-    /** @test */
-    #[Test]
-    public function the_hasanyrole_directive_will_evaluate_false_when_the_logged_in_user_does_not_have_any_of_the_required_roles()
-    {
-        $roles = ['writer', 'intern'];
-
-        auth()->setUser($this->getMember());
-
-        $this->assertEquals('does not have any of the given roles', $this->renderView('hasAnyRole', compact('roles')));
-        $this->assertEquals('does not have any of the given roles', $this->renderView('hasAnyRole', ['roles' => implode('|', $roles)]));
-    }
-
-    /** @test */
-    #[Test]
-    public function the_hasanyrole_directive_will_evaluate_true_when_the_logged_in_user_does_have_some_of_the_required_roles()
-    {
-        $roles = ['member', 'writer', 'intern'];
-
-        auth()->setUser($this->getMember());
-
-        $this->assertEquals('does have some of the roles', $this->renderView('hasAnyRole', compact('roles')));
-        $this->assertEquals('does have some of the roles', $this->renderView('hasAnyRole', ['roles' => implode('|', $roles)]));
-    }
-
-    /** @test */
-    #[Test]
-    public function the_hasanyrole_directive_will_evaluate_true_when_the_logged_in_user_does_have_some_of_the_required_roles_for_the_given_guard()
-    {
-        $roles = ['super-admin', 'moderator'];
-        $guard = 'admin';
-
-        auth('admin')->setUser($this->getSuperAdmin());
-
-        $this->assertEquals('does have some of the roles', $this->renderView('guardHasAnyRole', compact('roles', 'guard')));
-    }
-
-    /** @test */
-    #[Test]
-    public function the_hasanyrole_directive_will_evaluate_true_when_the_logged_in_user_does_have_some_of_the_required_roles_in_pipe()
-    {
-        $guard = 'admin';
-
-        auth('admin')->setUser($this->getSuperAdmin());
-
-        $this->assertEquals('does have some of the roles', $this->renderView('guardHasAnyRolePipe', compact('guard')));
-    }
-
-    /** @test */
-    #[Test]
-    public function the_hasanyrole_directive_will_evaluate_false_when_the_logged_in_user_doesnt_have_some_of_the_required_roles_in_pipe()
-    {
-        $guard = '';
-
-        auth('admin')->setUser($this->getMember());
-
-        $this->assertEquals('does not have any of the given roles', $this->renderView('guardHasAnyRolePipe', compact('guard')));
-    }
-
-    /** @test */
-    #[Test]
-    public function the_hasallroles_directive_will_evaluate_false_when_the_logged_in_user_does_not_have_all_required_roles()
-    {
-        $roles = ['member', 'writer'];
-
-        auth()->setUser($this->getMember());
-
-        $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', compact('roles')));
-        $this->assertEquals('does not have all of the given roles', $this->renderView('hasAllRoles', ['roles' => implode('|', $roles)]));
-    }
-
-    /** @test */
-    #[Test]
-    public function the_hasallroles_directive_will_evaluate_true_when_the_logged_in_user_does_have_all_required_roles()
-    {
-        $roles = ['member', 'writer'];
-
-        $user = $this->getMember();
-
-        $user->assignRole('writer');
-
-        auth()->setUser($user);
-
-        $this->assertEquals('does have all of the given roles', $this->renderView('hasAllRoles', compact('roles')));
-        $this->assertEquals('does have all of the given roles', $this->renderView('hasAllRoles', ['roles' => implode('|', $roles)]));
-    }
-
-    /** @test */
-    #[Test]
-    public function the_hasallroles_directive_will_evaluate_true_when_the_logged_in_user_does_have_all_required_roles_for_the_given_guard()
-    {
-        $roles = ['super-admin', 'moderator'];
-        $guard = 'admin';
-
-        $admin = $this->getSuperAdmin();
-
-        $admin->assignRole('moderator');
-
-        auth('admin')->setUser($admin);
-
-        $this->assertEquals('does have all of the given roles', $this->renderView('guardHasAllRoles', compact('roles', 'guard')));
-    }
-
-    /** @test */
-    #[Test]
-    public function the_hasallroles_directive_will_evaluate_true_when_the_logged_in_user_does_have_all_required_roles_in_pipe()
-    {
-        $guard = 'admin';
-
-        $admin = $this->getSuperAdmin();
-
-        $admin->assignRole('moderator');
-
-        auth('admin')->setUser($admin);
-
-        $this->assertEquals('does have all of the given roles', $this->renderView('guardHasAllRolesPipe', compact('guard')));
-    }
-
-    /** @test */
-    #[Test]
-    public function the_hasallroles_directive_will_evaluate_false_when_the_logged_in_user_doesnt_have_all_required_roles_in_pipe()
-    {
-        $guard = '';
-        $user = $this->getMember();
-
-        $user->assignRole('writer');
-
-        auth()->setUser($user);
-
-        $this->assertEquals('does not have all of the given roles', $this->renderView('guardHasAllRolesPipe', compact('guard')));
-    }
-
-    /** @test */
-    #[Test]
-    public function the_hasallroles_directive_will_evaluate_true_when_the_logged_in_user_does_have_all_required_roles_in_array()
-    {
-        $guard = 'admin';
-
-        $admin = $this->getSuperAdmin();
-
-        $admin->assignRole('moderator');
-
-        auth('admin')->setUser($admin);
-
-        $this->assertEquals('does have all of the given roles', $this->renderView('guardHasAllRolesArray', compact('guard')));
-    }
-
-    /** @test */
-    #[Test]
-    public function the_hasallroles_directive_will_evaluate_false_when_the_logged_in_user_doesnt_have_all_required_roles_in_array()
-    {
-        $guard = '';
-        $user = $this->getMember();
-
-        $user->assignRole('writer');
-
-        auth()->setUser($user);
-
-        $this->assertEquals('does not have all of the given roles', $this->renderView('guardHasAllRolesArray', compact('guard')));
-    }
-
-    protected function getWriter()
-    {
+    $this->getWriter = function () {
         $this->testUser->assignRole('writer');
 
         return $this->testUser;
-    }
+    };
 
-    protected function getMember()
-    {
+    $this->getMember = function () {
         $this->testUser->assignRole('member');
 
         return $this->testUser;
-    }
+    };
 
-    protected function getSuperAdmin()
-    {
+    $this->getSuperAdmin = function () {
         $this->testAdmin->assignRole('super-admin');
 
         return $this->testAdmin;
-    }
+    };
+});
 
-    protected function renderView($view, $parameters)
-    {
-        Artisan::call('view:clear');
+it('evaluates all blade directives as false when there is nobody logged in', function () {
+    $permission = 'edit-articles';
+    $role = 'writer';
+    $roles = [$role];
+    $elserole = 'na';
+    $elsepermission = 'na';
 
-        if (is_string($view)) {
-            $view = view($view)->with($parameters);
-        }
+    expect(renderView('can', ['permission' => $permission]))->toEqual('does not have permission');
+    expect(renderView('haspermission', compact('permission', 'elsepermission')))->toEqual('does not have permission');
+    expect(renderView('role', compact('role', 'elserole')))->toEqual('does not have role');
+    expect(renderView('hasRole', compact('role', 'elserole')))->toEqual('does not have role');
+    expect(renderView('hasAllRoles', compact('roles')))->toEqual('does not have all of the given roles');
+    expect(renderView('hasAllRoles', ['roles' => implode('|', $roles)]))->toEqual('does not have all of the given roles');
+    expect(renderView('hasAnyRole', compact('roles')))->toEqual('does not have any of the given roles');
+    expect(renderView('hasAnyRole', ['roles' => implode('|', $roles)]))->toEqual('does not have any of the given roles');
+});
 
-        return trim((string) ($view));
-    }
-}
+it('evaluates all blade directives as false when somebody without roles or permissions is logged in', function () {
+    $permission = 'edit-articles';
+    $role = 'writer';
+    $roles = 'writer';
+    $elserole = 'na';
+    $elsepermission = 'na';
+
+    auth()->setUser($this->testUser);
+
+    expect(renderView('can', compact('permission')))->toEqual('does not have permission');
+    expect(renderView('haspermission', compact('permission', 'elsepermission')))->toEqual('does not have permission');
+    expect(renderView('role', compact('role', 'elserole')))->toEqual('does not have role');
+    expect(renderView('hasRole', compact('role', 'elserole')))->toEqual('does not have role');
+    expect(renderView('hasAllRoles', compact('roles')))->toEqual('does not have all of the given roles');
+    expect(renderView('hasAnyRole', compact('roles')))->toEqual('does not have any of the given roles');
+});
+
+it('evaluates all blade directives as false when somebody with another guard is logged in', function () {
+    $permission = 'edit-articles';
+    $role = 'writer';
+    $roles = 'writer';
+    $elserole = 'na';
+    $elsepermission = 'na';
+
+    auth('admin')->setUser($this->testAdmin);
+
+    expect(renderView('can', compact('permission')))->toEqual('does not have permission');
+    expect(renderView('haspermission', compact('permission', 'elsepermission')))->toEqual('does not have permission');
+    expect(renderView('role', compact('role', 'elserole')))->toEqual('does not have role');
+    expect(renderView('hasRole', compact('role', 'elserole')))->toEqual('does not have role');
+    expect(renderView('hasAllRoles', compact('roles')))->toEqual('does not have all of the given roles');
+    expect(renderView('hasAnyRole', compact('roles')))->toEqual('does not have any of the given roles');
+    expect(renderView('hasAnyRole', compact('roles')))->toEqual('does not have any of the given roles');
+});
+
+it('accepts a guard name in the can directive', function () {
+    $user = ($this->getWriter)();
+    $user->givePermissionTo('edit-articles');
+    auth()->setUser($user);
+
+    $permission = 'edit-articles';
+    $guard = 'web';
+    expect(renderView('can', compact('permission', 'guard')))->toEqual('has permission');
+    $guard = 'admin';
+    expect(renderView('can', compact('permission', 'guard')))->toEqual('does not have permission');
+
+    auth()->logout();
+
+    // log in as the Admin with the permission-via-role
+    $this->testAdmin->givePermissionTo($this->testAdminPermission);
+    $user = $this->testAdmin;
+    auth()->setUser($user);
+
+    $permission = 'edit-articles';
+    $guard = 'web';
+    expect(renderView('can', compact('permission', 'guard')))->toEqual('does not have permission');
+
+    $permission = 'admin-permission';
+    $guard = 'admin';
+    expect($this->testAdmin->checkPermissionTo($permission, $guard))->toBeTrue();
+    expect(renderView('can', compact('permission', 'guard')))->toEqual('has permission');
+});
+
+it('evaluates the can directive as true when the logged in user has the permission', function () {
+    $user = ($this->getWriter)();
+    $user->givePermissionTo('edit-articles');
+
+    auth()->setUser($user);
+
+    expect(renderView('can', ['permission' => 'edit-articles']))->toEqual('has permission');
+});
+
+it('evaluates the haspermission directive as true when the logged in user has the permission', function () {
+    $user = ($this->getWriter)();
+
+    $permission = 'edit-articles';
+    $user->givePermissionTo('edit-articles');
+
+    auth()->setUser($user);
+
+    expect(renderView('haspermission', compact('permission')))->toEqual('has permission');
+
+    $guard = 'admin';
+    $elsepermission = 'na';
+    expect(renderView('haspermission', compact('permission', 'elsepermission', 'guard')))->toEqual('does not have permission');
+
+    $this->testAdminRole->givePermissionTo($this->testAdminPermission);
+    $this->testAdmin->assignRole($this->testAdminRole);
+    auth('admin')->setUser($this->testAdmin);
+    $guard = 'admin';
+    $permission = 'admin-permission';
+    expect(renderView('haspermission', compact('permission', 'guard', 'elsepermission')))->toEqual('has permission');
+});
+
+it('evaluates the role directive as true when the logged in user has the role', function () {
+    auth()->setUser(($this->getWriter)());
+
+    expect(renderView('role', ['role' => 'writer', 'elserole' => 'na']))->toEqual('has role');
+});
+
+it('evaluates the elserole directive as true when the logged in user has the role', function () {
+    auth()->setUser(($this->getMember)());
+
+    expect(renderView('role', ['role' => 'writer', 'elserole' => 'member']))->toEqual('has else role');
+});
+
+it('evaluates the role directive as true when the logged in user has the role for the given guard', function () {
+    auth('admin')->setUser(($this->getSuperAdmin)());
+
+    expect(renderView('guardRole', ['role' => 'super-admin', 'guard' => 'admin']))->toEqual('has role for guard');
+});
+
+it('evaluates the hasrole directive as true when the logged in user has the role', function () {
+    auth()->setUser(($this->getWriter)());
+
+    expect(renderView('hasRole', ['role' => 'writer']))->toEqual('has role');
+});
+
+it('evaluates the hasrole directive as true when the logged in user has the role for the given guard', function () {
+    auth('admin')->setUser(($this->getSuperAdmin)());
+
+    expect(renderView('guardHasRole', ['role' => 'super-admin', 'guard' => 'admin']))->toEqual('has role');
+});
+
+it('evaluates the unlessrole directive as true when the logged in user does not have the role', function () {
+    auth()->setUser(($this->getWriter)());
+
+    expect(renderView('unlessrole', ['role' => 'another']))->toEqual('does not have role');
+});
+
+it('evaluates the unlessrole directive as true when the logged in user does not have the role for the given guard', function () {
+    auth('admin')->setUser(($this->getSuperAdmin)());
+
+    expect(renderView('guardunlessrole', ['role' => 'another', 'guard' => 'admin']))->toEqual('does not have role');
+    expect(renderView('guardunlessrole', ['role' => 'super-admin', 'guard' => 'web']))->toEqual('does not have role');
+});
+
+it('evaluates the hasanyrole directive as false when the logged in user does not have any of the required roles', function () {
+    $roles = ['writer', 'intern'];
+
+    auth()->setUser(($this->getMember)());
+
+    expect(renderView('hasAnyRole', compact('roles')))->toEqual('does not have any of the given roles');
+    expect(renderView('hasAnyRole', ['roles' => implode('|', $roles)]))->toEqual('does not have any of the given roles');
+});
+
+it('evaluates the hasanyrole directive as true when the logged in user does have some of the required roles', function () {
+    $roles = ['member', 'writer', 'intern'];
+
+    auth()->setUser(($this->getMember)());
+
+    expect(renderView('hasAnyRole', compact('roles')))->toEqual('does have some of the roles');
+    expect(renderView('hasAnyRole', ['roles' => implode('|', $roles)]))->toEqual('does have some of the roles');
+});
+
+it('evaluates the hasanyrole directive as true when the logged in user does have some of the required roles for the given guard', function () {
+    $roles = ['super-admin', 'moderator'];
+    $guard = 'admin';
+
+    auth('admin')->setUser(($this->getSuperAdmin)());
+
+    expect(renderView('guardHasAnyRole', compact('roles', 'guard')))->toEqual('does have some of the roles');
+});
+
+it('evaluates the hasanyrole directive as true when the logged in user does have some of the required roles in pipe', function () {
+    $guard = 'admin';
+
+    auth('admin')->setUser(($this->getSuperAdmin)());
+
+    expect(renderView('guardHasAnyRolePipe', compact('guard')))->toEqual('does have some of the roles');
+});
+
+it('evaluates the hasanyrole directive as false when the logged in user doesnt have some of the required roles in pipe', function () {
+    $guard = '';
+
+    auth('admin')->setUser(($this->getMember)());
+
+    expect(renderView('guardHasAnyRolePipe', compact('guard')))->toEqual('does not have any of the given roles');
+});
+
+it('evaluates the hasallroles directive as false when the logged in user does not have all required roles', function () {
+    $roles = ['member', 'writer'];
+
+    auth()->setUser(($this->getMember)());
+
+    expect(renderView('hasAllRoles', compact('roles')))->toEqual('does not have all of the given roles');
+    expect(renderView('hasAllRoles', ['roles' => implode('|', $roles)]))->toEqual('does not have all of the given roles');
+});
+
+it('evaluates the hasallroles directive as true when the logged in user does have all required roles', function () {
+    $roles = ['member', 'writer'];
+
+    $user = ($this->getMember)();
+    $user->assignRole('writer');
+
+    auth()->setUser($user);
+
+    expect(renderView('hasAllRoles', compact('roles')))->toEqual('does have all of the given roles');
+    expect(renderView('hasAllRoles', ['roles' => implode('|', $roles)]))->toEqual('does have all of the given roles');
+});
+
+it('evaluates the hasallroles directive as true when the logged in user does have all required roles for the given guard', function () {
+    $roles = ['super-admin', 'moderator'];
+    $guard = 'admin';
+
+    $admin = ($this->getSuperAdmin)();
+    $admin->assignRole('moderator');
+
+    auth('admin')->setUser($admin);
+
+    expect(renderView('guardHasAllRoles', compact('roles', 'guard')))->toEqual('does have all of the given roles');
+});
+
+it('evaluates the hasallroles directive as true when the logged in user does have all required roles in pipe', function () {
+    $guard = 'admin';
+
+    $admin = ($this->getSuperAdmin)();
+    $admin->assignRole('moderator');
+
+    auth('admin')->setUser($admin);
+
+    expect(renderView('guardHasAllRolesPipe', compact('guard')))->toEqual('does have all of the given roles');
+});
+
+it('evaluates the hasallroles directive as false when the logged in user doesnt have all required roles in pipe', function () {
+    $guard = '';
+    $user = ($this->getMember)();
+    $user->assignRole('writer');
+
+    auth()->setUser($user);
+
+    expect(renderView('guardHasAllRolesPipe', compact('guard')))->toEqual('does not have all of the given roles');
+});
+
+it('evaluates the hasallroles directive as true when the logged in user does have all required roles in array', function () {
+    $guard = 'admin';
+
+    $admin = ($this->getSuperAdmin)();
+    $admin->assignRole('moderator');
+
+    auth('admin')->setUser($admin);
+
+    expect(renderView('guardHasAllRolesArray', compact('guard')))->toEqual('does have all of the given roles');
+});
+
+it('evaluates the hasallroles directive as false when the logged in user doesnt have all required roles in array', function () {
+    $guard = '';
+    $user = ($this->getMember)();
+    $user->assignRole('writer');
+
+    auth()->setUser($user);
+
+    expect(renderView('guardHasAllRolesArray', compact('guard')))->toEqual('does not have all of the given roles');
+});

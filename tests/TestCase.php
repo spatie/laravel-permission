@@ -21,7 +21,7 @@ use Spatie\Permission\Tests\TestModels\Admin;
 use Spatie\Permission\Tests\TestModels\Client;
 use Spatie\Permission\Tests\TestModels\User;
 
-abstract class TestCase extends Orchestra
+class TestCase extends Orchestra
 {
     /** @var \Spatie\Permission\Tests\TestModels\User */
     protected $testUser;
@@ -335,5 +335,87 @@ abstract class TestCase extends Orchestra
     protected function getLaravelVersion()
     {
         return (float) app()->version();
+    }
+}
+
+class CustomModelTestCase extends TestCase
+{
+    protected $useCustomModels = true;
+}
+
+class CustomModelWithDbCacheTestCase extends CustomModelTestCase
+{
+    protected int $resetDatabaseQuery = 0;
+
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        if ($app['config']->get('cache.default') == 'database') {
+            $this->resetDatabaseQuery = 1;
+        }
+    }
+}
+
+class TeamTestCase extends TestCase
+{
+    protected $hasTeams = true;
+}
+
+class PassportTestCase extends TestCase
+{
+    protected $usePassport = true;
+}
+
+class MultipleGuardsTestCase extends TestCase
+{
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        $app['config']->set('auth.guards', [
+            'web' => ['driver' => 'session', 'provider' => 'users'],
+            'api' => ['driver' => 'token', 'provider' => 'users'],
+            'jwt' => ['driver' => 'token', 'provider' => 'users'],
+            'abc' => ['driver' => 'abc'],
+            'admin' => ['driver' => 'session', 'provider' => 'admins'],
+        ]);
+
+        $this->setUpRoutes();
+    }
+
+    public function setUpRoutes(): void
+    {
+        Route::middleware('auth:api')->get('/check-api-guard-permission', function (Request $request) {
+            return ['status' => $request->user()->checkPermissionTo('use_api_guard')];
+        });
+    }
+}
+
+class RoleWithNestingTestCase extends CustomModelTestCase
+{
+    protected function setUpDatabase($app)
+    {
+        parent::setUpDatabase($app);
+
+        $tableRoles = $app['config']->get('permission.table_names.roles');
+
+        $app['db']->connection()->getSchemaBuilder()->create(\Spatie\Permission\Tests\TestModels\Role::HIERARCHY_TABLE, function ($table) use ($tableRoles) {
+            $table->id();
+            $table->uuid('parent_id');
+            $table->uuid('child_id');
+            $table->foreign('parent_id')->references('role_test_id')->on($tableRoles);
+            $table->foreign('child_id')->references('role_test_id')->on($tableRoles);
+        });
+    }
+}
+
+class CustomGateTestCase extends TestCase
+{
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        $app['config']->set('permission.register_permission_check_method', false);
     }
 }

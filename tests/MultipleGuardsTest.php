@@ -1,118 +1,93 @@
 <?php
 
-namespace Spatie\Permission\Tests;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Tests\MultipleGuardsTestCase;
 use Spatie\Permission\Tests\TestModels\Manager;
 
-class MultipleGuardsTest extends TestCase
-{
-    protected function getEnvironmentSetUp($app)
-    {
-        parent::getEnvironmentSetUp($app);
+uses(MultipleGuardsTestCase::class);
 
-        $app['config']->set('auth.guards', [
-            'web' => ['driver' => 'session', 'provider' => 'users'],
-            'api' => ['driver' => 'token', 'provider' => 'users'],
-            'jwt' => ['driver' => 'token', 'provider' => 'users'],
-            'abc' => ['driver' => 'abc'],
-            'admin' => ['driver' => 'session', 'provider' => 'admins'],
-        ]);
+beforeEach(function () {
+    app('config')->set('auth.guards', [
+        'web' => ['driver' => 'session', 'provider' => 'users'],
+        'api' => ['driver' => 'token', 'provider' => 'users'],
+        'jwt' => ['driver' => 'token', 'provider' => 'users'],
+        'abc' => ['driver' => 'abc'],
+        'admin' => ['driver' => 'session', 'provider' => 'admins'],
+    ]);
 
-        $this->setUpRoutes();
-    }
+    Route::middleware('auth:api')->get('/check-api-guard-permission', function (Request $request) {
+        return ['status' => $request->user()->checkPermissionTo('use_api_guard')];
+    });
+});
 
-    /**
-     * Create routes to test authentication with guards.
-     */
-    public function setUpRoutes(): void
-    {
-        Route::middleware('auth:api')->get('/check-api-guard-permission', function (Request $request) {
-            return [
-                'status' => $request->user()->checkPermissionTo('use_api_guard'),
-            ];
-        });
-    }
+it('can give a permission to a model that is used by multiple guards', function () {
+    $this->testUser->givePermissionTo(app(Permission::class)::create([
+        'name' => 'do_this',
+        'guard_name' => 'web',
+    ]));
 
-    /** @test */
-    #[Test]
-    public function it_can_give_a_permission_to_a_model_that_is_used_by_multiple_guards()
-    {
-        $this->testUser->givePermissionTo(app(Permission::class)::create([
-            'name' => 'do_this',
-            'guard_name' => 'web',
-        ]));
+    $this->testUser->givePermissionTo(app(Permission::class)::create([
+        'name' => 'do_that',
+        'guard_name' => 'api',
+    ]));
 
-        $this->testUser->givePermissionTo(app(Permission::class)::create([
-            'name' => 'do_that',
-            'guard_name' => 'api',
-        ]));
+    expect($this->testUser->checkPermissionTo('do_this', 'web'))->toBeTrue();
+    expect($this->testUser->checkPermissionTo('do_that', 'api'))->toBeTrue();
+    expect($this->testUser->checkPermissionTo('do_that', 'web'))->toBeFalse();
+});
 
-        $this->assertTrue($this->testUser->checkPermissionTo('do_this', 'web'));
-        $this->assertTrue($this->testUser->checkPermissionTo('do_that', 'api'));
-        $this->assertFalse($this->testUser->checkPermissionTo('do_that', 'web'));
-    }
+it('the gate can grant permission to a user by passing a guard name', function () {
+    $this->testUser->givePermissionTo(app(Permission::class)::create([
+        'name' => 'do_this',
+        'guard_name' => 'web',
+    ]));
 
-    /** @test */
-    #[Test]
-    public function the_gate_can_grant_permission_to_a_user_by_passing_a_guard_name()
-    {
-        $this->testUser->givePermissionTo(app(Permission::class)::create([
-            'name' => 'do_this',
-            'guard_name' => 'web',
-        ]));
+    $this->testUser->givePermissionTo(app(Permission::class)::create([
+        'name' => 'do_that',
+        'guard_name' => 'api',
+    ]));
 
-        $this->testUser->givePermissionTo(app(Permission::class)::create([
-            'name' => 'do_that',
-            'guard_name' => 'api',
-        ]));
+    expect($this->testUser->can('do_this', 'web'))->toBeTrue();
+    expect($this->testUser->can('do_that', 'api'))->toBeTrue();
+    expect($this->testUser->can('do_that', 'web'))->toBeFalse();
 
-        $this->assertTrue($this->testUser->can('do_this', 'web'));
-        $this->assertTrue($this->testUser->can('do_that', 'api'));
-        $this->assertFalse($this->testUser->can('do_that', 'web'));
+    expect($this->testUser->cannot('do_that', 'web'))->toBeTrue();
+    expect($this->testUser->canAny(['do_this', 'do_that'], 'web'))->toBeTrue();
 
-        $this->assertTrue($this->testUser->cannot('do_that', 'web'));
-        $this->assertTrue($this->testUser->canAny(['do_this', 'do_that'], 'web'));
+    $this->testAdminRole->givePermissionTo($this->testAdminPermission);
+    $this->testAdmin->assignRole($this->testAdminRole);
 
-        $this->testAdminRole->givePermissionTo($this->testAdminPermission);
-        $this->testAdmin->assignRole($this->testAdminRole);
+    expect($this->testAdmin->hasPermissionTo($this->testAdminPermission))->toBeTrue();
+    expect($this->testAdmin->can('admin-permission'))->toBeTrue();
+    expect($this->testAdmin->can('admin-permission', 'admin'))->toBeTrue();
+    expect($this->testAdmin->cannot('admin-permission', 'web'))->toBeTrue();
 
-        $this->assertTrue($this->testAdmin->hasPermissionTo($this->testAdminPermission));
-        $this->assertTrue($this->testAdmin->can('admin-permission'));
-        $this->assertTrue($this->testAdmin->can('admin-permission', 'admin'));
-        $this->assertTrue($this->testAdmin->cannot('admin-permission', 'web'));
+    expect($this->testAdmin->cannot('non-existing-permission'))->toBeTrue();
+    expect($this->testAdmin->cannot('non-existing-permission', 'web'))->toBeTrue();
+    expect($this->testAdmin->cannot('non-existing-permission', 'admin'))->toBeTrue();
+    expect($this->testAdmin->cannot(['admin-permission', 'non-existing-permission'], 'web'))->toBeTrue();
 
-        $this->assertTrue($this->testAdmin->cannot('non-existing-permission'));
-        $this->assertTrue($this->testAdmin->cannot('non-existing-permission', 'web'));
-        $this->assertTrue($this->testAdmin->cannot('non-existing-permission', 'admin'));
-        $this->assertTrue($this->testAdmin->cannot(['admin-permission', 'non-existing-permission'], 'web'));
+    expect($this->testAdmin->can('edit-articles', 'web'))->toBeFalse();
+    expect($this->testAdmin->can('edit-articles', 'admin'))->toBeFalse();
 
-        $this->assertFalse($this->testAdmin->can('edit-articles', 'web'));
-        $this->assertFalse($this->testAdmin->can('edit-articles', 'admin'));
+    expect($this->testUser->cannot('edit-articles', 'admin'))->toBeTrue();
+    expect($this->testUser->cannot('admin-permission', 'admin'))->toBeTrue();
+    expect($this->testUser->cannot('admin-permission', 'web'))->toBeTrue();
+});
 
-        $this->assertTrue($this->testUser->cannot('edit-articles', 'admin'));
-        $this->assertTrue($this->testUser->cannot('admin-permission', 'admin'));
-        $this->assertTrue($this->testUser->cannot('admin-permission', 'web'));
-    }
+it('can honour guardName function on model for overriding guard name property', function () {
+    $user = Manager::create(['email' => 'manager@test.com']);
+    $user->givePermissionTo(app(Permission::class)::create([
+        'name' => 'do_jwt',
+        'guard_name' => 'jwt',
+    ]));
 
-    /** @test */
-    #[Test]
-    public function it_can_honour_guardName_function_on_model_for_overriding_guard_name_property()
-    {
-        $user = Manager::create(['email' => 'manager@test.com']);
-        $user->givePermissionTo(app(Permission::class)::create([
-            'name' => 'do_jwt',
-            'guard_name' => 'jwt',
-        ]));
+    // Manager test user has the guardName override method, which returns 'jwt'
+    expect($user->checkPermissionTo('do_jwt', 'jwt'))->toBeTrue();
+    expect($user->hasPermissionTo('do_jwt', 'jwt'))->toBeTrue();
 
-        // Manager test user has the guardName override method, which returns 'jwt'
-        $this->assertTrue($user->checkPermissionTo('do_jwt', 'jwt'));
-        $this->assertTrue($user->hasPermissionTo('do_jwt', 'jwt'));
-
-        // Manager test user has the $guard_name property set to 'web'
-        $this->assertFalse($user->checkPermissionTo('do_jwt', 'web'));
-    }
-}
+    // Manager test user has the $guard_name property set to 'web'
+    expect($user->checkPermissionTo('do_jwt', 'web'))->toBeFalse();
+});

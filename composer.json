@@ -32,7 +32,8 @@
         "laravel/passport": "^11.0|^12.0",
         "laravel/pint": "^1.0",
         "orchestra/testbench": "^6.23|^7.0|^8.0|^9.0|^10.0",
-        "phpunit/phpunit": "^9.4|^10.1|^11.5"
+        "pestphp/pest": "^2.0|^3.0",
+        "pestphp/pest-plugin-laravel": "^2.0|^3.0"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -64,7 +65,7 @@
         }
     },
     "scripts": {
-        "test": "phpunit",
+        "test": "pest",
         "format": "pint",
         "analyse": "echo 'Checking dependencies...' && composer require --dev larastan/larastan && phpstan analyse"
     }

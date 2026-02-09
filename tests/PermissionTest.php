@@ -1,89 +1,64 @@
 <?php
 
-namespace Spatie\Permission\Tests;
-
-use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\PermissionAlreadyExists;
+use Spatie\Permission\Tests\TestCase;
 use Spatie\Permission\Tests\TestModels\User;
 
-class PermissionTest extends TestCase
-{
-    /** @test */
-    #[Test]
-    public function it_get_user_models_using_with()
-    {
-        $this->testUser->givePermissionTo($this->testUserPermission);
+uses(TestCase::class);
 
-        $permission = app(Permission::class)::with('users')
-            ->where($this->testUserPermission->getKeyName(), $this->testUserPermission->getKey())
-            ->first();
+it('gets user models using with', function () {
+    $this->testUser->givePermissionTo($this->testUserPermission);
 
-        $this->assertEquals($permission->getKey(), $this->testUserPermission->getKey());
-        $this->assertCount(1, $permission->users);
-        $this->assertEquals($permission->users[0]->id, $this->testUser->id);
-    }
+    $permission = app(Permission::class)::with('users')
+        ->where($this->testUserPermission->getKeyName(), $this->testUserPermission->getKey())
+        ->first();
 
-    /** @test */
-    #[Test]
-    public function it_throws_an_exception_when_the_permission_already_exists()
-    {
-        $this->expectException(PermissionAlreadyExists::class);
+    expect($this->testUserPermission->getKey())->toEqual($permission->getKey());
+    expect($permission->users)->toHaveCount(1);
+    expect($this->testUser->id)->toEqual($permission->users[0]->id);
+});
 
-        app(Permission::class)->create(['name' => 'test-permission']);
-        app(Permission::class)->create(['name' => 'test-permission']);
-    }
+it('throws an exception when the permission already exists', function () {
+    $this->expectException(PermissionAlreadyExists::class);
 
-    /** @test */
-    #[Test]
-    public function it_belongs_to_a_guard()
-    {
-        $permission = app(Permission::class)->create(['name' => 'can-edit', 'guard_name' => 'admin']);
+    app(Permission::class)->create(['name' => 'test-permission']);
+    app(Permission::class)->create(['name' => 'test-permission']);
+});
 
-        $this->assertEquals('admin', $permission->guard_name);
-    }
+it('belongs to a guard', function () {
+    $permission = app(Permission::class)->create(['name' => 'can-edit', 'guard_name' => 'admin']);
 
-    /** @test */
-    #[Test]
-    public function it_belongs_to_the_default_guard_by_default()
-    {
-        $this->assertEquals(
-            $this->app['config']->get('auth.defaults.guard'),
-            $this->testUserPermission->guard_name
-        );
-    }
+    expect($permission->guard_name)->toEqual('admin');
+});
 
-    /** @test */
-    #[Test]
-    public function it_has_user_models_of_the_right_class()
-    {
-        $this->testAdmin->givePermissionTo($this->testAdminPermission);
+it('belongs to the default guard by default', function () {
+    expect($this->testUserPermission->guard_name)->toEqual(
+        $this->app['config']->get('auth.defaults.guard')
+    );
+});
 
-        $this->testUser->givePermissionTo($this->testUserPermission);
+it('has user models of the right class', function () {
+    $this->testAdmin->givePermissionTo($this->testAdminPermission);
 
-        $this->assertCount(1, $this->testUserPermission->users);
-        $this->assertTrue($this->testUserPermission->users->first()->is($this->testUser));
-        $this->assertInstanceOf(User::class, $this->testUserPermission->users->first());
-    }
+    $this->testUser->givePermissionTo($this->testUserPermission);
 
-    /** @test */
-    #[Test]
-    public function it_is_retrievable_by_id()
-    {
-        $permission_by_id = app(Permission::class)->findById($this->testUserPermission->id);
+    expect($this->testUserPermission->users)->toHaveCount(1);
+    expect($this->testUserPermission->users->first()->is($this->testUser))->toBeTrue();
+    expect($this->testUserPermission->users->first())->toBeInstanceOf(User::class);
+});
 
-        $this->assertEquals($this->testUserPermission->id, $permission_by_id->id);
-    }
+it('is retrievable by id', function () {
+    $permission_by_id = app(Permission::class)->findById($this->testUserPermission->id);
 
-    /** @test */
-    #[Test]
-    public function it_can_delete_hydrated_permissions()
-    {
-        $this->reloadPermissions();
+    expect($permission_by_id->id)->toEqual($this->testUserPermission->id);
+});
 
-        $permission = app(Permission::class)->findByName($this->testUserPermission->name);
-        $permission->delete();
+it('can delete hydrated permissions', function () {
+    $this->reloadPermissions();
 
-        $this->assertCount(0, app(Permission::class)->where($this->testUserPermission->getKeyName(), $this->testUserPermission->getKey())->get());
-    }
-}
+    $permission = app(Permission::class)->findByName($this->testUserPermission->name);
+    $permission->delete();
+
+    expect(app(Permission::class)->where($this->testUserPermission->getKeyName(), $this->testUserPermission->getKey())->get())->toHaveCount(0);
+});

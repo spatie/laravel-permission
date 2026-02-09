@@ -1,7 +1,5 @@
 <?php
 
-namespace Spatie\Permission\Tests;
-
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -9,300 +7,187 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
 use InvalidArgumentException;
 use Laravel\Passport\Passport;
-use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
 use Spatie\Permission\Tests\TestModels\UserWithoutHasRoles;
 
-class RoleOrPermissionMiddlewareTest extends TestCase
-{
-    protected $roleOrPermissionMiddleware;
+uses(Spatie\Permission\Tests\PassportTestCase::class);
 
-    protected $usePassport = true;
+beforeEach(function () {
+    $this->roleOrPermissionMiddleware = new RoleOrPermissionMiddleware;
+});
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+it('a guest cannot access a route protected by the role or permission middleware', function () {
+    expect($this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole'))->toEqual(403);
+});
 
-        $this->roleOrPermissionMiddleware = new RoleOrPermissionMiddleware;
+it('a user can access a route protected by permission or role middleware if has this permission or role', function () {
+    Auth::login($this->testUser);
+
+    $this->testUser->assignRole('testRole');
+    $this->testUser->givePermissionTo('edit-articles');
+
+    expect($this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-news|edit-articles'))->toEqual(200);
+
+    $this->testUser->removeRole('testRole');
+
+    expect($this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles'))->toEqual(200);
+
+    $this->testUser->revokePermissionTo('edit-articles');
+    $this->testUser->assignRole('testRole');
+
+    expect($this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles'))->toEqual(200);
+    expect($this->runMiddleware($this->roleOrPermissionMiddleware, ['testRole', 'edit-articles']))->toEqual(200);
+});
+
+it('a client can access a route protected by permission or role middleware if has this permission or role', function () {
+    if ($this->getLaravelVersion() < 9) {
+        $this->markTestSkipped('requires laravel >= 9');
     }
 
-    /** @test */
-    #[Test]
-    public function a_guest_cannot_access_a_route_protected_by_the_role_or_permission_middleware()
-    {
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole')
-        );
+    Passport::actingAsClient($this->testClient, ['*']);
+
+    $this->testClient->assignRole('clientRole');
+    $this->testClient->givePermissionTo('edit-posts');
+
+    expect($this->runMiddleware($this->roleOrPermissionMiddleware, 'clientRole|edit-news|edit-posts', null, true))->toEqual(200);
+
+    $this->testClient->removeRole('clientRole');
+
+    expect($this->runMiddleware($this->roleOrPermissionMiddleware, 'clientRole|edit-posts', null, true))->toEqual(200);
+
+    $this->testClient->revokePermissionTo('edit-posts');
+    $this->testClient->assignRole('clientRole');
+
+    expect($this->runMiddleware($this->roleOrPermissionMiddleware, 'clientRole|edit-posts', null, true))->toEqual(200);
+    expect($this->runMiddleware($this->roleOrPermissionMiddleware, ['clientRole', 'edit-posts'], null, true))->toEqual(200);
+});
+
+it('a super admin user can access a route protected by permission or role middleware', function () {
+    Auth::login($this->testUser);
+
+    Gate::before(function ($user, $ability) {
+        return $user->getKey() === $this->testUser->getKey() ? true : null;
+    });
+
+    expect($this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles'))->toEqual(200);
+});
+
+it('a user can not access a route protected by permission or role middleware if have not has roles trait', function () {
+    $userWithoutHasRoles = UserWithoutHasRoles::create(['email' => 'test_not_has_roles@user.com']);
+
+    Auth::login($userWithoutHasRoles);
+
+    expect($this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles'))->toEqual(403);
+});
+
+it('a user can not access a route protected by permission or role middleware if have not this permission and role', function () {
+    Auth::login($this->testUser);
+
+    expect($this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles'))->toEqual(403);
+    expect($this->runMiddleware($this->roleOrPermissionMiddleware, 'missingRole|missingPermission'))->toEqual(403);
+});
+
+it('a client can not access a route protected by permission or role middleware if have not this permission and role', function () {
+    if ($this->getLaravelVersion() < 9) {
+        $this->markTestSkipped('requires laravel >= 9');
     }
 
-    /** @test */
-    #[Test]
-    public function a_user_can_access_a_route_protected_by_permission_or_role_middleware_if_has_this_permission_or_role()
-    {
-        Auth::login($this->testUser);
+    Passport::actingAsClient($this->testClient, ['*']);
 
-        $this->testUser->assignRole('testRole');
-        $this->testUser->givePermissionTo('edit-articles');
+    expect($this->runMiddleware($this->roleOrPermissionMiddleware, 'clientRole|edit-posts', null, true))->toEqual(403);
+    expect($this->runMiddleware($this->roleOrPermissionMiddleware, 'missingRole|missingPermission', null, true))->toEqual(403);
+});
 
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-news|edit-articles')
-        );
+it('use not existing custom guard in role or permission', function () {
+    $class = null;
 
-        $this->testUser->removeRole('testRole');
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles')
-        );
-
-        $this->testUser->revokePermissionTo('edit-articles');
-        $this->testUser->assignRole('testRole');
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles')
-        );
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, ['testRole', 'edit-articles'])
-        );
+    try {
+        $this->roleOrPermissionMiddleware->handle(new Request, function () {
+            return (new Response)->setContent('<html></html>');
+        }, 'testRole', 'xxx');
+    } catch (InvalidArgumentException $e) {
+        $class = get_class($e);
     }
 
-    /** @test */
-    #[Test]
-    public function a_client_can_access_a_route_protected_by_permission_or_role_middleware_if_has_this_permission_or_role(): void
-    {
-        if ($this->getLaravelVersion() < 9) {
-            $this->markTestSkipped('requires laravel >= 9');
-        }
+    expect($class)->toEqual(InvalidArgumentException::class);
+});
 
-        Passport::actingAsClient($this->testClient, ['*']);
+it('user can not access permission or role with guard admin while login using default guard', function () {
+    Auth::login($this->testUser);
 
-        $this->testClient->assignRole('clientRole');
-        $this->testClient->givePermissionTo('edit-posts');
+    $this->testUser->assignRole('testRole');
+    $this->testUser->givePermissionTo('edit-articles');
 
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'clientRole|edit-news|edit-posts', null, true)
-        );
+    expect($this->runMiddleware($this->roleOrPermissionMiddleware, 'edit-articles|testRole', 'admin'))->toEqual(403);
+});
 
-        $this->testClient->removeRole('clientRole');
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'clientRole|edit-posts', null, true)
-        );
-
-        $this->testClient->revokePermissionTo('edit-posts');
-        $this->testClient->assignRole('clientRole');
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'clientRole|edit-posts', null, true)
-        );
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, ['clientRole', 'edit-posts'], null, true)
-        );
+it('client can not access permission or role with guard admin while login using default guard', function () {
+    if ($this->getLaravelVersion() < 9) {
+        $this->markTestSkipped('requires laravel >= 9');
     }
 
-    /** @test */
-    #[Test]
-    public function a_super_admin_user_can_access_a_route_protected_by_permission_or_role_middleware()
-    {
-        Auth::login($this->testUser);
+    Passport::actingAsClient($this->testClient, ['*']);
 
-        Gate::before(function ($user, $ability) {
-            return $user->getKey() === $this->testUser->getKey() ? true : null;
-        });
+    $this->testClient->assignRole('clientRole');
+    $this->testClient->givePermissionTo('edit-posts');
 
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles')
-        );
+    expect($this->runMiddleware($this->roleOrPermissionMiddleware, 'edit-posts|clientRole', 'admin', true))->toEqual(403);
+});
+
+it('user can access permission or role with guard admin while login using admin guard', function () {
+    Auth::guard('admin')->login($this->testAdmin);
+
+    $this->testAdmin->assignRole('testAdminRole');
+    $this->testAdmin->givePermissionTo('admin-permission');
+
+    expect($this->runMiddleware($this->roleOrPermissionMiddleware, 'admin-permission|testAdminRole', 'admin'))->toEqual(200);
+});
+
+it('the required permissions or roles can be fetched from the exception', function () {
+    Auth::login($this->testUser);
+
+    $message = null;
+    $requiredRolesOrPermissions = [];
+
+    try {
+        $this->roleOrPermissionMiddleware->handle(new Request, function () {
+            return (new Response)->setContent('<html></html>');
+        }, 'some-permission|some-role');
+    } catch (UnauthorizedException $e) {
+        $message = $e->getMessage();
+        $requiredRolesOrPermissions = $e->getRequiredPermissions();
     }
 
-    /** @test */
-    #[Test]
-    public function a_user_can_not_access_a_route_protected_by_permission_or_role_middleware_if_have_not_has_roles_trait()
-    {
-        $userWithoutHasRoles = UserWithoutHasRoles::create(['email' => 'test_not_has_roles@user.com']);
+    expect($message)->toEqual('User does not have any of the necessary access rights.');
+    expect($requiredRolesOrPermissions)->toEqual(['some-permission', 'some-role']);
+});
 
-        Auth::login($userWithoutHasRoles);
+it('the required permissions or roles can be displayed in the exception', function () {
+    Auth::login($this->testUser);
+    Config::set(['permission.display_permission_in_exception' => true]);
+    Config::set(['permission.display_role_in_exception' => true]);
 
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles')
-        );
+    $message = null;
+
+    try {
+        $this->roleOrPermissionMiddleware->handle(new Request, function () {
+            return (new Response)->setContent('<html></html>');
+        }, 'some-permission|some-role');
+    } catch (UnauthorizedException $e) {
+        $message = $e->getMessage();
     }
 
-    /** @test */
-    #[Test]
-    public function a_user_can_not_access_a_route_protected_by_permission_or_role_middleware_if_have_not_this_permission_and_role()
-    {
-        Auth::login($this->testUser);
+    expect($message)->toEndWith('Necessary roles or permissions are some-permission, some-role');
+});
 
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles')
-        );
+it('the middleware can be created with static using method', function () {
+    expect(RoleOrPermissionMiddleware::using('edit-articles'))
+        ->toBe('Spatie\Permission\Middleware\RoleOrPermissionMiddleware:edit-articles');
 
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'missingRole|missingPermission')
-        );
-    }
+    expect(RoleOrPermissionMiddleware::using('edit-articles', 'my-guard'))
+        ->toEqual('Spatie\Permission\Middleware\RoleOrPermissionMiddleware:edit-articles,my-guard');
 
-    /** @test */
-    #[Test]
-    public function a_client_can_not_access_a_route_protected_by_permission_or_role_middleware_if_have_not_this_permission_and_role(): void
-    {
-        if ($this->getLaravelVersion() < 9) {
-            $this->markTestSkipped('requires laravel >= 9');
-        }
-
-        Passport::actingAsClient($this->testClient, ['*']);
-
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'clientRole|edit-posts', null, true)
-        );
-
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'missingRole|missingPermission', null, true)
-        );
-    }
-
-    /** @test */
-    #[Test]
-    public function use_not_existing_custom_guard_in_role_or_permission()
-    {
-        $class = null;
-
-        try {
-            $this->roleOrPermissionMiddleware->handle(new Request, function () {
-                return (new Response)->setContent('<html></html>');
-            }, 'testRole', 'xxx');
-        } catch (InvalidArgumentException $e) {
-            $class = get_class($e);
-        }
-
-        $this->assertEquals(InvalidArgumentException::class, $class);
-    }
-
-    /** @test */
-    #[Test]
-    public function user_can_not_access_permission_or_role_with_guard_admin_while_login_using_default_guard()
-    {
-        Auth::login($this->testUser);
-
-        $this->testUser->assignRole('testRole');
-        $this->testUser->givePermissionTo('edit-articles');
-
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'edit-articles|testRole', 'admin')
-        );
-    }
-
-    /** @test */
-    #[Test]
-    public function client_can_not_access_permission_or_role_with_guard_admin_while_login_using_default_guard(): void
-    {
-        if ($this->getLaravelVersion() < 9) {
-            $this->markTestSkipped('requires laravel >= 9');
-        }
-
-        Passport::actingAsClient($this->testClient, ['*']);
-
-        $this->testClient->assignRole('clientRole');
-        $this->testClient->givePermissionTo('edit-posts');
-
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'edit-posts|clientRole', 'admin', true)
-        );
-    }
-
-    /** @test */
-    #[Test]
-    public function user_can_access_permission_or_role_with_guard_admin_while_login_using_admin_guard()
-    {
-        Auth::guard('admin')->login($this->testAdmin);
-
-        $this->testAdmin->assignRole('testAdminRole');
-        $this->testAdmin->givePermissionTo('admin-permission');
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'admin-permission|testAdminRole', 'admin')
-        );
-    }
-
-    /** @test */
-    #[Test]
-    public function the_required_permissions_or_roles_can_be_fetched_from_the_exception()
-    {
-        Auth::login($this->testUser);
-
-        $message = null;
-        $requiredRolesOrPermissions = [];
-
-        try {
-            $this->roleOrPermissionMiddleware->handle(new Request, function () {
-                return (new Response)->setContent('<html></html>');
-            }, 'some-permission|some-role');
-        } catch (UnauthorizedException $e) {
-            $message = $e->getMessage();
-            $requiredRolesOrPermissions = $e->getRequiredPermissions();
-        }
-
-        $this->assertEquals('User does not have any of the necessary access rights.', $message);
-        $this->assertEquals(['some-permission', 'some-role'], $requiredRolesOrPermissions);
-    }
-
-    /** @test */
-    #[Test]
-    public function the_required_permissions_or_roles_can_be_displayed_in_the_exception()
-    {
-        Auth::login($this->testUser);
-        Config::set(['permission.display_permission_in_exception' => true]);
-        Config::set(['permission.display_role_in_exception' => true]);
-
-        $message = null;
-
-        try {
-            $this->roleOrPermissionMiddleware->handle(new Request, function () {
-                return (new Response)->setContent('<html></html>');
-            }, 'some-permission|some-role');
-        } catch (UnauthorizedException $e) {
-            $message = $e->getMessage();
-        }
-
-        $this->assertStringEndsWith('Necessary roles or permissions are some-permission, some-role', $message);
-    }
-
-    /** @test */
-    #[Test]
-    public function the_middleware_can_be_created_with_static_using_method()
-    {
-        $this->assertSame(
-            'Spatie\Permission\Middleware\RoleOrPermissionMiddleware:edit-articles',
-            RoleOrPermissionMiddleware::using('edit-articles')
-        );
-        $this->assertEquals(
-            'Spatie\Permission\Middleware\RoleOrPermissionMiddleware:edit-articles,my-guard',
-            RoleOrPermissionMiddleware::using('edit-articles', 'my-guard')
-        );
-        $this->assertEquals(
-            'Spatie\Permission\Middleware\RoleOrPermissionMiddleware:edit-articles|testAdminRole',
-            RoleOrPermissionMiddleware::using(['edit-articles', 'testAdminRole'])
-        );
-    }
-}
+    expect(RoleOrPermissionMiddleware::using(['edit-articles', 'testAdminRole']))
+        ->toEqual('Spatie\Permission\Middleware\RoleOrPermissionMiddleware:edit-articles|testAdminRole');
+});

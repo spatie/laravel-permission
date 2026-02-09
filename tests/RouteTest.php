@@ -1,183 +1,117 @@
 <?php
 
-namespace Spatie\Permission\Tests;
-
-use PHPUnit\Framework\Attributes\RequiresPhp;
-use PHPUnit\Framework\Attributes\Test;
+use Spatie\Permission\Tests\TestCase;
 use Spatie\Permission\Tests\TestModels\TestRolePermissionsEnum;
 
-class RouteTest extends TestCase
-{
-    /** @test */
-    #[Test]
-    public function test_role_function()
-    {
-        $router = $this->getRouter();
+uses(TestCase::class);
 
-        $router->get('role-test', $this->getRouteResponse())
-            ->name('role.test')
-            ->role('superadmin');
+it('test role function', function () {
+    $router = $this->getRouter();
 
-        $this->assertEquals(['role:superadmin'], $this->getLastRouteMiddlewareFromRouter($router));
-    }
+    $router->get('role-test', $this->getRouteResponse())
+        ->name('role.test')
+        ->role('superadmin');
 
-    /** @test */
-    #[Test]
-    public function test_permission_function()
-    {
-        $router = $this->getRouter();
+    expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual(['role:superadmin']);
+});
 
-        $router->get('permission-test', $this->getRouteResponse())
-            ->name('permission.test')
-            ->permission(['edit articles', 'save articles']);
+it('test permission function', function () {
+    $router = $this->getRouter();
 
-        $this->assertEquals(['permission:edit articles|save articles'], $this->getLastRouteMiddlewareFromRouter($router));
-    }
+    $router->get('permission-test', $this->getRouteResponse())
+        ->name('permission.test')
+        ->permission(['edit articles', 'save articles']);
 
-    /** @test */
-    #[Test]
-    public function test_role_and_permission_function_together()
-    {
-        $router = $this->getRouter();
+    expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual(['permission:edit articles|save articles']);
+});
 
-        $router->get('role-permission-test', $this->getRouteResponse())
-            ->name('role-permission.test')
-            ->role('superadmin|admin')
-            ->permission('create user|edit user');
+it('test role and permission function together', function () {
+    $router = $this->getRouter();
 
-        $this->assertEquals(
-            [
-                'role:superadmin|admin',
-                'permission:create user|edit user',
-            ],
-            $this->getLastRouteMiddlewareFromRouter($router)
-        );
-    }
+    $router->get('role-permission-test', $this->getRouteResponse())
+        ->name('role-permission.test')
+        ->role('superadmin|admin')
+        ->permission('create user|edit user');
 
-    /**
-     * @test
-     *
-     * @requires PHP 8.1.0
-     */
-    #[RequiresPhp('>= 8.1.0')]
-    #[Test]
-    public function test_role_function_with_backed_enum()
-    {
-        $router = $this->getRouter();
+    expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual([
+        'role:superadmin|admin',
+        'permission:create user|edit user',
+    ]);
+});
 
-        $router->get('role-test.enum', $this->getRouteResponse())
-            ->name('role.test.enum')
-            ->role(TestRolePermissionsEnum::USERMANAGER);
+it('test role function with backed enum', function () {
+    $router = $this->getRouter();
 
-        $this->assertEquals(['role:'.TestRolePermissionsEnum::USERMANAGER->value], $this->getLastRouteMiddlewareFromRouter($router));
-    }
+    $router->get('role-test.enum', $this->getRouteResponse())
+        ->name('role.test.enum')
+        ->role(TestRolePermissionsEnum::USERMANAGER);
 
-    /**
-     * @test
-     *
-     * @requires PHP 8.1.0
-     */
-    #[RequiresPhp('>= 8.1.0')]
-    #[Test]
-    public function test_permission_function_with_backed_enum()
-    {
-        $router = $this->getRouter();
+    expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual(['role:'.TestRolePermissionsEnum::USERMANAGER->value]);
+})->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
 
-        $router->get('permission-test.enum', $this->getRouteResponse())
-            ->name('permission.test.enum')
-            ->permission(TestRolePermissionsEnum::WRITER);
+it('test permission function with backed enum', function () {
+    $router = $this->getRouter();
 
-        $expected = ['permission:'.TestRolePermissionsEnum::WRITER->value];
-        $this->assertEquals($expected, $this->getLastRouteMiddlewareFromRouter($router));
-    }
+    $router->get('permission-test.enum', $this->getRouteResponse())
+        ->name('permission.test.enum')
+        ->permission(TestRolePermissionsEnum::WRITER);
 
-    /**
-     * @test
-     *
-     * @requires PHP 8.1.0
-     */
-    #[RequiresPhp('>= 8.1.0')]
-    #[Test]
-    public function test_role_and_permission_function_together_with_backed_enum()
-    {
-        $router = $this->getRouter();
+    $expected = ['permission:'.TestRolePermissionsEnum::WRITER->value];
+    expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual($expected);
+})->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
 
-        $router->get('roles-permissions-test.enum', $this->getRouteResponse())
-            ->name('roles-permissions.test.enum')
-            ->role([TestRolePermissionsEnum::USERMANAGER, TestRolePermissionsEnum::ADMIN])
-            ->permission([TestRolePermissionsEnum::WRITER, TestRolePermissionsEnum::EDITOR]);
+it('test role and permission function together with backed enum', function () {
+    $router = $this->getRouter();
 
-        $this->assertEquals(
-            [
-                'role:'.TestRolePermissionsEnum::USERMANAGER->value.'|'.TestRolePermissionsEnum::ADMIN->value,
-                'permission:'.TestRolePermissionsEnum::WRITER->value.'|'.TestRolePermissionsEnum::EDITOR->value,
-            ],
-            $this->getLastRouteMiddlewareFromRouter($router)
-        );
-    }
+    $router->get('roles-permissions-test.enum', $this->getRouteResponse())
+        ->name('roles-permissions.test.enum')
+        ->role([TestRolePermissionsEnum::USERMANAGER, TestRolePermissionsEnum::ADMIN])
+        ->permission([TestRolePermissionsEnum::WRITER, TestRolePermissionsEnum::EDITOR]);
 
-    /** @test */
-    #[Test]
-    public function test_role_or_permission_function()
-    {
-        $router = $this->getRouter();
+    expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual([
+        'role:'.TestRolePermissionsEnum::USERMANAGER->value.'|'.TestRolePermissionsEnum::ADMIN->value,
+        'permission:'.TestRolePermissionsEnum::WRITER->value.'|'.TestRolePermissionsEnum::EDITOR->value,
+    ]);
+})->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
 
-        $router->get('role-or-permission-test', $this->getRouteResponse())
-            ->name('role-or-permission.test')
-            ->roleOrPermission('admin|edit articles');
+it('test role or permission function', function () {
+    $router = $this->getRouter();
 
-        $this->assertEquals(['role_or_permission:admin|edit articles'], $this->getLastRouteMiddlewareFromRouter($router));
-    }
+    $router->get('role-or-permission-test', $this->getRouteResponse())
+        ->name('role-or-permission.test')
+        ->roleOrPermission('admin|edit articles');
 
-    /** @test */
-    #[Test]
-    public function test_role_or_permission_function_with_array()
-    {
-        $router = $this->getRouter();
+    expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual(['role_or_permission:admin|edit articles']);
+});
 
-        $router->get('role-or-permission-array-test', $this->getRouteResponse())
-            ->name('role-or-permission-array.test')
-            ->roleOrPermission(['admin', 'edit articles']);
+it('test role or permission function with array', function () {
+    $router = $this->getRouter();
 
-        $this->assertEquals(['role_or_permission:admin|edit articles'], $this->getLastRouteMiddlewareFromRouter($router));
-    }
+    $router->get('role-or-permission-array-test', $this->getRouteResponse())
+        ->name('role-or-permission-array.test')
+        ->roleOrPermission(['admin', 'edit articles']);
 
-    /**
-     * @test
-     *
-     * @requires PHP 8.1.0
-     */
-    #[RequiresPhp('>= 8.1.0')]
-    #[Test]
-    public function test_role_or_permission_function_with_backed_enum()
-    {
-        $router = $this->getRouter();
+    expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual(['role_or_permission:admin|edit articles']);
+});
 
-        $router->get('role-or-permission-test.enum', $this->getRouteResponse())
-            ->name('role-or-permission.test.enum')
-            ->roleOrPermission(TestRolePermissionsEnum::USERMANAGER);
+it('test role or permission function with backed enum', function () {
+    $router = $this->getRouter();
 
-        $this->assertEquals(['role_or_permission:'.TestRolePermissionsEnum::USERMANAGER->value], $this->getLastRouteMiddlewareFromRouter($router));
-    }
+    $router->get('role-or-permission-test.enum', $this->getRouteResponse())
+        ->name('role-or-permission.test.enum')
+        ->roleOrPermission(TestRolePermissionsEnum::USERMANAGER);
 
-    /**
-     * @test
-     *
-     * @requires PHP 8.1.0
-     */
-    #[RequiresPhp('>= 8.1.0')]
-    #[Test]
-    public function test_role_or_permission_function_with_backed_enum_array()
-    {
-        $router = $this->getRouter();
+    expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual(['role_or_permission:'.TestRolePermissionsEnum::USERMANAGER->value]);
+})->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
 
-        $router->get('role-or-permission-array-test.enum', $this->getRouteResponse())
-            ->name('role-or-permission-array.test.enum')
-            ->roleOrPermission([TestRolePermissionsEnum::USERMANAGER, TestRolePermissionsEnum::EDITARTICLES]); // @phpstan-ignore-line
+it('test role or permission function with backed enum array', function () {
+    $router = $this->getRouter();
 
-        $this->assertEquals(
-            ['role_or_permission:'.TestRolePermissionsEnum::USERMANAGER->value.'|'.TestRolePermissionsEnum::EDITARTICLES->value], // @phpstan-ignore-line
-            $this->getLastRouteMiddlewareFromRouter($router)
-        );
-    }
-}
+    $router->get('role-or-permission-array-test.enum', $this->getRouteResponse())
+        ->name('role-or-permission-array.test.enum')
+        ->roleOrPermission([TestRolePermissionsEnum::USERMANAGER, TestRolePermissionsEnum::EDITARTICLES]); // @phpstan-ignore-line
+
+    expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual(
+        ['role_or_permission:'.TestRolePermissionsEnum::USERMANAGER->value.'|'.TestRolePermissionsEnum::EDITARTICLES->value] // @phpstan-ignore-line
+    );
+})->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');

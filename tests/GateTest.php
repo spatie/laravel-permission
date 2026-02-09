@@ -1,116 +1,77 @@
 <?php
 
-namespace Spatie\Permission\Tests;
-
 use Illuminate\Contracts\Auth\Access\Gate;
-use PHPUnit\Framework\Attributes\RequiresPhp;
-use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Tests\TestCase;
 
-class GateTest extends TestCase
-{
-    /** @test */
-    #[Test]
-    public function it_can_determine_if_a_user_does_not_have_a_permission()
-    {
-        $this->assertFalse($this->testUser->can('edit-articles'));
-    }
+uses(TestCase::class);
 
-    /** @test */
-    #[Test]
-    public function it_allows_other_gate_before_callbacks_to_run_if_a_user_does_not_have_a_permission()
-    {
-        $this->assertFalse($this->testUser->can('edit-articles'));
+it('can determine if a user does not have a permission', function () {
+    expect($this->testUser->can('edit-articles'))->toBeFalse();
+});
 
-        app(Gate::class)->before(function () {
-            // this Gate-before intercept overrides everything to true ... like a typical Super-Admin might use
-            return true;
-        });
+it('allows other gate before callbacks to run if a user does not have a permission', function () {
+    expect($this->testUser->can('edit-articles'))->toBeFalse();
 
-        $this->assertTrue($this->testUser->can('edit-articles'));
-    }
+    app(Gate::class)->before(function () {
+        // this Gate-before intercept overrides everything to true ... like a typical Super-Admin might use
+        return true;
+    });
 
-    /** @test */
-    #[Test]
-    public function it_allows_gate_after_callback_to_grant_denied_privileges()
-    {
-        $this->assertFalse($this->testUser->can('edit-articles'));
+    expect($this->testUser->can('edit-articles'))->toBeTrue();
+});
 
-        app(Gate::class)->after(function ($user, $ability, $result) {
-            return true;
-        });
+it('allows gate after callback to grant denied privileges', function () {
+    expect($this->testUser->can('edit-articles'))->toBeFalse();
 
-        $this->assertTrue($this->testUser->can('edit-articles'));
-    }
+    app(Gate::class)->after(function ($user, $ability, $result) {
+        return true;
+    });
 
-    /** @test */
-    #[Test]
-    public function it_can_determine_if_a_user_has_a_direct_permission()
-    {
-        $this->testUser->givePermissionTo('edit-articles');
+    expect($this->testUser->can('edit-articles'))->toBeTrue();
+});
 
-        $this->assertTrue($this->testUser->can('edit-articles'));
+it('can determine if a user has a direct permission', function () {
+    $this->testUser->givePermissionTo('edit-articles');
 
-        $this->assertFalse($this->testUser->can('non-existing-permission'));
+    expect($this->testUser->can('edit-articles'))->toBeTrue();
+    expect($this->testUser->can('non-existing-permission'))->toBeFalse();
+    expect($this->testUser->can('admin-permission'))->toBeFalse();
+});
 
-        $this->assertFalse($this->testUser->can('admin-permission'));
-    }
+it('can determine if a user has a direct permission using enums', function () {
+    $enum = Spatie\Permission\Tests\TestModels\TestRolePermissionsEnum::VIEWARTICLES;
 
-    /**
-     * @test
-     *
-     * @requires PHP >= 8.1
-     */
-    #[RequiresPhp('>= 8.1')]
-    #[Test]
-    public function it_can_determine_if_a_user_has_a_direct_permission_using_enums()
-    {
-        $enum = TestModels\TestRolePermissionsEnum::VIEWARTICLES;
+    $permission = app(Permission::class)->findOrCreate($enum->value, 'web');
 
-        $permission = app(Permission::class)->findOrCreate($enum->value, 'web');
+    expect($this->testUser->can($enum->value))->toBeFalse();
+    expect($this->testUser->canAny([$enum->value, 'some other permission']))->toBeFalse();
 
-        $this->assertFalse($this->testUser->can($enum->value));
-        $this->assertFalse($this->testUser->canAny([$enum->value, 'some other permission']));
+    $this->testUser->givePermissionTo($enum);
 
-        $this->testUser->givePermissionTo($enum);
+    expect($this->testUser->hasPermissionTo($enum))->toBeTrue();
+    expect($this->testUser->can($enum->value))->toBeTrue();
+    expect($this->testUser->canAny([$enum->value, 'some other permission']))->toBeTrue();
+})->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
 
-        $this->assertTrue($this->testUser->hasPermissionTo($enum));
+it('can determine if a user has a permission through roles', function () {
+    $this->testUserRole->givePermissionTo($this->testUserPermission);
 
-        $this->assertTrue($this->testUser->can($enum->value));
-        $this->assertTrue($this->testUser->canAny([$enum->value, 'some other permission']));
-    }
+    $this->testUser->assignRole($this->testUserRole);
 
-    /** @test */
-    #[Test]
-    public function it_can_determine_if_a_user_has_a_permission_through_roles()
-    {
-        $this->testUserRole->givePermissionTo($this->testUserPermission);
+    expect($this->testUser->hasPermissionTo($this->testUserPermission))->toBeTrue();
+    expect($this->testUser->can('edit-articles'))->toBeTrue();
+    expect($this->testUser->can('non-existing-permission'))->toBeFalse();
+    expect($this->testUser->can('admin-permission'))->toBeFalse();
+});
 
-        $this->testUser->assignRole($this->testUserRole);
+it('can determine if a user with a different guard has a permission when using roles', function () {
+    $this->testAdminRole->givePermissionTo($this->testAdminPermission);
 
-        $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission));
+    $this->testAdmin->assignRole($this->testAdminRole);
 
-        $this->assertTrue($this->testUser->can('edit-articles'));
-
-        $this->assertFalse($this->testUser->can('non-existing-permission'));
-
-        $this->assertFalse($this->testUser->can('admin-permission'));
-    }
-
-    /** @test */
-    #[Test]
-    public function it_can_determine_if_a_user_with_a_different_guard_has_a_permission_when_using_roles()
-    {
-        $this->testAdminRole->givePermissionTo($this->testAdminPermission);
-
-        $this->testAdmin->assignRole($this->testAdminRole);
-
-        $this->assertTrue($this->testAdmin->hasPermissionTo($this->testAdminPermission));
-
-        $this->assertTrue($this->testAdmin->can('admin-permission'));
-
-        $this->assertFalse($this->testAdmin->can('non-existing-permission'));
-
-        $this->assertFalse($this->testAdmin->can('edit-articles'));
-    }
-}
+    expect($this->testAdmin->hasPermissionTo($this->testAdminPermission))->toBeTrue();
+    expect($this->testAdmin->can('admin-permission'))->toBeTrue();
+    expect($this->testAdmin->can('non-existing-permission'))->toBeFalse();
+    expect($this->testAdmin->can('edit-articles'))->toBeFalse();
+});

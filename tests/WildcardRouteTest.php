@@ -1,45 +1,33 @@
 <?php
 
-namespace Spatie\Permission\Tests;
+use Spatie\Permission\Tests\TestCase;
 
-use PHPUnit\Framework\Attributes\Test;
+uses(TestCase::class);
 
-class WildcardRouteTest extends TestCase
-{
-    /** @test */
-    #[Test]
-    public function test_permission_function()
-    {
-        app('config')->set('permission.enable_wildcard_permission', true);
+it('test permission function', function () {
+    app('config')->set('permission.enable_wildcard_permission', true);
 
-        $router = $this->getRouter();
+    $router = $this->getRouter();
 
-        $router->get('permission-test', $this->getRouteResponse())
-            ->name('permission.test')
-            ->permission(['articles.edit', 'articles.save']);
+    $router->get('permission-test', $this->getRouteResponse())
+        ->name('permission.test')
+        ->permission(['articles.edit', 'articles.save']);
 
-        $this->assertEquals(['permission:articles.edit|articles.save'], $this->getLastRouteMiddlewareFromRouter($router));
-    }
+    expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual(['permission:articles.edit|articles.save']);
+});
 
-    /** @test */
-    #[Test]
-    public function test_role_and_permission_function_together()
-    {
-        app('config')->set('permission.enable_wildcard_permission', true);
+it('test role and permission function together', function () {
+    app('config')->set('permission.enable_wildcard_permission', true);
 
-        $router = $this->getRouter();
+    $router = $this->getRouter();
 
-        $router->get('role-permission-test', $this->getRouteResponse())
-            ->name('role-permission.test')
-            ->role('superadmin|admin')
-            ->permission('user.create|user.edit');
+    $router->get('role-permission-test', $this->getRouteResponse())
+        ->name('role-permission.test')
+        ->role('superadmin|admin')
+        ->permission('user.create|user.edit');
 
-        $this->assertEquals(
-            [
-                'role:superadmin|admin',
-                'permission:user.create|user.edit',
-            ],
-            $this->getLastRouteMiddlewareFromRouter($router)
-        );
-    }
-}
+    expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual([
+        'role:superadmin|admin',
+        'permission:user.create|user.edit',
+    ]);
+});

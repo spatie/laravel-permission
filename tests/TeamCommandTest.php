@@ -1,87 +1,73 @@
 <?php
 
-namespace Spatie\Permission\Tests;
-
 use Illuminate\Support\Facades\Artisan;
-use PHPUnit\Framework\Attributes\Test;
+use Spatie\Permission\Tests\TeamTestCase;
 use Spatie\Permission\Tests\TestModels\User;
 
-class TeamCommandTest extends TestCase
-{
-    protected $hasTeams = true;
+uses(TeamTestCase::class);
 
-    /** @test */
-    #[Test]
-    public function it_can_assign_role_to_user_with_team_id()
-    {
-        $user = User::first();
+it('can assign role to user with team id', function () {
+    $user = User::first();
 
-        Artisan::call('permission:assign-role', [
-            'name' => 'testRole',
-            'userId' => $user->id,
-            'guard' => 'web',
-            'userModelNamespace' => User::class,
-            '--team-id' => 1,
-        ]);
+    Artisan::call('permission:assign-role', [
+        'name' => 'testRole',
+        'userId' => $user->id,
+        'guard' => 'web',
+        'userModelNamespace' => User::class,
+        '--team-id' => 1,
+    ]);
 
-        $output = Artisan::output();
+    $output = Artisan::output();
 
-        $this->assertStringContainsString('Role `testRole` assigned to user ID '.$user->id.' successfully.', $output);
+    expect($output)->toContain('Role `testRole` assigned to user ID '.$user->id.' successfully.');
 
-        setPermissionsTeamId(1);
-        $user->unsetRelation('roles');
-        $this->assertTrue($user->hasRole('testRole'));
-    }
+    setPermissionsTeamId(1);
+    $user->unsetRelation('roles');
+    expect($user->hasRole('testRole'))->toBeTrue();
+});
 
-    /** @test */
-    #[Test]
-    public function it_can_assign_role_to_user_on_different_teams()
-    {
-        $user = User::first();
+it('can assign role to user on different teams', function () {
+    $user = User::first();
 
-        Artisan::call('permission:assign-role', [
-            'name' => 'testRole',
-            'userId' => $user->id,
-            'guard' => 'web',
-            'userModelNamespace' => User::class,
-            '--team-id' => 1,
-        ]);
+    Artisan::call('permission:assign-role', [
+        'name' => 'testRole',
+        'userId' => $user->id,
+        'guard' => 'web',
+        'userModelNamespace' => User::class,
+        '--team-id' => 1,
+    ]);
 
-        Artisan::call('permission:assign-role', [
-            'name' => 'testRole2',
-            'userId' => $user->id,
-            'guard' => 'web',
-            'userModelNamespace' => User::class,
-            '--team-id' => 2,
-        ]);
+    Artisan::call('permission:assign-role', [
+        'name' => 'testRole2',
+        'userId' => $user->id,
+        'guard' => 'web',
+        'userModelNamespace' => User::class,
+        '--team-id' => 2,
+    ]);
 
-        setPermissionsTeamId(1);
-        $user->unsetRelation('roles');
-        $this->assertTrue($user->hasRole('testRole'));
-        $this->assertFalse($user->hasRole('testRole2'));
+    setPermissionsTeamId(1);
+    $user->unsetRelation('roles');
+    expect($user->hasRole('testRole'))->toBeTrue();
+    expect($user->hasRole('testRole2'))->toBeFalse();
 
-        setPermissionsTeamId(2);
-        $user->unsetRelation('roles');
-        $this->assertTrue($user->hasRole('testRole2'));
-        $this->assertFalse($user->hasRole('testRole'));
-    }
+    setPermissionsTeamId(2);
+    $user->unsetRelation('roles');
+    expect($user->hasRole('testRole2'))->toBeTrue();
+    expect($user->hasRole('testRole'))->toBeFalse();
+});
 
-    /** @test */
-    #[Test]
-    public function it_restores_previous_team_id_after_assigning_role()
-    {
-        $user = User::first();
+it('restores previous team id after assigning role', function () {
+    $user = User::first();
 
-        setPermissionsTeamId(5);
+    setPermissionsTeamId(5);
 
-        Artisan::call('permission:assign-role', [
-            'name' => 'testRole',
-            'userId' => $user->id,
-            'guard' => 'web',
-            'userModelNamespace' => User::class,
-            '--team-id' => 1,
-        ]);
+    Artisan::call('permission:assign-role', [
+        'name' => 'testRole',
+        'userId' => $user->id,
+        'guard' => 'web',
+        'userModelNamespace' => User::class,
+        '--team-id' => 1,
+    ]);
 
-        $this->assertEquals(5, getPermissionsTeamId());
-    }
-}
+    expect(getPermissionsTeamId())->toEqual(5);
+});

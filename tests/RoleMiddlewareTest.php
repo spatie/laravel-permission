@@ -1,421 +1,261 @@
 <?php
 
-namespace Spatie\Permission\Tests;
-
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use InvalidArgumentException;
 use Laravel\Passport\Passport;
-use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middleware\RoleMiddleware;
+use Spatie\Permission\Tests\TestModels;
 use Spatie\Permission\Tests\TestModels\UserWithoutHasRoles;
 
-class RoleMiddlewareTest extends TestCase
-{
-    protected $roleMiddleware;
+uses(Spatie\Permission\Tests\PassportTestCase::class);
 
-    protected $usePassport = true;
+beforeEach(function () {
+    $this->roleMiddleware = new RoleMiddleware;
+});
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+it('a guest cannot access a route protected by rolemiddleware', function () {
+    expect($this->runMiddleware($this->roleMiddleware, 'testRole'))->toEqual(403);
+});
 
-        $this->roleMiddleware = new RoleMiddleware;
+it('a user cannot access a route protected by role middleware of another guard', function () {
+    Auth::login($this->testUser);
+
+    $this->testUser->assignRole('testRole');
+
+    expect($this->runMiddleware($this->roleMiddleware, 'testAdminRole'))->toEqual(403);
+});
+
+it('a client cannot access a route protected by role middleware of another guard', function () {
+    if ($this->getLaravelVersion() < 9) {
+        $this->markTestSkipped('requires laravel >= 9');
     }
 
-    /** @test */
-    #[Test]
-    public function a_guest_cannot_access_a_route_protected_by_rolemiddleware()
-    {
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleMiddleware, 'testRole')
-        );
+    Passport::actingAsClient($this->testClient, ['*']);
+
+    $this->testClient->assignRole('clientRole');
+
+    expect($this->runMiddleware($this->roleMiddleware, 'testAdminRole', null, true))->toEqual(403);
+});
+
+it('a user can access a route protected by role middleware if have this role', function () {
+    Auth::login($this->testUser);
+
+    $this->testUser->assignRole('testRole');
+
+    expect($this->runMiddleware($this->roleMiddleware, 'testRole'))->toEqual(200);
+});
+
+it('a client can access a route protected by role middleware if have this role', function () {
+    if ($this->getLaravelVersion() < 9) {
+        $this->markTestSkipped('requires laravel >= 9');
     }
 
-    /** @test */
-    #[Test]
-    public function a_user_cannot_access_a_route_protected_by_role_middleware_of_another_guard()
-    {
-        Auth::login($this->testUser);
+    Passport::actingAsClient($this->testClient, ['*']);
 
-        $this->testUser->assignRole('testRole');
+    $this->testClient->assignRole('clientRole');
 
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleMiddleware, 'testAdminRole')
-        );
+    expect($this->runMiddleware($this->roleMiddleware, 'clientRole', null, true))->toEqual(200);
+});
+
+it('a user can access a route protected by this role middleware if have one of the roles', function () {
+    Auth::login($this->testUser);
+
+    $this->testUser->assignRole('testRole');
+
+    expect($this->runMiddleware($this->roleMiddleware, 'testRole|testRole2'))->toEqual(200);
+    expect($this->runMiddleware($this->roleMiddleware, ['testRole2', 'testRole']))->toEqual(200);
+});
+
+it('a client can access a route protected by this role middleware if have one of the roles', function () {
+    if ($this->getLaravelVersion() < 9) {
+        $this->markTestSkipped('requires laravel >= 9');
     }
 
-    /** @test */
-    #[Test]
-    public function a_client_cannot_access_a_route_protected_by_role_middleware_of_another_guard(): void
-    {
-        if ($this->getLaravelVersion() < 9) {
-            $this->markTestSkipped('requires laravel >= 9');
-        }
+    Passport::actingAsClient($this->testClient, ['*']);
 
-        Passport::actingAsClient($this->testClient, ['*']);
+    $this->testClient->assignRole('clientRole');
 
-        $this->testClient->assignRole('clientRole');
+    expect($this->runMiddleware($this->roleMiddleware, 'clientRole|testRole2', null, true))->toEqual(200);
+    expect($this->runMiddleware($this->roleMiddleware, ['testRole2', 'clientRole'], null, true))->toEqual(200);
+});
 
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleMiddleware, 'testAdminRole', null, true)
-        );
+it('a user cannot access a route protected by the role middleware if have not has roles trait', function () {
+    $userWithoutHasRoles = UserWithoutHasRoles::create(['email' => 'test_not_has_roles@user.com']);
+
+    Auth::login($userWithoutHasRoles);
+
+    expect($this->runMiddleware($this->roleMiddleware, 'testRole'))->toEqual(403);
+});
+
+it('a user cannot access a route protected by the role middleware if have a different role', function () {
+    Auth::login($this->testUser);
+
+    $this->testUser->assignRole(['testRole']);
+
+    expect($this->runMiddleware($this->roleMiddleware, 'testRole2'))->toEqual(403);
+});
+
+it('a client cannot access a route protected by the role middleware if have a different role', function () {
+    if ($this->getLaravelVersion() < 9) {
+        $this->markTestSkipped('requires laravel >= 9');
     }
 
-    /** @test */
-    #[Test]
-    public function a_user_can_access_a_route_protected_by_role_middleware_if_have_this_role()
-    {
-        Auth::login($this->testUser);
+    Passport::actingAsClient($this->testClient, ['*']);
 
-        $this->testUser->assignRole('testRole');
+    $this->testClient->assignRole(['clientRole']);
 
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleMiddleware, 'testRole')
-        );
+    expect($this->runMiddleware($this->roleMiddleware, 'clientRole2', null, true))->toEqual(403);
+});
+
+it('a user cannot access a route protected by role middleware if have not roles', function () {
+    Auth::login($this->testUser);
+
+    expect($this->runMiddleware($this->roleMiddleware, 'testRole|testRole2'))->toEqual(403);
+});
+
+it('a client cannot access a route protected by role middleware if have not roles', function () {
+    if ($this->getLaravelVersion() < 9) {
+        $this->markTestSkipped('requires laravel >= 9');
     }
 
-    /** @test */
-    #[Test]
-    public function a_client_can_access_a_route_protected_by_role_middleware_if_have_this_role(): void
-    {
-        if ($this->getLaravelVersion() < 9) {
-            $this->markTestSkipped('requires laravel >= 9');
-        }
+    Passport::actingAsClient($this->testClient, ['*']);
 
-        Passport::actingAsClient($this->testClient, ['*']);
+    expect($this->runMiddleware($this->roleMiddleware, 'testRole|testRole2', null, true))->toEqual(403);
+});
 
-        $this->testClient->assignRole('clientRole');
+it('a user cannot access a route protected by role middleware if role is undefined', function () {
+    Auth::login($this->testUser);
 
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleMiddleware, 'clientRole', null, true)
-        );
+    expect($this->runMiddleware($this->roleMiddleware, ''))->toEqual(403);
+});
+
+it('a client cannot access a route protected by role middleware if role is undefined', function () {
+    if ($this->getLaravelVersion() < 9) {
+        $this->markTestSkipped('requires laravel >= 9');
     }
 
-    /** @test */
-    #[Test]
-    public function a_user_can_access_a_route_protected_by_this_role_middleware_if_have_one_of_the_roles()
-    {
-        Auth::login($this->testUser);
+    Passport::actingAsClient($this->testClient, ['*']);
 
-        $this->testUser->assignRole('testRole');
+    expect($this->runMiddleware($this->roleMiddleware, '', null, true))->toEqual(403);
+});
 
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleMiddleware, 'testRole|testRole2')
-        );
+it('the required roles can be fetched from the exception', function () {
+    Auth::login($this->testUser);
 
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleMiddleware, ['testRole2', 'testRole'])
-        );
+    $message = null;
+    $requiredRoles = [];
+
+    try {
+        $this->roleMiddleware->handle(new Request, function () {
+            return (new Response)->setContent('<html></html>');
+        }, 'some-role');
+    } catch (UnauthorizedException $e) {
+        $message = $e->getMessage();
+        $requiredRoles = $e->getRequiredRoles();
     }
 
-    /** @test */
-    #[Test]
-    public function a_client_can_access_a_route_protected_by_this_role_middleware_if_have_one_of_the_roles(): void
-    {
-        if ($this->getLaravelVersion() < 9) {
-            $this->markTestSkipped('requires laravel >= 9');
-        }
+    expect($message)->toEqual('User does not have the right roles.');
+    expect($requiredRoles)->toEqual(['some-role']);
+});
 
-        Passport::actingAsClient($this->testClient, ['*']);
+it('the required roles can be displayed in the exception', function () {
+    Auth::login($this->testUser);
+    Config::set(['permission.display_role_in_exception' => true]);
 
-        $this->testClient->assignRole('clientRole');
+    $message = null;
 
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleMiddleware, 'clientRole|testRole2', null, true)
-        );
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleMiddleware, ['testRole2', 'clientRole'], null, true)
-        );
+    try {
+        $this->roleMiddleware->handle(new Request, function () {
+            return (new Response)->setContent('<html></html>');
+        }, 'some-role');
+    } catch (UnauthorizedException $e) {
+        $message = $e->getMessage();
     }
 
-    /** @test */
-    #[Test]
-    public function a_user_cannot_access_a_route_protected_by_the_role_middleware_if_have_not_has_roles_trait()
-    {
-        $userWithoutHasRoles = UserWithoutHasRoles::create(['email' => 'test_not_has_roles@user.com']);
+    expect($message)->toEndWith('Necessary roles are some-role');
+});
 
-        Auth::login($userWithoutHasRoles);
+it('use not existing custom guard in role', function () {
+    $class = null;
 
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleMiddleware, 'testRole')
-        );
+    try {
+        $this->roleMiddleware->handle(new Request, function () {
+            return (new Response)->setContent('<html></html>');
+        }, 'testRole', 'xxx');
+    } catch (InvalidArgumentException $e) {
+        $class = get_class($e);
     }
 
-    /** @test */
-    #[Test]
-    public function a_user_cannot_access_a_route_protected_by_the_role_middleware_if_have_a_different_role()
-    {
-        Auth::login($this->testUser);
+    expect($class)->toEqual(InvalidArgumentException::class);
+});
 
-        $this->testUser->assignRole(['testRole']);
+it('user can not access role with guard admin while login using default guard', function () {
+    Auth::login($this->testUser);
 
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleMiddleware, 'testRole2')
-        );
+    $this->testUser->assignRole('testRole');
+
+    expect($this->runMiddleware($this->roleMiddleware, 'testRole', 'admin'))->toEqual(403);
+});
+
+it('client can not access role with guard admin while login using default guard', function () {
+    if ($this->getLaravelVersion() < 9) {
+        $this->markTestSkipped('requires laravel >= 9');
     }
 
-    /** @test */
-    #[Test]
-    public function a_client_cannot_access_a_route_protected_by_the_role_middleware_if_have_a_different_role(): void
-    {
-        if ($this->getLaravelVersion() < 9) {
-            $this->markTestSkipped('requires laravel >= 9');
-        }
+    Passport::actingAsClient($this->testClient, ['*']);
 
-        Passport::actingAsClient($this->testClient, ['*']);
+    $this->testClient->assignRole('clientRole');
 
-        $this->testClient->assignRole(['clientRole']);
+    expect($this->runMiddleware($this->roleMiddleware, 'clientRole', 'admin', true))->toEqual(403);
+});
 
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleMiddleware, 'clientRole2', null, true)
-        );
-    }
+it('user can access role with guard admin while login using admin guard', function () {
+    Auth::guard('admin')->login($this->testAdmin);
 
-    /** @test */
-    #[Test]
-    public function a_user_cannot_access_a_route_protected_by_role_middleware_if_have_not_roles()
-    {
-        Auth::login($this->testUser);
+    $this->testAdmin->assignRole('testAdminRole');
 
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleMiddleware, 'testRole|testRole2')
-        );
-    }
+    expect($this->runMiddleware($this->roleMiddleware, 'testAdminRole', 'admin'))->toEqual(200);
+});
 
-    /** @test */
-    #[Test]
-    public function a_client_cannot_access_a_route_protected_by_role_middleware_if_have_not_roles(): void
-    {
-        if ($this->getLaravelVersion() < 9) {
-            $this->markTestSkipped('requires laravel >= 9');
-        }
+it('the middleware can be created with static using method', function () {
+    expect(RoleMiddleware::using('testAdminRole'))
+        ->toBe('Spatie\Permission\Middleware\RoleMiddleware:testAdminRole');
 
-        Passport::actingAsClient($this->testClient, ['*']);
+    expect(RoleMiddleware::using('testAdminRole', 'my-guard'))
+        ->toEqual('Spatie\Permission\Middleware\RoleMiddleware:testAdminRole,my-guard');
 
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleMiddleware, 'testRole|testRole2', null, true)
-        );
-    }
+    expect(RoleMiddleware::using(['testAdminRole', 'anotherRole']))
+        ->toEqual('Spatie\Permission\Middleware\RoleMiddleware:testAdminRole|anotherRole');
+});
 
-    /** @test */
-    #[Test]
-    public function a_user_cannot_access_a_route_protected_by_role_middleware_if_role_is_undefined()
-    {
-        Auth::login($this->testUser);
+it('the middleware can handle enum based roles with static using method', function () {
+    expect(RoleMiddleware::using(TestModels\TestRolePermissionsEnum::WRITER))
+        ->toBe('Spatie\Permission\Middleware\RoleMiddleware:writer');
 
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleMiddleware, '')
-        );
-    }
+    expect(RoleMiddleware::using(TestModels\TestRolePermissionsEnum::WRITER, 'my-guard'))
+        ->toEqual('Spatie\Permission\Middleware\RoleMiddleware:writer,my-guard');
 
-    /** @test */
-    #[Test]
-    public function a_client_cannot_access_a_route_protected_by_role_middleware_if_role_is_undefined(): void
-    {
-        if ($this->getLaravelVersion() < 9) {
-            $this->markTestSkipped('requires laravel >= 9');
-        }
+    expect(RoleMiddleware::using([TestModels\TestRolePermissionsEnum::WRITER, TestModels\TestRolePermissionsEnum::EDITOR]))
+        ->toEqual('Spatie\Permission\Middleware\RoleMiddleware:writer|editor');
+})->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
 
-        Passport::actingAsClient($this->testClient, ['*']);
+it('the middleware can handle enum based roles with handle method', function () {
+    app(Role::class)->create(['name' => TestModels\TestRolePermissionsEnum::WRITER->value]);
+    app(Role::class)->create(['name' => TestModels\TestRolePermissionsEnum::EDITOR->value]);
 
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleMiddleware, '', null, true)
-        );
-    }
+    Auth::login($this->testUser);
+    $this->testUser->assignRole(TestModels\TestRolePermissionsEnum::WRITER);
 
-    /** @test */
-    #[Test]
-    public function the_required_roles_can_be_fetched_from_the_exception()
-    {
-        Auth::login($this->testUser);
+    expect($this->runMiddleware($this->roleMiddleware, TestModels\TestRolePermissionsEnum::WRITER))
+        ->toEqual(200);
 
-        $message = null;
-        $requiredRoles = [];
+    $this->testUser->assignRole(TestModels\TestRolePermissionsEnum::EDITOR);
 
-        try {
-            $this->roleMiddleware->handle(new Request, function () {
-                return (new Response)->setContent('<html></html>');
-            }, 'some-role');
-        } catch (UnauthorizedException $e) {
-            $message = $e->getMessage();
-            $requiredRoles = $e->getRequiredRoles();
-        }
-
-        $this->assertEquals('User does not have the right roles.', $message);
-        $this->assertEquals(['some-role'], $requiredRoles);
-    }
-
-    /** @test */
-    #[Test]
-    public function the_required_roles_can_be_displayed_in_the_exception()
-    {
-        Auth::login($this->testUser);
-        Config::set(['permission.display_role_in_exception' => true]);
-
-        $message = null;
-
-        try {
-            $this->roleMiddleware->handle(new Request, function () {
-                return (new Response)->setContent('<html></html>');
-            }, 'some-role');
-        } catch (UnauthorizedException $e) {
-            $message = $e->getMessage();
-        }
-
-        $this->assertStringEndsWith('Necessary roles are some-role', $message);
-    }
-
-    /** @test */
-    #[Test]
-    public function use_not_existing_custom_guard_in_role()
-    {
-        $class = null;
-
-        try {
-            $this->roleMiddleware->handle(new Request, function () {
-                return (new Response)->setContent('<html></html>');
-            }, 'testRole', 'xxx');
-        } catch (InvalidArgumentException $e) {
-            $class = get_class($e);
-        }
-
-        $this->assertEquals(InvalidArgumentException::class, $class);
-    }
-
-    /** @test */
-    #[Test]
-    public function user_can_not_access_role_with_guard_admin_while_login_using_default_guard()
-    {
-        Auth::login($this->testUser);
-
-        $this->testUser->assignRole('testRole');
-
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleMiddleware, 'testRole', 'admin')
-        );
-    }
-
-    /** @test */
-    #[Test]
-    public function client_can_not_access_role_with_guard_admin_while_login_using_default_guard(): void
-    {
-        if ($this->getLaravelVersion() < 9) {
-            $this->markTestSkipped('requires laravel >= 9');
-        }
-
-        Passport::actingAsClient($this->testClient, ['*']);
-
-        $this->testClient->assignRole('clientRole');
-
-        $this->assertEquals(
-            403,
-            $this->runMiddleware($this->roleMiddleware, 'clientRole', 'admin', true)
-        );
-    }
-
-    /** @test */
-    #[Test]
-    public function user_can_access_role_with_guard_admin_while_login_using_admin_guard()
-    {
-        Auth::guard('admin')->login($this->testAdmin);
-
-        $this->testAdmin->assignRole('testAdminRole');
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleMiddleware, 'testAdminRole', 'admin')
-        );
-    }
-
-    /** @test */
-    #[Test]
-    public function the_middleware_can_be_created_with_static_using_method()
-    {
-        $this->assertSame(
-            'Spatie\Permission\Middleware\RoleMiddleware:testAdminRole',
-            RoleMiddleware::using('testAdminRole')
-        );
-        $this->assertEquals(
-            'Spatie\Permission\Middleware\RoleMiddleware:testAdminRole,my-guard',
-            RoleMiddleware::using('testAdminRole', 'my-guard')
-        );
-        $this->assertEquals(
-            'Spatie\Permission\Middleware\RoleMiddleware:testAdminRole|anotherRole',
-            RoleMiddleware::using(['testAdminRole', 'anotherRole'])
-        );
-    }
-
-    /**
-     * @test
-     *
-     * @requires PHP >= 8.1
-     */
-    #[RequiresPhp('>= 8.1')]
-    #[Test]
-    public function the_middleware_can_handle_enum_based_roles_with_static_using_method()
-    {
-        $this->assertSame(
-            'Spatie\Permission\Middleware\RoleMiddleware:writer',
-            RoleMiddleware::using(TestModels\TestRolePermissionsEnum::WRITER)
-        );
-        $this->assertEquals(
-            'Spatie\Permission\Middleware\RoleMiddleware:writer,my-guard',
-            RoleMiddleware::using(TestModels\TestRolePermissionsEnum::WRITER, 'my-guard')
-        );
-        $this->assertEquals(
-            'Spatie\Permission\Middleware\RoleMiddleware:writer|editor',
-            RoleMiddleware::using([TestModels\TestRolePermissionsEnum::WRITER, TestModels\TestRolePermissionsEnum::EDITOR])
-        );
-    }
-
-    /**
-     * @test
-     *
-     * @requires PHP >= 8.1
-     */
-    #[RequiresPhp('>= 8.1')]
-    #[Test]
-    public function the_middleware_can_handle_enum_based_roles_with_handle_method()
-    {
-        app(Role::class)->create(['name' => TestModels\TestRolePermissionsEnum::WRITER->value]);
-        app(Role::class)->create(['name' => TestModels\TestRolePermissionsEnum::EDITOR->value]);
-
-        Auth::login($this->testUser);
-        $this->testUser->assignRole(TestModels\TestRolePermissionsEnum::WRITER);
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleMiddleware, TestModels\TestRolePermissionsEnum::WRITER)
-        );
-
-        $this->testUser->assignRole(TestModels\TestRolePermissionsEnum::EDITOR);
-
-        $this->assertEquals(
-            200,
-            $this->runMiddleware($this->roleMiddleware, [TestModels\TestRolePermissionsEnum::WRITER, TestModels\TestRolePermissionsEnum::EDITOR])
-        );
-    }
-}
+    expect($this->runMiddleware($this->roleMiddleware, [TestModels\TestRolePermissionsEnum::WRITER, TestModels\TestRolePermissionsEnum::EDITOR]))
+        ->toEqual(200);
+})->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
