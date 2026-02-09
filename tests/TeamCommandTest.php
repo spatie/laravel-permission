@@ -4,7 +4,6 @@ namespace Spatie\Permission\Tests;
 
 use Illuminate\Support\Facades\Artisan;
 use PHPUnit\Framework\Attributes\Test;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Tests\TestModels\User;
 
 class TeamCommandTest extends TestCase
