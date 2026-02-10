@@ -6,7 +6,7 @@ use InvalidArgumentException;
 
 class PermissionDoesNotExist extends InvalidArgumentException
 {
-    public static function create(string $permissionName, ?string $guardName)
+    public static function create(string $permissionName, ?string $guardName): static
     {
         return new static(__('There is no permission named `:permission` for guard `:guard`.', [
             'permission' => $permissionName,
@@ -14,11 +14,7 @@ class PermissionDoesNotExist extends InvalidArgumentException
         ]));
     }
 
-    /**
-     * @param  int|string  $permissionId
-     * @return static
-     */
-    public static function withId($permissionId, ?string $guardName)
+    public static function withId(int|string $permissionId, ?string $guardName): static
     {
         return new static(__('There is no [permission] with ID `:id` for guard `:guard`.', [
             'id' => $permissionId,

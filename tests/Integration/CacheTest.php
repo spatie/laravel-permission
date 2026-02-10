@@ -193,19 +193,19 @@ it('uses the cache for has permission to', function () {
 });
 
 it('differentiates the cache by guard name', function () {
-    $this->expectException(PermissionDoesNotExist::class);
+    expect(function () {
+        $this->testUserRole->givePermissionTo(['edit-articles', 'web']);
+        $this->testUser->assignRole('testRole');
+        $this->testUser->loadMissing('roles', 'permissions');
 
-    $this->testUserRole->givePermissionTo(['edit-articles', 'web']);
-    $this->testUser->assignRole('testRole');
-    $this->testUser->loadMissing('roles', 'permissions');
+        resetQueryCount();
+        expect($this->testUser->hasPermissionTo('edit-articles', 'web'))->toBeTrue();
+        assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
 
-    resetQueryCount();
-    expect($this->testUser->hasPermissionTo('edit-articles', 'web'))->toBeTrue();
-    assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
-
-    resetQueryCount();
-    expect($this->testUser->hasPermissionTo('edit-articles', 'admin'))->toBeFalse();
-    assertQueryCount(1); // 1 for first lookup of this permission with this guard
+        resetQueryCount();
+        expect($this->testUser->hasPermissionTo('edit-articles', 'admin'))->toBeFalse();
+        assertQueryCount(1); // 1 for first lookup of this permission with this guard
+    })->toThrow(PermissionDoesNotExist::class);
 });
 
 it('uses the cache for get all permissions', function () {

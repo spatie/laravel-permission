@@ -17,6 +17,11 @@ parameters:
         # wildcard permissions:
         - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::getWildcardClass#'
         - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::getAllPermissions#'
-        # contract checks:
-        - '#Call to function is_a\(\) with (.*) and ''Spatie\\\\Permission\\\\Contracts\\\\Permission'' will always evaluate to true\.$#'
-        - '#Call to function is_a\(\) with (.*) and ''Spatie\\\\Permission\\\\Contracts\\\\Role'' will always evaluate to true\.$#'
+        # PermissionRegistrar accesses $roles on generic Model:
+        - '#Access to an undefined property Illuminate\\Database\\Eloquent\\Model::\$roles#'
+        # instanceof checks that are always false/true in specific trait contexts are intentional:
+        -
+            identifier: instanceof.alwaysFalse
+            path: src/Traits/HasPermissions.php
+        # unreachable code in trait contexts is intentional — traits are used in multiple model contexts:
+        - '#Unreachable statement - code above always terminates#'

@@ -8,8 +8,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
-use Spatie\Permission\Events\RoleAttached;
-use Spatie\Permission\Events\RoleDetached;
+use Spatie\Permission\Events\RoleAttachedEvent;
+use Spatie\Permission\Events\RoleDetachedEvent;
 use Spatie\Permission\PermissionRegistrar;
 
 trait HasRoles
@@ -18,7 +18,7 @@ trait HasRoles
 
     private ?string $roleClass = null;
 
-    public static function bootHasRoles()
+    public static function bootHasRoles(): void
     {
         static::deleting(function ($model) {
             if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
@@ -28,7 +28,7 @@ trait HasRoles
             $teams = app(PermissionRegistrar::class)->teams;
             app(PermissionRegistrar::class)->teams = false;
             $model->roles()->detach();
-            if (is_a($model, Permission::class)) {
+            if ($model instanceof Permission) {
                 $model->users()->detach();
             }
             app(PermissionRegistrar::class)->teams = $teams;
@@ -73,10 +73,8 @@ trait HasRoles
      * Scope the model query to certain roles only.
      *
      * @param  string|int|array|Role|Collection|\BackedEnum  $roles
-     * @param  string  $guard
-     * @param  bool  $without
      */
-    public function scopeRole(Builder $query, $roles, $guard = null, $without = false): Builder
+    public function scopeRole(Builder $query, $roles, ?string $guard = null, bool $without = false): Builder
     {
         if ($roles instanceof Collection) {
             $roles = $roles->all();
@@ -99,7 +97,7 @@ trait HasRoles
         $key = (new ($this->getRoleClass())())->getKeyName();
 
         return $query->{! $without ? 'whereHas' : 'whereDoesntHave'}('roles', fn (Builder $subQuery) => $subQuery
-            ->whereIn(config('permission.table_names.roles').".$key", \array_column($roles, $key))
+            ->whereIn(config('permission.table_names.roles').".$key", array_column($roles, $key))
         );
     }
 
@@ -107,9 +105,8 @@ trait HasRoles
      * Scope the model query to only those without certain roles.
      *
      * @param  string|int|array|Role|Collection|\BackedEnum  $roles
-     * @param  string  $guard
      */
-    public function scopeWithoutRole(Builder $query, $roles, $guard = null): Builder
+    public function scopeWithoutRole(Builder $query, $roles, ?string $guard = null): Builder
     {
         return $this->scopeRole($query, $roles, $guard, true);
     }
@@ -145,12 +142,12 @@ trait HasRoles
      * @param  string|int|array|Role|Collection|\BackedEnum  ...$roles
      * @return $this
      */
-    public function assignRole(...$roles)
+    public function assignRole(...$roles): static
     {
         $roles = $this->collectRoles($roles);
 
         $model = $this->getModel();
-        $teamPivot = app(PermissionRegistrar::class)->teams && ! is_a($this, Permission::class) ?
+        $teamPivot = app(PermissionRegistrar::class)->teams && ! $this instanceof Permission ?
             [app(PermissionRegistrar::class)->teamsKey => getPermissionsTeamId()] : [];
 
         if ($model->exists) {
@@ -164,7 +161,7 @@ trait HasRoles
             $this->roles()->attach(array_diff($roles, $currentRoles), $teamPivot);
             $model->unsetRelation('roles');
         } else {
-            $class = \get_class($model);
+            $class = $model::class;
             $saved = false;
 
             $class::saved(
@@ -179,12 +176,12 @@ trait HasRoles
             );
         }
 
-        if (is_a($this, Permission::class)) {
+        if ($this instanceof Permission) {
             $this->forgetCachedPermissions();
         }
 
         if (config('permission.events_enabled')) {
-            event(new RoleAttached($this->getModel(), $roles));
+            event(new RoleAttachedEvent($this->getModel(), $roles));
         }
 
         return $this;
@@ -196,7 +193,7 @@ trait HasRoles
      * @param  string|int|array|Role|Collection|\BackedEnum  ...$role
      * @return $this
      */
-    public function removeRole(...$role)
+    public function removeRole(...$role): static
     {
         $roles = $this->collectRoles($role);
 
@@ -204,12 +201,12 @@ trait HasRoles
 
         $this->unsetRelation('roles');
 
-        if (is_a($this, Permission::class)) {
+        if ($this instanceof Permission) {
             $this->forgetCachedPermissions();
         }
 
         if (config('permission.events_enabled')) {
-            event(new RoleDetached($this->getModel(), $roles));
+            event(new RoleDetachedEvent($this->getModel(), $roles));
         }
 
         return $this;
@@ -221,7 +218,7 @@ trait HasRoles
      * @param  string|int|array|Role|Collection|\BackedEnum  ...$roles
      * @return $this
      */
-    public function syncRoles(...$roles)
+    public function syncRoles(...$roles): static
     {
         if ($this->getModel()->exists) {
             $this->collectRoles($roles);
@@ -248,7 +245,7 @@ trait HasRoles
     {
         $this->loadMissing('roles');
 
-        if (is_string($roles) && strpos($roles, '|') !== false) {
+        if (is_string($roles) && str_contains($roles, '|')) {
             $roles = $this->convertPipeToArray($roles);
         }
 
@@ -328,7 +325,7 @@ trait HasRoles
             $roles = $roles->value;
         }
 
-        if (is_string($roles) && strpos($roles, '|') !== false) {
+        if (is_string($roles) && str_contains($roles, '|')) {
             $roles = $this->convertPipeToArray($roles);
         }
 
@@ -372,7 +369,7 @@ trait HasRoles
     {
         $this->loadMissing('roles');
 
-        if (is_string($roles) && strpos($roles, '|') !== false) {
+        if (is_string($roles) && str_contains($roles, '|')) {
             $roles = $this->convertPipeToArray($roles);
         }
 
@@ -422,7 +419,7 @@ trait HasRoles
         return $role;
     }
 
-    protected function convertPipeToArray(string $pipeString)
+    protected function convertPipeToArray(string $pipeString): array
     {
         $pipeString = trim($pipeString);
 

@@ -5,13 +5,13 @@ namespace Spatie\Permission\Commands;
 use Illuminate\Console\Command;
 use Spatie\Permission\PermissionRegistrar;
 
-class CacheReset extends Command
+class CacheResetCommand extends Command
 {
     protected $signature = 'permission:cache-reset';
 
     protected $description = 'Reset the permission cache';
 
-    public function handle()
+    public function handle(): int
     {
         $permissionRegistrar = app(PermissionRegistrar::class);
         $cacheExists = $permissionRegistrar->getCacheRepository()->has($permissionRegistrar->cacheKey);
@@ -21,5 +21,7 @@ class CacheReset extends Command
         } elseif ($cacheExists) {
             $this->error('Unable to flush cache.');
         }
+
+        return self::SUCCESS;
     }
 }

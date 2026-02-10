@@ -206,9 +206,8 @@ it('throws exception when wildcard permission is not properly formatted', functi
 
     $user1->givePermissionTo([$permission]);
 
-    $this->expectException(WildcardPermissionNotProperlyFormatted::class);
-
-    $user1->hasPermissionTo('invoices.*');
+    expect(fn () => $user1->hasPermissionTo('invoices.*'))
+        ->toThrow(WildcardPermissionNotProperlyFormatted::class);
 });
 
 it('can verify permission instances not assigned to user', function () {
@@ -260,9 +259,8 @@ it('throws exception when permission has invalid arguments', function () {
 
     $user = User::create(['email' => 'user@test.com']);
 
-    $this->expectException(WildcardPermissionInvalidArgument::class);
-
-    $user->hasPermissionTo(['posts.create']);
+    expect(fn () => $user->hasPermissionTo(['posts.create']))
+        ->toThrow(WildcardPermissionInvalidArgument::class);
 });
 
 it('throws exception when permission id not exists', function () {
@@ -270,7 +268,6 @@ it('throws exception when permission id not exists', function () {
 
     $user = User::create(['email' => 'user@test.com']);
 
-    $this->expectException(PermissionDoesNotExist::class);
-
-    $user->hasPermissionTo(6);
+    expect(fn () => $user->hasPermissionTo(6))
+        ->toThrow(PermissionDoesNotExist::class);
 });

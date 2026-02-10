@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 use Spatie\Permission\Contracts\Role;
-use Spatie\Permission\Events\PermissionAttached;
-use Spatie\Permission\Events\PermissionDetached;
+use Spatie\Permission\Events\PermissionAttachedEvent;
+use Spatie\Permission\Events\PermissionDetachedEvent;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\PermissionRegistrar;
@@ -41,19 +41,13 @@ it('can assign a permission to a user with a non default guard', function () {
 });
 
 it('throws an exception when assigning a permission that does not exist', function () {
-    $this->expectException(PermissionDoesNotExist::class);
-
-    $this->testUser->givePermissionTo('permission-does-not-exist');
+    expect(fn () => $this->testUser->givePermissionTo('permission-does-not-exist'))->toThrow(PermissionDoesNotExist::class);
 });
 
 it('throws an exception when assigning a permission to a user from a different guard', function () {
-    $this->expectException(GuardDoesNotMatch::class);
+    expect(fn () => $this->testUser->givePermissionTo($this->testAdminPermission))->toThrow(GuardDoesNotMatch::class);
 
-    $this->testUser->givePermissionTo($this->testAdminPermission);
-
-    $this->expectException(PermissionDoesNotExist::class);
-
-    $this->testUser->givePermissionTo('admin-permission');
+    expect(fn () => $this->testUser->givePermissionTo('admin-permission'))->toThrow(PermissionDoesNotExist::class);
 });
 
 it('can revoke a permission from a user', function () {
@@ -216,61 +210,37 @@ it('can scope users with only direct permission', function () {
 it('throws an exception when calling hasPermissionTo with an invalid type', function () {
     $user = User::create(['email' => 'user1@test.com']);
 
-    $this->expectException(PermissionDoesNotExist::class);
-
-    $user->hasPermissionTo(new \stdClass);
+    expect(fn () => $user->hasPermissionTo(new \stdClass))->toThrow(PermissionDoesNotExist::class);
 });
 
 it('throws an exception when calling hasPermissionTo with null', function () {
     $user = User::create(['email' => 'user1@test.com']);
 
-    $this->expectException(PermissionDoesNotExist::class);
-
-    $user->hasPermissionTo(null);
+    expect(fn () => $user->hasPermissionTo(null))->toThrow(PermissionDoesNotExist::class);
 });
 
 it('throws an exception when calling hasDirectPermission with an invalid type', function () {
     $user = User::create(['email' => 'user1@test.com']);
 
-    $this->expectException(PermissionDoesNotExist::class);
-
-    $user->hasDirectPermission(new \stdClass);
+    expect(fn () => $user->hasDirectPermission(new \stdClass))->toThrow(PermissionDoesNotExist::class);
 });
 
 it('throws an exception when calling hasDirectPermission with null', function () {
     $user = User::create(['email' => 'user1@test.com']);
 
-    $this->expectException(PermissionDoesNotExist::class);
-
-    $user->hasDirectPermission(null);
+    expect(fn () => $user->hasDirectPermission(null))->toThrow(PermissionDoesNotExist::class);
 });
 
 it('throws an exception when trying to scope a non existing permission', function () {
-    $this->expectException(PermissionDoesNotExist::class);
+    expect(fn () => User::permission('not defined permission')->get())->toThrow(PermissionDoesNotExist::class);
 
-    User::permission('not defined permission')->get();
-
-    $this->expectException(PermissionDoesNotExist::class);
-
-    User::withoutPermission('not defined permission')->get();
+    expect(fn () => User::withoutPermission('not defined permission')->get())->toThrow(PermissionDoesNotExist::class);
 });
 
 it('throws an exception when trying to scope a permission from another guard', function () {
-    $this->expectException(PermissionDoesNotExist::class);
+    expect(fn () => User::permission('testAdminPermission')->get())->toThrow(PermissionDoesNotExist::class);
 
-    User::permission('testAdminPermission')->get();
-
-    $this->expectException(PermissionDoesNotExist::class);
-
-    User::withoutPermission('testAdminPermission')->get();
-
-    $this->expectException(GuardDoesNotMatch::class);
-
-    User::permission($this->testAdminPermission)->get();
-
-    $this->expectException(GuardDoesNotMatch::class);
-
-    User::withoutPermission($this->testAdminPermission)->get();
+    expect(fn () => User::withoutPermission('testAdminPermission')->get())->toThrow(PermissionDoesNotExist::class);
 });
 
 it('doesnt detach permissions when user soft deleting', function () {
@@ -322,15 +292,11 @@ it('can determine that the user does not have a permission', function () {
 });
 
 it('throws an exception when the permission does not exist', function () {
-    $this->expectException(PermissionDoesNotExist::class);
-
-    $this->testUser->hasPermissionTo('does-not-exist');
+    expect(fn () => $this->testUser->hasPermissionTo('does-not-exist'))->toThrow(PermissionDoesNotExist::class);
 });
 
 it('throws an exception when the permission does not exist for this guard', function () {
-    $this->expectException(PermissionDoesNotExist::class);
-
-    $this->testUser->hasPermissionTo('does-not-exist', 'web');
+    expect(fn () => $this->testUser->hasPermissionTo('does-not-exist', 'web'))->toThrow(PermissionDoesNotExist::class);
 });
 
 it('can reject a user that does not have any permissions at all', function () {
@@ -464,12 +430,7 @@ it('can avoid sync duplicated permissions', function () {
 it('can avoid detach on permission that does not exist sync', function () {
     $this->testUser->syncPermissions('edit-articles');
 
-    try {
-        $this->testUser->syncPermissions('permission-does-not-exist');
-        $this->fail('Expected PermissionDoesNotExist exception was not thrown.');
-    } catch (PermissionDoesNotExist $e) {
-        //
-    }
+    expect(fn () => $this->testUser->syncPermissions('permission-does-not-exist'))->toThrow(PermissionDoesNotExist::class);
 
     expect($this->testUser->hasDirectPermission('edit-articles'))->toBeTrue();
     expect($this->testUser->checkPermissionTo('permission-does-not-exist'))->toBeFalse();
@@ -504,9 +465,7 @@ it('sync permission ignores null inputs', function () {
 it('sync permission error does not detach permissions', function () {
     $this->testUser->givePermissionTo('edit-news');
 
-    $this->expectException(PermissionDoesNotExist::class);
-
-    $this->testUser->syncPermissions('edit-articles', 'permission-that-does-not-exist');
+    expect(fn () => $this->testUser->syncPermissions('edit-articles', 'permission-that-does-not-exist'))->toThrow(PermissionDoesNotExist::class);
 
     expect($this->testUser->fresh()->hasDirectPermission('edit-news'))->toBeTrue();
 });
@@ -655,7 +614,7 @@ it('fires an event when a permission is added', function () {
         ->pluck($this->testUserPermission->getKeyName())
         ->toArray();
 
-    Event::assertDispatched(PermissionAttached::class, function ($event) use ($ids) {
+    Event::assertDispatched(PermissionAttachedEvent::class, function ($event) use ($ids) {
         return $event->model instanceof User
             && $event->model->hasPermissionTo('edit-news')
             && $event->model->hasPermissionTo('edit-articles')
@@ -673,7 +632,7 @@ it('does not fire an event when events are not enabled', function () {
         ->pluck($this->testUserPermission->getKeyName())
         ->toArray();
 
-    Event::assertNotDispatched(PermissionAttached::class);
+    Event::assertNotDispatched(PermissionAttachedEvent::class);
 });
 
 it('fires an event when a permission is removed', function () {
@@ -686,7 +645,7 @@ it('fires an event when a permission is removed', function () {
 
     $this->testUser->revokePermissionTo($permissions);
 
-    Event::assertDispatched(PermissionDetached::class, function ($event) use ($permissions) {
+    Event::assertDispatched(PermissionDetachedEvent::class, function ($event) use ($permissions) {
         return $event->model instanceof User
             && ! $event->model->hasPermissionTo('edit-news')
             && ! $event->model->hasPermissionTo('edit-articles')
@@ -697,30 +656,22 @@ it('fires an event when a permission is removed', function () {
 it('can be given a permission on role when lazy loading is restricted', function () {
     expect(Model::preventsLazyLoading())->toBeTrue();
 
-    try {
-        $testRole = app(Role::class)->with('permissions')->get()->first();
+    $testRole = app(Role::class)->with('permissions')->get()->first();
 
-        $testRole->givePermissionTo('edit-articles');
+    $testRole->givePermissionTo('edit-articles');
 
-        expect($testRole->hasPermissionTo('edit-articles'))->toBeTrue();
-    } catch (Exception $e) {
-        $this->fail('Lazy loading detected in the givePermissionTo method: '.$e->getMessage());
-    }
+    expect($testRole->hasPermissionTo('edit-articles'))->toBeTrue();
 });
 
 it('can be given a permission on user when lazy loading is restricted', function () {
     expect(Model::preventsLazyLoading())->toBeTrue();
 
-    try {
-        User::create(['email' => 'other@user.com']);
-        $testUser = User::with('permissions')->get()->first();
+    User::create(['email' => 'other@user.com']);
+    $testUser = User::with('permissions')->get()->first();
 
-        $testUser->givePermissionTo('edit-articles');
+    $testUser->givePermissionTo('edit-articles');
 
-        expect($testUser->hasPermissionTo('edit-articles'))->toBeTrue();
-    } catch (Exception $e) {
-        $this->fail('Lazy loading detected in the givePermissionTo method: '.$e->getMessage());
-    }
+    expect($testUser->hasPermissionTo('edit-articles'))->toBeTrue();
 });
 
 // ---- Custom model-specific tests ----

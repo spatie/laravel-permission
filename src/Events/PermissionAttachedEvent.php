@@ -11,15 +11,15 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Permission;
 
-class PermissionDetached
+class PermissionAttachedEvent
 {
     use Dispatchable;
     use InteractsWithSockets;
     use SerializesModels;
 
     /**
-     * Internally the HasPermissions trait passes $permissionsOrIds as an Eloquent record.
-     * Theoretically one could register the event to other places and pass an array etc.
+     * Internally the HasPermissions trait passes an array of permission ids (eg: int's or uuid's)
+     * Theoretically one could register the event to other places and pass an Eloquent record.
      * So a Listener should inspect the type of $permissionsOrIds received before using.
      *
      * @param  array|int[]|string[]|Permission|Permission[]|Collection  $permissionsOrIds

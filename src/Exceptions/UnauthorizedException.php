@@ -7,11 +7,11 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class UnauthorizedException extends HttpException
 {
-    private $requiredRoles = [];
+    private array $requiredRoles = [];
 
-    private $requiredPermissions = [];
+    private array $requiredPermissions = [];
 
-    public static function forRoles(array $roles): self
+    public static function forRoles(array $roles): static
     {
         $message = __('User does not have the right roles.');
 
@@ -25,7 +25,7 @@ class UnauthorizedException extends HttpException
         return $exception;
     }
 
-    public static function forPermissions(array $permissions): self
+    public static function forPermissions(array $permissions): static
     {
         $message = __('User does not have the right permissions.');
 
@@ -39,7 +39,7 @@ class UnauthorizedException extends HttpException
         return $exception;
     }
 
-    public static function forRolesOrPermissions(array $rolesOrPermissions): self
+    public static function forRolesOrPermissions(array $rolesOrPermissions): static
     {
         $message = __('User does not have any of the necessary access rights.');
 
@@ -53,16 +53,14 @@ class UnauthorizedException extends HttpException
         return $exception;
     }
 
-    public static function missingTraitHasRoles(Authorizable $user): self
+    public static function missingTraitHasRoles(Authorizable $user): static
     {
-        $class = get_class($user);
-
         return new static(403, __('Authorizable class `:class` must use Spatie\\Permission\\Traits\\HasRoles trait.', [
-            'class' => $class,
+            'class' => $user::class,
         ]), null, []);
     }
 
-    public static function notLoggedIn(): self
+    public static function notLoggedIn(): static
     {
         return new static(403, __('User is not logged in.'), null, []);
     }

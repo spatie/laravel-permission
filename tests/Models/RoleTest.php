@@ -41,10 +41,10 @@ it('has user models of the right class', function () {
 });
 
 it('throws an exception when the role already exists', function () {
-    $this->expectException(RoleAlreadyExists::class);
+    app(Role::class)->create(['name' => 'test-role']);
 
-    app(Role::class)->create(['name' => 'test-role']);
-    app(Role::class)->create(['name' => 'test-role']);
+    expect(fn () => app(Role::class)->create(['name' => 'test-role']))
+        ->toThrow(RoleAlreadyExists::class);
 });
 
 it('can be given a permission', function () {
@@ -54,19 +54,16 @@ it('can be given a permission', function () {
 });
 
 it('throws an exception when given a permission that does not exist', function () {
-    $this->expectException(PermissionDoesNotExist::class);
-
-    $this->testUserRole->givePermissionTo('create-evil-empire');
+    expect(fn () => $this->testUserRole->givePermissionTo('create-evil-empire'))
+        ->toThrow(PermissionDoesNotExist::class);
 });
 
 it('throws an exception when given a permission that belongs to another guard', function () {
-    $this->expectException(PermissionDoesNotExist::class);
+    expect(fn () => $this->testUserRole->givePermissionTo('admin-permission'))
+        ->toThrow(PermissionDoesNotExist::class);
 
-    $this->testUserRole->givePermissionTo('admin-permission');
-
-    $this->expectException(GuardDoesNotMatch::class);
-
-    $this->testUserRole->givePermissionTo($this->testAdminPermission);
+    expect(fn () => $this->testUserRole->givePermissionTo($this->testAdminPermission))
+        ->toThrow(GuardDoesNotMatch::class);
 });
 
 it('can be given multiple permissions using an array', function () {
@@ -95,21 +92,18 @@ it('can sync permissions', function () {
 it('throws an exception when syncing permissions that do not exist', function () {
     $this->testUserRole->givePermissionTo('edit-articles');
 
-    $this->expectException(PermissionDoesNotExist::class);
-
-    $this->testUserRole->syncPermissions('permission-does-not-exist');
+    expect(fn () => $this->testUserRole->syncPermissions('permission-does-not-exist'))
+        ->toThrow(PermissionDoesNotExist::class);
 });
 
 it('throws an exception when syncing permissions that belong to a different guard', function () {
     $this->testUserRole->givePermissionTo('edit-articles');
 
-    $this->expectException(PermissionDoesNotExist::class);
+    expect(fn () => $this->testUserRole->syncPermissions('admin-permission'))
+        ->toThrow(PermissionDoesNotExist::class);
 
-    $this->testUserRole->syncPermissions('admin-permission');
-
-    $this->expectException(GuardDoesNotMatch::class);
-
-    $this->testUserRole->syncPermissions($this->testAdminPermission);
+    expect(fn () => $this->testUserRole->syncPermissions($this->testAdminPermission))
+        ->toThrow(GuardDoesNotMatch::class);
 });
 
 it('will remove all permissions when passing an empty array to sync permissions', function () {
@@ -125,9 +119,8 @@ it('will remove all permissions when passing an empty array to sync permissions'
 test('sync permission error does not detach permissions', function () {
     $this->testUserRole->givePermissionTo('edit-news');
 
-    $this->expectException(PermissionDoesNotExist::class);
-
-    $this->testUserRole->syncPermissions('edit-articles', 'permission-that-does-not-exist');
+    expect(fn () => $this->testUserRole->syncPermissions('edit-articles', 'permission-that-does-not-exist'))
+        ->toThrow(PermissionDoesNotExist::class);
 
     expect($this->testUserRole->fresh()->hasDirectPermission('edit-news'))->toBeTrue();
 });
@@ -155,9 +148,8 @@ it('returns false if it does not have the permission', function () {
 });
 
 it('throws an exception if the permission does not exist', function () {
-    $this->expectException(PermissionDoesNotExist::class);
-
-    $this->testUserRole->hasPermissionTo('doesnt-exist');
+    expect(fn () => $this->testUserRole->hasPermissionTo('doesnt-exist'))
+        ->toThrow(PermissionDoesNotExist::class);
 });
 
 it('returns false if it does not have a permission object', function () {
@@ -179,23 +171,19 @@ it('creates permission object with findOrCreate if it does not have a permission
 });
 
 it('creates a role with findOrCreate if the named role does not exist', function () {
-    $this->expectException(RoleDoesNotExist::class);
-
-    $role1 = app(Role::class)->findByName('non-existing-role');
-
-    $this->assertNull($role1);
+    expect(fn () => app(Role::class)->findByName('non-existing-role'))
+        ->toThrow(RoleDoesNotExist::class);
 
     $role2 = app(Role::class)->findOrCreate('yet-another-role');
 
-    expect($role2)->toBeInstanceOf(Role::class);
+    expect($role2)->toBeInstanceOf(app(Role::class)::class);
 });
 
 it('throws an exception when a permission of the wrong guard is passed in', function () {
-    $this->expectException(GuardDoesNotMatch::class);
-
     $permission = app(Permission::class)->findByName('wrong-guard-permission', 'admin');
 
-    $this->testUserRole->hasPermissionTo($permission);
+    expect(fn () => $this->testUserRole->hasPermissionTo($permission))
+        ->toThrow(GuardDoesNotMatch::class);
 });
 
 it('belongs to a guard', function () {

@@ -3,13 +3,14 @@
 namespace Spatie\Permission\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Guard;
 
 class PermissionMiddleware
 {
-    public function handle($request, Closure $next, $permission, $guard = null)
+    public function handle(Request $request, Closure $next, $permission, ?string $guard = null)
     {
         $authGuard = Auth::guard($guard);
 
@@ -39,12 +40,8 @@ class PermissionMiddleware
 
     /**
      * Specify the permission and guard for the middleware.
-     *
-     * @param  array|string|\BackedEnum  $permission
-     * @param  string|null  $guard
-     * @return string
      */
-    public static function using($permission, $guard = null)
+    public static function using(array|string|\BackedEnum $permission, ?string $guard = null): string
     {
         // Convert Enum to its value if an Enum is passed
         if ($permission instanceof \BackedEnum) {
@@ -58,12 +55,7 @@ class PermissionMiddleware
         return static::class.':'.$args;
     }
 
-    /**
-     * Convert array or string of permissions to string representation.
-     *
-     * @return string
-     */
-    protected static function parsePermissionsToString(array|string|\BackedEnum $permission)
+    protected static function parsePermissionsToString(array|string|\BackedEnum $permission): string
     {
         // Convert Enum to its value if an Enum is passed
         if ($permission instanceof \BackedEnum) {
