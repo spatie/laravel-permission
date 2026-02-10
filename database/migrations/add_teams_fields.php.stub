@@ -52,7 +52,7 @@ return new class extends Migration
                     'model_has_permissions_permission_model_type_primary');
                 if (DB::getDriverName() !== 'sqlite') {
                     $table->foreign($pivotPermission)
-                        ->references('id')->on($tableNames['permissions'])->onDelete('cascade');
+                        ->references('id')->on($tableNames['permissions'])->cascadeOnDelete();
                 }
             });
         }
@@ -71,7 +71,7 @@ return new class extends Migration
                     'model_has_roles_role_model_type_primary');
                 if (DB::getDriverName() !== 'sqlite') {
                     $table->foreign($pivotRole)
-                        ->references('id')->on($tableNames['roles'])->onDelete('cascade');
+                        ->references('id')->on($tableNames['roles'])->cascadeOnDelete();
                 }
             });
         }
