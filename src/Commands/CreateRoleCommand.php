@@ -3,6 +3,7 @@
 namespace Spatie\Permission\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 use Spatie\Permission\Contracts\Role as RoleContract;
 use Spatie\Permission\PermissionRegistrar;
@@ -45,7 +46,7 @@ class CreateRoleCommand extends Command
         return self::SUCCESS;
     }
 
-    protected function makePermissions(?string $string = null): ?\Illuminate\Support\Collection
+    protected function makePermissions(?string $string = null): ?Collection
     {
         if (empty($string)) {
             return null;

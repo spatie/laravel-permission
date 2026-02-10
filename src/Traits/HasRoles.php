@@ -14,6 +14,8 @@ use Spatie\Permission\Events\RoleDetachedEvent;
 use Spatie\Permission\PermissionRegistrar;
 use TypeError;
 
+use function Illuminate\Support\enum_value;
+
 trait HasRoles
 {
     use HasPermissions;
@@ -87,9 +89,7 @@ trait HasRoles
                 return $role;
             }
 
-            if ($role instanceof BackedEnum) {
-                $role = $role->value;
-            }
+            $role = enum_value($role);
 
             $method = is_int($role) || PermissionRegistrar::isUid($role) ? 'findById' : 'findByName';
 
@@ -257,14 +257,7 @@ trait HasRoles
             return $this->roles
                 ->when($guard, fn ($q) => $q->where('guard_name', $guard))
                 ->pluck('name')
-                ->contains(function ($name) use ($roles) {
-                    /** @var string|BackedEnum $name */
-                    if ($name instanceof BackedEnum) {
-                        return $name->value == $roles;
-                    }
-
-                    return $name == $roles;
-                });
+                ->contains(fn ($name) => enum_value($name) == $roles);
         }
 
         if (is_int($roles) || PermissionRegistrar::isUid($roles)) {
@@ -323,9 +316,7 @@ trait HasRoles
     {
         $this->loadMissing('roles');
 
-        if ($roles instanceof BackedEnum) {
-            $roles = $roles->value;
-        }
+        $roles = enum_value($roles);
 
         if (is_string($roles) && str_contains($roles, '|')) {
             $roles = $this->convertPipeToArray($roles);
@@ -339,25 +330,13 @@ trait HasRoles
             return $this->roles->contains($roles->getKeyName(), $roles->getKey());
         }
 
-        $roles = collect()->make($roles)->map(function ($role) {
-            if ($role instanceof BackedEnum) {
-                return $role->value;
-            }
-
-            return $role instanceof Role ? $role->name : $role;
-        });
+        $roles = collect()->make($roles)->map(fn ($role) => $role instanceof Role ? $role->name : enum_value($role));
 
         $roleNames = $guard
             ? $this->roles->where('guard_name', $guard)->pluck('name')
             : $this->getRoleNames();
 
-        $roleNames = $roleNames->transform(function ($roleName) {
-            if ($roleName instanceof BackedEnum) {
-                return $roleName->value;
-            }
-
-            return $roleName;
-        });
+        $roleNames = $roleNames->transform(fn ($roleName) => enum_value($roleName));
 
         return $roles->intersect($roleNames) == $roles;
     }
@@ -406,9 +385,7 @@ trait HasRoles
 
     protected function getStoredRole($role): Role
     {
-        if ($role instanceof BackedEnum) {
-            $role = $role->value;
-        }
+        $role = enum_value($role);
 
         if (is_int($role) || PermissionRegistrar::isUid($role)) {
             return $this->getRoleClass()::findById($role, $this->getDefaultGuardName());

@@ -20,6 +20,8 @@ use Spatie\Permission\Guard;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\WildcardPermission;
 
+use function Illuminate\Support\enum_value;
+
 trait HasPermissions
 {
     private ?string $permissionClass = null;
@@ -153,9 +155,7 @@ trait HasPermissions
                 return $permission;
             }
 
-            if ($permission instanceof BackedEnum) {
-                $permission = $permission->value;
-            }
+            $permission = enum_value($permission);
 
             $method = is_int($permission) || PermissionRegistrar::isUid($permission) ? 'findById' : 'findByName';
 
@@ -172,9 +172,7 @@ trait HasPermissions
      */
     public function filterPermission($permission, ?string $guardName = null): Permission
     {
-        if ($permission instanceof BackedEnum) {
-            $permission = $permission->value;
-        }
+        $permission = enum_value($permission);
 
         if (is_int($permission) || PermissionRegistrar::isUid($permission)) {
             $permission = $this->getPermissionClass()::findById(
@@ -224,9 +222,7 @@ trait HasPermissions
     {
         $guardName = $guardName ?? $this->getDefaultGuardName();
 
-        if ($permission instanceof BackedEnum) {
-            $permission = $permission->value;
-        }
+        $permission = enum_value($permission);
 
         if (is_int($permission) || PermissionRegistrar::isUid($permission)) {
             $permission = $this->getPermissionClass()::findById($permission, $guardName);
@@ -492,9 +488,7 @@ trait HasPermissions
      */
     protected function getStoredPermission($permissions)
     {
-        if ($permissions instanceof BackedEnum) {
-            $permissions = $permissions->value;
-        }
+        $permissions = enum_value($permissions);
 
         if (is_int($permissions) || PermissionRegistrar::isUid($permissions)) {
             return $this->getPermissionClass()::findById($permissions, $this->getDefaultGuardName());
@@ -505,13 +499,7 @@ trait HasPermissions
         }
 
         if (is_array($permissions)) {
-            $permissions = array_map(function ($permission) {
-                if ($permission instanceof BackedEnum) {
-                    return $permission->value;
-                }
-
-                return $permission instanceof Permission ? $permission->name : $permission;
-            }, $permissions);
+            $permissions = array_map(fn ($permission) => $permission instanceof Permission ? $permission->name : enum_value($permission), $permissions);
 
             return $this->getPermissionClass()::whereIn('name', $permissions)
                 ->whereIn('guard_name', $this->getGuardNames())

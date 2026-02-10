@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Guard;
 
+use function Illuminate\Support\enum_value;
+
 class PermissionMiddleware
 {
     public function handle(Request $request, Closure $next, $permission, ?string $guard = null)
@@ -44,12 +46,7 @@ class PermissionMiddleware
      */
     public static function using(array|string|BackedEnum $permission, ?string $guard = null): string
     {
-        // Convert Enum to its value if an Enum is passed
-        if ($permission instanceof BackedEnum) {
-            $permission = $permission->value;
-        }
-
-        $permissionString = self::parsePermissionsToString($permission);
+        $permissionString = self::parsePermissionsToString(enum_value($permission));
 
         $args = is_null($guard) ? $permissionString : "$permissionString,$guard";
 
@@ -58,15 +55,10 @@ class PermissionMiddleware
 
     protected static function parsePermissionsToString(array|string|BackedEnum $permission): string
     {
-        // Convert Enum to its value if an Enum is passed
-        if ($permission instanceof BackedEnum) {
-            $permission = $permission->value;
-        }
+        $permission = enum_value($permission);
 
         if (is_array($permission)) {
-            $permission = array_map(fn ($r) => $r instanceof BackedEnum ? $r->value : $r, $permission);
-
-            return implode('|', $permission);
+            return implode('|', array_map(fn ($r) => enum_value($r), $permission));
         }
 
         return (string) $permission;
