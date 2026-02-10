@@ -42,7 +42,6 @@ class PermissionMiddleware
      *
      * @param  array|string|\BackedEnum  $permission
      * @param  string|null  $guard
-     * @return string
      */
     public static function using($permission, $guard = null): string
     {
@@ -60,8 +59,6 @@ class PermissionMiddleware
 
     /**
      * Convert array or string of permissions to string representation.
-     *
-     * @return string
      */
     protected static function parsePermissionsToString(array|string|\BackedEnum $permission): string
     {

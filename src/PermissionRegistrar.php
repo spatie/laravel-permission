@@ -108,9 +108,6 @@ class PermissionRegistrar
         $this->teamResolver->setPermissionsTeamId($id);
     }
 
-    /**
-     * @return int|string|null
-     */
     public function getPermissionsTeamId(): int|string|null
     {
         return $this->teamResolver->getPermissionsTeamId();

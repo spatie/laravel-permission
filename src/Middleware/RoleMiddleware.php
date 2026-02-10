@@ -42,7 +42,6 @@ class RoleMiddleware
      *
      * @param  array|string|\BackedEnum  $role
      * @param  string|null  $guard
-     * @return string
      */
     public static function using($role, $guard = null): string
     {
@@ -55,8 +54,6 @@ class RoleMiddleware
 
     /**
      * Convert array or string of roles to string representation.
-     *
-     * @return string
      */
     protected static function parseRolesToString(array|string|\BackedEnum $role): string
     {

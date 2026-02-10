@@ -42,7 +42,6 @@ class RoleOrPermissionMiddleware
      *
      * @param  array|string|\BackedEnum  $roleOrPermission
      * @param  string|null  $guard
-     * @return string
      */
     public static function using($roleOrPermission, $guard = null): string
     {
@@ -54,8 +53,6 @@ class RoleOrPermissionMiddleware
 
     /**
      * Convert array or string of roles/permissions to string representation.
-     *
-     * @return string
      */
     protected static function parseRoleOrPermissionToString(array|string|\BackedEnum $roleOrPermission): string
     {

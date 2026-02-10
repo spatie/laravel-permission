@@ -167,7 +167,6 @@ trait HasPermissions
      * Find a permission.
      *
      * @param  string|int|Permission|\BackedEnum  $permission
-     * @return Permission
      *
      * @throws PermissionDoesNotExist
      */

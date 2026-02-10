@@ -22,9 +22,6 @@ if (! function_exists('setPermissionsTeamId')) {
 }
 
 if (! function_exists('getPermissionsTeamId')) {
-    /**
-     * @return int|string|null
-     */
     function getPermissionsTeamId(): int|string|null
     {
         return app(PermissionRegistrar::class)->getPermissionsTeamId();

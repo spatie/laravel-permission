@@ -59,8 +59,6 @@ class UpgradeForTeams extends Command
 
     /**
      * Create the migration.
-     *
-     * @return bool
      */
     protected function createMigration(): bool
     {
@@ -79,8 +77,6 @@ class UpgradeForTeams extends Command
     /**
      * Build a warning regarding possible duplication
      * due to already existing migrations.
-     *
-     * @return string
      */
     protected function getExistingMigrationsWarning(array $existingMigrations): string
     {
@@ -96,8 +92,6 @@ class UpgradeForTeams extends Command
     /**
      * Check if there is another migration
      * with the same suffix.
-     *
-     * @return array
      */
     protected function alreadyExistingMigrations(): array
     {
@@ -111,9 +105,6 @@ class UpgradeForTeams extends Command
      *
      * The date parameter is optional for ability
      * to provide a custom value or a wildcard.
-     *
-     * @param  string|null  $date
-     * @return string
      */
     protected function getMigrationPath(?string $date = null): string
     {
