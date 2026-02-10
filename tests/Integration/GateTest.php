@@ -2,6 +2,7 @@
 
 use Illuminate\Contracts\Auth\Access\Gate;
 use Spatie\Permission\Contracts\Permission;
+
 it('can determine if a user does not have a permission', function () {
     expect($this->testUser->can('edit-articles'))->toBeFalse();
 });

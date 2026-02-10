@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Artisan;
 use Spatie\Permission\Contracts\Role;
+
 function renderView(string $view, array $parameters): string
 {
     Artisan::call('view:clear');
