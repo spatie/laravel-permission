@@ -10,9 +10,11 @@ jobs:
       fail-fast: false
       matrix:
         php: [8.5, 8.4]
+        laravel: ['^12']
+        testbench: ['^10']
         dependency-version: [prefer-lowest, prefer-stable]
 
-    name: P${{ matrix.php }} - ${{ matrix.dependency-version }}
+    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }}
 
     steps:
       - name: Checkout code
@@ -27,7 +29,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "laravel/framework:^12.0" "orchestra/testbench:^10.0" "symfony/console:>=4.3.4" "mockery/mockery:^1.3.2" "nesbot/carbon:>=2.72.6" --no-interaction --no-update
+          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" "symfony/console:>=4.3.4" "mockery/mockery:^1.3.2" "nesbot/carbon:>=2.72.6" --no-interaction --no-update
           composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
 
       - name: Execute tests
