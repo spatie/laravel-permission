@@ -55,7 +55,7 @@ trait HasPermissions
         return $this->permissionClass;
     }
 
-    public function getWildcardClass()
+    public function getWildcardClass(): string
     {
         if (! is_null($this->wildcardClass)) {
             return $this->wildcardClass;
@@ -171,7 +171,7 @@ trait HasPermissions
      *
      * @throws PermissionDoesNotExist
      */
-    public function filterPermission($permission, $guardName = null)
+    public function filterPermission($permission, $guardName = null): Permission
     {
         if ($permission instanceof \BackedEnum) {
             $permission = $permission->value;
@@ -494,7 +494,7 @@ trait HasPermissions
      * @param  string|int|array|Permission|Collection|\BackedEnum  $permissions
      * @return Permission|Permission[]|Collection
      */
-    protected function getStoredPermission($permissions)
+    protected function getStoredPermission($permissions): Permission|array|Collection
     {
         if ($permissions instanceof \BackedEnum) {
             $permissions = $permissions->value;
@@ -530,7 +530,7 @@ trait HasPermissions
      *
      * @throws GuardDoesNotMatch
      */
-    protected function ensureModelSharesGuard($roleOrPermission)
+    protected function ensureModelSharesGuard($roleOrPermission): void
     {
         if (! $this->getGuardNames()->contains($roleOrPermission->guard_name)) {
             throw GuardDoesNotMatch::create($roleOrPermission->guard_name, $this->getGuardNames());
@@ -550,9 +550,9 @@ trait HasPermissions
     /**
      * Forget the cached permissions.
      */
-    public function forgetCachedPermissions()
+    public function forgetCachedPermissions(): bool
     {
-        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        return app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 
     /**

@@ -111,7 +111,7 @@ class PermissionRegistrar
     /**
      * @return int|string|null
      */
-    public function getPermissionsTeamId()
+    public function getPermissionsTeamId(): int|string|null
     {
         return $this->teamResolver->getPermissionsTeamId();
     }
@@ -137,7 +137,7 @@ class PermissionRegistrar
     /**
      * Flush the cache.
      */
-    public function forgetCachedPermissions()
+    public function forgetCachedPermissions(): bool
     {
         $this->permissions = null;
         $this->forgetWildcardPermissionIndex();
@@ -182,7 +182,7 @@ class PermissionRegistrar
      *
      * @alias of clearPermissionsCollection()
      */
-    public function clearClassPermissions()
+    public function clearClassPermissions(): void
     {
         $this->clearPermissionsCollection();
     }
@@ -266,7 +266,7 @@ class PermissionRegistrar
         return $this->permissionClass;
     }
 
-    public function setPermissionClass($permissionClass)
+    public function setPermissionClass(string $permissionClass): self
     {
         $this->permissionClass = $permissionClass;
         config()->set('permission.models.permission', $permissionClass);
@@ -280,7 +280,7 @@ class PermissionRegistrar
         return $this->roleClass;
     }
 
-    public function setRoleClass($roleClass)
+    public function setRoleClass(string $roleClass): self
     {
         $this->roleClass = $roleClass;
         config()->set('permission.models.role', $roleClass);

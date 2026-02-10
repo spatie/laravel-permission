@@ -44,7 +44,7 @@ class RoleOrPermissionMiddleware
      * @param  string|null  $guard
      * @return string
      */
-    public static function using($roleOrPermission, $guard = null)
+    public static function using($roleOrPermission, $guard = null): string
     {
         $roleOrPermissionString = self::parseRoleOrPermissionToString($roleOrPermission);
         $args = is_null($guard) ? $roleOrPermissionString : "$roleOrPermissionString,$guard";
@@ -57,7 +57,7 @@ class RoleOrPermissionMiddleware
      *
      * @return string
      */
-    protected static function parseRoleOrPermissionToString(array|string|\BackedEnum $roleOrPermission)
+    protected static function parseRoleOrPermissionToString(array|string|\BackedEnum $roleOrPermission): string
     {
         // Convert Enum to its value if an Enum is passed
         if ($roleOrPermission instanceof \BackedEnum) {

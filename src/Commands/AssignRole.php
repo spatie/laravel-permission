@@ -17,7 +17,7 @@ class AssignRole extends Command
 
     protected $description = 'Assign a role to a user';
 
-    public function handle(PermissionRegistrar $permissionRegistrar)
+    public function handle(PermissionRegistrar $permissionRegistrar): int
     {
         $roleName = $this->argument('name');
         $userId = $this->argument('userId');
@@ -27,7 +27,7 @@ class AssignRole extends Command
         if (! $permissionRegistrar->teams && $this->option('team-id')) {
             $this->warn('Teams feature disabled, argument --team-id has no effect. Either enable it in permissions config file or remove --team-id parameter');
 
-            return;
+            return self::FAILURE;
         }
 
         // Validate that the model class exists and is instantiable

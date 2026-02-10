@@ -44,7 +44,7 @@ class RoleMiddleware
      * @param  string|null  $guard
      * @return string
      */
-    public static function using($role, $guard = null)
+    public static function using($role, $guard = null): string
     {
         $roleString = self::parseRolesToString($role);
 
@@ -58,7 +58,7 @@ class RoleMiddleware
      *
      * @return string
      */
-    protected static function parseRolesToString(array|string|\BackedEnum $role)
+    protected static function parseRolesToString(array|string|\BackedEnum $role): string
     {
         // Convert Enum to its value if an Enum is passed
         if ($role instanceof \BackedEnum) {

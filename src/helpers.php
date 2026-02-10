@@ -15,7 +15,7 @@ if (! function_exists('setPermissionsTeamId')) {
     /**
      * @param  int|string|null|\Illuminate\Database\Eloquent\Model  $id
      */
-    function setPermissionsTeamId($id)
+    function setPermissionsTeamId($id): void
     {
         app(PermissionRegistrar::class)->setPermissionsTeamId($id);
     }
@@ -25,7 +25,7 @@ if (! function_exists('getPermissionsTeamId')) {
     /**
      * @return int|string|null
      */
-    function getPermissionsTeamId()
+    function getPermissionsTeamId(): int|string|null
     {
         return app(PermissionRegistrar::class)->getPermissionsTeamId();
     }

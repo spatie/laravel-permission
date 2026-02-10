@@ -422,7 +422,7 @@ trait HasRoles
         return $role;
     }
 
-    protected function convertPipeToArray(string $pipeString)
+    protected function convertPipeToArray(string $pipeString): array
     {
         $pipeString = trim($pipeString);
 

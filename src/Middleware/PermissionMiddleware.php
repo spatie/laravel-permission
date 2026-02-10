@@ -44,7 +44,7 @@ class PermissionMiddleware
      * @param  string|null  $guard
      * @return string
      */
-    public static function using($permission, $guard = null)
+    public static function using($permission, $guard = null): string
     {
         // Convert Enum to its value if an Enum is passed
         if ($permission instanceof \BackedEnum) {
@@ -63,7 +63,7 @@ class PermissionMiddleware
      *
      * @return string
      */
-    protected static function parsePermissionsToString(array|string|\BackedEnum $permission)
+    protected static function parsePermissionsToString(array|string|\BackedEnum $permission): string
     {
         // Convert Enum to its value if an Enum is passed
         if ($permission instanceof \BackedEnum) {

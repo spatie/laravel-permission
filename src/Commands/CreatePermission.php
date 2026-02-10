@@ -13,12 +13,14 @@ class CreatePermission extends Command
 
     protected $description = 'Create a permission';
 
-    public function handle()
+    public function handle(): int
     {
         $permissionClass = app(PermissionContract::class);
 
         $permission = $permissionClass::findOrCreate($this->argument('name'), $this->argument('guard'));
 
         $this->info("Permission `{$permission->name}` ".($permission->wasRecentlyCreated ? 'created' : 'already exists'));
+
+        return self::SUCCESS;
     }
 }
