@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use ReflectionClass;
 
 class Guard
 {
@@ -28,7 +29,7 @@ class Guard
         }
 
         if (! isset($guardName)) {
-            $guardName = (new \ReflectionClass($class))->getDefaultProperties()['guard_name'] ?? null;
+            $guardName = (new ReflectionClass($class))->getDefaultProperties()['guard_name'] ?? null;
         }
 
         if ($guardName) {

@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission;
 
+use BackedEnum;
 use Composer\InstalledVersions;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Foundation\Application;
@@ -87,7 +88,7 @@ class PermissionServiceProvider extends PackageServiceProvider
     {
         Route::macro('role', function ($roles = []) {
             $roles = Arr::wrap($roles);
-            $roles = array_map(fn ($role) => $role instanceof \BackedEnum ? $role->value : $role, $roles);
+            $roles = array_map(fn ($role) => $role instanceof BackedEnum ? $role->value : $role, $roles);
 
             /** @var Route $this */
             return $this->middleware('role:'.implode('|', $roles));
@@ -95,7 +96,7 @@ class PermissionServiceProvider extends PackageServiceProvider
 
         Route::macro('permission', function ($permissions = []) {
             $permissions = Arr::wrap($permissions);
-            $permissions = array_map(fn ($permission) => $permission instanceof \BackedEnum ? $permission->value : $permission, $permissions);
+            $permissions = array_map(fn ($permission) => $permission instanceof BackedEnum ? $permission->value : $permission, $permissions);
 
             /** @var Route $this */
             return $this->middleware('permission:'.implode('|', $permissions));
@@ -103,7 +104,7 @@ class PermissionServiceProvider extends PackageServiceProvider
 
         Route::macro('roleOrPermission', function ($rolesOrPermissions = []) {
             $rolesOrPermissions = Arr::wrap($rolesOrPermissions);
-            $rolesOrPermissions = array_map(fn ($item) => $item instanceof \BackedEnum ? $item->value : $item, $rolesOrPermissions);
+            $rolesOrPermissions = array_map(fn ($item) => $item instanceof BackedEnum ? $item->value : $item, $rolesOrPermissions);
 
             /** @var Route $this */
             return $this->middleware('role_or_permission:'.implode('|', $rolesOrPermissions));

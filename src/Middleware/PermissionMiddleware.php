@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Middleware;
 
+use BackedEnum;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -41,10 +42,10 @@ class PermissionMiddleware
     /**
      * Specify the permission and guard for the middleware.
      */
-    public static function using(array|string|\BackedEnum $permission, ?string $guard = null): string
+    public static function using(array|string|BackedEnum $permission, ?string $guard = null): string
     {
         // Convert Enum to its value if an Enum is passed
-        if ($permission instanceof \BackedEnum) {
+        if ($permission instanceof BackedEnum) {
             $permission = $permission->value;
         }
 
@@ -55,15 +56,15 @@ class PermissionMiddleware
         return static::class.':'.$args;
     }
 
-    protected static function parsePermissionsToString(array|string|\BackedEnum $permission): string
+    protected static function parsePermissionsToString(array|string|BackedEnum $permission): string
     {
         // Convert Enum to its value if an Enum is passed
-        if ($permission instanceof \BackedEnum) {
+        if ($permission instanceof BackedEnum) {
             $permission = $permission->value;
         }
 
         if (is_array($permission)) {
-            $permission = array_map(fn ($r) => $r instanceof \BackedEnum ? $r->value : $r, $permission);
+            $permission = array_map(fn ($r) => $r instanceof BackedEnum ? $r->value : $r, $permission);
 
             return implode('|', $permission);
         }

@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Traits;
 
+use BackedEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Arr;
@@ -100,7 +101,7 @@ trait HasPermissions
     /**
      * Scope the model query to certain permissions only.
      *
-     * @param  string|int|array|Permission|Collection|\BackedEnum  $permissions
+     * @param  string|int|array|Permission|Collection|BackedEnum  $permissions
      */
     public function scopePermission(Builder $query, $permissions, bool $without = false): Builder
     {
@@ -129,7 +130,7 @@ trait HasPermissions
      * Scope the model query to only those without certain permissions,
      * whether indirectly by role or by direct permission.
      *
-     * @param  string|int|array|Permission|Collection|\BackedEnum  $permissions
+     * @param  string|int|array|Permission|Collection|BackedEnum  $permissions
      */
     public function scopeWithoutPermission(Builder $query, $permissions): Builder
     {
@@ -137,7 +138,7 @@ trait HasPermissions
     }
 
     /**
-     * @param  string|int|array|Permission|Collection|\BackedEnum  $permissions
+     * @param  string|int|array|Permission|Collection|BackedEnum  $permissions
      *
      * @throws PermissionDoesNotExist
      */
@@ -152,7 +153,7 @@ trait HasPermissions
                 return $permission;
             }
 
-            if ($permission instanceof \BackedEnum) {
+            if ($permission instanceof BackedEnum) {
                 $permission = $permission->value;
             }
 
@@ -165,13 +166,13 @@ trait HasPermissions
     /**
      * Find a permission.
      *
-     * @param  string|int|Permission|\BackedEnum  $permission
+     * @param  string|int|Permission|BackedEnum  $permission
      *
      * @throws PermissionDoesNotExist
      */
     public function filterPermission($permission, ?string $guardName = null): Permission
     {
-        if ($permission instanceof \BackedEnum) {
+        if ($permission instanceof BackedEnum) {
             $permission = $permission->value;
         }
 
@@ -199,7 +200,7 @@ trait HasPermissions
     /**
      * Determine if the model may perform the given permission.
      *
-     * @param  string|int|Permission|\BackedEnum  $permission
+     * @param  string|int|Permission|BackedEnum  $permission
      *
      * @throws PermissionDoesNotExist
      */
@@ -217,13 +218,13 @@ trait HasPermissions
     /**
      * Validates a wildcard permission against all permissions of a user.
      *
-     * @param  string|int|Permission|\BackedEnum  $permission
+     * @param  string|int|Permission|BackedEnum  $permission
      */
     protected function hasWildcardPermission($permission, ?string $guardName = null): bool
     {
         $guardName = $guardName ?? $this->getDefaultGuardName();
 
-        if ($permission instanceof \BackedEnum) {
+        if ($permission instanceof BackedEnum) {
             $permission = $permission->value;
         }
 
@@ -250,7 +251,7 @@ trait HasPermissions
     /**
      * An alias to hasPermissionTo(), but avoids throwing an exception.
      *
-     * @param  string|int|Permission|\BackedEnum  $permission
+     * @param  string|int|Permission|BackedEnum  $permission
      */
     public function checkPermissionTo($permission, ?string $guardName = null): bool
     {
@@ -264,7 +265,7 @@ trait HasPermissions
     /**
      * Determine if the model has any of the given permissions.
      *
-     * @param  string|int|array|Permission|Collection|\BackedEnum  ...$permissions
+     * @param  string|int|array|Permission|Collection|BackedEnum  ...$permissions
      */
     public function hasAnyPermission(...$permissions): bool
     {
@@ -282,7 +283,7 @@ trait HasPermissions
     /**
      * Determine if the model has all of the given permissions.
      *
-     * @param  string|int|array|Permission|Collection|\BackedEnum  ...$permissions
+     * @param  string|int|array|Permission|Collection|BackedEnum  ...$permissions
      */
     public function hasAllPermissions(...$permissions): bool
     {
@@ -312,7 +313,7 @@ trait HasPermissions
     /**
      * Determine if the model has the given permission.
      *
-     * @param  string|int|Permission|\BackedEnum  $permission
+     * @param  string|int|Permission|BackedEnum  $permission
      *
      * @throws PermissionDoesNotExist
      */
@@ -356,7 +357,7 @@ trait HasPermissions
     /**
      * Returns array of permissions ids
      *
-     * @param  string|int|array|Permission|Collection|\BackedEnum  $permissions
+     * @param  string|int|array|Permission|Collection|BackedEnum  $permissions
      */
     private function collectPermissions(...$permissions): array
     {
@@ -384,7 +385,7 @@ trait HasPermissions
     /**
      * Grant the given permission(s) to a role.
      *
-     * @param  string|int|array|Permission|Collection|\BackedEnum  $permissions
+     * @param  string|int|array|Permission|Collection|BackedEnum  $permissions
      * @return $this
      */
     public function givePermissionTo(...$permissions): static
@@ -439,7 +440,7 @@ trait HasPermissions
     /**
      * Remove all current permissions and set the given ones.
      *
-     * @param  string|int|array|Permission|Collection|\BackedEnum  $permissions
+     * @param  string|int|array|Permission|Collection|BackedEnum  $permissions
      * @return $this
      */
     public function syncPermissions(...$permissions): static
@@ -456,7 +457,7 @@ trait HasPermissions
     /**
      * Revoke the given permission(s).
      *
-     * @param  Permission|Permission[]|string|string[]|\BackedEnum  $permission
+     * @param  Permission|Permission[]|string|string[]|BackedEnum  $permission
      * @return $this
      */
     public function revokePermissionTo($permission): static
@@ -486,12 +487,12 @@ trait HasPermissions
     }
 
     /**
-     * @param  string|int|array|Permission|Collection|\BackedEnum  $permissions
+     * @param  string|int|array|Permission|Collection|BackedEnum  $permissions
      * @return Permission|Permission[]|Collection
      */
     protected function getStoredPermission($permissions)
     {
-        if ($permissions instanceof \BackedEnum) {
+        if ($permissions instanceof BackedEnum) {
             $permissions = $permissions->value;
         }
 
@@ -505,7 +506,7 @@ trait HasPermissions
 
         if (is_array($permissions)) {
             $permissions = array_map(function ($permission) {
-                if ($permission instanceof \BackedEnum) {
+                if ($permission instanceof BackedEnum) {
                     return $permission->value;
                 }
 
@@ -553,7 +554,7 @@ trait HasPermissions
     /**
      * Check if the model has All of the requested Direct permissions.
      *
-     * @param  string|int|array|Permission|Collection|\BackedEnum  ...$permissions
+     * @param  string|int|array|Permission|Collection|BackedEnum  ...$permissions
      */
     public function hasAllDirectPermissions(...$permissions): bool
     {
@@ -571,7 +572,7 @@ trait HasPermissions
     /**
      * Check if the model has Any of the requested Direct permissions.
      *
-     * @param  string|int|array|Permission|Collection|\BackedEnum  ...$permissions
+     * @param  string|int|array|Permission|Collection|BackedEnum  ...$permissions
      */
     public function hasAnyDirectPermission(...$permissions): bool
     {

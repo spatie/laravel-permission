@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission;
 
+use DateInterval;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Contracts\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Access\Gate;
@@ -29,7 +30,7 @@ class PermissionRegistrar
 
     public string $pivotPermission;
 
-    public \DateInterval|int $cacheExpirationTime;
+    public DateInterval|int $cacheExpirationTime;
 
     public bool $teams;
 
@@ -61,7 +62,7 @@ class PermissionRegistrar
 
     public function initializeCache(): void
     {
-        $this->cacheExpirationTime = config('permission.cache.expiration_time') ?: \DateInterval::createFromDateString('24 hours');
+        $this->cacheExpirationTime = config('permission.cache.expiration_time') ?: DateInterval::createFromDateString('24 hours');
 
         $this->teams = config('permission.teams', false);
         $this->teamsKey = config('permission.column_names.team_foreign_key', 'team_id');

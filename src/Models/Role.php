@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Models;
 
+use BackedEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Permission\Contracts\Role as RoleContract;
@@ -188,7 +189,7 @@ class Role extends Model implements RoleContract
     /**
      * Determine if the role may perform the given permission.
      *
-     * @param  string|int|\Spatie\Permission\Contracts\Permission|\BackedEnum  $permission
+     * @param  string|int|\Spatie\Permission\Contracts\Permission|BackedEnum  $permission
      *
      * @throws PermissionDoesNotExist|GuardDoesNotMatch
      */

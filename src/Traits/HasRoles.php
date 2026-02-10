@@ -2,10 +2,12 @@
 
 namespace Spatie\Permission\Traits;
 
+use BackedEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use TypeError;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Events\RoleAttachedEvent;
@@ -72,7 +74,7 @@ trait HasRoles
     /**
      * Scope the model query to certain roles only.
      *
-     * @param  string|int|array|Role|Collection|\BackedEnum  $roles
+     * @param  string|int|array|Role|Collection|BackedEnum  $roles
      */
     public function scopeRole(Builder $query, $roles, ?string $guard = null, bool $without = false): Builder
     {
@@ -85,7 +87,7 @@ trait HasRoles
                 return $role;
             }
 
-            if ($role instanceof \BackedEnum) {
+            if ($role instanceof BackedEnum) {
                 $role = $role->value;
             }
 
@@ -104,7 +106,7 @@ trait HasRoles
     /**
      * Scope the model query to only those without certain roles.
      *
-     * @param  string|int|array|Role|Collection|\BackedEnum  $roles
+     * @param  string|int|array|Role|Collection|BackedEnum  $roles
      */
     public function scopeWithoutRole(Builder $query, $roles, ?string $guard = null): Builder
     {
@@ -114,7 +116,7 @@ trait HasRoles
     /**
      * Returns array of role ids
      *
-     * @param  string|int|array|Role|Collection|\BackedEnum  $roles
+     * @param  string|int|array|Role|Collection|BackedEnum  $roles
      */
     private function collectRoles(...$roles): array
     {
@@ -139,7 +141,7 @@ trait HasRoles
     /**
      * Assign the given role to the model.
      *
-     * @param  string|int|array|Role|Collection|\BackedEnum  ...$roles
+     * @param  string|int|array|Role|Collection|BackedEnum  ...$roles
      * @return $this
      */
     public function assignRole(...$roles): static
@@ -190,7 +192,7 @@ trait HasRoles
     /**
      * Revoke the given role from the model.
      *
-     * @param  string|int|array|Role|Collection|\BackedEnum  ...$role
+     * @param  string|int|array|Role|Collection|BackedEnum  ...$role
      * @return $this
      */
     public function removeRole(...$role): static
@@ -215,7 +217,7 @@ trait HasRoles
     /**
      * Remove all current roles and set the given ones.
      *
-     * @param  string|int|array|Role|Collection|\BackedEnum  ...$roles
+     * @param  string|int|array|Role|Collection|BackedEnum  ...$roles
      * @return $this
      */
     public function syncRoles(...$roles): static
@@ -239,7 +241,7 @@ trait HasRoles
     /**
      * Determine if the model has (one of) the given role(s).
      *
-     * @param  string|int|array|Role|Collection|\BackedEnum  $roles
+     * @param  string|int|array|Role|Collection|BackedEnum  $roles
      */
     public function hasRole($roles, ?string $guard = null): bool
     {
@@ -249,15 +251,15 @@ trait HasRoles
             $roles = $this->convertPipeToArray($roles);
         }
 
-        if ($roles instanceof \BackedEnum) {
+        if ($roles instanceof BackedEnum) {
             $roles = $roles->value;
 
             return $this->roles
                 ->when($guard, fn ($q) => $q->where('guard_name', $guard))
                 ->pluck('name')
                 ->contains(function ($name) use ($roles) {
-                    /** @var string|\BackedEnum $name */
-                    if ($name instanceof \BackedEnum) {
+                    /** @var string|BackedEnum $name */
+                    if ($name instanceof BackedEnum) {
                         return $name->value == $roles;
                     }
 
@@ -297,7 +299,7 @@ trait HasRoles
             return $roles->intersect($guard ? $this->roles->where('guard_name', $guard) : $this->roles)->isNotEmpty();
         }
 
-        throw new \TypeError('Unsupported type for $roles parameter to hasRole().');
+        throw new TypeError('Unsupported type for $roles parameter to hasRole().');
     }
 
     /**
@@ -305,7 +307,7 @@ trait HasRoles
      *
      * Alias to hasRole() but without Guard controls
      *
-     * @param  string|int|array|Role|Collection|\BackedEnum  $roles
+     * @param  string|int|array|Role|Collection|BackedEnum  $roles
      */
     public function hasAnyRole(...$roles): bool
     {
@@ -315,13 +317,13 @@ trait HasRoles
     /**
      * Determine if the model has all of the given role(s).
      *
-     * @param  string|array|Role|Collection|\BackedEnum  $roles
+     * @param  string|array|Role|Collection|BackedEnum  $roles
      */
     public function hasAllRoles($roles, ?string $guard = null): bool
     {
         $this->loadMissing('roles');
 
-        if ($roles instanceof \BackedEnum) {
+        if ($roles instanceof BackedEnum) {
             $roles = $roles->value;
         }
 
@@ -338,7 +340,7 @@ trait HasRoles
         }
 
         $roles = collect()->make($roles)->map(function ($role) {
-            if ($role instanceof \BackedEnum) {
+            if ($role instanceof BackedEnum) {
                 return $role->value;
             }
 
@@ -350,7 +352,7 @@ trait HasRoles
             : $this->getRoleNames();
 
         $roleNames = $roleNames->transform(function ($roleName) {
-            if ($roleName instanceof \BackedEnum) {
+            if ($roleName instanceof BackedEnum) {
                 return $roleName->value;
             }
 
@@ -363,7 +365,7 @@ trait HasRoles
     /**
      * Determine if the model has exactly all of the given role(s).
      *
-     * @param  string|array|Role|Collection|\BackedEnum  $roles
+     * @param  string|array|Role|Collection|BackedEnum  $roles
      */
     public function hasExactRoles($roles, ?string $guard = null): bool
     {
@@ -404,7 +406,7 @@ trait HasRoles
 
     protected function getStoredRole($role): Role
     {
-        if ($role instanceof \BackedEnum) {
+        if ($role instanceof BackedEnum) {
             $role = $role->value;
         }
 
