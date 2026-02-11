@@ -25,7 +25,8 @@ HOWEVER, if you manipulate permission/role data directly in the database instead
 
 Additionally, because the Role and Permission models are Eloquent models which implement the `RefreshesPermissionCache` trait, creating and deleting Roles and Permissions will automatically clear the cache. If you have created your own models which do not extend the default models then you will need to implement the trait yourself.
 
-**NOTE: User-specific role/permission assignments are kept in-memory since v4.4.0, so the cache-reset is no longer called since v5.1.0 when updating User-related assignments.**
+**NOTE: User-specific role/permission assignments are kept in-memory.**
+
 Examples:
 ```php
 // These operations on a User do not call a cache-reset, because the User-related assignments are in-memory.

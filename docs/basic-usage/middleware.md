@@ -10,7 +10,7 @@ For checking against a single permission (see Best Practices) using `can`, you c
 ```php
 Route::group(['middleware' => ['can:publish articles']], function () { ... });
 
-// or with static method (requires Laravel 10.9+)
+// or with static method
 Route::group(['middleware' => [\Illuminate\Auth\Middleware\Authorize::using('publish articles')]], function () { ... });
 ```
 
@@ -22,7 +22,7 @@ This package comes with `RoleMiddleware`, `PermissionMiddleware` and `RoleOrPerm
 
 You can register their aliases for easy reference elsewhere in your app:
 
-In Laravel 11+ open `/bootstrap/app.php` and register them there:
+Open `/bootstrap/app.php` and register them there:
 
 ```php
     ->withMiddleware(function (Middleware $middleware) {
@@ -34,24 +34,10 @@ In Laravel 11+ open `/bootstrap/app.php` and register them there:
     })
 ```
 
-In Laravel 9 and 10 you can add them in `app/Http/Kernel.php`:
-
-```php
-// Laravel 9 uses $routeMiddleware = [
-//protected $routeMiddleware = [
-// Laravel 10+ uses $middlewareAliases = [
-protected $middlewareAliases = [
-    // ...
-    'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
-    'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
-    'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
-];
-```
-
 ### Middleware Priority
 If your app is triggering *404 Not Found* responses when a *403 Not Authorized* response might be expected, it might be a middleware priority clash. Explore reordering priorities so that this package's middleware runs before Laravel's `SubstituteBindings` middleware. (See [Middleware docs](https://laravel.com/docs/master/middleware#sorting-middleware) ). 
 
-In Laravel 11 you could explore `$middleware->prependToGroup()` instead. See the Laravel Documentation for details.
+If needed, you could optionally explore `$middleware->prependToGroup()` instead. See the Laravel Documentation for details.
 
 
 ## Using Middleware in Routes and Controllers
@@ -85,7 +71,7 @@ Route::group(['middleware' => ['permission:publish articles|edit articles,api']]
 
 ### Controllers
 
-In Laravel 11, if your controller implements the `HasMiddleware` interface, you can register [controller middleware](https://laravel.com/docs/11.x/controllers#controller-middleware) using the `middleware()` method:
+If your controller implements the `HasMiddleware` interface, you can register [controller middleware](https://laravel.com/docs/12.x/controllers#controller-middleware) using the `middleware()` method:
 
 ```php
 public static function middleware(): array
@@ -97,18 +83,6 @@ public static function middleware(): array
         new Middleware(\Spatie\Permission\Middleware\RoleMiddleware::using('manager'), except:['show']),
         new Middleware(\Spatie\Permission\Middleware\PermissionMiddleware::using('delete records,api'), only:['destroy']),
     ];
-}
-```
-
-In Laravel 10 and older, you can register it in the constructor:
-```php
-public function __construct()
-{
-    // examples:
-    $this->middleware(['role:manager','permission:publish articles|edit articles']);
-    $this->middleware(['role_or_permission:manager|edit articles']);
-    // or with specific guard
-    $this->middleware(['role_or_permission:manager|edit articles,api']);
 }
 ```
 

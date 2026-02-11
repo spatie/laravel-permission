@@ -16,11 +16,11 @@ Let's say that your application uses access tokens for authentication and when i
 
 You could, for example, create a `Gate::before()` method call to handle this:
 
-**app/Providers/AuthServiceProvider.php** (or maybe `AppServiceProvider.php` since Laravel 11)
+**/app/Providers/AppServiceProvider.php**
 ```php
 use Illuminate\Support\Facades\Gate;
 
-public function boot()
+public function boot(): void
 {
     ...
 
@@ -29,5 +29,5 @@ public function boot()
     });
 }
 ```
-Here `hasTokenPermission` is a **custom method you need to implement yourself**.
+Here `hasTokenPermission` is a **custom method you need to implement yourself, or call some other method on your model**.
 

@@ -5,15 +5,9 @@ weight: 4
 
 ## Enum Prerequisites
 
-Requires `version 6` of this package.
-
-Requires PHP 8.1 or higher.
-
-If you are using PHP 8.1+ you can implement Enums as native types. 
-
 Internally, Enums implicitly implement `\BackedEnum`, which is how this package recognizes that you're passing an Enum.
 
-NOTE: Presently (version 6) this package does not support using `$casts` to specify enums on the `Permission` model. You can still use enums to reference things as shown below, just without declaring it in a `$casts` property.
+NOTE: Presently (versions 6, 7) this package does not support using `$casts` to specify enums on the `Permission` model. You can still use enums to reference things as shown below, just without declaring it in a `$casts` property.
 
 
 ## Code Requirements
@@ -51,12 +45,11 @@ enum RolesEnum: string
 
 When **creating** roles/permissions, you cannot pass an Enum name directly, because Eloquent expects a string for the name.
 
-You must manually convert the name to its value in order to pass the correct string to Eloquent for the role/permission name.
+Use Laravel's `enum_value()` function for simplicity: 
 
-eg: use `RolesEnum::WRITER->value` when specifying the role/permission name
 
 ```php
-  $role = app(Role::class)->findOrCreate(RolesEnum::WRITER->value, 'web');
+  $role = app(Role::class)->findOrCreate(enum_value(RolesEnum::WRITER), 'web');
 ```
 Same with creating Permissions.
 
@@ -64,20 +57,17 @@ Same with creating Permissions.
 
 In your application code, when checking for authorization using features of this package, you can use `MyEnum::NAME` directly in most cases, without passing `->value` to convert to a string.
 
-There may occasionally be times where you will need to manually fallback to adding `->value` (eg: `MyEnum::NAME->value`) when using features that aren't aware of Enum support, such as when you need to pass `string` values instead of an `Enum` to a function that doesn't recognize Enums (Prior to Laravel v11.23.0 the framework didn't support Enums when interacting with Gate via the `can()` methods/helpers (eg: `can`, `canAny`, etc)).
+There may occasionally be times where you will need to manually fallback to adding `->value` (eg: `MyEnum::NAME->value`) when using features that aren't aware of Enum support, such as when you need to pass `string` values instead of an `Enum` to a function that doesn't recognize Enums. Again, wrap it with `enum_value()` as a simple workaround.
 
 Examples:
 ```php
 // the following are identical because `hasPermissionTo` is aware of `BackedEnum` support:
 $user->hasPermissionTo(PermissionsEnum::VIEWPOSTS);
 $user->hasPermissionTo(PermissionsEnum::VIEWPOSTS->value);
-
-// when calling Gate features, such as Model Policies, etc, prior to Laravel v11.23.0
-$user->can(PermissionsEnum::VIEWPOSTS->value);
-$model->can(PermissionsEnum::VIEWPOSTS->value);
+$user->hasPermissionTo(enum_value(PermissionsEnum::VIEWPOSTS));
 
 // Blade directives:
-@can(PermissionsEnum::VIEWPOSTS->value)
+@can(enum_value(PermissionsEnum::VIEWPOSTS))
 ```
 
 

@@ -68,7 +68,7 @@ Depending on your MySQL or MariaDB configuration, you may implement one of the f
 2. OR if your app doesn't require a longer default, in your AppServiceProvider you can set `Schema::defaultStringLength(125)`. [See the Laravel Docs for instructions](https://laravel.com/docs/10.x/migrations#index-lengths-mysql-mariadb). This will have Laravel set all strings to 125 characters by default.
 
 3. OR you could edit the migration and specify a shorter length for 4 fields. Then in your app be sure to manually impose validation limits on any form fields related to these fields. 
-There are 2 instances of this code snippet where you can explicitly set the length.:
+In the migration file, there are 2 places where you can explicitly set the length for both the 'name' and 'guard_name' fields, on 2 tables. Suggested specific lengths are shown below:
 ```php
     $table->string('name');       // For MyISAM use string('name', 225); // (or 166 for InnoDB with Redundant/Compact row format)
     $table->string('guard_name'); // For MyISAM use string('guard_name', 25);
