@@ -2,6 +2,51 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 7.0.0 - 2026-02-11
+
+### Modernize codebase for v7
+
+The aim for v7 is to modernize the codebase while keeping the upgrade path easy. Modern PHP/Laravel features, Pest tests, but no big architectural changes. A future v8 could then tackle larger changes and streamline the package more fundamentally.
+
+#### Version requirements
+
+- Requires PHP ^8.4 and Laravel ^12.0
+- Test suite uses Pest ^3.0
+
+#### Service provider
+
+- Converted to `PackageServiceProvider` from `spatie/laravel-package-tools`
+- Removed Lumen support
+
+#### Class renames
+
+- Event classes now have an `Event` suffix (`PermissionAttached` → `PermissionAttachedEvent`, etc.)
+- Command classes now have a `Command` suffix (`CacheReset` → `CacheResetCommand`, etc.)
+
+#### Type safety
+
+- Added return types and parameter types throughout traits, middleware, exceptions, contracts, and commands
+
+#### Code modernization
+
+- `is_a($this, X::class)` → `$this instanceof X`
+- `get_class($obj)` → `$obj::class`
+- `strpos($x, $y) !== false` → `str_contains($x, $y)`
+- Constructor promotion in `WildcardPermission`
+- Proper `use` imports for global classes
+
+#### Cleanup
+
+- Removed deprecated `clearClassPermissions()` method
+- Removed `__construct` from `Wildcard` contract
+- Modernized migration stubs
+
+#### Testing
+
+- Converted entire test suite from PHPUnit to Pest (#2912)
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/6.24.1...7.0.0
+
 ## 6.24.1 - 2026-02-09
 
 ### What's Changed
@@ -1135,6 +1180,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -1182,6 +1228,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
