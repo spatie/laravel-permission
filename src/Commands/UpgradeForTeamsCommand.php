@@ -5,21 +5,21 @@ namespace Spatie\Permission\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Config;
 
-class UpgradeForTeams extends Command
+class UpgradeForTeamsCommand extends Command
 {
     protected $signature = 'permission:setup-teams';
 
     protected $description = 'Setup the teams feature by generating the associated migration.';
 
-    protected $migrationSuffix = 'add_teams_fields.php';
+    protected string $migrationSuffix = 'add_teams_fields.php';
 
-    public function handle()
+    public function handle(): int
     {
         if (! Config::get('permission.teams')) {
             $this->error('Teams feature is disabled in your permission.php file.');
             $this->warn('Please enable the teams setting in your configuration.');
 
-            return;
+            return self::FAILURE;
         }
 
         $this->line('');
@@ -36,7 +36,7 @@ class UpgradeForTeams extends Command
         $this->line('');
 
         if (! $this->confirm('Proceed with the migration creation?', true)) {
-            return;
+            return self::SUCCESS;
         }
 
         $this->line('');
@@ -53,14 +53,11 @@ class UpgradeForTeams extends Command
         }
 
         $this->line('');
+
+        return self::SUCCESS;
     }
 
-    /**
-     * Create the migration.
-     *
-     * @return bool
-     */
-    protected function createMigration()
+    protected function createMigration(): bool
     {
         try {
             $migrationStub = __DIR__."/../../database/migrations/{$this->migrationSuffix}.stub";
@@ -74,13 +71,7 @@ class UpgradeForTeams extends Command
         }
     }
 
-    /**
-     * Build a warning regarding possible duplication
-     * due to already existing migrations.
-     *
-     * @return string
-     */
-    protected function getExistingMigrationsWarning(array $existingMigrations)
+    protected function getExistingMigrationsWarning(array $existingMigrations): string
     {
         if (count($existingMigrations) > 1) {
             $base = "Setup teams migrations already exist.\nFollowing files were found: ";
@@ -91,31 +82,16 @@ class UpgradeForTeams extends Command
         return $base.array_reduce($existingMigrations, fn ($carry, $fileName) => $carry."\n - ".$fileName);
     }
 
-    /**
-     * Check if there is another migration
-     * with the same suffix.
-     *
-     * @return array
-     */
-    protected function alreadyExistingMigrations()
+    protected function alreadyExistingMigrations(): array
     {
         $matchingFiles = glob($this->getMigrationPath('*'));
 
         return array_map(fn ($path) => basename($path), $matchingFiles);
     }
 
-    /**
-     * Get the migration path.
-     *
-     * The date parameter is optional for ability
-     * to provide a custom value or a wildcard.
-     *
-     * @param  string|null  $date
-     * @return string
-     */
-    protected function getMigrationPath($date = null)
+    protected function getMigrationPath(?string $date = null): string
     {
-        $date = $date ?: date('Y_m_d_His');
+        $date = $date ?: now()->format('Y_m_d_His');
 
         return database_path("migrations/{$date}_{$this->migrationSuffix}");
     }

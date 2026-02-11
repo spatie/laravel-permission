@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 use Spatie\Permission\Contracts\Role as RoleContract;
-use Spatie\Permission\Events\RoleAttached;
-use Spatie\Permission\Events\RoleDetached;
+use Spatie\Permission\Events\RoleAttachedEvent;
+use Spatie\Permission\Events\RoleDetachedEvent;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\PermissionRegistrar;
@@ -221,21 +221,15 @@ it('does not throw an exception when assigning a role that is already assigned',
 });
 
 it('throws an exception when assigning a role that does not exist', function () {
-    $this->expectException(RoleDoesNotExist::class);
-
-    $this->testUser->assignRole('evil-emperor');
+    expect(fn () => $this->testUser->assignRole('evil-emperor'))->toThrow(RoleDoesNotExist::class);
 });
 
 it('can only assign roles from the correct guard', function () {
-    $this->expectException(RoleDoesNotExist::class);
-
-    $this->testUser->assignRole('testAdminRole');
+    expect(fn () => $this->testUser->assignRole('testAdminRole'))->toThrow(RoleDoesNotExist::class);
 });
 
 it('throws an exception when assigning a role from a different guard', function () {
-    $this->expectException(GuardDoesNotMatch::class);
-
-    $this->testUser->assignRole($this->testAdminRole);
+    expect(fn () => $this->testUser->assignRole($this->testAdminRole))->toThrow(GuardDoesNotMatch::class);
 });
 
 it('ignores null roles when syncing', function () {
@@ -279,12 +273,7 @@ it('can avoid sync duplicated roles', function () {
 it('can avoid detach on role that does not exist sync', function () {
     $this->testUser->syncRoles('testRole');
 
-    try {
-        $this->testUser->syncRoles('role-does-not-exist');
-        $this->fail('Expected RoleDoesNotExist exception was not thrown.');
-    } catch (RoleDoesNotExist $e) {
-        //
-    }
+    expect(fn () => $this->testUser->syncRoles('role-does-not-exist'))->toThrow(RoleDoesNotExist::class);
 
     expect($this->testUser->hasRole('testRole'))->toBeTrue();
     expect($this->testUser->hasRole('role-does-not-exist'))->toBeFalse();
@@ -321,9 +310,7 @@ it('will remove all roles when an empty array is passed to sync roles', function
 it('sync roles error does not detach roles', function () {
     $this->testUser->assignRole('testRole');
 
-    $this->expectException(RoleDoesNotExist::class);
-
-    $this->testUser->syncRoles('testRole2', 'role-that-does-not-exist');
+    expect(fn () => $this->testUser->syncRoles('testRole2', 'role-that-does-not-exist'))->toThrow(RoleDoesNotExist::class);
 
     expect($this->testUser->fresh()->hasRole('testRole'))->toBeTrue();
 });
@@ -399,13 +386,9 @@ it('calling assignRole before saving object doesnt interfere with other objects'
 });
 
 it('throws an exception when syncing a role from another guard', function () {
-    $this->expectException(RoleDoesNotExist::class);
+    expect(fn () => $this->testUser->syncRoles('testRole', 'testAdminRole'))->toThrow(RoleDoesNotExist::class);
 
-    $this->testUser->syncRoles('testRole', 'testAdminRole');
-
-    $this->expectException(GuardDoesNotMatch::class);
-
-    $this->testUser->syncRoles('testRole', $this->testAdminRole);
+    expect(fn () => $this->testUser->syncRoles('testRole', $this->testAdminRole))->toThrow(GuardDoesNotMatch::class);
 });
 
 it('deletes pivot table entries when deleting models', function () {
@@ -627,35 +610,19 @@ it('can withoutscope against a specific guard', function () {
 });
 
 it('throws an exception when trying to scope a role from another guard', function () {
-    $this->expectException(RoleDoesNotExist::class);
-
-    User::role('testAdminRole')->get();
-
-    $this->expectException(GuardDoesNotMatch::class);
-
-    User::role($this->testAdminRole)->get();
+    expect(fn () => User::role('testAdminRole')->get())->toThrow(RoleDoesNotExist::class);
 });
 
 it('throws an exception when trying to call withoutscope on a role from another guard', function () {
-    $this->expectException(RoleDoesNotExist::class);
-
-    User::withoutRole('testAdminRole')->get();
-
-    $this->expectException(GuardDoesNotMatch::class);
-
-    User::withoutRole($this->testAdminRole)->get();
+    expect(fn () => User::withoutRole('testAdminRole')->get())->toThrow(RoleDoesNotExist::class);
 });
 
 it('throws an exception when trying to scope a non existing role', function () {
-    $this->expectException(RoleDoesNotExist::class);
-
-    User::role('role not defined')->get();
+    expect(fn () => User::role('role not defined')->get())->toThrow(RoleDoesNotExist::class);
 });
 
 it('throws an exception when trying to use withoutscope on a non existing role', function () {
-    $this->expectException(RoleDoesNotExist::class);
-
-    User::withoutRole('role not defined')->get();
+    expect(fn () => User::withoutRole('role not defined')->get())->toThrow(RoleDoesNotExist::class);
 });
 
 it('can determine that a user has one of the given roles', function () {
@@ -771,9 +738,7 @@ it('returns false instead of an exception when checking against any undefined ro
 });
 
 it('throws an exception if an unsupported type is passed to hasRoles', function () {
-    $this->expectException(\TypeError::class);
-
-    $this->testUser->hasRole(new class {});
+    expect(fn () => $this->testUser->hasRole(new class {}))->toThrow(\TypeError::class);
 });
 
 it('can retrieve role names', function () {
@@ -804,7 +769,7 @@ it('fires an event when a role is added', function () {
         ->pluck($this->testUserRole->getKeyName())
         ->toArray();
 
-    Event::assertDispatched(RoleAttached::class, function ($event) use ($roleIds) {
+    Event::assertDispatched(RoleAttachedEvent::class, function ($event) use ($roleIds) {
         return $event->model instanceof User
             && $event->model->hasRole('testRole')
             && $event->model->hasRole('testRole2')
@@ -824,7 +789,7 @@ it('fires an event when a role is removed', function () {
         ->pluck($this->testUserRole->getKeyName())
         ->toArray();
 
-    Event::assertDispatched(RoleDetached::class, function ($event) use ($roleIds) {
+    Event::assertDispatched(RoleDetachedEvent::class, function ($event) use ($roleIds) {
         return $event->model instanceof User
             && ! $event->model->hasRole('testRole')
             && ! $event->model->hasRole('testRole2')
@@ -835,33 +800,25 @@ it('fires an event when a role is removed', function () {
 it('can be given a role on permission when lazy loading is restricted', function () {
     expect(Model::preventsLazyLoading())->toBeTrue();
 
-    try {
-        $testPermission = app(PermissionContract::class)->with('roles')->get()->first();
+    $testPermission = app(PermissionContract::class)->with('roles')->get()->first();
 
-        $testPermission->assignRole('testRole');
+    $testPermission->assignRole('testRole');
 
-        expect($testPermission->hasRole('testRole'))->toBeTrue();
-    } catch (Exception $e) {
-        $this->fail('Lazy loading detected in the givePermissionTo method: '.$e->getMessage());
-    }
+    expect($testPermission->hasRole('testRole'))->toBeTrue();
 });
 
 it('can be given a role on user when lazy loading is restricted', function () {
     expect(Model::preventsLazyLoading())->toBeTrue();
 
-    try {
-        User::create(['email' => 'other@user.com']);
-        $user = User::with('roles')->get()->first();
-        $user->assignRole('testRole');
+    User::create(['email' => 'other@user.com']);
+    $user = User::with('roles')->get()->first();
+    $user->assignRole('testRole');
 
-        expect($user->hasRole('testRole'))->toBeTrue();
-    } catch (Exception $e) {
-        $this->fail('Lazy loading detected in the givePermissionTo method: '.$e->getMessage());
-    }
+    expect($user->hasRole('testRole'))->toBeTrue();
 });
 
 it('fires detach event when syncing roles', function () {
-    Event::fake([RoleDetached::class, RoleAttached::class]);
+    Event::fake([RoleDetachedEvent::class, RoleAttachedEvent::class]);
     app('config')->set('permission.events_enabled', true);
 
     $this->testUser->assignRole('testRole', 'testRole2');
@@ -878,7 +835,7 @@ it('fires detach event when syncing roles', function () {
         ->pluck($this->testUserRole->getKeyName())
         ->toArray();
 
-    Event::assertDispatched(RoleDetached::class, function ($event) use ($removedRoleIds) {
+    Event::assertDispatched(RoleDetachedEvent::class, function ($event) use ($removedRoleIds) {
         return $event->model instanceof User
             && ! $event->model->hasRole('testRole')
             && ! $event->model->hasRole('testRole2')
@@ -889,7 +846,7 @@ it('fires detach event when syncing roles', function () {
         ->pluck($this->testUserRole->getKeyName())
         ->toArray();
 
-    Event::assertDispatched(RoleAttached::class, function ($event) use ($attachedRoleIds) {
+    Event::assertDispatched(RoleAttachedEvent::class, function ($event) use ($attachedRoleIds) {
         return $event->model instanceof User
             && $event->model->hasRole('testRole3')
             && $event->rolesOrIds === $attachedRoleIds;

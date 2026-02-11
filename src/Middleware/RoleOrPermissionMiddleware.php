@@ -2,14 +2,18 @@
 
 namespace Spatie\Permission\Middleware;
 
+use BackedEnum;
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Guard;
 
+use function Illuminate\Support\enum_value;
+
 class RoleOrPermissionMiddleware
 {
-    public function handle($request, Closure $next, $roleOrPermission, $guard = null)
+    public function handle(Request $request, Closure $next, $roleOrPermission, ?string $guard = null)
     {
         $authGuard = Auth::guard($guard);
 
@@ -39,12 +43,8 @@ class RoleOrPermissionMiddleware
 
     /**
      * Specify the role or permission and guard for the middleware.
-     *
-     * @param  array|string|\BackedEnum  $roleOrPermission
-     * @param  string|null  $guard
-     * @return string
      */
-    public static function using($roleOrPermission, $guard = null)
+    public static function using(array|string|BackedEnum $roleOrPermission, ?string $guard = null): string
     {
         $roleOrPermissionString = self::parseRoleOrPermissionToString($roleOrPermission);
         $args = is_null($guard) ? $roleOrPermissionString : "$roleOrPermissionString,$guard";
@@ -52,22 +52,12 @@ class RoleOrPermissionMiddleware
         return static::class.':'.$args;
     }
 
-    /**
-     * Convert array or string of roles/permissions to string representation.
-     *
-     * @return string
-     */
-    protected static function parseRoleOrPermissionToString(array|string|\BackedEnum $roleOrPermission)
+    protected static function parseRoleOrPermissionToString(array|string|BackedEnum $roleOrPermission): string
     {
-        // Convert Enum to its value if an Enum is passed
-        if ($roleOrPermission instanceof \BackedEnum) {
-            $roleOrPermission = $roleOrPermission->value;
-        }
+        $roleOrPermission = enum_value($roleOrPermission);
 
         if (is_array($roleOrPermission)) {
-            $roleOrPermission = array_map(fn ($r) => $r instanceof \BackedEnum ? $r->value : $r, $roleOrPermission);
-
-            return implode('|', $roleOrPermission);
+            return implode('|', array_map(fn ($r) => enum_value($r), $roleOrPermission));
         }
 
         return (string) $roleOrPermission;

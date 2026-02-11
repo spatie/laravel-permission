@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Contracts;
 
+use BackedEnum;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
@@ -43,8 +44,6 @@ interface Role
 
     /**
      * Determine if the user may perform the given permission.
-     *
-     * @param  string|int|\Spatie\Permission\Contracts\Permission|\BackedEnum  $permission
      */
-    public function hasPermissionTo($permission, ?string $guardName): bool;
+    public function hasPermissionTo(string|int|Permission|BackedEnum $permission, ?string $guardName = null): bool;
 }

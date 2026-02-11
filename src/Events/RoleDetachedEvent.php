@@ -11,7 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Role;
 
-class RoleDetached
+class RoleDetachedEvent
 {
     use Dispatchable;
     use InteractsWithSockets;

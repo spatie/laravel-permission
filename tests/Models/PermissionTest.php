@@ -17,10 +17,10 @@ it('gets user models using with', function () {
 });
 
 it('throws an exception when the permission already exists', function () {
-    $this->expectException(PermissionAlreadyExists::class);
+    app(Permission::class)->create(['name' => 'test-permission']);
 
-    app(Permission::class)->create(['name' => 'test-permission']);
-    app(Permission::class)->create(['name' => 'test-permission']);
+    expect(fn () => app(Permission::class)->create(['name' => 'test-permission']))
+        ->toThrow(PermissionAlreadyExists::class);
 });
 
 it('belongs to a guard', function () {

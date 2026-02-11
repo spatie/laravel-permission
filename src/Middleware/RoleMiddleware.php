@@ -2,14 +2,18 @@
 
 namespace Spatie\Permission\Middleware;
 
+use BackedEnum;
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Guard;
 
+use function Illuminate\Support\enum_value;
+
 class RoleMiddleware
 {
-    public function handle($request, Closure $next, $role, $guard = null)
+    public function handle(Request $request, Closure $next, $role, ?string $guard = null)
     {
         $authGuard = Auth::guard($guard);
 
@@ -39,12 +43,8 @@ class RoleMiddleware
 
     /**
      * Specify the role and guard for the middleware.
-     *
-     * @param  array|string|\BackedEnum  $role
-     * @param  string|null  $guard
-     * @return string
      */
-    public static function using($role, $guard = null)
+    public static function using(array|string|BackedEnum $role, ?string $guard = null): string
     {
         $roleString = self::parseRolesToString($role);
 
@@ -53,22 +53,12 @@ class RoleMiddleware
         return static::class.':'.$args;
     }
 
-    /**
-     * Convert array or string of roles to string representation.
-     *
-     * @return string
-     */
-    protected static function parseRolesToString(array|string|\BackedEnum $role)
+    protected static function parseRolesToString(array|string|BackedEnum $role): string
     {
-        // Convert Enum to its value if an Enum is passed
-        if ($role instanceof \BackedEnum) {
-            $role = $role->value;
-        }
+        $role = enum_value($role);
 
         if (is_array($role)) {
-            $role = array_map(fn ($r) => $r instanceof \BackedEnum ? $r->value : $r, $role);
-
-            return implode('|', $role);
+            return implode('|', array_map(fn ($r) => enum_value($r), $role));
         }
 
         return (string) $role;

@@ -216,20 +216,18 @@ class TestCase extends Orchestra
     {
         $migration = str_replace(
             [
-                '(\'id\'); // permission id',
-                '(\'id\'); // role id',
+                '$table->id(); // permission id',
+                '$table->id(); // role id',
                 'references(\'id\') // permission id',
                 'references(\'id\') // role id',
-                'bigIncrements',
                 'unsignedBigInteger($pivotRole)',
                 'unsignedBigInteger($pivotPermission)',
             ],
             [
-                '(\'permission_test_id\');',
-                '(\'role_test_id\');',
+                '$table->uuid(\'permission_test_id\');',
+                '$table->uuid(\'role_test_id\');',
                 'references(\'permission_test_id\')',
                 'references(\'role_test_id\')',
-                'uuid',
                 'uuid($pivotRole)->nullable(false)',
                 'uuid($pivotPermission)->nullable(false)',
             ],

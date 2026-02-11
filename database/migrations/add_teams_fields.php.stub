@@ -1,9 +1,9 @@
 <?php
 
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -21,12 +21,9 @@ return new class extends Migration
         if (! $teams) {
             return;
         }
-        if (empty($tableNames)) {
-            throw new \Exception('Error: config/permission.php not loaded. Run [php artisan config:clear] and try again.');
-        }
-        if (empty($columnNames['team_foreign_key'] ?? null)) {
-            throw new \Exception('Error: team_foreign_key on config/permission.php not loaded. Run [php artisan config:clear] and try again.');
-        }
+
+        throw_if(empty($tableNames), 'Error: config/permission.php not loaded. Run [php artisan config:clear] and try again.');
+        throw_if(empty($columnNames['team_foreign_key'] ?? null), 'Error: team_foreign_key on config/permission.php not loaded. Run [php artisan config:clear] and try again.');
 
         if (! Schema::hasColumn($tableNames['roles'], $columnNames['team_foreign_key'])) {
             Schema::table($tableNames['roles'], function (Blueprint $table) use ($columnNames) {
@@ -52,7 +49,9 @@ return new class extends Migration
                     'model_has_permissions_permission_model_type_primary');
                 if (DB::getDriverName() !== 'sqlite') {
                     $table->foreign($pivotPermission)
-                        ->references('id')->on($tableNames['permissions'])->onDelete('cascade');
+                        ->references('id')
+                        ->on($tableNames['permissions'])
+                        ->cascadeOnDelete();
                 }
             });
         }
@@ -71,7 +70,9 @@ return new class extends Migration
                     'model_has_roles_role_model_type_primary');
                 if (DB::getDriverName() !== 'sqlite') {
                     $table->foreign($pivotRole)
-                        ->references('id')->on($tableNames['roles'])->onDelete('cascade');
+                        ->references('id')
+                        ->on($tableNames['roles'])
+                        ->cascadeOnDelete();
                 }
             });
         }
@@ -84,8 +85,5 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down(): void
-    {
-
-    }
+    public function down(): void {}
 };

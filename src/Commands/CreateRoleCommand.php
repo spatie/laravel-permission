@@ -3,11 +3,12 @@
 namespace Spatie\Permission\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 use Spatie\Permission\Contracts\Role as RoleContract;
 use Spatie\Permission\PermissionRegistrar;
 
-class CreateRole extends Command
+class CreateRoleCommand extends Command
 {
     protected $signature = 'permission:create-role
         {name : The name of the role}
@@ -17,7 +18,7 @@ class CreateRole extends Command
 
     protected $description = 'Create a role';
 
-    public function handle(PermissionRegistrar $permissionRegistrar)
+    public function handle(PermissionRegistrar $permissionRegistrar): int
     {
         $roleClass = app(RoleContract::class);
 
@@ -27,7 +28,7 @@ class CreateRole extends Command
         if (! $permissionRegistrar->teams && $this->option('team-id')) {
             $this->warn('Teams feature disabled, argument --team-id has no effect. Either enable it in permissions config file or remove --team-id parameter');
 
-            return;
+            return self::SUCCESS;
         }
 
         $role = $roleClass::findOrCreate($this->argument('name'), $this->argument('guard'));
@@ -41,15 +42,14 @@ class CreateRole extends Command
         $role->givePermissionTo($this->makePermissions($this->argument('permissions')));
 
         $this->info("Role `{$role->name}` ".($role->wasRecentlyCreated ? 'created' : 'updated'));
+
+        return self::SUCCESS;
     }
 
-    /**
-     * @param  array|null|string  $string
-     */
-    protected function makePermissions($string = null)
+    protected function makePermissions(?string $string = null): ?Collection
     {
         if (empty($string)) {
-            return;
+            return null;
         }
 
         $permissionClass = app(PermissionContract::class);

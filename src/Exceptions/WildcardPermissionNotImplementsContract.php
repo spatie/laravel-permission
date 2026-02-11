@@ -6,7 +6,7 @@ use InvalidArgumentException;
 
 class WildcardPermissionNotImplementsContract extends InvalidArgumentException
 {
-    public static function create()
+    public static function create(): static
     {
         return new static(__('Wildcard permission class must implement Spatie\\Permission\\Contracts\\Wildcard contract'));
     }

@@ -1,6 +1,6 @@
 {
     "name": "spatie/laravel-permission",
-    "description": "Permission handling for Laravel 8.0 and up",
+    "description": "Permission handling for Laravel 12 and up",
     "license": "MIT",
     "keywords": [
         "spatie",
@@ -22,18 +22,21 @@
     ],
     "homepage": "https://github.com/spatie/laravel-permission",
     "require": {
-        "php": "^8.0",
-        "illuminate/auth": "^8.12|^9.0|^10.0|^11.0|^12.0",
-        "illuminate/container": "^8.12|^9.0|^10.0|^11.0|^12.0",
-        "illuminate/contracts": "^8.12|^9.0|^10.0|^11.0|^12.0",
-        "illuminate/database": "^8.12|^9.0|^10.0|^11.0|^12.0"
+        "php": "^8.4",
+        "illuminate/auth": "^12.0",
+        "illuminate/container": "^12.0",
+        "illuminate/contracts": "^12.0",
+        "illuminate/database": "^12.0",
+        "spatie/laravel-package-tools": "^1.0"
     },
     "require-dev": {
-        "laravel/passport": "^11.0|^12.0",
+        "larastan/larastan": "^3.9",
+        "laravel/passport": "^12.0",
         "laravel/pint": "^1.0",
-        "orchestra/testbench": "^6.23|^7.0|^8.0|^9.0|^10.0",
-        "pestphp/pest": "^2.0|^3.0",
-        "pestphp/pest-plugin-laravel": "^2.0|^3.0"
+        "orchestra/testbench": "^10.0",
+        "pestphp/pest": "^3.0",
+        "pestphp/pest-plugin-laravel": "^3.0",
+        "phpstan/phpstan": "^2.1"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -58,8 +61,8 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "6.x-dev",
-            "dev-master": "6.x-dev"
+            "dev-main": "7.x-dev",
+            "dev-master": "7.x-dev"
         },
         "laravel": {
             "providers": [
