@@ -232,3 +232,11 @@ it('can change role class on runtime', function () {
     expect($this->testUser->roles[0])->toBeInstanceOf(RuntimeRole::class);
     expect($this->testUser->roles[0]->name)->toBe('test-role');
 });
+
+it('does not treat string "0" as empty when assigning role', function () {
+    app(Role::class)->create(['name' => '0']);
+
+    $this->testUser->assignRole('0');
+
+    expect($this->testUser->hasRole('0'))->toBeTrue();
+});

@@ -124,7 +124,7 @@ trait HasRoles
         return collect($roles)
             ->flatten()
             ->reduce(function ($array, $role) {
-                if (empty($role)) {
+                if ($role === null || $role === '') {
                     return $array;
                 }
 
