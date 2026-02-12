@@ -33,7 +33,7 @@ For guidance with upgrading your extended models, your migrations, your routes, 
 
 ### Requirements
 
-- PHP 8.4 or higher
+- PHP 8.3 or higher
 - Laravel 12 or higher
 
 ### Service Provider
