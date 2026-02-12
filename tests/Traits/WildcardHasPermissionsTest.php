@@ -95,7 +95,7 @@ it('can assign wildcard permissions using enums', function () {
 
     expect($user1->hasPermissionTo(Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::WildcardArticlesView))->toBeFalse();
     expect($user1->hasAnyPermission(Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::WildcardArticlesView))->toBeFalse();
-})->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
+});
 
 it('can check wildcard permissions via roles', function () {
     app('config')->set('permission.enable_wildcard_permission', true);
