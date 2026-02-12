@@ -39,10 +39,6 @@ it('a user can access a route protected by permission or role middleware if has 
 });
 
 it('a client can access a route protected by permission or role middleware if has this permission or role', function () {
-    if ($this->getLaravelVersion() < 9) {
-        $this->markTestSkipped('requires laravel >= 9');
-    }
-
     Passport::actingAsClient($this->testClient, ['*']);
 
     $this->testClient->assignRole('clientRole');
@@ -87,10 +83,6 @@ it('a user can not access a route protected by permission or role middleware if 
 });
 
 it('a client can not access a route protected by permission or role middleware if have not this permission and role', function () {
-    if ($this->getLaravelVersion() < 9) {
-        $this->markTestSkipped('requires laravel >= 9');
-    }
-
     Passport::actingAsClient($this->testClient, ['*']);
 
     expect($this->runMiddleware($this->roleOrPermissionMiddleware, 'clientRole|edit-posts', null, true))->toEqual(403);
@@ -121,10 +113,6 @@ it('user can not access permission or role with guard admin while login using de
 });
 
 it('client can not access permission or role with guard admin while login using default guard', function () {
-    if ($this->getLaravelVersion() < 9) {
-        $this->markTestSkipped('requires laravel >= 9');
-    }
-
     Passport::actingAsClient($this->testClient, ['*']);
 
     $this->testClient->assignRole('clientRole');

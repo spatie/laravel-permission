@@ -29,10 +29,6 @@ it('a user cannot access a route protected by role middleware of another guard',
 });
 
 it('a client cannot access a route protected by role middleware of another guard', function () {
-    if ($this->getLaravelVersion() < 9) {
-        $this->markTestSkipped('requires laravel >= 9');
-    }
-
     Passport::actingAsClient($this->testClient, ['*']);
 
     $this->testClient->assignRole('clientRole');
@@ -49,10 +45,6 @@ it('a user can access a route protected by role middleware if have this role', f
 });
 
 it('a client can access a route protected by role middleware if have this role', function () {
-    if ($this->getLaravelVersion() < 9) {
-        $this->markTestSkipped('requires laravel >= 9');
-    }
-
     Passport::actingAsClient($this->testClient, ['*']);
 
     $this->testClient->assignRole('clientRole');
@@ -70,10 +62,6 @@ it('a user can access a route protected by this role middleware if have one of t
 });
 
 it('a client can access a route protected by this role middleware if have one of the roles', function () {
-    if ($this->getLaravelVersion() < 9) {
-        $this->markTestSkipped('requires laravel >= 9');
-    }
-
     Passport::actingAsClient($this->testClient, ['*']);
 
     $this->testClient->assignRole('clientRole');
@@ -99,10 +87,6 @@ it('a user cannot access a route protected by the role middleware if have a diff
 });
 
 it('a client cannot access a route protected by the role middleware if have a different role', function () {
-    if ($this->getLaravelVersion() < 9) {
-        $this->markTestSkipped('requires laravel >= 9');
-    }
-
     Passport::actingAsClient($this->testClient, ['*']);
 
     $this->testClient->assignRole(['clientRole']);
@@ -117,10 +101,6 @@ it('a user cannot access a route protected by role middleware if have not roles'
 });
 
 it('a client cannot access a route protected by role middleware if have not roles', function () {
-    if ($this->getLaravelVersion() < 9) {
-        $this->markTestSkipped('requires laravel >= 9');
-    }
-
     Passport::actingAsClient($this->testClient, ['*']);
 
     expect($this->runMiddleware($this->roleMiddleware, 'testRole|testRole2', null, true))->toEqual(403);
@@ -133,10 +113,6 @@ it('a user cannot access a route protected by role middleware if role is undefin
 });
 
 it('a client cannot access a route protected by role middleware if role is undefined', function () {
-    if ($this->getLaravelVersion() < 9) {
-        $this->markTestSkipped('requires laravel >= 9');
-    }
-
     Passport::actingAsClient($this->testClient, ['*']);
 
     expect($this->runMiddleware($this->roleMiddleware, '', null, true))->toEqual(403);
@@ -201,10 +177,6 @@ it('user can not access role with guard admin while login using default guard', 
 });
 
 it('client can not access role with guard admin while login using default guard', function () {
-    if ($this->getLaravelVersion() < 9) {
-        $this->markTestSkipped('requires laravel >= 9');
-    }
-
     Passport::actingAsClient($this->testClient, ['*']);
 
     $this->testClient->assignRole('clientRole');

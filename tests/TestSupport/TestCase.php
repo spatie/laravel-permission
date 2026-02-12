@@ -82,9 +82,7 @@ class TestCase extends Orchestra
      */
     protected function getPackageProviders($app): array
     {
-        return $this->getLaravelVersion() < 9 ? [
-            PermissionServiceProvider::class,
-        ] : [
+        return [
             PermissionServiceProvider::class,
             PassportServiceProvider::class,
         ];
@@ -191,10 +189,6 @@ class TestCase extends Orchestra
 
     public function setUpPassport(): void
     {
-        if ($this->getLaravelVersion() < 9) {
-            return;
-        }
-
         $app = $this->app;
 
         $app['config']->set('permission.use_passport_client_credentials', true);

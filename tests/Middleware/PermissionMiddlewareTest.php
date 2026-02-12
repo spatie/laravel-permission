@@ -44,10 +44,6 @@ it('a user cannot access a route protected by the permission middleware of a dif
 });
 
 it('a client cannot access a route protected by the permission middleware of a different guard', function () {
-    if ($this->getLaravelVersion() < 9) {
-        $this->markTestSkipped('requires laravel >= 9');
-    }
-
     // These permissions are created fresh here in reverse order of guard being applied, so they are not "found first" in the db lookup when matching
     app(Permission::class)->create(['name' => 'admin-permission2', 'guard_name' => 'web']);
     $p1 = app(Permission::class)->create(['name' => 'admin-permission2', 'guard_name' => 'api']);
@@ -79,10 +75,6 @@ it('a user can access a route protected by permission middleware if have this pe
 });
 
 it('a client can access a route protected by permission middleware if have this permission', function () {
-    if ($this->getLaravelVersion() < 9) {
-        $this->markTestSkipped('requires laravel >= 9');
-    }
-
     Passport::actingAsClient($this->testClient, ['*'], 'api');
 
     $this->testClient->givePermissionTo('edit-posts');
@@ -100,10 +92,6 @@ it('a user can access a route protected by this permission middleware if have on
 });
 
 it('a client can access a route protected by this permission middleware if have one of the permissions', function () {
-    if ($this->getLaravelVersion() < 9) {
-        $this->markTestSkipped('requires laravel >= 9');
-    }
-
     Passport::actingAsClient($this->testClient, ['*']);
 
     $this->testClient->givePermissionTo('edit-posts');
@@ -129,10 +117,6 @@ it('a user cannot access a route protected by the permission middleware if have 
 });
 
 it('a client cannot access a route protected by the permission middleware if have a different permission', function () {
-    if ($this->getLaravelVersion() < 9) {
-        $this->markTestSkipped('requires laravel >= 9');
-    }
-
     Passport::actingAsClient($this->testClient, ['*']);
 
     $this->testClient->givePermissionTo('edit-posts');
@@ -147,10 +131,6 @@ it('a user cannot access a route protected by permission middleware if have not 
 });
 
 it('a client cannot access a route protected by permission middleware if have not permissions', function () {
-    if ($this->getLaravelVersion() < 9) {
-        $this->markTestSkipped('requires laravel >= 9');
-    }
-
     Passport::actingAsClient($this->testClient, ['*']);
 
     expect($this->runMiddleware($this->permissionMiddleware, 'edit-articles|edit-posts', null, true))->toEqual(403);
@@ -168,10 +148,6 @@ it('a user can access a route protected by permission middleware if has permissi
 });
 
 it('a client can access a route protected by permission middleware if has permission via role', function () {
-    if ($this->getLaravelVersion() < 9) {
-        $this->markTestSkipped('requires laravel >= 9');
-    }
-
     Passport::actingAsClient($this->testClient, ['*']);
 
     expect($this->runMiddleware($this->permissionMiddleware, 'edit-articles', null, true))->toEqual(403);
@@ -241,10 +217,6 @@ it('user can not access permission with guard admin while login using default gu
 });
 
 it('client can not access permission with guard admin while login using default guard', function () {
-    if ($this->getLaravelVersion() < 9) {
-        $this->markTestSkipped('requires laravel >= 9');
-    }
-
     Passport::actingAsClient($this->testClient, ['*']);
 
     $this->testClient->givePermissionTo('edit-posts');
