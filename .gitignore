@@ -6,4 +6,4 @@ tests/temp
 .phpunit.cache
 .phpunit.result.cache
 .php-cs-fixer.cache
-tests/CreatePermissionCustomTables.php
+tests/TestSupport/CreatePermissionCustomTables.php
