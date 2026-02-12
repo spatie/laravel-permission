@@ -212,7 +212,7 @@ class TestCase extends Orchestra
         $this->testClientPermission = $app[Permission::class]->create(['name' => 'edit-posts', 'guard_name' => 'api']);
     }
 
-    private function prepareMigration()
+    private function prepareMigration(): void
     {
         $migration = str_replace(
             [
@@ -295,12 +295,12 @@ class TestCase extends Orchestra
         });
     }
 
-    protected function reloadPermissions()
+    protected function reloadPermissions(): void
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 
-    public function createCacheTable()
+    public function createCacheTable(): void
     {
         Schema::create('cache', function ($table) {
             $table->string('key')->unique();
@@ -355,7 +355,7 @@ class TestCase extends Orchestra
         };
     }
 
-    protected function getLaravelVersion()
+    protected function getLaravelVersion(): float
     {
         return (float) app()->version();
     }
