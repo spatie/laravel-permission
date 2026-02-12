@@ -22,7 +22,7 @@
     ],
     "homepage": "https://github.com/spatie/laravel-permission",
     "require": {
-        "php": "^8.4",
+        "php": "^8.3",
         "illuminate/auth": "^12.0",
         "illuminate/container": "^12.0",
         "illuminate/contracts": "^12.0",
