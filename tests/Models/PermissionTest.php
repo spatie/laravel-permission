@@ -59,3 +59,11 @@ it('can delete hydrated permissions', function () {
 
     expect(app(Permission::class)->where($this->testUserPermission->getKeyName(), $this->testUserPermission->getKey())->get())->toHaveCount(0);
 });
+
+it('does not treat string "0" as empty when giving permission', function () {
+    app(Permission::class)->create(['name' => '0']);
+
+    $this->testUser->givePermissionTo('0');
+
+    expect($this->testUser->hasPermissionTo('0'))->toBeTrue();
+});

@@ -360,7 +360,7 @@ trait HasPermissions
         return collect($permissions)
             ->flatten()
             ->reduce(function ($array, $permission) {
-                if (empty($permission)) {
+                if ($permission === null || $permission === '') {
                     return $array;
                 }
 
