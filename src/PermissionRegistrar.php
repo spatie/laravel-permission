@@ -223,13 +223,8 @@ class PermissionRegistrar
         $method = $onlyOne ? 'first' : 'filter';
 
         $permissions = $this->permissions->$method(static function ($permission) use ($params) {
-            foreach ($params as $attr => $value) {
-                if ($permission->getAttribute($attr) != $value) {
-                    return false;
-                }
-            }
+            return array_all($params, fn($value, $attr) => $permission->getAttribute($attr) == $value);
 
-            return true;
         });
 
         if ($onlyOne) {
