@@ -49,7 +49,7 @@ it('can determine if a user has a direct permission using enums', function () {
     expect($this->testUser->hasPermissionTo($enum))->toBeTrue();
     expect($this->testUser->can($enum->value))->toBeTrue();
     expect($this->testUser->canAny([$enum->value, 'some other permission']))->toBeTrue();
-})->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
+});
 
 it('can determine if a user has a permission through roles', function () {
     $this->testUserRole->givePermissionTo($this->testUserPermission);

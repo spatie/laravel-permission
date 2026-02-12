@@ -212,7 +212,7 @@ it('the middleware can handle enum based roles with static using method', functi
 
     expect(RoleMiddleware::using([TestModels\TestRolePermissionsEnum::Writer, TestModels\TestRolePermissionsEnum::Editor]))
         ->toEqual('Spatie\Permission\Middleware\RoleMiddleware:writer|editor');
-})->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
+});
 
 it('the middleware can handle enum based roles with handle method', function () {
     app(Role::class)->create(['name' => TestModels\TestRolePermissionsEnum::Writer->value]);
@@ -228,4 +228,4 @@ it('the middleware can handle enum based roles with handle method', function () 
 
     expect($this->runMiddleware($this->roleMiddleware, [TestModels\TestRolePermissionsEnum::Writer, TestModels\TestRolePermissionsEnum::Editor]))
         ->toEqual(200);
-})->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
+});

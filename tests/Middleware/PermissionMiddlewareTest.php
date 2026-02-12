@@ -252,7 +252,7 @@ it('the middleware can handle enum based permissions with static using method', 
 
     expect(PermissionMiddleware::using([TestModels\TestRolePermissionsEnum::ViewArticles, TestModels\TestRolePermissionsEnum::EditArticles]))
         ->toEqual('Spatie\Permission\Middleware\PermissionMiddleware:view articles|edit articles');
-})->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
+});
 
 it('the middleware can handle enum based permissions with handle method', function () {
     app(Permission::class)->create(['name' => TestModels\TestRolePermissionsEnum::ViewArticles->value]);
@@ -268,4 +268,4 @@ it('the middleware can handle enum based permissions with handle method', functi
 
     expect($this->runMiddleware($this->permissionMiddleware, [TestModels\TestRolePermissionsEnum::ViewArticles, TestModels\TestRolePermissionsEnum::EditArticles]))
         ->toEqual(200);
-})->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
+});

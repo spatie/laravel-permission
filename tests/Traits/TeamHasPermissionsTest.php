@@ -68,7 +68,7 @@ it('can assign and remove a permission using enums', function () {
     expect($this->testUser->hasPermissionTo($enum))->toBeFalse();
     expect($this->testUser->hasAnyPermission($enum))->toBeFalse();
     expect($this->testUser->hasDirectPermission($enum))->toBeFalse();
-})->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
+});
 
 it('can scope users using enums', function () {
     $enum1 = Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::ViewArticles;
@@ -93,7 +93,7 @@ it('can scope users using enums', function () {
     expect($scopedUsers2->count())->toEqual(1);
     expect($scopedUsers3->count())->toEqual(2);
     expect($scopedUsers4->count())->toEqual(1);
-})->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
+});
 
 it('can scope users using a string', function () {
     User::all()->each(fn ($item) => $item->delete());

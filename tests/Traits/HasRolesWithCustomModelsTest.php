@@ -93,7 +93,7 @@ it('can assign and remove a role using enums', function () {
     $this->testUser->removeRole($enum1);
 
     expect($this->testUser->hasRole($enum1))->toBeFalse();
-})->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
+});
 
 it('can scope a role using enums', function () {
     $enum1 = Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::UserManager;
@@ -118,7 +118,7 @@ it('can scope a role using enums', function () {
     expect($scopedUsers1->count())->toEqual(1);
     expect($scopedUsers2->count())->toEqual(0);
     expect($scopedUsers3->count())->toEqual(3);
-})->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
+});
 
 it('can assign and remove a role', function () {
     expect($this->testUser->hasRole('testRole'))->toBeFalse();

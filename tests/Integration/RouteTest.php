@@ -44,7 +44,7 @@ it('test role function with backed enum', function () {
         ->role(TestRolePermissionsEnum::UserManager);
 
     expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual(['role:'.TestRolePermissionsEnum::UserManager->value]);
-})->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
+});
 
 it('test permission function with backed enum', function () {
     $router = $this->getRouter();
@@ -55,7 +55,7 @@ it('test permission function with backed enum', function () {
 
     $expected = ['permission:'.TestRolePermissionsEnum::Writer->value];
     expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual($expected);
-})->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
+});
 
 it('test role and permission function together with backed enum', function () {
     $router = $this->getRouter();
@@ -69,7 +69,7 @@ it('test role and permission function together with backed enum', function () {
         'role:'.TestRolePermissionsEnum::UserManager->value.'|'.TestRolePermissionsEnum::Admin->value,
         'permission:'.TestRolePermissionsEnum::Writer->value.'|'.TestRolePermissionsEnum::Editor->value,
     ]);
-})->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
+});
 
 it('test role or permission function', function () {
     $router = $this->getRouter();
@@ -99,7 +99,7 @@ it('test role or permission function with backed enum', function () {
         ->roleOrPermission(TestRolePermissionsEnum::UserManager);
 
     expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual(['role_or_permission:'.TestRolePermissionsEnum::UserManager->value]);
-})->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
+});
 
 it('test role or permission function with backed enum array', function () {
     $router = $this->getRouter();
@@ -111,4 +111,4 @@ it('test role or permission function with backed enum array', function () {
     expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual(
         ['role_or_permission:'.TestRolePermissionsEnum::UserManager->value.'|'.TestRolePermissionsEnum::EditArticles->value] // @phpstan-ignore-line
     );
-})->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
+});
