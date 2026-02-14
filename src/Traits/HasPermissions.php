@@ -116,15 +116,26 @@ trait HasPermissions
             array_reduce($permissions, fn ($result, $permission) => array_merge($result, $permission->roles->all()), [])
         );
 
-        return $query->where(fn (Builder $query) => $query
-            ->{! $without ? 'whereHas' : 'whereDoesntHave'}('permissions', fn (Builder $subQuery) => $subQuery
-            ->whereIn(config('permission.table_names.permissions').".$permissionKey", array_column($permissions, $permissionKey))
-            )
-            ->when(count($rolesWithPermissions), fn ($whenQuery) => $whenQuery
-                ->{! $without ? 'orWhereHas' : 'whereDoesntHave'}('roles', fn (Builder $subQuery) => $subQuery
-                ->whereIn(config('permission.table_names.roles').".$roleKey", array_column($rolesWithPermissions, $roleKey))
+        return $query->where(
+            fn (Builder $query) => $query
+                ->when(
+                    $this instanceof Permission,
+                    fn ($q) => $q->{! $without ? 'whereIn' : 'whereNotIn'}(config('permission.table_names.permissions').".$permissionKey", array_column($permissions, $permissionKey)),
+                    fn ($q) => $q->{! $without ? 'whereHas' : 'whereDoesntHave'}(
+                        'permissions',
+                        fn (Builder $subQuery) => $subQuery
+                            ->whereIn(config('permission.table_names.permissions').".$permissionKey", array_column($permissions, $permissionKey))
+                    )
                 )
-            )
+                ->when(
+                    count($rolesWithPermissions),
+                    fn ($whenQuery) => $whenQuery
+                        ->{! $without ? 'orWhereHas' : 'whereDoesntHave'}(
+                            'roles',
+                            fn (Builder $subQuery) => $subQuery
+                                ->whereIn(config('permission.table_names.roles').".$roleKey", array_column($rolesWithPermissions, $roleKey))
+                        )
+                )
         );
     }
 
@@ -317,6 +328,14 @@ trait HasPermissions
     {
         $permission = $this->filterPermission($permission);
 
+        if ($this instanceof Permission) {
+            return $this->getKey() == $permission->getKey();
+        }
+
+        if (! $this->exists) {
+            return false;
+        }
+
         return $this->loadMissing('permissions')->permissions
             ->contains($permission->getKeyName(), $permission->getKey());
     }
@@ -340,14 +359,34 @@ trait HasPermissions
      */
     public function getAllPermissions(): Collection
     {
-        /** @var Collection $permissions */
-        $permissions = $this->permissions;
-
-        if (! $this instanceof Permission) {
-            $permissions = $permissions->merge($this->getPermissionsViaRoles());
+        if ($this instanceof Permission) {
+            return collect([$this]);
         }
 
-        return $permissions->sort()->values();
+        if (! $this->exists) {
+            return collect();
+        }
+
+        return $this->getDirectPermissions()
+            ->merge($this->getPermissionsViaRoles())
+            ->sort()
+            ->values();
+    }
+
+    /**
+     * Return all permissions directly coupled to the model.
+     */
+    public function getDirectPermissions(): Collection
+    {
+        if ($this instanceof Permission) {
+            return collect([$this]);
+        }
+
+        if (! $this->exists) {
+            return collect();
+        }
+
+        return $this->permissions;
     }
 
     /**
@@ -386,6 +425,10 @@ trait HasPermissions
      */
     public function givePermissionTo(...$permissions): static
     {
+        if ($this instanceof Permission) {
+            return $this;
+        }
+
         $permissions = $this->collectPermissions($permissions);
 
         $model = $this->getModel();
@@ -441,6 +484,10 @@ trait HasPermissions
      */
     public function syncPermissions(...$permissions): static
     {
+        if ($this instanceof Permission) {
+            return $this;
+        }
+
         if ($this->getModel()->exists) {
             $this->collectPermissions($permissions);
             $this->permissions()->detach();
@@ -458,6 +505,10 @@ trait HasPermissions
      */
     public function revokePermissionTo($permission): static
     {
+        if ($this instanceof Permission) {
+            return $this;
+        }
+
         $storedPermission = $this->getStoredPermission($permission);
 
         $this->permissions()->detach($storedPermission);
@@ -479,7 +530,15 @@ trait HasPermissions
 
     public function getPermissionNames(): Collection
     {
-        return $this->permissions->pluck('name');
+        if ($this instanceof Permission) {
+            return collect([$this->name]);
+        }
+
+        if (! $this->exists) {
+            return collect();
+        }
+
+        return $this->getDirectPermissions()->pluck('name');
     }
 
     /**
