@@ -13,8 +13,12 @@ jobs:
       matrix:
         php: [8.5, 8.4, 8.3]
         laravel: [^13, ^12]
-        testbench: [^10, ^11.0]
         dependency-version: [prefer-lowest, prefer-stable]
+        include:
+          - laravel: "^13.0"
+            testbench: 11.*
+          - laravel: "^12.0"
+            testbench: 10.*
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }}
 
