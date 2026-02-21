@@ -23,19 +23,19 @@
     "homepage": "https://github.com/spatie/laravel-permission",
     "require": {
         "php": "^8.3",
-        "illuminate/auth": "^12.0",
-        "illuminate/container": "^12.0",
-        "illuminate/contracts": "^12.0",
-        "illuminate/database": "^12.0",
+        "illuminate/auth": "^12.0|^13.0",
+        "illuminate/container": "^12.0|^13.0",
+        "illuminate/contracts": "^12.0|^13.0",
+        "illuminate/database": "^12.0|^13.0",
         "spatie/laravel-package-tools": "^1.0"
     },
     "require-dev": {
         "larastan/larastan": "^3.9",
-        "laravel/passport": "^12.0",
+        "laravel/passport": "^13.0",
         "laravel/pint": "^1.0",
-        "orchestra/testbench": "^10.0",
-        "pestphp/pest": "^3.0",
-        "pestphp/pest-plugin-laravel": "^3.0",
+        "orchestra/testbench": "^10.0|^11.0",
+        "pestphp/pest": "^3.0|^4.0",
+        "pestphp/pest-plugin-laravel": "^3.0|^4.1",
         "phpstan/phpstan": "^2.1"
     },
     "minimum-stability": "dev",
