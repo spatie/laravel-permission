@@ -4,6 +4,7 @@ namespace Spatie\Permission\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Arr;
 use Spatie\Permission\PermissionRegistrar;
 
 trait HasModels
@@ -32,19 +33,19 @@ trait HasModels
     {
         $guardModelClass = getModelForGuard($this->attributes['guard_name'] ?? config('auth.defaults.guard'));
 
-        return collect($models)
-            ->flatten()
-            ->reduce(function (array $carry, $model) use ($guardModelClass) {
-                if ($model === null || $model === '') {
+        return collect(Arr::flatten($models))
+            ->reduce(function (array $carry, $value) use ($guardModelClass) {
+                if ($value === null || $value === '') {
                     return $carry;
                 }
 
-                if (! $model instanceof Model) {
-                    $model = $guardModelClass::findOrFail($model);
+                if ($value instanceof Model) {
+                    $morphClass = $value->getMorphClass();
+                    $id = $value->getKey();
+                } else {
+                    $morphClass = $guardModelClass;
+                    $id = $value;
                 }
-
-                $morphClass = $model->getMorphClass();
-                $id = $model->getKey();
 
                 if (! isset($carry[$morphClass]) || ! in_array($id, $carry[$morphClass])) {
                     $carry[$morphClass][] = $id;
