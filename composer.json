@@ -31,7 +31,7 @@
     },
     "require-dev": {
         "larastan/larastan": "^3.9",
-        "laravel/passport": "^12.0|^13.0",
+        "laravel/passport": "^13.0",
         "laravel/pint": "^1.0",
         "orchestra/testbench": "^10.0|^11.0",
         "pestphp/pest": "^3.0|^4.0",
