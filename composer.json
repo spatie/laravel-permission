@@ -35,7 +35,7 @@
         "laravel/pint": "^1.0",
         "orchestra/testbench": "^10.0|^11.0",
         "pestphp/pest": "^3.0|^4.0",
-        "pestphp/pest-plugin-laravel": "^3.0",
+        "pestphp/pest-plugin-laravel": "^3.0|^4.1",
         "phpstan/phpstan": "^2.1"
     },
     "minimum-stability": "dev",

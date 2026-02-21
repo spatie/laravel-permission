@@ -13,7 +13,7 @@ jobs:
       matrix:
         php: [8.5, 8.4, 8.3]
         laravel: ["^13", "^12"]
-        dependency-version: [prefer-lowest, prefer-stable]
+        dependency-version: [prefer-stable]
         include:
           - laravel: "^13"
             testbench: 11.*
