@@ -182,6 +182,8 @@ trait HasRoles
             $this->forgetCachedPermissions();
         }
 
+        $this->forgetWildcardPermissionIndex();
+
         if (config('permission.events_enabled')) {
             event(new RoleAttachedEvent($this->getModel(), $roles));
         }
@@ -206,6 +208,8 @@ trait HasRoles
         if ($this instanceof Permission) {
             $this->forgetCachedPermissions();
         }
+
+        $this->forgetWildcardPermissionIndex();
 
         if (config('permission.events_enabled')) {
             event(new RoleDetachedEvent($this->getModel(), $roles));
