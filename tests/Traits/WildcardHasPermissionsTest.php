@@ -118,6 +118,40 @@ it('can check wildcard permissions via roles', function () {
     expect($user1->hasPermissionTo('projects.list'))->toBeFalse();
 });
 
+it('clears wildcard index when assigning a role', function () {
+    app('config')->set('permission.enable_wildcard_permission', true);
+
+    $user = User::create(['email' => 'user1@test.com']);
+
+    $permission = Permission::create(['name' => 'posts.*']);
+    $this->testUserRole->givePermissionTo($permission);
+
+    // Check permission before assigning role — this populates the wildcard index
+    expect($user->hasPermissionTo('posts.create'))->toBeFalse();
+
+    $user->assignRole('testRole');
+
+    // After assigning the role, the wildcard index should be cleared
+    expect($user->hasPermissionTo('posts.create'))->toBeTrue();
+});
+
+it('clears wildcard index when removing a role', function () {
+    app('config')->set('permission.enable_wildcard_permission', true);
+
+    $user = User::create(['email' => 'user1@test.com']);
+
+    $permission = Permission::create(['name' => 'posts.*']);
+    $this->testUserRole->givePermissionTo($permission);
+
+    $user->assignRole('testRole');
+    expect($user->hasPermissionTo('posts.create'))->toBeTrue();
+
+    $user->removeRole('testRole');
+
+    // After removing the role, the wildcard index should be cleared
+    expect($user->hasPermissionTo('posts.create'))->toBeFalse();
+});
+
 it('can check custom wildcard permission', function () {
     app('config')->set('permission.enable_wildcard_permission', true);
     app('config')->set('permission.wildcard_permission', WildcardPermission::class);
