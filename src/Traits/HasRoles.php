@@ -12,6 +12,7 @@ use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Events\RoleAttachedEvent;
 use Spatie\Permission\Events\RoleDetachedEvent;
 use Spatie\Permission\PermissionRegistrar;
+use Spatie\Permission\Exceptions\TeamsNotEnabled;
 use TypeError;
 
 use function Illuminate\Support\enum_value;
@@ -113,6 +114,23 @@ trait HasRoles
         return $this->scopeRole($query, $roles, $guard, true);
     }
 
+    /**
+     * A model may be part of multiple teams.
+     */
+    public function teams(): BelongsToMany
+    {
+        if (! app(PermissionRegistrar::class)->teams) {
+            throw TeamsNotEnabled::create();
+        }
+
+        return $this->morphToMany(
+            config('permission.models.team'),
+            'model',
+            config('permission.table_names.model_has_roles'),
+            config('permission.column_names.model_morph_key'),
+            app(PermissionRegistrar::class)->teamsKey
+        )->distinct();
+    }
     /**
      * Returns array of role ids
      *
