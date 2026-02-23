@@ -132,7 +132,7 @@ trait HasRoles
         )->distinct();
     }
 
-     /**
+    /**
      * Scope the model query to certain teams only.
      *
      * @param  int|string|array|\Illuminate\Database\Eloquent\Model|Collection  $teams
