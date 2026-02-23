@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Events\RoleAttachedEvent;
 use Spatie\Permission\Events\RoleDetachedEvent;
@@ -32,7 +31,7 @@ trait HasRoles
             $teams = app(PermissionRegistrar::class)->teams;
             app(PermissionRegistrar::class)->teams = false;
             $model->roles()->detach();
-            if ($model instanceof Permission) {
+            if ($model->isPermissionModel()) {
                 $model->users()->detach();
             }
             app(PermissionRegistrar::class)->teams = $teams;
@@ -98,8 +97,10 @@ trait HasRoles
 
         $key = (new ($this->getRoleClass())())->getKeyName();
 
-        return $query->{! $without ? 'whereHas' : 'whereDoesntHave'}('roles', fn (Builder $subQuery) => $subQuery
-            ->whereIn(config('permission.table_names.roles').".$key", array_column($roles, $key))
+        return $query->{! $without ? 'whereHas' : 'whereDoesntHave'}(
+            'roles',
+            fn (Builder $subQuery) => $subQuery
+                ->whereIn(config('permission.table_names.roles').".$key", array_column($roles, $key))
         );
     }
 
@@ -149,7 +150,7 @@ trait HasRoles
         $roles = $this->collectRoles($roles);
 
         $model = $this->getModel();
-        $teamPivot = app(PermissionRegistrar::class)->teams && ! $this instanceof Permission ?
+        $teamPivot = app(PermissionRegistrar::class)->teams && ! $this->isPermissionModel() ?
             [app(PermissionRegistrar::class)->teamsKey => getPermissionsTeamId()] : [];
 
         if ($model->exists) {
@@ -178,7 +179,7 @@ trait HasRoles
             );
         }
 
-        if ($this instanceof Permission) {
+        if ($this->isPermissionModel()) {
             $this->forgetCachedPermissions();
         }
 
@@ -205,7 +206,7 @@ trait HasRoles
 
         $this->unsetRelation('roles');
 
-        if ($this instanceof Permission) {
+        if ($this->isPermissionModel()) {
             $this->forgetCachedPermissions();
         }
 
@@ -249,6 +250,10 @@ trait HasRoles
      */
     public function hasRole($roles, ?string $guard = null): bool
     {
+        if (! $this->exists) {
+            return false;
+        }
+
         $this->loadMissing('roles');
 
         if (is_string($roles) && str_contains($roles, '|')) {
@@ -366,22 +371,19 @@ trait HasRoles
             $roles = [$roles->name];
         }
 
-        $roles = collect()->make($roles)->map(fn ($role) => $role instanceof Role ? $role->name : $role
+        $roles = collect()->make($roles)->map(
+            fn ($role) => $role instanceof Role ? $role->name : $role
         );
 
         return $this->roles->count() == $roles->count() && $this->hasAllRoles($roles, $guard);
     }
 
-    /**
-     * Return all permissions directly coupled to the model.
-     */
-    public function getDirectPermissions(): Collection
-    {
-        return $this->permissions;
-    }
-
     public function getRoleNames(): Collection
     {
+        if (! $this->exists) {
+            return collect();
+        }
+
         $this->loadMissing('roles');
 
         return $this->roles->pluck('name');
