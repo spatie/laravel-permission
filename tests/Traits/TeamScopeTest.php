@@ -1,5 +1,6 @@
 <?php
 
+use Spatie\Permission\Exceptions\TeamModelNotConfigured;
 use Spatie\Permission\Exceptions\TeamsNotEnabled;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Tests\TestSupport\TestModels\User;
@@ -18,6 +19,14 @@ it('throws an exception when teams are not enabled', function () {
 
     expect(fn () => User::team(1)->get())->toThrow(TeamsNotEnabled::class);
     expect(fn () => User::withoutTeam(1)->get())->toThrow(TeamsNotEnabled::class);
+});
+
+it('throws an exception when team model is not configured', function () {
+    app('config')->set('permission.models.team', null);
+
+    expect(fn () => User::team(1)->get())->toThrow(TeamModelNotConfigured::class);
+    expect(fn () => User::withoutTeam(1)->get())->toThrow(TeamModelNotConfigured::class);
+    expect(fn () => $this->testUser->teams()->get())->toThrow(TeamModelNotConfigured::class);
 });
 
 it('can scope users by team using an id', function () {
@@ -102,6 +111,7 @@ it('can scope users without a team using an array of ids', function () {
     User::all()->each(fn ($u) => $u->delete());
     $user1 = User::create(['email' => 'user1@test.com']);
     $user2 = User::create(['email' => 'user2@test.com']);
+    $user3 = User::create(['email' => 'user3@test.com']);
 
     setPermissionsTeamId(1);
     $user1->assignRole('testRole');
@@ -119,6 +129,7 @@ it('can scope users without a team using a collection', function () {
     User::all()->each(fn ($u) => $u->delete());
     $user1 = User::create(['email' => 'user1@test.com']);
     $user2 = User::create(['email' => 'user2@test.com']);
+    $user3 = User::create(['email' => 'user3@test.com']);
 
     setPermissionsTeamId(1);
     $user1->assignRole('testRole');
@@ -126,7 +137,9 @@ it('can scope users without a team using a collection', function () {
     setPermissionsTeamId(2);
     $user2->assignRole('testRole');
 
+    // user3 has no role in team 1 or 2
     expect(User::withoutTeam(collect([1, 2]))->get()->count())->toEqual(1);
+    // user2 and user3 have no role in team 1
     expect(User::withoutTeam(collect([1]))->get()->count())->toEqual(2);
 });
 

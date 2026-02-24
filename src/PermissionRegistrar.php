@@ -24,6 +24,8 @@ class PermissionRegistrar
 
     protected string $roleClass;
 
+    protected ?string $teamClass;
+
     protected Collection|array|null $permissions = null;
 
     public string $pivotRole;
@@ -54,6 +56,7 @@ class PermissionRegistrar
     {
         $this->permissionClass = config('permission.models.permission');
         $this->roleClass = config('permission.models.role');
+        $this->teamClass = config('permission.models.team');
         $this->teamResolver = new (config('permission.team_resolver', DefaultTeamResolver::class));
 
         $this->cacheManager = $cacheManager;
@@ -258,6 +261,22 @@ class PermissionRegistrar
         $this->roleClass = $roleClass;
         config()->set('permission.models.role', $roleClass);
         app()->bind(Role::class, $roleClass);
+
+        return $this;
+    }
+
+    public function getTeamClass(): ?string
+    {
+        return $this->teamClass;
+    }
+
+    public function setTeamClass(?string $teamClass): static
+    {
+        $this->teamClass = $teamClass;
+        config()->set('permission.models.team', $teamClass);
+        if ($teamClass) {
+            app()->bind(config('permission.models.team'), $teamClass);
+        }
 
         return $this;
     }

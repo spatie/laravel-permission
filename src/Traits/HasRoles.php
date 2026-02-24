@@ -12,6 +12,7 @@ use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Events\RoleAttachedEvent;
 use Spatie\Permission\Events\RoleDetachedEvent;
 use Spatie\Permission\PermissionRegistrar;
+use Spatie\Permission\Exceptions\TeamModelNotConfigured;
 use Spatie\Permission\Exceptions\TeamsNotEnabled;
 use TypeError;
 
@@ -123,6 +124,10 @@ trait HasRoles
             throw TeamsNotEnabled::create();
         }
 
+        if (! config('permission.models.team')) {
+            throw TeamModelNotConfigured::create();
+        }
+
         return $this->morphToMany(
             config('permission.models.team'),
             'model',
@@ -141,6 +146,10 @@ trait HasRoles
     {
         if (! app(PermissionRegistrar::class)->teams) {
             throw TeamsNotEnabled::create();
+        }
+
+        if (! config('permission.models.team')) {
+            throw TeamModelNotConfigured::create();
         }
 
         if ($teams instanceof Collection) {
