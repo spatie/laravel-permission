@@ -66,7 +66,7 @@ it('can scope users by team using a collection', function () {
     User::all()->each(fn ($u) => $u->delete());
     $user1 = User::create(['email' => 'user1@test.com']);
     $user2 = User::create(['email' => 'user2@test.com']);
-   
+
     setPermissionsTeamId(1);
     $user1->assignRole('testRole');
 

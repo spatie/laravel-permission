@@ -11,9 +11,9 @@ use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Events\RoleAttachedEvent;
 use Spatie\Permission\Events\RoleDetachedEvent;
-use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Exceptions\TeamModelNotConfigured;
 use Spatie\Permission\Exceptions\TeamsNotEnabled;
+use Spatie\Permission\PermissionRegistrar;
 use TypeError;
 
 use function Illuminate\Support\enum_value;

@@ -26,7 +26,6 @@ return [
 
         'role' => Spatie\Permission\Models\Role::class,
 
-
         /*
          * When using the "Teams" feature from this package, we need to know which
          * Eloquent model should be used to retrieve your teams. Of course, it
