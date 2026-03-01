@@ -181,3 +181,45 @@ it('does nothing when detaching models that are not attached', function () {
 
     expect($user1->fresh()->hasRole($this->testUserRole))->toBeTrue();
 });
+
+// --- explicit model class ---
+
+it('can sync models using IDs with explicit model class', function () {
+    $user1 = User::create(['email' => 'user1@test.com']);
+    $user2 = User::create(['email' => 'user2@test.com']);
+
+    $this->testUserRole->syncModels([$user1->getKey(), $user2->getKey()], User::class);
+
+    expect($user1->fresh()->hasRole($this->testUserRole))->toBeTrue();
+    expect($user2->fresh()->hasRole($this->testUserRole))->toBeTrue();
+});
+
+it('can attach models using IDs with explicit model class', function () {
+    $user1 = User::create(['email' => 'user1@test.com']);
+
+    $this->testUserRole->attachModels($user1->getKey(), User::class);
+
+    expect($user1->fresh()->hasRole($this->testUserRole))->toBeTrue();
+});
+
+it('can detach models using IDs with explicit model class', function () {
+    $user1 = User::create(['email' => 'user1@test.com']);
+
+    $user1->assignRole($this->testUserRole);
+
+    $this->testUserRole->detachModels($user1->getKey(), User::class);
+
+    expect($user1->fresh()->hasRole($this->testUserRole))->toBeFalse();
+});
+
+// --- config default_model ---
+
+it('uses config default_model when resolving IDs', function () {
+    config()->set('permission.models.default_model', User::class);
+
+    $user1 = User::create(['email' => 'user1@test.com']);
+
+    $this->testUserRole->syncModels([$user1->getKey()]);
+
+    expect($user1->fresh()->hasRole($this->testUserRole))->toBeTrue();
+});

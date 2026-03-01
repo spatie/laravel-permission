@@ -24,17 +24,27 @@ trait HasModels
     }
 
     /**
+     * Resolve the model class to use when raw IDs are passed.
+     */
+    private function resolveModelClass(?string $modelClass = null): string
+    {
+        return $modelClass
+            ?? config('permission.models.default_model')
+            ?? getModelForGuard($this->attributes['guard_name'] ?? config('auth.defaults.guard'));
+    }
+
+    /**
      * Returns a grouped array of model IDs keyed by morph class.
      *
-     * @param  Model|int|string|array|\Illuminate\Support\Collection  ...$models
+     * @param  Model|int|string|array|\Illuminate\Support\Collection  $models
      * @return array<string, list<int|string>>
      */
-    private function collectModels(...$models): array
+    private function collectModels($models, ?string $modelClass = null): array
     {
-        $guardModelClass = getModelForGuard($this->attributes['guard_name'] ?? config('auth.defaults.guard'));
+        $defaultModelClass = $this->resolveModelClass($modelClass);
 
         return collect(Arr::flatten($models))
-            ->reduce(function (array $carry, $value) use ($guardModelClass) {
+            ->reduce(function (array $carry, $value) use ($defaultModelClass) {
                 if ($value === null || $value === '') {
                     return $carry;
                 }
@@ -43,7 +53,7 @@ trait HasModels
                     $morphClass = $value->getMorphClass();
                     $id = $value->getKey();
                 } else {
-                    $morphClass = $guardModelClass;
+                    $morphClass = $defaultModelClass;
                     $id = $value;
                 }
 
@@ -61,9 +71,9 @@ trait HasModels
      * @param  Model|int|string|array|\Illuminate\Support\Collection  ...$models
      * @return $this
      */
-    public function attachModels(...$models): static
+    public function attachModels(array|Model|int|string $models, ?string $modelClass = null): static
     {
-        $grouped = $this->collectModels($models);
+        $grouped = $this->collectModels($models, $modelClass);
 
         $teamPivot = app(PermissionRegistrar::class)->teams
             ? [app(PermissionRegistrar::class)->teamsKey => getPermissionsTeamId()]
@@ -88,9 +98,9 @@ trait HasModels
      * @param  Model|int|string|array|\Illuminate\Support\Collection  ...$models
      * @return $this
      */
-    public function detachModels(...$models): static
+    public function detachModels(array|Model|int|string $models, ?string $modelClass = null): static
     {
-        $grouped = $this->collectModels($models);
+        $grouped = $this->collectModels($models, $modelClass);
 
         foreach ($grouped as $morphClass => $ids) {
             $this->morphRelationForModelClass($morphClass)->detach($ids);
@@ -107,9 +117,9 @@ trait HasModels
      * @param  Model|int|string|array|\Illuminate\Support\Collection  ...$models
      * @return $this
      */
-    public function syncModels(...$models): static
+    public function syncModels(array|Model|int|string $models, ?string $modelClass = null): static
     {
-        $grouped = $this->collectModels($models);
+        $grouped = $this->collectModels($models, $modelClass);
 
         if ($this->getModel()->exists) {
             $morphTypes = $this->getConnection()
