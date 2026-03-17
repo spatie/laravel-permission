@@ -210,7 +210,7 @@ class TestCase extends Orchestra
         $this->artisan('passport:client', ['--password' => true, '--name' => config('app.name').' Password Grant Client', '--provider' => $provider]);
 
         // Passport uses redirect_uris from v13
-        if (! Schema::hasColumn(config('passport.table_names.clients'), 'redirect_uris')) {
+        if (Schema::hasColumn(config('passport.table_names.clients'), 'redirect')) {
             $this->testClient = Client::create(['name' => 'Test', 'redirect' => 'https://example.com', 'personal_access_client' => 0, 'password_client' => 0, 'revoked' => 0]);
         } else {
             // Passport 13+
