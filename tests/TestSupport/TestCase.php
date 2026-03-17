@@ -209,9 +209,11 @@ class TestCase extends Orchestra
         $this->artisan('passport:client', ['--personal' => true, '--name' => config('app.name').' Personal Access Client', '--provider' => $provider]);
         $this->artisan('passport:client', ['--password' => true, '--name' => config('app.name').' Password Grant Client', '--provider' => $provider]);
 
-        if ($this->getLaravelVersion() < 13) {
+        // Passport uses redirect_uris from v13
+        if (! Schema::hasColumn(config('passport.table_names.clients'), 'redirect_uris')) {
             $this->testClient = Client::create(['name' => 'Test', 'redirect' => 'https://example.com', 'personal_access_client' => 0, 'password_client' => 0, 'revoked' => 0]);
         } else {
+            // Passport 13+
             $this->testClient = Client::create(['name' => 'Test', 'redirect_uris' => ['https://example.com'], 'grant_types' => [], 'revoked' => 0]);
         }
         $this->testClientRole = $app[Role::class]->create(['name' => 'clientRole', 'guard_name' => 'api']);
