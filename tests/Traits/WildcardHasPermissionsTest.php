@@ -4,6 +4,7 @@ use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Exceptions\WildcardPermissionInvalidArgument;
 use Spatie\Permission\Exceptions\WildcardPermissionNotProperlyFormatted;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum;
 use Spatie\Permission\Tests\TestSupport\TestModels\User;
 use Spatie\Permission\Tests\TestSupport\TestModels\WildcardPermission;
 
@@ -67,10 +68,10 @@ it('can assign wildcard permissions using enums', function () {
 
     $user1 = User::create(['email' => 'user1@test.com']);
 
-    $articlesCreator = Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::WildcardArticlesCreator;
-    $newsEverything = Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::WildcardNewsEverything;
-    $postsEverything = Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::WildcardPostsEverything;
-    $postsCreate = Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::WildcardPostsCreate;
+    $articlesCreator = TestRolePermissionsEnum::WildcardArticlesCreator;
+    $newsEverything = TestRolePermissionsEnum::WildcardNewsEverything;
+    $postsEverything = TestRolePermissionsEnum::WildcardPostsEverything;
+    $postsCreate = TestRolePermissionsEnum::WildcardPostsCreate;
 
     $permission1 = app(Permission::class)->findOrCreate($articlesCreator->value, 'web');
     $permission2 = app(Permission::class)->findOrCreate($newsEverything->value, 'web');
@@ -82,19 +83,19 @@ it('can assign wildcard permissions using enums', function () {
     expect($user1->hasPermissionTo($postsCreate->value.'.123'))->toBeTrue();
     expect($user1->hasPermissionTo($postsEverything))->toBeTrue();
 
-    expect($user1->hasPermissionTo(Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::WildcardArticlesView))->toBeTrue();
-    expect($user1->hasAnyPermission(Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::WildcardArticlesView))->toBeTrue();
+    expect($user1->hasPermissionTo(TestRolePermissionsEnum::WildcardArticlesView))->toBeTrue();
+    expect($user1->hasAnyPermission(TestRolePermissionsEnum::WildcardArticlesView))->toBeTrue();
 
-    expect($user1->hasPermissionTo(Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::WildcardProjectsView))->toBeFalse();
+    expect($user1->hasPermissionTo(TestRolePermissionsEnum::WildcardProjectsView))->toBeFalse();
 
     $user1->revokePermissionTo([$permission1, $permission2, $permission3]);
 
-    expect($user1->hasPermissionTo(Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::WildcardPostsCreate))->toBeFalse();
+    expect($user1->hasPermissionTo(TestRolePermissionsEnum::WildcardPostsCreate))->toBeFalse();
     expect($user1->hasPermissionTo($postsCreate->value.'.123'))->toBeFalse();
-    expect($user1->hasPermissionTo(Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::WildcardPostsEverything))->toBeFalse();
+    expect($user1->hasPermissionTo(TestRolePermissionsEnum::WildcardPostsEverything))->toBeFalse();
 
-    expect($user1->hasPermissionTo(Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::WildcardArticlesView))->toBeFalse();
-    expect($user1->hasAnyPermission(Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::WildcardArticlesView))->toBeFalse();
+    expect($user1->hasPermissionTo(TestRolePermissionsEnum::WildcardArticlesView))->toBeFalse();
+    expect($user1->hasAnyPermission(TestRolePermissionsEnum::WildcardArticlesView))->toBeFalse();
 })->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
 
 it('can check wildcard permissions via roles', function () {

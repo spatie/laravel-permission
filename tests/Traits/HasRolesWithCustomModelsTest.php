@@ -14,6 +14,7 @@ use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Tests\TestSupport\TestModels\Admin;
 use Spatie\Permission\Tests\TestSupport\TestModels\Role;
 use Spatie\Permission\Tests\TestSupport\TestModels\SoftDeletingUser;
+use Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum;
 use Spatie\Permission\Tests\TestSupport\TestModels\User;
 
 beforeEach(function () {
@@ -50,10 +51,10 @@ it('can determine that the user does not have a role', function () {
 });
 
 it('can assign and remove a role using enums', function () {
-    $enum1 = Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::UserManager;
-    $enum2 = Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::Writer;
-    $enum3 = Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::CastedEnum1;
-    $enum4 = Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::CastedEnum2;
+    $enum1 = TestRolePermissionsEnum::UserManager;
+    $enum2 = TestRolePermissionsEnum::Writer;
+    $enum3 = TestRolePermissionsEnum::CastedEnum1;
+    $enum4 = TestRolePermissionsEnum::CastedEnum2;
 
     app(RoleContract::class)->findOrCreate($enum1->value, 'web');
     app(RoleContract::class)->findOrCreate($enum2->value, 'web');
@@ -96,8 +97,8 @@ it('can assign and remove a role using enums', function () {
 })->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
 
 it('can scope a role using enums', function () {
-    $enum1 = Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::UserManager;
-    $enum2 = Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::Writer;
+    $enum1 = TestRolePermissionsEnum::UserManager;
+    $enum2 = TestRolePermissionsEnum::Writer;
     $role1 = app(RoleContract::class)->findOrCreate($enum1->value, 'web');
     $role2 = app(RoleContract::class)->findOrCreate($enum2->value, 'web');
 
@@ -771,7 +772,7 @@ it('returns false instead of an exception when checking against any undefined ro
 });
 
 it('throws an exception if an unsupported type is passed to hasRoles', function () {
-    $this->expectException(\TypeError::class);
+    $this->expectException(TypeError::class);
 
     $this->testUser->hasRole(new class {});
 });

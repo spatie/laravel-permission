@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Guard;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -13,7 +14,7 @@ if (! function_exists('getModelForGuard')) {
 
 if (! function_exists('setPermissionsTeamId')) {
     /**
-     * @param  int|string|null|\Illuminate\Database\Eloquent\Model  $id
+     * @param  int|string|null|Model  $id
      */
     function setPermissionsTeamId($id)
     {

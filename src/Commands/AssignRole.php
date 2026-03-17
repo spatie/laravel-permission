@@ -3,6 +3,7 @@
 namespace Spatie\Permission\Commands;
 
 use Illuminate\Console\Command;
+use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Contracts\Role as RoleContract;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -48,7 +49,7 @@ class AssignRole extends Command
         $teamIdAux = getPermissionsTeamId();
         setPermissionsTeamId($this->option('team-id') ?: null);
 
-        /** @var \Spatie\Permission\Contracts\Role $roleClass */
+        /** @var Role $roleClass */
         $roleClass = app(RoleContract::class);
 
         $role = $roleClass::findOrCreate($roleName, $guardName);

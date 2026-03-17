@@ -9,6 +9,7 @@ use Spatie\Permission\Events\PermissionDetached;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Tests\TestSupport\TestModels\SoftDeletingUser;
+use Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum;
 use Spatie\Permission\Tests\TestSupport\TestModels\User;
 
 it('can assign a permission to a user', function () {
@@ -55,7 +56,7 @@ it('can revoke a permission from a user', function () {
 });
 
 it('can assign and remove a permission using enums', function () {
-    $enum = Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::ViewArticles;
+    $enum = TestRolePermissionsEnum::ViewArticles;
 
     $permission = app(Permission::class)->findOrCreate($enum->value, 'web');
 
@@ -73,8 +74,8 @@ it('can assign and remove a permission using enums', function () {
 })->skip(PHP_VERSION_ID < 80100, 'Requires PHP >= 8.1');
 
 it('can scope users using enums', function () {
-    $enum1 = Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::ViewArticles;
-    $enum2 = Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::EditArticles;
+    $enum1 = TestRolePermissionsEnum::ViewArticles;
+    $enum2 = TestRolePermissionsEnum::EditArticles;
     $permission1 = app(Permission::class)->findOrCreate($enum1->value, 'web');
     $permission2 = app(Permission::class)->findOrCreate($enum2->value, 'web');
 
@@ -224,7 +225,7 @@ it('throws an exception when calling hasPermissionTo with an invalid type', func
 
     $this->expectException(PermissionDoesNotExist::class);
 
-    $user->hasPermissionTo(new \stdClass);
+    $user->hasPermissionTo(new stdClass);
 });
 
 it('throws an exception when calling hasPermissionTo with null', function () {
@@ -240,7 +241,7 @@ it('throws an exception when calling hasDirectPermission with an invalid type', 
 
     $this->expectException(PermissionDoesNotExist::class);
 
-    $user->hasDirectPermission(new \stdClass);
+    $user->hasDirectPermission(new stdClass);
 });
 
 it('throws an exception when calling hasDirectPermission with null', function () {

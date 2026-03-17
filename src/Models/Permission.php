@@ -5,6 +5,7 @@ namespace Spatie\Permission\Models;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Carbon;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 use Spatie\Permission\Exceptions\PermissionAlreadyExists;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
@@ -14,8 +15,8 @@ use Spatie\Permission\Traits\HasRoles;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
 
 /**
- * @property ?\Illuminate\Support\Carbon $created_at
- * @property ?\Illuminate\Support\Carbon $updated_at
+ * @property ?Carbon $created_at
+ * @property ?Carbon $updated_at
  */
 class Permission extends Model implements PermissionContract
 {
