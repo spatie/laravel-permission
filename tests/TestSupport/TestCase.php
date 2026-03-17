@@ -12,6 +12,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
+use Laravel\Passport\Bridge\PersonalAccessBearerTokenResponse;
 use Laravel\Passport\PassportServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Spatie\Permission\Contracts\Permission;
@@ -210,7 +211,7 @@ class TestCase extends Orchestra
         $this->artisan('passport:client', ['--password' => true, '--name' => config('app.name').' Password Grant Client', '--provider' => $provider]);
 
         // Passport uses redirect_uris from v13
-        if (Schema::hasColumn(config('passport.table_names.clients'), 'redirect')) {
+        if (!class_exists(PersonalAccessBearerTokenResponse::class)) {
             $this->testClient = Client::create(['name' => 'Test', 'redirect' => 'https://example.com', 'personal_access_client' => 0, 'password_client' => 0, 'revoked' => 0]);
         } else {
             // Passport 13+
