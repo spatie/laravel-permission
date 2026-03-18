@@ -178,8 +178,9 @@ class Role extends Model implements RoleContract
         if ($registrar->teams) {
             $teamsKey = $registrar->teamsKey;
 
-            $query->where(fn ($q) => $q->whereNull($teamsKey)
-                ->orWhere($teamsKey, $params[$teamsKey] ?? getPermissionsTeamId())
+            $query->where(
+                fn ($q) => $q->whereNull($teamsKey)
+                    ->orWhere($teamsKey, $params[$teamsKey] ?? getPermissionsTeamId())
             );
             unset($params[$teamsKey]);
         }
@@ -212,5 +213,10 @@ class Role extends Model implements RoleContract
 
         return $this->loadMissing('permissions')->permissions
             ->contains($permission->getKeyName(), $permission->getKey());
+    }
+
+    public function isRoleModel(): bool
+    {
+        return true;
     }
 }

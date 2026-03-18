@@ -160,4 +160,14 @@ class Permission extends Model implements PermissionContract
         /** @var PermissionContract|null */
         return static::getPermissions($params, true)->first();
     }
+
+    public function isPermissionModel(): bool
+    {
+        return true;
+    }
+
+    public function getDirectPermissions(): Collection
+    {
+        return collect([$this]);
+    }
 }
