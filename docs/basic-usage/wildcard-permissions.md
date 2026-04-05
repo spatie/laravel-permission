@@ -3,7 +3,7 @@ title: Wildcard permissions
 weight: 6
 ---
 
-When enabled, wildcard permissions offers you a flexible representation for a variety of permission schemes. 
+When enabled, wildcard permissions offer you a flexible representation for a variety of permission schemes. 
 
 The wildcard permissions implementation is inspired by the default permission implementation of 
  [Apache Shiro](https://shiro.apache.org/permissions.html). See the Shiro documentation for more examples and deeper explanation of the concepts.
