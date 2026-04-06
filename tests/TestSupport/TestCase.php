@@ -198,10 +198,10 @@ class TestCase extends Orchestra
         // $this->artisan('passport:keys');
         $this->loadMigrationsFrom(__DIR__.'/../../vendor/laravel/passport/database/migrations/');
         $provider = in_array('users', array_keys(config('auth.providers'))) ? 'users' : null;
-        $this->artisan('passport:client', ['--personal' => true, '--name' => config('app.name').' Personal Access Client']);
+        $this->artisan('passport:client', ['--personal' => true, '--name' => config('app.name').' Personal Access Client', '--provider' => $provider]);
         $this->artisan('passport:client', ['--password' => true, '--name' => config('app.name').' Password Grant Client', '--provider' => $provider]);
 
-        $this->testClient = Client::create(['name' => 'Test', 'redirect' => 'https://example.com', 'personal_access_client' => 0, 'password_client' => 0, 'revoked' => 0]);
+        $this->testClient = Client::create(['name' => 'Test', 'redirect_uris' => ['https://example.com'], 'grant_types' => [], 'revoked' => 0]);
         $this->testClientRole = $app[Role::class]->create(['name' => 'clientRole', 'guard_name' => 'api']);
         $this->testClientPermission = $app[Permission::class]->create(['name' => 'edit-posts', 'guard_name' => 'api']);
     }

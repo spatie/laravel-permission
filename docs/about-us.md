@@ -11,6 +11,6 @@ we release our code as open source software [on GitHub](https://spatie.be/openso
 
 This package is heavily based on [Jeffrey Way](https://twitter.com/jeffrey_way)'s awesome [Laracasts](https://laracasts.com) lessons
 on [permissions and roles](https://laracasts.com/series/whats-new-in-laravel-5-1/episodes/16). His original code
-can be found [in this repo on GitHub](https://github.com/laracasts/laravel-5-roles-and-permissions-demo).
+can be found [in this repo on GitHub](https://github.com/laracasts/laravel-5-roles-and-permissions-demo). And newer lessons on [mastering permissions in Laravel](https://laracasts.com/series/mastering-permissions-in-laravel) talk about other ways to implement some of these features as well.
 
 Special thanks to [Alex Vanderbist](https://github.com/AlexVanderbist) who greatly helped with `v2`, and to [Chris Brown](https://github.com/drbyte) for his longtime support helping us maintain the package.
