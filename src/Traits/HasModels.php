@@ -43,7 +43,7 @@ trait HasModels
     {
         $defaultModelClass = $this->resolveModelClass($modelClass);
 
-        return collect(Arr::flatten($models))
+        return collect(Arr::flatten(Arr::wrap($models)))
             ->reduce(function (array $carry, $value) use ($defaultModelClass) {
                 if ($value === null || $value === '') {
                     return $carry;
