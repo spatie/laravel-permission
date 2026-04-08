@@ -1,6 +1,6 @@
 {
     "name": "spatie/laravel-permission",
-    "description": "Permission handling for Laravel 12 and up",
+    "description": "Permission handling for Laravel 12 and 13",
     "license": "MIT",
     "keywords": [
         "spatie",
