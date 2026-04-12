@@ -89,7 +89,7 @@ Special thanks to [Caneco](https://twitter.com/caneco) for the original logo.
 
 ## Alternatives
 
-- [Povilas Korop](https://twitter.com/@povilaskorop) did an excellent job listing the alternatives [in an article on Laravel News](https://laravel-news.com/two-best-roles-permissions-packages). In that same article, he compares laravel-permission to [Joseph Silber](https://github.com/JosephSilber)'s [Bouncer]((https://github.com/JosephSilber/bouncer)), which in our book is also an excellent package.
+- [Povilas Korop](https://twitter.com/@povilaskorop) did an excellent job listing the alternatives [in an article on Laravel News](https://laravel-news.com/two-best-roles-permissions-packages). In that same article, he compares laravel-permission to [Joseph Silber](https://github.com/JosephSilber)'s [Bouncer](https://github.com/JosephSilber/bouncer), which in our book is also an excellent package.
 - [santigarcor/laratrust](https://github.com/santigarcor/laratrust) implements team support
 - [ultraware/roles](https://github.com/ultraware/roles) (archived) takes a slightly different approach to its features.
 - [zizaco/entrust](https://github.com/zizaco/entrust) offers some wildcard pattern matching
