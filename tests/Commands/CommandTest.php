@@ -5,6 +5,7 @@ use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\Facades\Artisan;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Tests\TestSupport\TestModels\User;
 
 it('can create a role', function () {
@@ -56,6 +57,21 @@ it('can create a role without duplication', function () {
 
     expect(Role::where('name', 'new-role')->get())->toHaveCount(1);
     expect(Role::where('name', 'new-role')->first()->permissions)->toHaveCount(0);
+});
+
+it('warns but still creates a role and preserves team id when team id is passed while teams are disabled', function () {
+    setPermissionsTeamId(5);
+
+    Artisan::call('permission:create-role', [
+        'name' => 'new-role',
+        '--team-id' => 1,
+    ]);
+
+    $output = Artisan::output();
+
+    expect($output)->toContain('Teams feature disabled');
+    expect(Role::where('name', 'new-role')->get())->toHaveCount(1);
+    expect(getPermissionsTeamId())->toEqual(5);
 });
 
 it('can create a permission without duplication', function () {
@@ -125,7 +141,7 @@ it('can setup teams upgrade', function () {
 
 it('can show roles by teams', function () {
     config()->set('permission.teams', true);
-    app(\Spatie\Permission\PermissionRegistrar::class)->initializeCache();
+    app(PermissionRegistrar::class)->initializeCache();
 
     Role::where('name', 'testRole2')->delete();
     Role::create(['name' => 'testRole_2']);
@@ -147,7 +163,7 @@ it('can respond to about command with default', function () {
         $this->markTestSkipped();
     }
 
-    app(\Spatie\Permission\PermissionRegistrar::class)->initializeCache();
+    app(PermissionRegistrar::class)->initializeCache();
 
     Artisan::call('about');
     $output = str_replace("\r\n", "\n", Artisan::output());
@@ -164,7 +180,7 @@ it('can respond to about command with teams', function () {
         $this->markTestSkipped();
     }
 
-    app(\Spatie\Permission\PermissionRegistrar::class)->initializeCache();
+    app(PermissionRegistrar::class)->initializeCache();
 
     config()->set('permission.teams', true);
 

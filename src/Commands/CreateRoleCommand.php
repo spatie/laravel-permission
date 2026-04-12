@@ -23,16 +23,20 @@ class CreateRoleCommand extends Command
         $roleClass = app(RoleContract::class);
 
         $teamIdAux = getPermissionsTeamId();
-        setPermissionsTeamId($this->option('team-id') ?: null);
 
         if (! $permissionRegistrar->teams && $this->option('team-id')) {
             $this->warn('Teams feature disabled, argument --team-id has no effect. Either enable it in permissions config file or remove --team-id parameter');
-
-            return self::SUCCESS;
         }
 
-        $role = $roleClass::findOrCreate($this->argument('name'), $this->argument('guard'));
-        setPermissionsTeamId($teamIdAux);
+        try {
+            if ($permissionRegistrar->teams) {
+                setPermissionsTeamId($this->option('team-id') ?: null);
+            }
+
+            $role = $roleClass::findOrCreate($this->argument('name'), $this->argument('guard'));
+        } finally {
+            setPermissionsTeamId($teamIdAux);
+        }
 
         $teams_key = $permissionRegistrar->teamsKey;
         if ($permissionRegistrar->teams && $this->option('team-id') && is_null($role->$teams_key)) {
