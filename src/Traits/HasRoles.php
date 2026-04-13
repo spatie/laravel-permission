@@ -11,6 +11,8 @@ use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Events\RoleAttachedEvent;
 use Spatie\Permission\Events\RoleDetachedEvent;
+use Spatie\Permission\Exceptions\TeamModelNotConfigured;
+use Spatie\Permission\Exceptions\TeamsNotEnabled;
 use Spatie\Permission\PermissionRegistrar;
 use TypeError;
 
@@ -111,6 +113,76 @@ trait HasRoles
     public function scopeWithoutRole(Builder $query, $roles, ?string $guard = null): Builder
     {
         return $this->scopeRole($query, $roles, $guard, true);
+    }
+
+    /**
+     * A model may be part of multiple teams.
+     */
+    public function teams(): BelongsToMany
+    {
+        if (! app(PermissionRegistrar::class)->teams) {
+            throw TeamsNotEnabled::create();
+        }
+
+        if (! config('permission.models.team')) {
+            throw TeamModelNotConfigured::create();
+        }
+
+        return $this->morphToMany(
+            config('permission.models.team'),
+            'model',
+            config('permission.table_names.model_has_roles'),
+            config('permission.column_names.model_morph_key'),
+            app(PermissionRegistrar::class)->teamsKey
+        )->distinct();
+    }
+
+    /**
+     * Scope the model query to certain teams only.
+     *
+     * @param  int|string|array|\Illuminate\Database\Eloquent\Model|Collection  $teams
+     */
+    public function scopeTeam(Builder $query, $teams, bool $without = false): Builder
+    {
+        if (! app(PermissionRegistrar::class)->teams) {
+            throw TeamsNotEnabled::create();
+        }
+
+        if (! config('permission.models.team')) {
+            throw TeamModelNotConfigured::create();
+        }
+
+        if ($teams instanceof Collection) {
+            $teams = $teams->all();
+        }
+
+        $teams = Arr::wrap($teams);
+
+        $teamClass = config('permission.models.team');
+
+        $teamIds = array_map(fn ($team) => $team instanceof $teamClass ? $team->getKey() : $team, $teams);
+
+        $pivotTable = config('permission.table_names.model_has_roles');
+        $morphKey = config('permission.column_names.model_morph_key');
+        $teamsKey = app(PermissionRegistrar::class)->teamsKey;
+
+        return $query->{! $without ? 'whereExists' : 'whereNotExists'}(
+            fn ($subQuery) => $subQuery
+                ->from($pivotTable)
+                ->whereColumn($morphKey, $query->getModel()->getQualifiedKeyName())
+                ->where('model_type', $query->getModel()->getMorphClass())
+                ->whereIn($teamsKey, $teamIds)
+        );
+    }
+
+    /**
+     * Scope the model query to those without certain teams.
+     *
+     * @param  int|string|array|\Illuminate\Database\Eloquent\Model|Collection  $teams
+     */
+    public function scopeWithoutTeam(Builder $query, $teams): Builder
+    {
+        return $this->scopeTeam($query, $teams, true);
     }
 
     /**
