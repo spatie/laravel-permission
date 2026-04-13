@@ -12,6 +12,7 @@ use Spatie\Permission\Exceptions\RoleAlreadyExists;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Guard;
 use Spatie\Permission\PermissionRegistrar;
+use Spatie\Permission\Traits\HasModels;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
 
@@ -26,6 +27,7 @@ use Spatie\Permission\Traits\RefreshesPermissionCache;
  */
 class Role extends Model implements RoleContract
 {
+    use HasModels;
     use HasPermissions;
     use RefreshesPermissionCache;
 
