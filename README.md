@@ -16,7 +16,7 @@
 
 ## Documentation, Installation, and Usage Instructions
 
-See the [documentation](https://spatie.be/docs/laravel-permission/) for detailed installation and usage instructions.
+See the [documentation](https://spatie.be/docs/laravel-permission/) for detailed instructions for how-to-use, as well as installation and upgrade guidance.
 
 ## What It Does
 This package allows you to manage user permissions and roles in a database.
