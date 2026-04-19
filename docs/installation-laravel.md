@@ -48,14 +48,21 @@ See the "Prerequisites" documentation page for compatibility details.
 
         php artisan migrate
 
-9. **Add the necessary trait to your User model**: 
+9. **Add the necessary trait to your User model**:
 
-        // The User model requires this trait
+    ```php
+    use Illuminate\Foundation\Auth\User as Authenticatable;
+    use Spatie\Permission\Traits\HasRoles;
+
+    class User extends Authenticatable
+    {
         use HasRoles;
 
-10. Consult the **Basic Usage** section of the docs to get started using the features of this package.
+        // ...
+    }
+    ```
 
-.
+10. Consult the **Basic Usage** section of the docs to get started using the features of this package.
 
 
 ## Default config file contents
