@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Guard;
+use Spatie\Permission\Support\Config;
 
 use function Illuminate\Support\enum_value;
 
@@ -20,7 +21,7 @@ class RoleMiddleware
         $user = $authGuard->user();
 
         // For machine-to-machine Passport clients
-        if (! $user && $request->bearerToken() && config('permission.use_passport_client_credentials')) {
+        if (! $user && $request->bearerToken() && Config::usePassportClientCredentials()) {
             $user = Guard::getPassportClient($guard);
         }
 
