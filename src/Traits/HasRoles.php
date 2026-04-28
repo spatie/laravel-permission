@@ -11,9 +11,8 @@ use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Events\RoleAttachedEvent;
 use Spatie\Permission\Events\RoleDetachedEvent;
-use Spatie\Permission\Exceptions\TeamModelNotConfigured;
-use Spatie\Permission\Exceptions\TeamsNotEnabled;
 use Spatie\Permission\PermissionRegistrar;
+use Spatie\Permission\Support\Config;
 use TypeError;
 
 use function Illuminate\Support\enum_value;
@@ -120,20 +119,12 @@ trait HasRoles
      */
     public function teams(): BelongsToMany
     {
-        if (! app(PermissionRegistrar::class)->teams) {
-            throw TeamsNotEnabled::create();
-        }
-
-        if (! config('permission.models.team')) {
-            throw TeamModelNotConfigured::create();
-        }
-
         return $this->morphToMany(
-            config('permission.models.team'),
+            Config::teamModel(),
             'model',
-            config('permission.table_names.model_has_roles'),
-            config('permission.column_names.model_morph_key'),
-            app(PermissionRegistrar::class)->teamsKey
+            Config::modelHasRolesTable(),
+            Config::morphKey(),
+            Config::teamForeignKey()
         )->distinct();
     }
 
@@ -144,27 +135,20 @@ trait HasRoles
      */
     public function scopeTeam(Builder $query, $teams, bool $without = false): Builder
     {
-        if (! app(PermissionRegistrar::class)->teams) {
-            throw TeamsNotEnabled::create();
-        }
-
-        if (! config('permission.models.team')) {
-            throw TeamModelNotConfigured::create();
-        }
+        $teamModel = Config::teamModel();
 
         if ($teams instanceof Collection) {
             $teams = $teams->all();
         }
 
-        $teams = Arr::wrap($teams);
+        $teamIds = array_map(
+            fn ($team) => $team instanceof $teamModel ? $team->getKey() : $team,
+            Arr::wrap($teams),
+        );
 
-        $teamClass = config('permission.models.team');
-
-        $teamIds = array_map(fn ($team) => $team instanceof $teamClass ? $team->getKey() : $team, $teams);
-
-        $pivotTable = config('permission.table_names.model_has_roles');
-        $morphKey = config('permission.column_names.model_morph_key');
-        $teamsKey = app(PermissionRegistrar::class)->teamsKey;
+        $pivotTable = Config::modelHasRolesTable();
+        $morphKey = Config::morphKey();
+        $teamsKey = Config::teamForeignKey();
 
         return $query->{! $without ? 'whereExists' : 'whereNotExists'}(
             fn ($subQuery) => $subQuery

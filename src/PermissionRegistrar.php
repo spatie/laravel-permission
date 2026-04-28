@@ -24,7 +24,7 @@ class PermissionRegistrar
 
     protected string $roleClass;
 
-    protected ?string $teamClass;
+    protected ?string $teamClass = null;
 
     protected Collection|array|null $permissions = null;
 
@@ -274,9 +274,6 @@ class PermissionRegistrar
     {
         $this->teamClass = $teamClass;
         config()->set('permission.models.team', $teamClass);
-        if ($teamClass) {
-            app()->bind(config('permission.models.team'), $teamClass);
-        }
 
         return $this;
     }
