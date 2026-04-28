@@ -2,9 +2,8 @@
 
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\PermissionRegistrar;
+use Spatie\Permission\Support\Config;
 use Spatie\Permission\Tests\TestSupport\TestModels\User;
-
-// --- syncModels ---
 
 it('can sync models to a role', function () {
     $user1 = User::create(['email' => 'user1@test.com']);
@@ -29,7 +28,7 @@ it('removes previous models when syncing', function () {
     expect($user2->fresh()->hasRole($this->testUserRole))->toBeTrue();
 });
 
-it('will remove all models when an empty array is passed to syncModels', function () {
+it('removes all models when syncing with an empty array', function () {
     $user1 = User::create(['email' => 'user1@test.com']);
     $user2 = User::create(['email' => 'user2@test.com']);
 
@@ -47,7 +46,7 @@ it('does not add duplicate models when syncing', function () {
 
     $this->testUserRole->syncModels([$user1, $user1]);
 
-    $count = DB::table(config('permission.table_names.model_has_roles'))
+    $count = DB::table(Config::modelHasRolesTable())
         ->where(app(PermissionRegistrar::class)->pivotRole, $this->testUserRole->getKey())
         ->count();
 
@@ -71,8 +70,6 @@ it('can sync models using IDs', function () {
     expect($user1->fresh()->hasRole($this->testUserRole))->toBeTrue();
     expect($user2->fresh()->hasRole($this->testUserRole))->toBeTrue();
 });
-
-// --- attachModels ---
 
 it('can attach models to a role', function () {
     $user1 = User::create(['email' => 'user1@test.com']);
@@ -105,7 +102,7 @@ it('does not attach duplicate models', function () {
 
     $this->testUserRole->attachModels([$user1, $user1]);
 
-    $count = DB::table(config('permission.table_names.model_has_roles'))
+    $count = DB::table(Config::modelHasRolesTable())
         ->where(app(PermissionRegistrar::class)->pivotRole, $this->testUserRole->getKey())
         ->count();
 
@@ -118,7 +115,7 @@ it('does not attach already attached models', function () {
     $this->testUserRole->attachModels($user1);
     $this->testUserRole->attachModels($user1);
 
-    $count = DB::table(config('permission.table_names.model_has_roles'))
+    $count = DB::table(Config::modelHasRolesTable())
         ->where(app(PermissionRegistrar::class)->pivotRole, $this->testUserRole->getKey())
         ->count();
 
@@ -135,8 +132,6 @@ it('can attach additional models without removing existing ones', function () {
     expect($user1->fresh()->hasRole($this->testUserRole))->toBeTrue();
     expect($user2->fresh()->hasRole($this->testUserRole))->toBeTrue();
 });
-
-// --- detachModels ---
 
 it('can detach models from a role', function () {
     $user1 = User::create(['email' => 'user1@test.com']);
@@ -182,8 +177,6 @@ it('does nothing when detaching models that are not attached', function () {
     expect($user1->fresh()->hasRole($this->testUserRole))->toBeTrue();
 });
 
-// --- explicit model class ---
-
 it('can sync models using IDs with explicit model class', function () {
     $user1 = User::create(['email' => 'user1@test.com']);
     $user2 = User::create(['email' => 'user2@test.com']);
@@ -211,8 +204,6 @@ it('can detach models using IDs with explicit model class', function () {
 
     expect($user1->fresh()->hasRole($this->testUserRole))->toBeFalse();
 });
-
-// --- config default_model ---
 
 it('uses config default_model when resolving IDs', function () {
     config()->set('permission.models.default_model', User::class);

@@ -5,11 +5,13 @@ namespace Spatie\Permission\Models;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Carbon;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 use Spatie\Permission\Exceptions\PermissionAlreadyExists;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Guard;
 use Spatie\Permission\PermissionRegistrar;
+use Spatie\Permission\Support\Config;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
 
@@ -17,10 +19,10 @@ use Spatie\Permission\Traits\RefreshesPermissionCache;
  * @property int|string $id
  * @property string $name
  * @property string $guard_name
- * @property ?\Illuminate\Support\Carbon $created_at
- * @property ?\Illuminate\Support\Carbon $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Role> $roles
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model> $users
+ * @property ?Carbon $created_at
+ * @property ?Carbon $updated_at
+ * @property-read Collection<int, Role> $roles
+ * @property-read Collection<int, Model> $users
  */
 class Permission extends Model implements PermissionContract
 {
@@ -36,7 +38,7 @@ class Permission extends Model implements PermissionContract
         parent::__construct($attributes);
 
         $this->guarded[] = $this->primaryKey;
-        $this->table = config('permission.table_names.permissions') ?: parent::getTable();
+        $this->table = Config::permissionsTable() ?: parent::getTable();
     }
 
     /**
@@ -65,8 +67,8 @@ class Permission extends Model implements PermissionContract
         $registrar = app(PermissionRegistrar::class);
 
         return $this->belongsToMany(
-            config('permission.models.role'),
-            config('permission.table_names.role_has_permissions'),
+            Config::roleModel(),
+            Config::roleHasPermissionsTable(),
             $registrar->pivotPermission,
             $registrar->pivotRole
         );
@@ -80,9 +82,9 @@ class Permission extends Model implements PermissionContract
         return $this->morphedByMany(
             getModelForGuard($this->attributes['guard_name'] ?? config('auth.defaults.guard')),
             'model',
-            config('permission.table_names.model_has_permissions'),
+            Config::modelHasPermissionsTable(),
             app(PermissionRegistrar::class)->pivotPermission,
-            config('permission.column_names.model_morph_key')
+            Config::morphKey()
         );
     }
 

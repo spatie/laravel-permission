@@ -235,7 +235,7 @@ it('should not over hydrate roles for get all permissions', function () {
 
 it('can reset the cache with artisan command', function () {
     Artisan::call('permission:create-permission', ['name' => 'new-permission']);
-    expect(\Spatie\Permission\Models\Permission::where('name', 'new-permission')->get())->toHaveCount(1);
+    expect(Spatie\Permission\Models\Permission::where('name', 'new-permission')->get())->toHaveCount(1);
 
     resetQueryCount();
     // retrieve permissions, and assert that the cache had to be loaded

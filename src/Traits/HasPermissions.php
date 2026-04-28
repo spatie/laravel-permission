@@ -18,7 +18,7 @@ use Spatie\Permission\Exceptions\WildcardPermissionInvalidArgument;
 use Spatie\Permission\Exceptions\WildcardPermissionNotImplementsContract;
 use Spatie\Permission\Guard;
 use Spatie\Permission\PermissionRegistrar;
-use Spatie\Permission\WildcardPermission;
+use Spatie\Permission\Support\Config;
 
 use function Illuminate\Support\enum_value;
 
@@ -66,8 +66,8 @@ trait HasPermissions
 
         $this->wildcardClass = '';
 
-        if (config('permission.enable_wildcard_permission')) {
-            $this->wildcardClass = config('permission.wildcard_permission', WildcardPermission::class);
+        if (Config::wildcardPermissionsEnabled()) {
+            $this->wildcardClass = Config::wildcardPermissionClass();
 
             if (! is_subclass_of($this->wildcardClass, Wildcard::class)) {
                 throw WildcardPermissionNotImplementsContract::create();
@@ -83,18 +83,18 @@ trait HasPermissions
     public function permissions(): BelongsToMany
     {
         $relation = $this->morphToMany(
-            config('permission.models.permission'),
+            Config::permissionModel(),
             'model',
-            config('permission.table_names.model_has_permissions'),
-            config('permission.column_names.model_morph_key'),
+            Config::modelHasPermissionsTable(),
+            Config::morphKey(),
             app(PermissionRegistrar::class)->pivotPermission
         );
 
-        if (! app(PermissionRegistrar::class)->teams) {
+        if (! Config::teamsEnabled()) {
             return $relation;
         }
 
-        $teamsKey = app(PermissionRegistrar::class)->teamsKey;
+        $teamsKey = Config::teamForeignKey();
         $relation->withPivot($teamsKey);
 
         return $relation->wherePivot($teamsKey, getPermissionsTeamId());
@@ -118,11 +118,11 @@ trait HasPermissions
 
         return $query->where(fn (Builder $query) => $query
             ->{! $without ? 'whereHas' : 'whereDoesntHave'}('permissions', fn (Builder $subQuery) => $subQuery
-            ->whereIn(config('permission.table_names.permissions').".$permissionKey", array_column($permissions, $permissionKey))
+            ->whereIn(Config::permissionsTable().".$permissionKey", array_column($permissions, $permissionKey))
             )
             ->when(count($rolesWithPermissions), fn ($whenQuery) => $whenQuery
                 ->{! $without ? 'orWhereHas' : 'whereDoesntHave'}('roles', fn (Builder $subQuery) => $subQuery
-                ->whereIn(config('permission.table_names.roles').".$roleKey", array_column($rolesWithPermissions, $roleKey))
+                ->whereIn(Config::rolesTable().".$roleKey", array_column($rolesWithPermissions, $roleKey))
                 )
             )
         );
@@ -417,7 +417,7 @@ trait HasPermissions
             $this->forgetCachedPermissions();
         }
 
-        if (config('permission.events_enabled')) {
+        if (Config::eventsEnabled()) {
             event(new PermissionAttachedEvent($this->getModel(), $permissions));
         }
 
@@ -466,7 +466,7 @@ trait HasPermissions
             $this->forgetCachedPermissions();
         }
 
-        if (config('permission.events_enabled')) {
+        if (Config::eventsEnabled()) {
             event(new PermissionDetachedEvent($this->getModel(), $storedPermission));
         }
 

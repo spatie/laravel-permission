@@ -2,6 +2,21 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 7.3.0 - 2026-04-07
+
+### What's Changed
+
+**Downgraded PHP requirement to 8.3.**
+
+* Change PHP requirement from ^8.4 to ^8.3 by @erikn69 in https://github.com/spatie/laravel-permission/pull/2939
+* [Docs] Fix grammar: 'offers' -> 'offer' by @tareq-halaby in https://github.com/spatie/laravel-permission/pull/2940
+
+### New Contributors
+
+* @tareq-halaby made their first contribution in https://github.com/spatie/laravel-permission/pull/2940
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/7.2.4...7.3.0
+
 ## 7.2.4 - 2026-03-17
 
 ### What's Changed
@@ -1250,6 +1265,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -1297,6 +1313,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 

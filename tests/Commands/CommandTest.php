@@ -5,6 +5,7 @@ use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\Facades\Artisan;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Tests\TestSupport\TestModels\User;
 
 it('can create a role', function () {
@@ -125,7 +126,7 @@ it('can setup teams upgrade', function () {
 
 it('can show roles by teams', function () {
     config()->set('permission.teams', true);
-    app(\Spatie\Permission\PermissionRegistrar::class)->initializeCache();
+    app(PermissionRegistrar::class)->initializeCache();
 
     Role::where('name', 'testRole2')->delete();
     Role::create(['name' => 'testRole_2']);
@@ -147,7 +148,7 @@ it('can respond to about command with default', function () {
         $this->markTestSkipped();
     }
 
-    app(\Spatie\Permission\PermissionRegistrar::class)->initializeCache();
+    app(PermissionRegistrar::class)->initializeCache();
 
     Artisan::call('about');
     $output = str_replace("\r\n", "\n", Artisan::output());
@@ -164,7 +165,7 @@ it('can respond to about command with teams', function () {
         $this->markTestSkipped();
     }
 
-    app(\Spatie\Permission\PermissionRegistrar::class)->initializeCache();
+    app(PermissionRegistrar::class)->initializeCache();
 
     config()->set('permission.teams', true);
 
