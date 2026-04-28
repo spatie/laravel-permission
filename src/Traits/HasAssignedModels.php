@@ -10,15 +10,15 @@ use Illuminate\Support\Collection;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Support\Config;
 
-trait HasModels
+trait HasAssignedModels
 {
     /**
-     * Attach models to this role without removing existing associations.
+     * Assign this role to the given models without removing existing assignments.
      *
      * @param  Model|int|string|array<int, Model|int|string>|Collection<int, Model|int|string>  $models
      * @return $this
      */
-    public function attachModels(array|Collection|Model|int|string $models, ?string $modelClass = null): static
+    public function assignToModels(array|Collection|Model|int|string $models, ?string $modelClass = null): static
     {
         if (! $this->exists) {
             return $this;
@@ -39,12 +39,12 @@ trait HasModels
     }
 
     /**
-     * Detach models from this role.
+     * Remove this role from the given models.
      *
      * @param  Model|int|string|array<int, Model|int|string>|Collection<int, Model|int|string>  $models
      * @return $this
      */
-    public function detachModels(array|Collection|Model|int|string $models, ?string $modelClass = null): static
+    public function removeFromModels(array|Collection|Model|int|string $models, ?string $modelClass = null): static
     {
         foreach ($this->groupModelsByMorphClass($models, $modelClass) as $morphClass => $ids) {
             $this->relationForModel($morphClass)->detach($ids);

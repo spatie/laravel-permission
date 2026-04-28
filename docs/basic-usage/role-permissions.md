@@ -31,16 +31,16 @@ $user->syncRoles(['writer', 'admin']);
 
 ## Assigning Models to a Role
 
-Sometimes it is more convenient to work from the role's side, for example when building an admin screen that lists every user with a given role. The `attachModels`, `detachModels`, and `syncModels` methods on a role do the inverse of `assignRole`, `removeRole`, and `syncRoles`:
+Sometimes it is more convenient to work from the role's side, for example when building an admin screen that lists every user with a given role. The `assignToModels`, `removeFromModels`, and `syncModels` methods on a role do the inverse of `assignRole`, `removeRole`, and `syncRoles`:
 
 ```php
 $role = Role::findByName('writer');
 
 // Give the role to two users at once.
-$role->attachModels([$user1, $user2]);
+$role->assignToModels([$user1, $user2]);
 
 // Remove it from one user.
-$role->detachModels($user1);
+$role->removeFromModels($user1);
 
 // Replace every model that currently has this role with a new set.
 $role->syncModels([$user2, $user3]);
@@ -49,11 +49,11 @@ $role->syncModels([$user2, $user3]);
 Each method also accepts a single model, a single ID, an array of IDs, a Collection, or a mix of models and IDs:
 
 ```php
-$role->attachModels($user);                  // a single model
-$role->attachModels($user->id);              // a single ID
-$role->attachModels([1, 2, 3]);              // an array of IDs
-$role->attachModels(User::query()->get());   // a Collection
-$role->attachModels([$user1, 5, $user2]);    // mixed
+$role->assignToModels($user);                  // a single model
+$role->assignToModels($user->id);              // a single ID
+$role->assignToModels([1, 2, 3]);              // an array of IDs
+$role->assignToModels(User::query()->get());   // a Collection
+$role->assignToModels([$user1, 5, $user2]);    // mixed
 ```
 
 When you pass raw IDs, the package needs to know which model class they belong to. By default it uses the model registered for the role's guard (the same model `Auth::user()` returns). You can override this in two ways.
@@ -61,7 +61,7 @@ When you pass raw IDs, the package needs to know which model class they belong t
 Pass the class as the second argument:
 
 ```php
-$role->attachModels([1, 2, 3], User::class);
+$role->assignToModels([1, 2, 3], User::class);
 ```
 
 Or set a default once in `config/permission.php`:
@@ -73,10 +73,10 @@ Or set a default once in `config/permission.php`:
 ],
 ```
 
-If you need to attach different model types in the same call, pass them as instances. The role can hold any model that uses the `HasRoles` trait, not just users:
+If you need to assign the role to different model types in the same call, pass them as instances. The role can be assigned to any model that uses the `HasRoles` trait, not just users:
 
 ```php
-$role->attachModels([$user, $admin, $apiClient]);
+$role->assignToModels([$user, $admin, $apiClient]);
 ```
 
 ## Checking Roles

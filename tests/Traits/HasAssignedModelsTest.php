@@ -71,36 +71,36 @@ it('can sync models using IDs', function () {
     expect($user2->fresh()->hasRole($this->testUserRole))->toBeTrue();
 });
 
-it('can attach models to a role', function () {
+it('can assign a role to models', function () {
     $user1 = User::create(['email' => 'user1@test.com']);
     $user2 = User::create(['email' => 'user2@test.com']);
 
-    $this->testUserRole->attachModels([$user1, $user2]);
+    $this->testUserRole->assignToModels([$user1, $user2]);
 
     expect($user1->fresh()->hasRole($this->testUserRole))->toBeTrue();
     expect($user2->fresh()->hasRole($this->testUserRole))->toBeTrue();
 });
 
-it('can attach a single model instance', function () {
+it('can assign a role to a single model instance', function () {
     $user1 = User::create(['email' => 'user1@test.com']);
 
-    $this->testUserRole->attachModels($user1);
+    $this->testUserRole->assignToModels($user1);
 
     expect($user1->fresh()->hasRole($this->testUserRole))->toBeTrue();
 });
 
-it('can attach models using IDs', function () {
+it('can assign a role to models using IDs', function () {
     $user1 = User::create(['email' => 'user1@test.com']);
 
-    $this->testUserRole->attachModels($user1->getKey());
+    $this->testUserRole->assignToModels($user1->getKey());
 
     expect($user1->fresh()->hasRole($this->testUserRole))->toBeTrue();
 });
 
-it('does not attach duplicate models', function () {
+it('does not assign duplicate models', function () {
     $user1 = User::create(['email' => 'user1@test.com']);
 
-    $this->testUserRole->attachModels([$user1, $user1]);
+    $this->testUserRole->assignToModels([$user1, $user1]);
 
     $count = DB::table(Config::modelHasRolesTable())
         ->where(app(PermissionRegistrar::class)->pivotRole, $this->testUserRole->getKey())
@@ -109,11 +109,11 @@ it('does not attach duplicate models', function () {
     expect($count)->toBe(1);
 });
 
-it('does not attach already attached models', function () {
+it('does not re-assign models already assigned', function () {
     $user1 = User::create(['email' => 'user1@test.com']);
 
-    $this->testUserRole->attachModels($user1);
-    $this->testUserRole->attachModels($user1);
+    $this->testUserRole->assignToModels($user1);
+    $this->testUserRole->assignToModels($user1);
 
     $count = DB::table(Config::modelHasRolesTable())
         ->where(app(PermissionRegistrar::class)->pivotRole, $this->testUserRole->getKey())
@@ -122,57 +122,57 @@ it('does not attach already attached models', function () {
     expect($count)->toBe(1);
 });
 
-it('can attach additional models without removing existing ones', function () {
+it('can assign additional models without removing existing ones', function () {
     $user1 = User::create(['email' => 'user1@test.com']);
     $user2 = User::create(['email' => 'user2@test.com']);
 
-    $this->testUserRole->attachModels($user1);
-    $this->testUserRole->attachModels($user2);
+    $this->testUserRole->assignToModels($user1);
+    $this->testUserRole->assignToModels($user2);
 
     expect($user1->fresh()->hasRole($this->testUserRole))->toBeTrue();
     expect($user2->fresh()->hasRole($this->testUserRole))->toBeTrue();
 });
 
-it('can detach models from a role', function () {
+it('can remove a role from models', function () {
     $user1 = User::create(['email' => 'user1@test.com']);
     $user2 = User::create(['email' => 'user2@test.com']);
 
     $user1->assignRole($this->testUserRole);
     $user2->assignRole($this->testUserRole);
 
-    $this->testUserRole->detachModels([$user1]);
+    $this->testUserRole->removeFromModels([$user1]);
 
     expect($user1->fresh()->hasRole($this->testUserRole))->toBeFalse();
     expect($user2->fresh()->hasRole($this->testUserRole))->toBeTrue();
 });
 
-it('can detach a single model instance', function () {
+it('can remove a role from a single model instance', function () {
     $user1 = User::create(['email' => 'user1@test.com']);
 
     $user1->assignRole($this->testUserRole);
 
-    $this->testUserRole->detachModels($user1);
+    $this->testUserRole->removeFromModels($user1);
 
     expect($user1->fresh()->hasRole($this->testUserRole))->toBeFalse();
 });
 
-it('can detach models using IDs', function () {
+it('can remove a role from models using IDs', function () {
     $user1 = User::create(['email' => 'user1@test.com']);
 
     $user1->assignRole($this->testUserRole);
 
-    $this->testUserRole->detachModels($user1->getKey());
+    $this->testUserRole->removeFromModels($user1->getKey());
 
     expect($user1->fresh()->hasRole($this->testUserRole))->toBeFalse();
 });
 
-it('does nothing when detaching models that are not attached', function () {
+it('does nothing when removing the role from models that do not have it', function () {
     $user1 = User::create(['email' => 'user1@test.com']);
     $user2 = User::create(['email' => 'user2@test.com']);
 
     $user1->assignRole($this->testUserRole);
 
-    $this->testUserRole->detachModels($user2);
+    $this->testUserRole->removeFromModels($user2);
 
     expect($user1->fresh()->hasRole($this->testUserRole))->toBeTrue();
 });
@@ -187,20 +187,20 @@ it('can sync models using IDs with explicit model class', function () {
     expect($user2->fresh()->hasRole($this->testUserRole))->toBeTrue();
 });
 
-it('can attach models using IDs with explicit model class', function () {
+it('can assign a role to models using IDs with explicit model class', function () {
     $user1 = User::create(['email' => 'user1@test.com']);
 
-    $this->testUserRole->attachModels($user1->getKey(), User::class);
+    $this->testUserRole->assignToModels($user1->getKey(), User::class);
 
     expect($user1->fresh()->hasRole($this->testUserRole))->toBeTrue();
 });
 
-it('can detach models using IDs with explicit model class', function () {
+it('can remove a role from models using IDs with explicit model class', function () {
     $user1 = User::create(['email' => 'user1@test.com']);
 
     $user1->assignRole($this->testUserRole);
 
-    $this->testUserRole->detachModels($user1->getKey(), User::class);
+    $this->testUserRole->removeFromModels($user1->getKey(), User::class);
 
     expect($user1->fresh()->hasRole($this->testUserRole))->toBeFalse();
 });
