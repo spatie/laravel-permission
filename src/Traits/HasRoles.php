@@ -58,16 +58,16 @@ trait HasRoles
         $relation = $this->morphToMany(
             config('permission.models.role'),
             'model',
-            config('permission.table_names.model_has_roles'),
-            config('permission.column_names.model_morph_key'),
+            Config::modelHasRolesTable(),
+            Config::morphKey(),
             app(PermissionRegistrar::class)->pivotRole
         );
 
-        if (! app(PermissionRegistrar::class)->teams) {
+        if (! Config::teamsEnabled()) {
             return $relation;
         }
 
-        $teamsKey = app(PermissionRegistrar::class)->teamsKey;
+        $teamsKey = Config::teamForeignKey();
         $relation->withPivot($teamsKey);
         $teamField = config('permission.table_names.roles').'.'.$teamsKey;
 
