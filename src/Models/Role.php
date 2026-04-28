@@ -14,6 +14,7 @@ use Spatie\Permission\Exceptions\RoleAlreadyExists;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Guard;
 use Spatie\Permission\PermissionRegistrar;
+use Spatie\Permission\Support\Config;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
 
@@ -40,7 +41,7 @@ class Role extends Model implements RoleContract
         parent::__construct($attributes);
 
         $this->guarded[] = $this->primaryKey;
-        $this->table = config('permission.table_names.roles') ?: parent::getTable();
+        $this->table = Config::rolesTable() ?: parent::getTable();
     }
 
     /**
@@ -81,8 +82,8 @@ class Role extends Model implements RoleContract
         $registrar = app(PermissionRegistrar::class);
 
         return $this->belongsToMany(
-            config('permission.models.permission'),
-            config('permission.table_names.role_has_permissions'),
+            Config::permissionModel(),
+            Config::roleHasPermissionsTable(),
             $registrar->pivotRole,
             $registrar->pivotPermission
         );
@@ -96,9 +97,9 @@ class Role extends Model implements RoleContract
         return $this->morphedByMany(
             getModelForGuard($this->attributes['guard_name'] ?? config('auth.defaults.guard')),
             'model',
-            config('permission.table_names.model_has_roles'),
+            Config::modelHasRolesTable(),
             app(PermissionRegistrar::class)->pivotRole,
-            config('permission.column_names.model_morph_key')
+            Config::morphKey()
         );
     }
 

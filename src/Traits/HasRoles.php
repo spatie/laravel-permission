@@ -56,7 +56,7 @@ trait HasRoles
     public function roles(): BelongsToMany
     {
         $relation = $this->morphToMany(
-            config('permission.models.role'),
+            Config::roleModel(),
             'model',
             Config::modelHasRolesTable(),
             Config::morphKey(),
@@ -69,7 +69,7 @@ trait HasRoles
 
         $teamsKey = Config::teamForeignKey();
         $relation->withPivot($teamsKey);
-        $teamField = config('permission.table_names.roles').'.'.$teamsKey;
+        $teamField = Config::rolesTable().'.'.$teamsKey;
 
         return $relation->wherePivot($teamsKey, getPermissionsTeamId())
             ->where(fn ($q) => $q->whereNull($teamField)->orWhere($teamField, getPermissionsTeamId()));
@@ -101,7 +101,7 @@ trait HasRoles
         $key = (new ($this->getRoleClass())())->getKeyName();
 
         return $query->{! $without ? 'whereHas' : 'whereDoesntHave'}('roles', fn (Builder $subQuery) => $subQuery
-            ->whereIn(config('permission.table_names.roles').".$key", array_column($roles, $key))
+            ->whereIn(Config::rolesTable().".$key", array_column($roles, $key))
         );
     }
 
@@ -241,7 +241,7 @@ trait HasRoles
 
         $this->forgetWildcardPermissionIndex();
 
-        if (config('permission.events_enabled')) {
+        if (Config::eventsEnabled()) {
             event(new RoleAttachedEvent($this->getModel(), $roles));
         }
 
@@ -268,7 +268,7 @@ trait HasRoles
 
         $this->forgetWildcardPermissionIndex();
 
-        if (config('permission.events_enabled')) {
+        if (Config::eventsEnabled()) {
             event(new RoleDetachedEvent($this->getModel(), $roles));
         }
 
@@ -285,7 +285,7 @@ trait HasRoles
     {
         if ($this->getModel()->exists) {
             $this->collectRoles($roles);
-            if (config('permission.events_enabled')) {
+            if (Config::eventsEnabled()) {
                 $currentRoles = $this->roles()->get();
                 if ($currentRoles->isNotEmpty()) {
                     $this->removeRole($currentRoles);
