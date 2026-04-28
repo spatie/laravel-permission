@@ -4,6 +4,7 @@ namespace Spatie\Permission\Traits;
 
 use BackedEnum;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -131,7 +132,7 @@ trait HasRoles
     /**
      * Scope the model query to certain teams only.
      *
-     * @param  int|string|array|\Illuminate\Database\Eloquent\Model|Collection  $teams
+     * @param  int|string|array|Model|Collection  $teams
      */
     public function scopeTeam(Builder $query, $teams, bool $without = false): Builder
     {
@@ -162,7 +163,7 @@ trait HasRoles
     /**
      * Scope the model query to those without certain teams.
      *
-     * @param  int|string|array|\Illuminate\Database\Eloquent\Model|Collection  $teams
+     * @param  int|string|array|Model|Collection  $teams
      */
     public function scopeWithoutTeam(Builder $query, $teams): Builder
     {

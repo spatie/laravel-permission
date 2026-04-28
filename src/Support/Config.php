@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Support;
 
+use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Exceptions\TeamModelNotConfigured;
 use Spatie\Permission\Exceptions\TeamsNotEnabled;
 use Spatie\Permission\PermissionRegistrar;
@@ -21,7 +22,7 @@ class Config
     }
 
     /**
-     * @return class-string<\Illuminate\Database\Eloquent\Model>
+     * @return class-string<Model>
      */
     public static function teamModel(): string
     {
