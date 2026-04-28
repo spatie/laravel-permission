@@ -2,6 +2,23 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 7.4.0 - 2026-04-28
+
+### What's Changed
+
+* Bump dependabot/fetch-metadata from 2 to 3 by @dependabot[bot] in https://github.com/spatie/laravel-permission/pull/2945
+* Fix malformed Bouncer link in README by @dhrupo in https://github.com/spatie/laravel-permission/pull/2943
+* Teams accessors in HasRolesTrait by @AnjeyNov in https://github.com/spatie/laravel-permission/pull/2928
+* Add syncModels method to Role model with HasModels trait by @Briareos17 in https://github.com/spatie/laravel-permission/pull/2922
+
+### New Contributors
+
+* @dhrupo made their first contribution in https://github.com/spatie/laravel-permission/pull/2943
+* @AnjeyNov made their first contribution in https://github.com/spatie/laravel-permission/pull/2928
+* @Briareos17 made their first contribution in https://github.com/spatie/laravel-permission/pull/2922
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/7.3.0...7.4.0
+
 ## 7.3.0 - 2026-04-07
 
 ### What's Changed
@@ -1266,6 +1283,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -1313,6 +1331,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
