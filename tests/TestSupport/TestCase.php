@@ -2,8 +2,10 @@
 
 namespace Spatie\Permission\Tests\TestSupport;
 
+use Illuminate\Cache\DatabaseStore;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -24,10 +26,10 @@ use Spatie\Permission\Tests\TestSupport\TestModels\User;
 
 class TestCase extends Orchestra
 {
-    /** @var \Spatie\Permission\Tests\TestSupport\TestModels\User */
+    /** @var User */
     protected $testUser;
 
-    /** @var \Spatie\Permission\Tests\TestSupport\TestModels\Admin */
+    /** @var Admin */
     protected $testAdmin;
 
     /** @var \Spatie\Permission\Models\Role */
@@ -78,7 +80,7 @@ class TestCase extends Orchestra
     }
 
     /**
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  Application  $app
      */
     protected function getPackageProviders($app): array
     {
@@ -91,7 +93,7 @@ class TestCase extends Orchestra
     /**
      * Set up the environment.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  Application  $app
      */
     protected function getEnvironmentSetUp($app)
     {
@@ -132,7 +134,7 @@ class TestCase extends Orchestra
     /**
      * Set up the database.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  Application  $app
      */
     protected function setUpDatabase($app)
     {
@@ -156,8 +158,8 @@ class TestCase extends Orchestra
             $table->timestamps();
         });
 
-        if (Cache::getStore() instanceof \Illuminate\Cache\DatabaseStore ||
-            $app[PermissionRegistrar::class]->getCacheStore() instanceof \Illuminate\Cache\DatabaseStore) {
+        if (Cache::getStore() instanceof DatabaseStore ||
+            $app[PermissionRegistrar::class]->getCacheStore() instanceof DatabaseStore) {
             $this->createCacheTable();
         }
 
@@ -170,7 +172,7 @@ class TestCase extends Orchestra
     /**
      * Set up initial roles and permissions used in many tests
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  Application  $app
      */
     protected function setUpBaseTestPermissions($app): void
     {
@@ -255,8 +257,8 @@ class TestCase extends Orchestra
         self::$migration->down();
 
         $registrar = app(PermissionRegistrar::class);
-        $registrar->setPermissionClass(\Spatie\Permission\Tests\TestSupport\TestModels\Permission::class);
-        $registrar->setRoleClass(\Spatie\Permission\Tests\TestSupport\TestModels\Role::class);
+        $registrar->setPermissionClass(TestModels\Permission::class);
+        $registrar->setRoleClass(TestRole::class);
 
         self::$customMigration->up();
 

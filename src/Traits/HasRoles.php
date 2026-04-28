@@ -4,6 +4,7 @@ namespace Spatie\Permission\Traits;
 
 use BackedEnum;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -12,6 +13,7 @@ use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Events\RoleAttachedEvent;
 use Spatie\Permission\Events\RoleDetachedEvent;
 use Spatie\Permission\PermissionRegistrar;
+use Spatie\Permission\Support\Config;
 use TypeError;
 
 use function Illuminate\Support\enum_value;
@@ -54,20 +56,20 @@ trait HasRoles
     public function roles(): BelongsToMany
     {
         $relation = $this->morphToMany(
-            config('permission.models.role'),
+            Config::roleModel(),
             'model',
-            config('permission.table_names.model_has_roles'),
-            config('permission.column_names.model_morph_key'),
+            Config::modelHasRolesTable(),
+            Config::morphKey(),
             app(PermissionRegistrar::class)->pivotRole
         );
 
-        if (! app(PermissionRegistrar::class)->teams) {
+        if (! Config::teamsEnabled()) {
             return $relation;
         }
 
-        $teamsKey = app(PermissionRegistrar::class)->teamsKey;
+        $teamsKey = Config::teamForeignKey();
         $relation->withPivot($teamsKey);
-        $teamField = config('permission.table_names.roles').'.'.$teamsKey;
+        $teamField = Config::rolesTable().'.'.$teamsKey;
 
         return $relation->wherePivot($teamsKey, getPermissionsTeamId())
             ->where(fn ($q) => $q->whereNull($teamField)->orWhere($teamField, getPermissionsTeamId()));
@@ -99,7 +101,7 @@ trait HasRoles
         $key = (new ($this->getRoleClass())())->getKeyName();
 
         return $query->{! $without ? 'whereHas' : 'whereDoesntHave'}('roles', fn (Builder $subQuery) => $subQuery
-            ->whereIn(config('permission.table_names.roles').".$key", array_column($roles, $key))
+            ->whereIn(Config::rolesTable().".$key", array_column($roles, $key))
         );
     }
 
@@ -111,6 +113,61 @@ trait HasRoles
     public function scopeWithoutRole(Builder $query, $roles, ?string $guard = null): Builder
     {
         return $this->scopeRole($query, $roles, $guard, true);
+    }
+
+    /**
+     * A model may be part of multiple teams.
+     */
+    public function teams(): BelongsToMany
+    {
+        return $this->morphToMany(
+            Config::teamModel(),
+            'model',
+            Config::modelHasRolesTable(),
+            Config::morphKey(),
+            Config::teamForeignKey()
+        )->distinct();
+    }
+
+    /**
+     * Scope the model query to certain teams only.
+     *
+     * @param  int|string|array|Model|Collection  $teams
+     */
+    public function scopeTeam(Builder $query, $teams, bool $without = false): Builder
+    {
+        $teamModel = Config::teamModel();
+
+        if ($teams instanceof Collection) {
+            $teams = $teams->all();
+        }
+
+        $teamIds = array_map(
+            fn ($team) => $team instanceof $teamModel ? $team->getKey() : $team,
+            Arr::wrap($teams),
+        );
+
+        $pivotTable = Config::modelHasRolesTable();
+        $morphKey = Config::morphKey();
+        $teamsKey = Config::teamForeignKey();
+
+        return $query->{! $without ? 'whereExists' : 'whereNotExists'}(
+            fn ($subQuery) => $subQuery
+                ->from($pivotTable)
+                ->whereColumn($morphKey, $query->getModel()->getQualifiedKeyName())
+                ->where('model_type', $query->getModel()->getMorphClass())
+                ->whereIn($teamsKey, $teamIds)
+        );
+    }
+
+    /**
+     * Scope the model query to those without certain teams.
+     *
+     * @param  int|string|array|Model|Collection  $teams
+     */
+    public function scopeWithoutTeam(Builder $query, $teams): Builder
+    {
+        return $this->scopeTeam($query, $teams, true);
     }
 
     /**
@@ -184,7 +241,7 @@ trait HasRoles
 
         $this->forgetWildcardPermissionIndex();
 
-        if (config('permission.events_enabled')) {
+        if (Config::eventsEnabled()) {
             event(new RoleAttachedEvent($this->getModel(), $roles));
         }
 
@@ -211,7 +268,7 @@ trait HasRoles
 
         $this->forgetWildcardPermissionIndex();
 
-        if (config('permission.events_enabled')) {
+        if (Config::eventsEnabled()) {
             event(new RoleDetachedEvent($this->getModel(), $roles));
         }
 
@@ -228,7 +285,7 @@ trait HasRoles
     {
         if ($this->getModel()->exists) {
             $this->collectRoles($roles);
-            if (config('permission.events_enabled')) {
+            if (Config::eventsEnabled()) {
                 $currentRoles = $this->roles()->get();
                 if ($currentRoles->isNotEmpty()) {
                     $this->removeRole($currentRoles);

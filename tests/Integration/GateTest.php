@@ -2,6 +2,7 @@
 
 use Illuminate\Contracts\Auth\Access\Gate;
 use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum;
 
 it('can determine if a user does not have a permission', function () {
     expect($this->testUser->can('edit-articles'))->toBeFalse();
@@ -37,7 +38,7 @@ it('can determine if a user has a direct permission', function () {
 });
 
 it('can determine if a user has a direct permission using enums', function () {
-    $enum = Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum::ViewArticles;
+    $enum = TestRolePermissionsEnum::ViewArticles;
 
     $permission = app(Permission::class)->findOrCreate($enum->value, 'web');
 

@@ -2,7 +2,9 @@
 
 namespace Spatie\Permission\Tests\TestSupport\TestModels;
 
-class RuntimeRole extends \Spatie\Permission\Models\Role
+use Spatie\Permission\Models\Role;
+
+class RuntimeRole extends Role
 {
     protected $visible = [
         'id',

@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 use Spatie\Permission\Contracts\Role as RoleContract;
+use Spatie\Permission\Support\Config;
 use Symfony\Component\Console\Helper\TableCell;
 
 class ShowCommand extends Command
@@ -20,8 +21,8 @@ class ShowCommand extends Command
     {
         $permissionClass = app(PermissionContract::class);
         $roleClass = app(RoleContract::class);
-        $teamsEnabled = config('permission.teams');
-        $team_key = config('permission.column_names.team_foreign_key');
+        $teamsEnabled = Config::teamsEnabled();
+        $team_key = Config::teamForeignKey();
 
         $style = $this->argument('style') ?? 'default';
         $guard = $this->argument('guard');

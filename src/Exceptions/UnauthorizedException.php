@@ -3,6 +3,7 @@
 namespace Spatie\Permission\Exceptions;
 
 use Illuminate\Contracts\Auth\Access\Authorizable;
+use Spatie\Permission\Support\Config;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class UnauthorizedException extends HttpException
@@ -15,7 +16,7 @@ class UnauthorizedException extends HttpException
     {
         $message = __('User does not have the right roles.');
 
-        if (config('permission.display_role_in_exception')) {
+        if (Config::displayRoleInException()) {
             $message .= ' '.__('Necessary roles are :roles', ['roles' => implode(', ', $roles)]);
         }
 
@@ -29,7 +30,7 @@ class UnauthorizedException extends HttpException
     {
         $message = __('User does not have the right permissions.');
 
-        if (config('permission.display_permission_in_exception')) {
+        if (Config::displayPermissionInException()) {
             $message .= ' '.__('Necessary permissions are :permissions', ['permissions' => implode(', ', $permissions)]);
         }
 
@@ -43,7 +44,7 @@ class UnauthorizedException extends HttpException
     {
         $message = __('User does not have any of the necessary access rights.');
 
-        if (config('permission.display_permission_in_exception') && config('permission.display_role_in_exception')) {
+        if (Config::displayPermissionInException() && Config::displayRoleInException()) {
             $message .= ' '.__('Necessary roles or permissions are :values', ['values' => implode(', ', $rolesOrPermissions)]);
         }
 
