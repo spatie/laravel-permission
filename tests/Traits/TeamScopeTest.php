@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Exceptions\TeamModelNotConfigured;
@@ -25,13 +26,22 @@ afterEach(function () {
     Schema::dropIfExists('teams');
 });
 
-it('throws an exception when teams are not enabled', function () {
+it('throws an exception when team scopes are queried while teams are not enabled', function () {
     config()->set('permission.teams', false);
     app(PermissionRegistrar::class)->teams = false;
 
     expect(fn () => User::team(1)->get())->toThrow(TeamsNotEnabled::class);
     expect(fn () => User::withoutTeam(1)->get())->toThrow(TeamsNotEnabled::class);
-    expect(fn () => $this->testUser->teams()->get())->toThrow(TeamsNotEnabled::class);
+});
+
+it('returns an empty teams relation when teams are not enabled so model introspection does not break', function () {
+    config()->set('permission.teams', false);
+    app(PermissionRegistrar::class)->teams = false;
+
+    $relation = $this->testUser->teams();
+
+    expect($relation)->toBeInstanceOf(BelongsToMany::class);
+    expect($relation->get())->toHaveCount(0);
 });
 
 it('throws an exception when team model is not configured', function () {

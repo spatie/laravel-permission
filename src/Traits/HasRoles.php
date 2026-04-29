@@ -117,9 +117,23 @@ trait HasRoles
 
     /**
      * A model may be part of multiple teams.
+     *
+     * When the teams feature is disabled this returns an empty BelongsToMany so
+     * tooling that introspects model relations (e.g. ide-helper:models) does not
+     * break. Querying it is a no-op and produces no rows.
      */
     public function teams(): BelongsToMany
     {
+        if (! Config::teamsEnabled()) {
+            return $this->morphToMany(
+                Config::permissionModel(),
+                'model',
+                Config::modelHasRolesTable(),
+                Config::morphKey(),
+                Config::teamForeignKey()
+            )->whereRaw('1 = 0');
+        }
+
         return $this->morphToMany(
             Config::teamModel(),
             'model',
