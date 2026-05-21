@@ -34,6 +34,7 @@ class PermissionServiceProvider extends PackageServiceProvider
                 Commands\ShowCommand::class,
                 Commands\UpgradeForTeamsCommand::class,
                 Commands\AssignRoleCommand::class,
+                Commands\PermissionGenerate::class,
             ]);
     }
 

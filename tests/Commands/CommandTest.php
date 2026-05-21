@@ -66,6 +66,111 @@ it('can create a permission without duplication', function () {
     expect(Permission::where('name', 'new-permission')->get())->toHaveCount(1);
 });
 
+it('can generate configured roles and permissions', function () {
+    config()->set('permission.defined_permissions', [
+        'web' => [
+            'privileged_role' => 'admin',
+            'permission_prefix' => 'admin_',
+            'permission' => [
+                'users' => [
+                    'create_user',
+                    'edit_user',
+                ],
+            ],
+        ],
+        'api' => [
+            'privileged_role' => 'api-admin',
+            'permission_prefix' => 'api_',
+            'permission' => [
+                'tokens' => [
+                    'create_token',
+                ],
+            ],
+        ],
+    ]);
+
+    Artisan::call('permission:generate');
+
+    $webRole = Role::findByName('admin', 'web');
+    $apiRole = Role::findByName('api-admin', 'api');
+    $permission = Permission::findByName('admin_create_user', 'web');
+
+    expect($webRole->hasPermissionTo('admin_create_user'))->toBeTrue()
+        ->and($webRole->hasPermissionTo('admin_edit_user'))->toBeTrue()
+        ->and($apiRole->hasPermissionTo('api_create_token'))->toBeTrue()
+        ->and($permission->display_name)->toBe('Admin Create User')
+        ->and($permission->permission_group)->toBe('users');
+});
+
+it('can generate configured permissions for one guard', function () {
+    config()->set('permission.defined_permissions', [
+        'web' => [
+            'privileged_role' => 'admin',
+            'permission_prefix' => 'admin_',
+            'permission' => [
+                'users' => ['create_user'],
+            ],
+        ],
+        'api' => [
+            'privileged_role' => 'api-admin',
+            'permission_prefix' => 'api_',
+            'permission' => [
+                'tokens' => ['create_token'],
+            ],
+        ],
+    ]);
+
+    Artisan::call('permission:generate', ['--guard' => 'api']);
+
+    expect(Role::where('name', 'admin')->where('guard_name', 'web')->exists())->toBeFalse()
+        ->and(Permission::where('name', 'admin_create_user')->where('guard_name', 'web')->exists())->toBeFalse()
+        ->and(Role::where('name', 'api-admin')->where('guard_name', 'api')->exists())->toBeTrue()
+        ->and(Permission::where('name', 'api_create_token')->where('guard_name', 'api')->exists())->toBeTrue();
+});
+
+it('can override generated privileged role name', function () {
+    config()->set('permission.defined_permissions', [
+        'web' => [
+            'privileged_role' => 'admin',
+            'permission_prefix' => '',
+            'permission' => [
+                'users' => ['create_user'],
+            ],
+        ],
+    ]);
+
+    Artisan::call('permission:generate', ['privilegedRole' => 'Super Admin']);
+
+    expect(Role::where('name', 'admin')->where('guard_name', 'web')->exists())->toBeFalse()
+        ->and(Role::findByName('Super Admin', 'web')->hasPermissionTo('create_user'))->toBeTrue();
+});
+
+it('does not duplicate generated roles or permissions', function () {
+    config()->set('permission.defined_permissions', [
+        'web' => [
+            'privileged_role' => 'admin',
+            'permission_prefix' => 'admin_',
+            'permission' => [
+                'users' => ['create_user'],
+            ],
+        ],
+    ]);
+
+    Artisan::call('permission:generate');
+    Artisan::call('permission:generate');
+
+    expect(Role::where('name', 'admin')->where('guard_name', 'web')->get())->toHaveCount(1)
+        ->and(Permission::where('name', 'admin_create_user')->where('guard_name', 'web')->get())->toHaveCount(1);
+});
+
+it('can skip generation when no permissions are configured', function () {
+    config()->set('permission.defined_permissions', []);
+
+    Artisan::call('permission:generate');
+
+    expect(Artisan::output())->toContain('No permissions configured at `permission.defined_permissions`.');
+});
+
 it('can show permission tables', function () {
     Role::where('name', 'testRole2')->delete();
     Role::create(['name' => 'testRole_2']);

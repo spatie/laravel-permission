@@ -25,6 +25,8 @@ return new class extends Migration
          */
         Schema::create($tableNames['permissions'], static function (Blueprint $table) {
             $table->id(); // permission id
+            $table->string('display_name')->nullable();
+            $table->string('permission_group')->nullable();
             $table->string('name');
             $table->string('guard_name');
             $table->timestamps();

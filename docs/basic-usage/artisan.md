@@ -38,6 +38,46 @@ php artisan permission:create-role --team-id=1 writer
 php artisan permission:create-role writer api --team-id=1
 ```
 
+## Generating configured permissions
+
+You may define reusable permission sets in `config/permission.php` under `defined_permissions`:
+
+```php
+'defined_permissions' => [
+    'web' => [
+        'privileged_role' => 'admin',
+        'permission_prefix' => 'admin_',
+        'permission' => [
+            'user' => [
+                'create_user',
+                'edit_user',
+                'delete_user',
+            ],
+        ],
+    ],
+],
+```
+
+Generate the configured roles and permissions with:
+
+```bash
+php artisan permission:generate
+```
+
+The command creates the configured privileged role for each guard, creates each permission using the configured prefix, stores the permission group, and assigns the generated permissions to the privileged role.
+
+To generate permissions for only one configured guard, pass `--guard`:
+
+```bash
+php artisan permission:generate --guard=web
+```
+
+To override the configured privileged role for the run, pass the role name as the first argument:
+
+```bash
+php artisan permission:generate "Super Admin"
+```
+
 ## Displaying roles and permissions in the console
 
 There is also a `show` command to show a table of roles and permissions per guard:
