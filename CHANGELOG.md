@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 8.0.0 - 2026-05-30
+
+* Updated contracts to allow more thorough BackedEnum support.
+
 ## 7.4.2 - 2026-05-30
 
 ### What's Changed

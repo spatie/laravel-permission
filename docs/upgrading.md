@@ -27,6 +27,17 @@ ALL upgrades of this package should follow these steps:
 and/or consult the [Release Notes](https://github.com/spatie/laravel-permission/releases)
 
 
+## Upgrading from v7 to v8
+
+Note that 2 model contracts have changed function signatures, to allow `findByName()` and `findOrCreate()` to accept `BackedEnum|string` instead of just `string`.
+
+If you have implemented either of these contracts in your own models, you will need to update the method signatures in your models to match the new signatures. See PR [#2953](https://github.com/spatie/laravel-permission/pull/2953) for details.
+- `Spatie\Permission\Contracts\Role`
+- `Spatie\Permission\Contracts\Permission`
+
+
+For guidance with upgrading your extended models, your migrations, your routes, etc, see the **Upgrade Essentials** section at the top of this file.
+
 ## Upgrading from v6 to v7
 
 For guidance with upgrading your extended models, your migrations, your routes, etc, see the **Upgrade Essentials** section at the top of this file.
