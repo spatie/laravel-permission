@@ -19,6 +19,8 @@ use Spatie\Permission\Traits\HasAssignedModels;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
 
+use function Illuminate\Support\enum_value;
+
 /**
  * @property int|string $id
  * @property string $name
@@ -54,6 +56,7 @@ class Role extends Model implements RoleContract
     public static function create(array $attributes = [])
     {
         $attributes['guard_name'] ??= Guard::getDefaultName(static::class);
+        $attributes['name'] = enum_value($attributes['name']);
 
         $params = ['name' => $attributes['name'], 'guard_name' => $attributes['guard_name']];
 
@@ -112,8 +115,9 @@ class Role extends Model implements RoleContract
      *
      * @throws RoleDoesNotExist
      */
-    public static function findByName(string $name, ?string $guardName = null): RoleContract
+    public static function findByName(BackedEnum|string $name, ?string $guardName = null): RoleContract
     {
+        $name = enum_value($name);
         $guardName ??= Guard::getDefaultName(static::class);
 
         $role = static::findByParam(['name' => $name, 'guard_name' => $guardName]);
@@ -148,8 +152,9 @@ class Role extends Model implements RoleContract
      *
      * @return RoleContract|Role
      */
-    public static function findOrCreate(string $name, ?string $guardName = null): RoleContract
+    public static function findOrCreate(BackedEnum|string $name, ?string $guardName = null): RoleContract
     {
+        $name = enum_value($name);
         $guardName ??= Guard::getDefaultName(static::class);
 
         $attributes = ['name' => $name, 'guard_name' => $guardName];

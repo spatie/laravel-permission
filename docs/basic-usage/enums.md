@@ -43,15 +43,19 @@ enum RolesEnum: string
 
 ## Creating Roles/Permissions using Enums
 
-When **creating** roles/permissions, you cannot pass an Enum name directly, because Eloquent expects a string for the name.
-
-Use Laravel's `enum_value()` function for simplicity: 
-
+You can pass a `BackedEnum` directly when creating, finding, or finding-or-creating roles and permissions.
+These use Laravel's `enum_value()` function under the hood.
 
 ```php
-  $role = app(Role::class)->findOrCreate(enum_value(RolesEnum::WRITER), 'web');
+$role = app(Role::class)->create(['name' => RolesEnum::WRITER]);
+$role = app(Role::class)->findByName(RolesEnum::WRITER);
+$role = app(Role::class)->findOrCreate(RolesEnum::WRITER);
+
+$permission = app(Permission::class)->create(['name' => PermissionsEnum::EDITPOSTS]);
+$permission = app(Permission::class)->findByName(PermissionsEnum::EDITPOSTS);
+$permission = app(Permission::class)->findOrCreate(PermissionsEnum::EDITPOSTS);
 ```
-Same with creating Permissions.
+
 
 ### Authorizing using Enums
 
@@ -75,6 +79,15 @@ $user->hasPermissionTo(enum_value(PermissionsEnum::VIEWPOSTS));
 The following methods of this package support passing `BackedEnum` parameters directly:
 
 ```php
+    // Creating
+    app(Role::class)->create(['name' => RolesEnum::WRITER]);
+    app(Role::class)->findByName(RolesEnum::WRITER);
+    app(Role::class)->findOrCreate(RolesEnum::WRITER);
+
+    app(Permission::class)->create(['name' => PermissionsEnum::EDITPOSTS]);
+    app(Permission::class)->findByName(PermissionsEnum::EDITPOSTS);
+    app(Permission::class)->findOrCreate(PermissionsEnum::EDITPOSTS);
+
 	$user->assignRole(RolesEnum::WRITER);
 	$user->removeRole(RolesEnum::EDITOR);
 

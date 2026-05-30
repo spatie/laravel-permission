@@ -2,6 +2,7 @@
 
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Exceptions\PermissionAlreadyExists;
+use Spatie\Permission\Tests\Models\TestPermissionEnum;
 use Spatie\Permission\Tests\TestSupport\TestModels\User;
 
 it('gets user models using with', function () {
@@ -16,12 +17,39 @@ it('gets user models using with', function () {
     expect($this->testUser->id)->toEqual($permission->users[0]->id);
 });
 
-it('throws an exception when the permission already exists', function () {
-    app(Permission::class)->create(['name' => 'test-permission']);
+it('can be created', function (string|BackedEnum $name, string $expected) {
+    $permission = app(Permission::class)->create(['name' => $name]);
+    expect($permission->name)->toEqual($expected);
+})->with([
+    'string' => ['test-permission', 'test-permission'],
+    'enum' => [TestPermissionEnum::TestPermission, TestPermissionEnum::TestPermission->value],
+]);
 
-    expect(fn () => app(Permission::class)->create(['name' => 'test-permission']))
+it('can find by name', function (string|BackedEnum $name, string $expected) {
+    app(Permission::class)->create(['name' => $name]);
+    $permission = app(Permission::class)->findByName($name);
+    expect($permission->name)->toEqual($expected);
+})->with([
+    'string' => ['test-permission', 'test-permission'],
+    'enum' => [TestPermissionEnum::TestPermission, TestPermissionEnum::TestPermission->value],
+]);
+
+it('can find or create by name', function (string|BackedEnum $name, string $expected) {
+    $permission = app(Permission::class)->findOrCreate($name);
+    expect($permission->name)->toEqual($expected);
+})->with([
+    'string' => ['test-permission', 'test-permission'],
+    'enum' => [TestPermissionEnum::TestPermission, TestPermissionEnum::TestPermission->value],
+]);
+
+it('throws an exception when the permission already exists', function (string|BackedEnum $name) {
+    app(Permission::class)->create(['name' => $name]);
+    expect(fn () => app(Permission::class)->create(['name' => $name]))
         ->toThrow(PermissionAlreadyExists::class);
-});
+})->with([
+    'string' => ['test-permission'],
+    'enum' => [TestPermissionEnum::TestPermission],
+]);
 
 it('belongs to a guard', function () {
     $permission = app(Permission::class)->create(['name' => 'can-edit', 'guard_name' => 'admin']);

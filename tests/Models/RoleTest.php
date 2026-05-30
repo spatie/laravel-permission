@@ -7,6 +7,7 @@ use Spatie\Permission\Exceptions\RoleAlreadyExists;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
+use Spatie\Permission\Tests\Models\TestRoleEnum;
 use Spatie\Permission\Tests\TestSupport\TestModels\Admin;
 use Spatie\Permission\Tests\TestSupport\TestModels\RuntimeRole;
 use Spatie\Permission\Tests\TestSupport\TestModels\User;
@@ -40,12 +41,23 @@ it('has user models of the right class', function () {
     expect($this->testAdminRole->users->first())->toBeInstanceOf(Admin::class);
 });
 
-it('throws an exception when the role already exists', function () {
-    app(Role::class)->create(['name' => 'test-role']);
+it('can be created', function (string|BackedEnum $name, string $expected) {
+    $role = app(Role::class)->create(['name' => $name]);
+    expect($role->name)->toEqual($expected);
+})->with([
+    'string' => ['test-role', 'test-role'],
+    'enum' => [TestRoleEnum::TestRole, TestRoleEnum::TestRole->value],
+]);
 
-    expect(fn () => app(Role::class)->create(['name' => 'test-role']))
+it('throws an exception when the role already exists', function (string|BackedEnum $name) {
+    app(Role::class)->create(['name' => $name]);
+
+    expect(fn () => app(Role::class)->create(['name' => $name]))
         ->toThrow(RoleAlreadyExists::class);
-});
+})->with([
+    'string' => ['test-role'],
+    'enum' => [TestRoleEnum::TestRole],
+]);
 
 it('can be given a permission', function () {
     $this->testUserRole->givePermissionTo('edit-articles');
@@ -152,6 +164,15 @@ it('throws an exception if the permission does not exist', function () {
         ->toThrow(PermissionDoesNotExist::class);
 });
 
+it('can be found by name', function (string|BackedEnum $name, string $expected) {
+    app(Role::class)->create(['name' => $name]);
+    $role = app(Role::class)->findByName($name);
+    expect($role->name)->toEqual($expected);
+})->with([
+    'string' => ['test-role', 'test-role'],
+    'enum' => [TestRoleEnum::TestRole, TestRoleEnum::TestRole->value],
+]);
+
 it('returns false if it does not have a permission object', function () {
     $permission = app(Permission::class)->findByName('other-permission');
 
@@ -170,14 +191,16 @@ it('creates permission object with findOrCreate if it does not have a permission
     expect($this->testUserRole->hasPermissionTo('another-permission'))->toBeTrue();
 });
 
-it('creates a role with findOrCreate if the named role does not exist', function () {
-    expect(fn () => app(Role::class)->findByName('non-existing-role'))
+it('creates a role with findOrCreate if the named role does not exist', function (string|BackedEnum $name, string $expected) {
+    expect(fn () => app(Role::class)->findByName($name))
         ->toThrow(RoleDoesNotExist::class);
 
-    $role2 = app(Role::class)->findOrCreate('yet-another-role');
-
-    expect($role2)->toBeInstanceOf(app(Role::class)::class);
-});
+    $role = app(Role::class)->findOrCreate($name);
+    expect($role->name)->toEqual($expected);
+})->with([
+    'string' => ['test-role', 'test-role'],
+    'enum' => [TestRoleEnum::TestRole, TestRoleEnum::TestRole->value],
+]);
 
 it('throws an exception when a permission of the wrong guard is passed in', function () {
     $permission = app(Permission::class)->findByName('wrong-guard-permission', 'admin');
