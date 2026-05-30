@@ -5,17 +5,17 @@ weight: 3
 
 ## Laravel Version Compatibility
 
-Laravel Version | Package Version
-----------------|-----------
- 12, 13         |  `^7.0`  (PHP 8.3+)
- 8,9,10,11,12   |  `^6.0`  (PHP 8.0+)
- 7,8,9,10       |  `^5.8`
- 7,8,9          |  `^5.7`
- 7,8            |  `^5.4`-`^5.6`
- 6,7,8          |  `^5.0`-`^5.3`
- 6,7,8          |  `^4`
- 5.8            |  `^3`
-   
+| Laravel Version | Package Version             |
+|-----------------|-----------------------------|
+| 12, 13          | `^7.0` (PHP 8.3+)           |
+| 8,9,10,11,12    | `^6.0`  (PHP 8.0-8.5)       |
+| 7,8,9,10        | `^5.8` (PHP 7.3-8.3)        |
+| 7,8,9           | `^5.7` (PHP 7.2-8.2)        |
+| 7,8             | `^5.4`-`^5.6` (PHP 7.2-8.1) |
+| 6,7,8           | `^5.0`-`^5.3` (PHP 7.2-8.1) |
+| 6,7,8           | `^4` (PHP 7.2-8.1)          |
+| 5.8             | `^3` (PHP 7.2-7.4)          |
+
 ## User Model / Contract/Interface
 
 This package uses Laravel's Gate layer to provide Authorization capabilities.
