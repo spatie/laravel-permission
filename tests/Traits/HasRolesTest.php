@@ -110,6 +110,26 @@ it('can scope a role using enums', function () {
     expect($scopedUsers3->count())->toEqual(3);
 });
 
+it('can convert pipe strings to arrays, stripping only matched surrounding quotes', function () {
+    $convert = function (string $pipeString) {
+        $method = new ReflectionMethod($this->testUser, 'convertPipeToArray');
+
+        return $method->invoke($this->testUser, $pipeString);
+    };
+
+    // Unquoted input splits on the pipe.
+    expect($convert('writer|admin'))->toBe(['writer', 'admin']);
+
+    // Matched surrounding quotes are stripped before splitting.
+    expect($convert("'writer|admin'"))->toBe(['writer', 'admin']);
+    expect($convert('"writer|admin"'))->toBe(['writer', 'admin']);
+
+    // Mismatched quotes (leading quote only) must NOT be stripped: the leading
+    // quote is part of the first value. The previous self-comparison bug made
+    // this guard dead and incorrectly stripped the quote.
+    expect($convert("'writer|admin"))->toBe(["'writer", 'admin']);
+});
+
 it('can assign and remove a role', function () {
     expect($this->testUser->hasRole('testRole'))->toBeFalse();
 
