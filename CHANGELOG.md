@@ -2,6 +2,31 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 8.1.0 - 2026-06-27
+
+## What's Changed
+* Fixed: mismatched surrounding quote characters in pipe-delimited role strings are now preserved instead of stripped.  by @albertoarena in https://github.com/spatie/laravel-permission/pull/2960
+
+Fixes malformed pipe strings that start with `'` or `"` and do not end with the same quote. Normal documented usage is unchanged:
+
+```php
+hasAnyRole('writer|admin')       // same
+hasAnyRole("'writer|admin'")     // same
+hasAnyRole('"writer|admin"')     // same
+hasAnyRole("'writer|admin")      // changed: mismatched apostrophe is removed
+hasAnyRole("'writer|admin\"")    // changed: mismatched quote is removed
+```
+
+### also
+* docs: modernize middleware usage examples by @zainphp in https://github.com/spatie/laravel-permission/pull/2954
+* Bump actions/checkout from 6 to 7 by @dependabot[bot] in https://github.com/spatie/laravel-permission/pull/2959
+
+## New Contributors
+* @zainphp made their first contribution in https://github.com/spatie/laravel-permission/pull/2954
+* @albertoarena made their first contribution in https://github.com/spatie/laravel-permission/pull/2960
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/8.0.0...8.1.0
+
 ## 8.0.0 - 2026-05-30
 
 * Updated contracts to allow more thorough BackedEnum support.
