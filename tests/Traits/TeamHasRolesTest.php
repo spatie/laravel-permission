@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Spatie\Permission\Contracts\Permission;
@@ -14,6 +16,24 @@ use Spatie\Permission\Tests\TestSupport\TestModels\Admin;
 use Spatie\Permission\Tests\TestSupport\TestModels\SoftDeletingUser;
 use Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum;
 use Spatie\Permission\Tests\TestSupport\TestModels\User;
+use Spatie\Permission\Tests\TestSupport\TestModels\UserWithoutHasRoles;
+use Spatie\Permission\Traits\HasRoles;
+
+class TeamHasRolesCustomPivot extends MorphPivot {}
+
+class TeamHasRolesCustomPivotUser extends UserWithoutHasRoles
+{
+    use HasRoles {
+        roles as traitRoles;
+    }
+
+    public function roles(): BelongsToMany
+    {
+        return $this->traitRoles()
+            ->withPivot('team_test_id')
+            ->using(TeamHasRolesCustomPivot::class);
+    }
+}
 
 beforeEach(fn () => $this->setUpTeams());
 
@@ -942,6 +962,67 @@ it('can sync or remove roles without detach on different teams', function () {
     $this->testUser->load('roles');
 
     expect($this->testUser->getRoleNames()->sort()->values())
+        ->toEqual(collect(['testRole', 'testRole3']));
+});
+
+it('can remove a role from one team when using a custom pivot class', function () {
+    config()->set('auth.providers.users.model', TeamHasRolesCustomPivotUser::class);
+
+    app(Role::class)->create(['name' => 'testRole3', 'team_test_id' => 2]);
+
+    $user = TeamHasRolesCustomPivotUser::create(['email' => 'custom-pivot-remove-role@test.com']);
+
+    setPermissionsTeamId(1);
+    $user->syncRoles('testRole', 'testRole2');
+
+    setPermissionsTeamId(2);
+    $user->syncRoles('testRole', 'testRole3');
+    $user->load('roles');
+
+    expect($user->getRoleNames()->sort()->values())
+        ->toEqual(collect(['testRole', 'testRole3']));
+
+    setPermissionsTeamId(1);
+    $user->load('roles');
+
+    expect($user->getRoleNames()->sort()->values())
+        ->toEqual(collect(['testRole', 'testRole2']));
+
+    $user->removeRole('testRole');
+
+    expect($user->getRoleNames()->sort()->values())
+        ->toEqual(collect(['testRole2']));
+
+    setPermissionsTeamId(2);
+    $user->load('roles');
+
+    expect($user->getRoleNames()->sort()->values())
+        ->toEqual(collect(['testRole', 'testRole3']));
+});
+
+it('can sync roles for one team when using a custom pivot class', function () {
+    config()->set('auth.providers.users.model', TeamHasRolesCustomPivotUser::class);
+
+    app(Role::class)->create(['name' => 'testRole3', 'team_test_id' => 2]);
+
+    $user = TeamHasRolesCustomPivotUser::create(['email' => 'custom-pivot-sync-roles@test.com']);
+
+    setPermissionsTeamId(1);
+    $user->assignRole('testRole', 'testRole2');
+
+    setPermissionsTeamId(2);
+    $user->assignRole('testRole', 'testRole3');
+
+    setPermissionsTeamId(1);
+    $user->syncRoles('testRole2');
+
+    expect($user->getRoleNames()->sort()->values())
+        ->toEqual(collect(['testRole2']));
+
+    setPermissionsTeamId(2);
+    $user->load('roles');
+
+    expect($user->getRoleNames()->sort()->values())
         ->toEqual(collect(['testRole', 'testRole3']));
 });
 
