@@ -5,6 +5,8 @@ weight: 1
 
 This package allows you to manage user permissions and roles in a database.
 
+Think of a `Permission` as a specific ability or capability your app checks for, such as `edit articles`. Think of a `Role` as a named group of permissions that can be assigned to users or other models.
+
 Once installed you can do stuff like this:
 
 ```php

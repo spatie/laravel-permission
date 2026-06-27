@@ -18,8 +18,8 @@ class User extends Authenticatable
 }
 ```
 
-## Create A Permission
-This package allows for users to be associated with permissions and roles. Every role is associated with multiple permissions.
+## Create Roles and Permissions
+This package allows for users to be associated with permissions and roles. A permission is a specific ability or capability, and a role is a named group of permissions.
 A `Role` and a `Permission` are regular Eloquent models. They require a `name` and can be created like this:
 
 ```php
