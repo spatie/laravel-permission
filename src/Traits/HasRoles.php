@@ -6,6 +6,7 @@ use BackedEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Permission;
@@ -209,6 +210,32 @@ trait HasRoles
             }, []);
     }
 
+    private function detachRoles(?array $roles = null): int
+    {
+        $relation = $this->roles();
+
+        if (! Config::teamsEnabled() || $this instanceof Permission || $relation->getPivotClass() === Pivot::class) {
+            return $relation->detach($roles);
+        }
+
+        // Custom pivot deletes do not include the team key, so keep deletion on the scoped pivot query.
+        $query = $relation->newPivotQuery();
+
+        if (! is_null($roles)) {
+            if (empty($roles)) {
+                return 0;
+            }
+
+            $query->whereIn($relation->getQualifiedRelatedPivotKeyName(), $roles);
+        }
+
+        $results = $query->delete();
+
+        $relation->touchIfTouching();
+
+        return $results;
+    }
+
     /**
      * Assign the given role to the model.
      *
@@ -272,7 +299,7 @@ trait HasRoles
     {
         $roles = $this->collectRoles($role);
 
-        $this->roles()->detach($roles);
+        $this->detachRoles($roles);
 
         $this->unsetRelation('roles');
 
@@ -305,7 +332,7 @@ trait HasRoles
                     $this->removeRole($currentRoles);
                 }
             } else {
-                $this->roles()->detach();
+                $this->detachRoles();
                 $this->setRelation('roles', collect());
             }
         }
