@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Spatie\Permission\Contracts\Permission;
@@ -14,6 +16,22 @@ use Spatie\Permission\Tests\TestSupport\TestModels\Admin;
 use Spatie\Permission\Tests\TestSupport\TestModels\SoftDeletingUser;
 use Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum;
 use Spatie\Permission\Tests\TestSupport\TestModels\User;
+use Spatie\Permission\Tests\TestSupport\TestModels\UserWithoutHasRoles;
+use Spatie\Permission\Traits\HasRoles;
+
+class HasRolesCustomPivot extends MorphPivot {}
+
+class HasRolesCustomPivotUser extends UserWithoutHasRoles
+{
+    use HasRoles {
+        roles as traitRoles;
+    }
+
+    public function roles(): BelongsToMany
+    {
+        return $this->traitRoles()->using(HasRolesCustomPivot::class);
+    }
+}
 
 it('can determine that the user does not have a role', function () {
     expect($this->testUser->hasRole('testRole'))->toBeFalse();
@@ -140,6 +158,26 @@ it('can assign and remove a role', function () {
     $this->testUser->removeRole('testRole');
 
     expect($this->testUser->hasRole('testRole'))->toBeFalse();
+});
+
+it('can remove a role when using a custom pivot class without teams', function () {
+    config()->set('auth.providers.users.model', HasRolesCustomPivotUser::class);
+
+    $user = HasRolesCustomPivotUser::create(['email' => 'custom-pivot-without-teams@test.com']);
+
+    $user->assignRole('testRole', 'testRole2');
+
+    expect($user->getRoleNames()->sort()->values())
+        ->toEqual(collect(['testRole', 'testRole2']));
+
+    $user->removeRole('testRole');
+
+    expect($user->getRoleNames()->sort()->values())
+        ->toEqual(collect(['testRole2']));
+
+    $user->syncRoles([]);
+
+    expect($user->getRoleNames())->toBeEmpty();
 });
 
 it('removes a role and returns roles', function () {

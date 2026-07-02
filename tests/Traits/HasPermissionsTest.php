@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Support\Facades\Event;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
@@ -11,6 +13,22 @@ use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Tests\TestSupport\TestModels\SoftDeletingUser;
 use Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum;
 use Spatie\Permission\Tests\TestSupport\TestModels\User;
+use Spatie\Permission\Tests\TestSupport\TestModels\UserWithoutHasRoles;
+use Spatie\Permission\Traits\HasRoles;
+
+class HasPermissionsCustomPivot extends MorphPivot {}
+
+class HasPermissionsCustomPivotUser extends UserWithoutHasRoles
+{
+    use HasRoles {
+        permissions as traitPermissions;
+    }
+
+    public function permissions(): BelongsToMany
+    {
+        return $this->traitPermissions()->using(HasPermissionsCustomPivot::class);
+    }
+}
 
 it('can assign a permission to a user', function () {
     $this->testUser->givePermissionTo($this->testUserPermission);
@@ -50,6 +68,26 @@ it('can revoke a permission from a user', function () {
     $this->testUser->revokePermissionTo($this->testUserPermission);
 
     expect($this->testUser->hasPermissionTo($this->testUserPermission))->toBeFalse();
+});
+
+it('can revoke a permission when using a custom pivot class without teams', function () {
+    config()->set('auth.providers.users.model', HasPermissionsCustomPivotUser::class);
+
+    $user = HasPermissionsCustomPivotUser::create(['email' => 'custom-pivot-permissions-without-teams@test.com']);
+
+    $user->givePermissionTo('edit-articles', 'edit-news');
+
+    expect($user->getPermissionNames()->sort()->values())
+        ->toEqual(collect(['edit-articles', 'edit-news']));
+
+    $user->revokePermissionTo('edit-articles');
+
+    expect($user->getPermissionNames()->sort()->values())
+        ->toEqual(collect(['edit-news']));
+
+    $user->syncPermissions([]);
+
+    expect($user->getPermissionNames())->toBeEmpty();
 });
 
 it('can assign and remove a permission using enums', function () {

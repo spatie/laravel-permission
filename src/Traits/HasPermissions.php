@@ -5,6 +5,7 @@ namespace Spatie\Permission\Traits;
 use BackedEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Permission;
@@ -385,6 +386,32 @@ trait HasPermissions
             }, []);
     }
 
+    private function detachPermissions(?array $permissions = null): int
+    {
+        $relation = $this->permissions();
+
+        if (! Config::teamsEnabled() || $this instanceof Role || $relation->getPivotClass() === Pivot::class) {
+            return $relation->detach($permissions);
+        }
+
+        // Custom pivot deletes do not include the team key, so keep deletion on the scoped pivot query.
+        $query = $relation->newPivotQuery();
+
+        if (! is_null($permissions)) {
+            if (empty($permissions)) {
+                return 0;
+            }
+
+            $query->whereIn($relation->getQualifiedRelatedPivotKeyName(), $permissions);
+        }
+
+        $results = $query->delete();
+
+        $relation->touchIfTouching();
+
+        return $results;
+    }
+
     /**
      * Grant the given permission(s) to a role.
      *
@@ -458,7 +485,7 @@ trait HasPermissions
                     $this->revokePermissionTo($currentPermissions);
                 }
             } else {
-                $this->permissions()->detach();
+                $this->detachPermissions();
                 $this->setRelation('permissions', collect());
             }
         }
@@ -475,8 +502,9 @@ trait HasPermissions
     public function revokePermissionTo($permission): static
     {
         $storedPermission = $this->getStoredPermission($permission);
+        $permissions = $this->collectPermissions($storedPermission);
 
-        $this->permissions()->detach($storedPermission);
+        $this->detachPermissions($permissions);
 
         if ($this instanceof Role) {
             $this->forgetCachedPermissions();

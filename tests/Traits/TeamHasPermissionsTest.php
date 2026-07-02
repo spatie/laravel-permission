@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Support\Facades\Event;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
@@ -11,6 +13,24 @@ use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Tests\TestSupport\TestModels\SoftDeletingUser;
 use Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum;
 use Spatie\Permission\Tests\TestSupport\TestModels\User;
+use Spatie\Permission\Tests\TestSupport\TestModels\UserWithoutHasRoles;
+use Spatie\Permission\Traits\HasRoles;
+
+class TeamHasPermissionsCustomPivot extends MorphPivot {}
+
+class TeamHasPermissionsCustomPivotUser extends UserWithoutHasRoles
+{
+    use HasRoles {
+        permissions as traitPermissions;
+    }
+
+    public function permissions(): BelongsToMany
+    {
+        return $this->traitPermissions()
+            ->withPivot('team_test_id')
+            ->using(TeamHasPermissionsCustomPivot::class);
+    }
+}
 
 beforeEach(fn () => $this->setUpTeams());
 
@@ -754,6 +774,114 @@ it('can sync or remove permission without detach on different teams', function (
     $this->testUser->load('permissions');
     expect($this->testUser->getPermissionNames()->sort()->values())
         ->toEqual(collect(['edit-articles', 'edit-blog']));
+});
+
+it('can revoke a permission from one team when using a custom pivot class', function () {
+    config()->set('auth.providers.users.model', TeamHasPermissionsCustomPivotUser::class);
+
+    $user = TeamHasPermissionsCustomPivotUser::create(['email' => 'custom-pivot-revoke-permission@test.com']);
+
+    setPermissionsTeamId(1);
+    $user->givePermissionTo('edit-articles', 'edit-news');
+
+    setPermissionsTeamId(2);
+    $user->givePermissionTo('edit-articles', 'edit-blog');
+    $user->load('permissions');
+
+    expect($user->getPermissionNames()->sort()->values())
+        ->toEqual(collect(['edit-articles', 'edit-blog']));
+
+    setPermissionsTeamId(1);
+    $user->load('permissions');
+
+    expect($user->getPermissionNames()->sort()->values())
+        ->toEqual(collect(['edit-articles', 'edit-news']));
+
+    $user->revokePermissionTo('edit-articles');
+
+    expect($user->getPermissionNames()->sort()->values())
+        ->toEqual(collect(['edit-news']));
+
+    setPermissionsTeamId(2);
+    $user->load('permissions');
+
+    expect($user->getPermissionNames()->sort()->values())
+        ->toEqual(collect(['edit-articles', 'edit-blog']));
+});
+
+it('can sync permissions for one team when using a custom pivot class', function () {
+    config()->set('auth.providers.users.model', TeamHasPermissionsCustomPivotUser::class);
+
+    $user = TeamHasPermissionsCustomPivotUser::create(['email' => 'custom-pivot-sync-permissions@test.com']);
+
+    setPermissionsTeamId(1);
+    $user->givePermissionTo('edit-articles', 'edit-news');
+
+    setPermissionsTeamId(2);
+    $user->givePermissionTo('edit-articles', 'edit-blog');
+
+    setPermissionsTeamId(1);
+    $user->syncPermissions('edit-news');
+
+    expect($user->getPermissionNames()->sort()->values())
+        ->toEqual(collect(['edit-news']));
+
+    setPermissionsTeamId(2);
+    $user->load('permissions');
+
+    expect($user->getPermissionNames()->sort()->values())
+        ->toEqual(collect(['edit-articles', 'edit-blog']));
+});
+
+it('can sync permissions with events for one team when using a custom pivot class', function () {
+    Event::fake([PermissionDetachedEvent::class, PermissionAttachedEvent::class]);
+    app('config')->set('permission.events_enabled', true);
+    config()->set('auth.providers.users.model', TeamHasPermissionsCustomPivotUser::class);
+
+    $user = TeamHasPermissionsCustomPivotUser::create(['email' => 'custom-pivot-sync-permissions-events@test.com']);
+
+    setPermissionsTeamId(1);
+    $user->givePermissionTo('edit-articles', 'edit-news');
+
+    setPermissionsTeamId(2);
+    $user->givePermissionTo('edit-articles', 'edit-blog');
+
+    setPermissionsTeamId(1);
+    $user->syncPermissions('edit-news');
+
+    expect($user->getPermissionNames()->sort()->values())
+        ->toEqual(collect(['edit-news']));
+
+    Event::assertDispatched(PermissionDetachedEvent::class);
+
+    setPermissionsTeamId(2);
+    $user->load('permissions');
+
+    expect($user->getPermissionNames()->sort()->values())
+        ->toEqual(collect(['edit-articles', 'edit-blog']));
+});
+
+it('can sync to no permissions for one team when using a custom pivot class', function () {
+    config()->set('auth.providers.users.model', TeamHasPermissionsCustomPivotUser::class);
+
+    $user = TeamHasPermissionsCustomPivotUser::create(['email' => 'custom-pivot-sync-empty-permissions@test.com']);
+
+    setPermissionsTeamId(1);
+    $user->givePermissionTo('edit-articles', 'edit-news');
+
+    setPermissionsTeamId(2);
+    $user->givePermissionTo('edit-articles');
+
+    setPermissionsTeamId(1);
+    $user->syncPermissions([]);
+
+    expect($user->getPermissionNames())->toBeEmpty();
+
+    setPermissionsTeamId(2);
+    $user->load('permissions');
+
+    expect($user->getPermissionNames()->sort()->values())
+        ->toEqual(collect(['edit-articles']));
 });
 
 it('can scope users on different teams', function () {
