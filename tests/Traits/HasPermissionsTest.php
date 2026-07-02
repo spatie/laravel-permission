@@ -675,6 +675,35 @@ it('fires an event when a permission is removed', function () {
     });
 });
 
+it('fires detach event when syncing permissions', function () {
+    Event::fake([PermissionDetachedEvent::class, PermissionAttachedEvent::class]);
+    app('config')->set('permission.events_enabled', true);
+
+    $this->testUser->givePermissionTo('edit-articles', 'edit-news');
+
+    $this->testUser->syncPermissions('edit-articles');
+
+    expect($this->testUser->hasPermissionTo('edit-articles'))->toBeTrue();
+    expect($this->testUser->hasPermissionTo('edit-news'))->toBeFalse();
+
+    Event::assertDispatched(PermissionDetachedEvent::class, function ($event) {
+        $names = collect($event->permissionsOrIds)->map(
+            fn ($permission) => is_object($permission)
+                ? $permission->name
+                : app(Permission::class)::findById($permission)->name
+        );
+
+        return $event->model instanceof User
+            && ! $event->model->hasPermissionTo('edit-news')
+            && $names->contains('edit-news');
+    });
+
+    Event::assertDispatched(PermissionAttachedEvent::class, function ($event) {
+        return $event->model instanceof User
+            && $event->model->hasPermissionTo('edit-articles');
+    });
+});
+
 it('can be given a permission on role when lazy loading is restricted', function () {
     expect(Model::preventsLazyLoading())->toBeTrue();
 
