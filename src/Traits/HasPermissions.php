@@ -326,6 +326,13 @@ trait HasPermissions
      */
     public function getPermissionsViaRoles(): Collection
     {
+        // This trait is shared by both Role and Permission models; Larastan analyses it once per
+        // consuming class, pinning $this to that one class, so it reports the check for the other
+        // class as dead code even though both checks are needed at runtime.
+        // The phpstan finding appears to be environment-dependent, invisible to the current CI runner
+        // but reproducible on at least one real local dev setup (Mac + Herd + PHP 8.4.6).
+        // Ignoring here so local and CI static-analysis results stay consistent for all contributors.
+        // @phpstan-ignore instanceof.alwaysFalse
         if ($this instanceof Role || $this instanceof Permission) {
             return collect();
         }
