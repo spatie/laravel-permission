@@ -1026,6 +1026,59 @@ it('can sync roles for one team when using a custom pivot class', function () {
         ->toEqual(collect(['testRole', 'testRole3']));
 });
 
+it('can sync roles with events for one team when using a custom pivot class', function () {
+    Event::fake([RoleDetachedEvent::class, RoleAttachedEvent::class]);
+    app('config')->set('permission.events_enabled', true);
+    config()->set('auth.providers.users.model', TeamHasRolesCustomPivotUser::class);
+
+    app(Role::class)->create(['name' => 'testRole3', 'team_test_id' => 2]);
+
+    $user = TeamHasRolesCustomPivotUser::create(['email' => 'custom-pivot-sync-roles-events@test.com']);
+
+    setPermissionsTeamId(1);
+    $user->assignRole('testRole', 'testRole2');
+
+    setPermissionsTeamId(2);
+    $user->assignRole('testRole', 'testRole3');
+
+    setPermissionsTeamId(1);
+    $user->syncRoles('testRole2');
+
+    expect($user->getRoleNames()->sort()->values())
+        ->toEqual(collect(['testRole2']));
+
+    Event::assertDispatched(RoleDetachedEvent::class);
+
+    setPermissionsTeamId(2);
+    $user->load('roles');
+
+    expect($user->getRoleNames()->sort()->values())
+        ->toEqual(collect(['testRole', 'testRole3']));
+});
+
+it('can sync to no roles for one team when using a custom pivot class', function () {
+    config()->set('auth.providers.users.model', TeamHasRolesCustomPivotUser::class);
+
+    $user = TeamHasRolesCustomPivotUser::create(['email' => 'custom-pivot-sync-empty-roles@test.com']);
+
+    setPermissionsTeamId(1);
+    $user->assignRole('testRole', 'testRole2');
+
+    setPermissionsTeamId(2);
+    $user->assignRole('testRole');
+
+    setPermissionsTeamId(1);
+    $user->syncRoles([]);
+
+    expect($user->getRoleNames())->toBeEmpty();
+
+    setPermissionsTeamId(2);
+    $user->load('roles');
+
+    expect($user->getRoleNames()->sort()->values())
+        ->toEqual(collect(['testRole']));
+});
+
 it('can scope users on different teams', function () {
     User::all()->each(fn ($item) => $item->delete());
     $user1 = User::create(['email' => 'user1@test.com']);
