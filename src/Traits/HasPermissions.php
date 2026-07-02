@@ -443,8 +443,17 @@ trait HasPermissions
     {
         if ($this->getModel()->exists) {
             $this->collectPermissions($permissions);
-            $this->permissions()->detach();
-            $this->setRelation('permissions', collect());
+
+            if (Config::eventsEnabled()) {
+                $currentPermissions = $this->permissions()->get();
+
+                if ($currentPermissions->isNotEmpty()) {
+                    $this->revokePermissionTo($currentPermissions);
+                }
+            } else {
+                $this->permissions()->detach();
+                $this->setRelation('permissions', collect());
+            }
         }
 
         return $this->givePermissionTo($permissions);
