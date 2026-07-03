@@ -173,6 +173,13 @@ it('can be found by name', function (string|BackedEnum $name, string $expected) 
     'enum' => [TestRoleEnum::TestRole, TestRoleEnum::TestRole->value],
 ]);
 
+it('returns false when checking permission via role on a role instance directly', function () {
+    $method = new ReflectionMethod($this->testUserRole, 'hasPermissionViaRole');
+    $method->setAccessible(true);
+
+    expect($method->invoke($this->testUserRole, $this->testUserPermission))->toBeFalse();
+});
+
 it('returns false if it does not have a permission object', function () {
     $permission = app(Permission::class)->findByName('other-permission');
 
@@ -201,6 +208,11 @@ it('creates a role with findOrCreate if the named role does not exist', function
     'string' => ['test-role', 'test-role'],
     'enum' => [TestRoleEnum::TestRole, TestRoleEnum::TestRole->value],
 ]);
+
+it('throws an exception when a role with the given id does not exist', function () {
+    expect(fn () => app(Role::class)::findById(456789, 'web'))
+        ->toThrow(RoleDoesNotExist::class);
+});
 
 it('throws an exception when a permission of the wrong guard is passed in', function () {
     $permission = app(Permission::class)->findByName('wrong-guard-permission', 'admin');

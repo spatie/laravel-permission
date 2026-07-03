@@ -36,6 +36,12 @@ it('can assign a permission to a user', function () {
     expect($this->testUser->hasPermissionTo($this->testUserPermission))->toBeTrue();
 });
 
+it('can check a permission by its id', function () {
+    $this->testUser->givePermissionTo($this->testUserPermission);
+
+    expect($this->testUser->hasPermissionTo($this->testUserPermission->id))->toBeTrue();
+});
+
 it('can assign a permission to a user with a non default guard', function () {
     $testUserPermission = app(Permission::class)->create([
         'name' => 'edit-articles',
@@ -68,6 +74,13 @@ it('can revoke a permission from a user', function () {
     $this->testUser->revokePermissionTo($this->testUserPermission);
 
     expect($this->testUser->hasPermissionTo($this->testUserPermission))->toBeFalse();
+});
+
+it('silently ignores values that cannot be resolved to a permission', function () {
+    $this->testUser->givePermissionTo(['edit-articles', true]);
+
+    expect($this->testUser->hasPermissionTo('edit-articles'))->toBeTrue();
+    expect($this->testUser->permissions)->toHaveCount(1);
 });
 
 it('can revoke a permission when using a custom pivot class without teams', function () {

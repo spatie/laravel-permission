@@ -250,3 +250,19 @@ it('can reset the cache with artisan command', function () {
     // assert that the cache had to be reloaded
     assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
 });
+
+it('shows an error when the cache exists but cannot be flushed', function () {
+    $registrar = Mockery::mock(PermissionRegistrar::class)->makePartial();
+    $registrar->cacheKey = $this->registrar->cacheKey;
+    $registrar->shouldReceive('forgetCachedPermissions')->once()->andReturn(false);
+
+    $cacheRepository = Mockery::mock(Illuminate\Contracts\Cache\Repository::class);
+    $cacheRepository->shouldReceive('has')->with($registrar->cacheKey)->andReturn(true);
+    $registrar->shouldReceive('getCacheRepository')->once()->andReturn($cacheRepository);
+
+    app()->instance(PermissionRegistrar::class, $registrar);
+
+    Artisan::call('permission:cache-reset');
+
+    expect(Artisan::output())->toContain('Unable to flush cache.');
+});

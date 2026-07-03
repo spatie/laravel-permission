@@ -1000,6 +1000,20 @@ it('can remove a role from one team when using a custom pivot class', function (
         ->toEqual(collect(['testRole', 'testRole3']));
 });
 
+it('does nothing when removing an empty set of roles for one team when using a custom pivot class', function () {
+    config()->set('auth.providers.users.model', TeamHasRolesCustomPivotUser::class);
+
+    $user = TeamHasRolesCustomPivotUser::create(['email' => 'custom-pivot-remove-empty-roles@test.com']);
+
+    setPermissionsTeamId(1);
+    $user->syncRoles('testRole', 'testRole2');
+
+    $user->removeRole([]);
+
+    expect($user->getRoleNames()->sort()->values())
+        ->toEqual(collect(['testRole', 'testRole2']));
+});
+
 it('can sync roles for one team when using a custom pivot class', function () {
     config()->set('auth.providers.users.model', TeamHasRolesCustomPivotUser::class);
 

@@ -146,6 +146,20 @@ it('can convert pipe strings to arrays, stripping only matched surrounding quote
     // quote is part of the first value. The previous self-comparison bug made
     // this guard dead and incorrectly stripped the quote.
     expect($convert("'writer|admin"))->toBe(["'writer", 'admin']);
+
+    // Matching surrounding characters that aren't quotes must NOT be stripped.
+    expect($convert('xwriter|adminx'))->toBe(['xwriter', 'adminx']);
+
+    // Very short strings are just stripped of pipes and returned as a single value.
+    expect($convert('a|'))->toBe(['a']);
+    expect($convert('|'))->toBe(['']);
+});
+
+it('can check exact roles using a pipe-delimited string', function () {
+    $this->testUser->assignRole('testRole', 'testRole2');
+
+    expect($this->testUser->hasExactRoles('testRole|testRole2'))->toBeTrue();
+    expect($this->testUser->hasExactRoles('testRole|testRole2|testRole3'))->toBeFalse();
 });
 
 it('can assign and remove a role', function () {

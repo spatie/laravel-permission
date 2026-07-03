@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Support\Config;
 use Spatie\Permission\Tests\TestSupport\TestModels\User;
@@ -203,6 +204,30 @@ it('can remove a role from models using IDs with explicit model class', function
     $this->testUserRole->removeFromModels($user1->getKey(), User::class);
 
     expect($user1->fresh()->hasRole($this->testUserRole))->toBeFalse();
+});
+
+it('does nothing when assigning an unsaved role to models', function () {
+    $role = new Role(['name' => 'unsaved-role']);
+    $user1 = User::create(['email' => 'user1@test.com']);
+
+    $result = $role->assignToModels($user1);
+
+    expect($result)->toBe($role);
+    expect($user1->fresh()->roles)->toHaveCount(0);
+});
+
+it('applies the current team id when assigning models with teams enabled', function () {
+    $this->setUpTeams();
+
+    $user1 = User::create(['email' => 'team-user1@test.com']);
+
+    $this->testUserRole->assignToModels($user1);
+
+    $pivot = DB::table(Config::modelHasRolesTable())
+        ->where(Config::morphKey(), $user1->getKey())
+        ->first();
+
+    expect((int) $pivot->team_test_id)->toBe(1);
 });
 
 it('uses config default_model when resolving IDs', function () {

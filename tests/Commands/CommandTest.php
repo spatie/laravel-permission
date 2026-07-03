@@ -124,6 +124,79 @@ it('can setup teams upgrade', function () {
     }
 });
 
+it('fails to setup teams when the teams feature is disabled', function () {
+    config()->set('permission.teams', false);
+
+    $this->artisan('permission:setup-teams')
+        ->expectsOutputToContain('Teams feature is disabled in your permission.php file.')
+        ->assertExitCode(1);
+});
+
+it('can decline the teams migration creation', function () {
+    config()->set('permission.teams', true);
+
+    $this->artisan('permission:setup-teams')
+        ->expectsConfirmation('Proceed with the migration creation?', 'no')
+        ->assertExitCode(0);
+
+    expect(glob(database_path('migrations/*_add_teams_fields.php')))->toBeEmpty();
+});
+
+it('warns when a teams migration already exists', function () {
+    config()->set('permission.teams', true);
+
+    $existingMigration = database_path('migrations/0000_00_00_000000_add_teams_fields.php');
+    file_put_contents($existingMigration, '<?php');
+
+    $this->artisan('permission:setup-teams')
+        ->expectsOutputToContain('Setup teams migration already exists.')
+        ->expectsConfirmation('Proceed with the migration creation?', 'no')
+        ->assertExitCode(0);
+
+    $matchingFiles = glob(database_path('migrations/*_add_teams_fields.php'));
+    foreach ($matchingFiles as $file) {
+        unlink($file);
+    }
+});
+
+it('warns when multiple teams migrations already exist', function () {
+    config()->set('permission.teams', true);
+
+    $existingMigration1 = database_path('migrations/0000_00_00_000000_add_teams_fields.php');
+    $existingMigration2 = database_path('migrations/0000_00_00_000001_add_teams_fields.php');
+    file_put_contents($existingMigration1, '<?php');
+    file_put_contents($existingMigration2, '<?php');
+
+    $this->artisan('permission:setup-teams')
+        ->expectsOutputToContain('Setup teams migrations already exist.')
+        ->expectsConfirmation('Proceed with the migration creation?', 'no')
+        ->assertExitCode(0);
+
+    $matchingFiles = glob(database_path('migrations/*_add_teams_fields.php'));
+    foreach ($matchingFiles as $file) {
+        unlink($file);
+    }
+});
+
+it('shows an error when the teams migration cannot be created', function () {
+    config()->set('permission.teams', true);
+
+    $migrationPath = database_path('migrations');
+    $originalPermissions = fileperms($migrationPath) & 0777;
+    chmod($migrationPath, 0555);
+
+    try {
+        $this->artisan('permission:setup-teams')
+            ->expectsConfirmation('Proceed with the migration creation?', 'yes')
+            ->expectsOutputToContain("Couldn't create migration.")
+            ->assertExitCode(0);
+    } finally {
+        chmod($migrationPath, $originalPermissions);
+    }
+
+    expect(glob(database_path('migrations/*_add_teams_fields.php')))->toBeEmpty();
+});
+
 it('can show roles by teams', function () {
     config()->set('permission.teams', true);
     app(PermissionRegistrar::class)->initializeCache();
@@ -237,4 +310,32 @@ it('warns when assigning role with team id but teams disabled', function () {
     $output = Artisan::output();
 
     expect($output)->toContain('Teams feature disabled');
+});
+
+it('warns when creating a role with team id but teams disabled', function () {
+    Artisan::call('permission:create-role', [
+        'name' => 'new-role',
+        '--team-id' => 1,
+    ]);
+
+    $output = Artisan::output();
+
+    expect($output)->toContain('Teams feature disabled, argument --team-id has no effect');
+    expect(Role::where('name', 'new-role')->get())->toHaveCount(0);
+});
+
+it('warns when creating a role with team id and the role already exists on the global team', function () {
+    config()->set('permission.teams', true);
+    app(PermissionRegistrar::class)->initializeCache();
+
+    Artisan::call('permission:create-role', ['name' => 'new-role']);
+
+    Artisan::call('permission:create-role', [
+        'name' => 'new-role',
+        '--team-id' => 1,
+    ]);
+
+    $output = Artisan::output();
+
+    expect($output)->toContain('Role `new-role` already exists on the global team; argument --team-id has no effect');
 });

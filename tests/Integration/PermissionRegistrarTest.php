@@ -161,3 +161,33 @@ it('can change team id', function () {
 
     expect(app(PermissionRegistrar::class)->getPermissionsTeamId())->toBe($team_id);
 });
+
+it('can change team id using a model instance', function () {
+    app(PermissionRegistrar::class)->setPermissionsTeamId($this->testUser);
+
+    expect(app(PermissionRegistrar::class)->getPermissionsTeamId())->toBe($this->testUser->getKey());
+});
+
+it('falls back to the array cache store when an undefined cache store is configured', function () {
+    config()->set('permission.cache.store', 'this-store-does-not-exist');
+
+    app(PermissionRegistrar::class)->initializeCache();
+
+    expect(app(PermissionRegistrar::class)->getCacheStore())
+        ->toBeInstanceOf(Illuminate\Cache\ArrayStore::class);
+});
+
+it('retries loading permissions when another load is already in progress', function () {
+    $registrar = app(PermissionRegistrar::class);
+    $registrar->forgetCachedPermissions();
+
+    $reflectedClass = new ReflectionClass($registrar);
+    $loadingProperty = $reflectedClass->getProperty('isLoadingPermissions');
+    $loadingProperty->setAccessible(true);
+    $loadingProperty->setValue($registrar, true);
+
+    $permissions = $registrar->getPermissions();
+
+    expect($permissions)->toBeInstanceOf(Illuminate\Database\Eloquent\Collection::class);
+    expect($loadingProperty->getValue($registrar))->toBeFalse();
+});

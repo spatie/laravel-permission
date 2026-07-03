@@ -809,6 +809,20 @@ it('can revoke a permission from one team when using a custom pivot class', func
         ->toEqual(collect(['edit-articles', 'edit-blog']));
 });
 
+it('does nothing when revoking an empty set of permissions for one team when using a custom pivot class', function () {
+    config()->set('auth.providers.users.model', TeamHasPermissionsCustomPivotUser::class);
+
+    $user = TeamHasPermissionsCustomPivotUser::create(['email' => 'custom-pivot-revoke-empty-permission@test.com']);
+
+    setPermissionsTeamId(1);
+    $user->givePermissionTo('edit-articles', 'edit-news');
+
+    $user->revokePermissionTo([]);
+
+    expect($user->getPermissionNames()->sort()->values())
+        ->toEqual(collect(['edit-articles', 'edit-news']));
+});
+
 it('can sync permissions for one team when using a custom pivot class', function () {
     config()->set('auth.providers.users.model', TeamHasPermissionsCustomPivotUser::class);
 

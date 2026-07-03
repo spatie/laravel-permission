@@ -2,6 +2,7 @@
 
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Exceptions\WildcardPermissionInvalidArgument;
+use Spatie\Permission\Exceptions\WildcardPermissionNotImplementsContract;
 use Spatie\Permission\Exceptions\WildcardPermissionNotProperlyFormatted;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum;
@@ -242,6 +243,29 @@ it('throws exception when wildcard permission is not properly formatted', functi
     $user1->givePermissionTo([$permission]);
 
     expect(fn () => $user1->hasPermissionTo('invoices.*'))
+        ->toThrow(WildcardPermissionNotProperlyFormatted::class);
+});
+
+it('throws exception when wildcard permission class does not implement contract', function () {
+    app('config')->set('permission.enable_wildcard_permission', true);
+    app('config')->set('permission.wildcard_permission', User::class);
+
+    $user1 = User::create(['email' => 'user1@test.com']);
+
+    expect(fn () => $user1->hasPermissionTo('posts.create'))
+        ->toThrow(WildcardPermissionNotImplementsContract::class);
+});
+
+it('throws exception when a comma-separated wildcard subpart is blank', function () {
+    app('config')->set('permission.enable_wildcard_permission', true);
+
+    $user1 = User::create(['email' => 'user1@test.com']);
+
+    $permission = Permission::create(['name' => 'articles,,edit']);
+
+    $user1->givePermissionTo([$permission]);
+
+    expect(fn () => $user1->hasPermissionTo('articles.edit'))
         ->toThrow(WildcardPermissionNotProperlyFormatted::class);
 });
 
