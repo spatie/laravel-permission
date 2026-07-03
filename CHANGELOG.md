@@ -2,9 +2,24 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 8.2.0 - 2026-07-03
+
+### What's Changed
+
+* Fire PermissionDetachedEvent when syncing permissions (symmetry with syncRoles) by @chengkangzai in https://github.com/spatie/laravel-permission/pull/2963
+* Fixed a bug where removing a role or permission from a model on one team could also remove that same assignment on other teams, when the model uses a custom pivot class (`->using(CustomPivot::class)`) on `roles()`/`permissions()` with teams enabled. (Issue #2867) by @drbyte in https://github.com/spatie/laravel-permission/pull/2961
+
+**Watch out for in your own test suite:**
+
+- If you use custom pivot model `deleting`/`deleted` hooks to react to role/permission removal under teams, those hooks were already unreliable in this scenario and remain out of scope — switch to listening for `RoleDetachedEvent` / `PermissionDetachedEvent` instead.
+- `revokePermissionTo()` can now throw `GuardDoesNotMatch` in rare cases where it previously wouldn't have, as a side effect of routing through the same guard-check used by `givePermissionTo()`. This should not affect normal usage (permissions being revoked are already guard-matched), but if your tests exercise unusual multi-guard setups, re-run them against this release.
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/8.1.0...8.2.0
+
 ## 8.1.0 - 2026-06-27
 
 ## What's Changed
+
 * Fixed: mismatched surrounding quote characters in pipe-delimited role strings are now preserved instead of stripped.  by @albertoarena in https://github.com/spatie/laravel-permission/pull/2960
 
 Fixes malformed pipe strings that start with `'` or `"` and do not end with the same quote. Normal documented usage is unchanged:
@@ -15,13 +30,15 @@ hasAnyRole("'writer|admin'")     // same
 hasAnyRole('"writer|admin"')     // same
 hasAnyRole("'writer|admin")      // changed: mismatched apostrophe is removed
 hasAnyRole("'writer|admin\"")    // changed: mismatched quote is removed
-```
 
+```
 ### also
+
 * docs: modernize middleware usage examples by @zainphp in https://github.com/spatie/laravel-permission/pull/2954
 * Bump actions/checkout from 6 to 7 by @dependabot[bot] in https://github.com/spatie/laravel-permission/pull/2959
 
 ## New Contributors
+
 * @zainphp made their first contribution in https://github.com/spatie/laravel-permission/pull/2954
 * @albertoarena made their first contribution in https://github.com/spatie/laravel-permission/pull/2960
 
@@ -1331,6 +1348,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -1378,6 +1396,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
