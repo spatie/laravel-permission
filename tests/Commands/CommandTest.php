@@ -1,7 +1,5 @@
 <?php
 
-use Composer\InstalledVersions;
-use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\Facades\Artisan;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -214,13 +212,6 @@ it('can show roles by teams', function () {
 });
 
 it('can respond to about command with default', function () {
-    if (! class_exists(InstalledVersions::class) || ! class_exists(AboutCommand::class)) {
-        $this->markTestSkipped();
-    }
-    if (! method_exists(AboutCommand::class, 'flushState')) {
-        $this->markTestSkipped();
-    }
-
     app(PermissionRegistrar::class)->initializeCache();
 
     Artisan::call('about');
@@ -231,13 +222,6 @@ it('can respond to about command with default', function () {
 });
 
 it('can respond to about command with teams', function () {
-    if (! class_exists(InstalledVersions::class) || ! class_exists(AboutCommand::class)) {
-        $this->markTestSkipped();
-    }
-    if (! method_exists(AboutCommand::class, 'flushState')) {
-        $this->markTestSkipped();
-    }
-
     app(PermissionRegistrar::class)->initializeCache();
 
     config()->set('permission.teams', true);

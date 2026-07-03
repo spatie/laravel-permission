@@ -135,10 +135,6 @@ class PermissionServiceProvider extends PackageServiceProvider
 
     protected function registerAbout(): void
     {
-        if (! class_exists(InstalledVersions::class) || ! class_exists(AboutCommand::class)) {
-            return;
-        }
-
         // array format: 'Display Text' => 'boolean-config-key name'
         $features = [
             'Teams' => 'teams',

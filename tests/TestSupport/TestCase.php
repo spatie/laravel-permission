@@ -74,9 +74,7 @@ class TestCase extends Orchestra
     {
         parent::tearDown();
 
-        if (method_exists(AboutCommand::class, 'flushState')) {
-            AboutCommand::flushState();
-        }
+        AboutCommand::flushState();
     }
 
     /**
