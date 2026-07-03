@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 use Spatie\Permission\Contracts\Role as RoleContract;
 use Spatie\Permission\Models\Permission as SpatiePermission;
@@ -20,6 +21,62 @@ it('can clear loaded permissions collection', function () {
     app(PermissionRegistrar::class)->clearPermissionsCollection();
 
     expect($reflectedProperty->getValue(app(PermissionRegistrar::class)))->toBeNull();
+});
+
+it('clears the loaded permissions collection when reinitializing the cache', function () {
+    $reflectedClass = new ReflectionClass(app(PermissionRegistrar::class));
+    $reflectedProperty = $reflectedClass->getProperty('permissions');
+    $reflectedProperty->setAccessible(true);
+
+    app(PermissionRegistrar::class)->getPermissions();
+
+    expect($reflectedProperty->getValue(app(PermissionRegistrar::class)))->not->toBeNull();
+
+    app(PermissionRegistrar::class)->initializeCache();
+
+    expect($reflectedProperty->getValue(app(PermissionRegistrar::class)))->toBeNull();
+});
+
+it('does not leak a previous tenant\'s permissions after switching cache context via initializeCache', function () {
+    // Two separate cache "stores" stand in for two tenants' cache namespaces
+    // (e.g. distinct cache prefixes/connections in a real multi-tenant app).
+    config([
+        'cache.stores.tenant_a' => ['driver' => 'array'],
+        'cache.stores.tenant_b' => ['driver' => 'array'],
+    ]);
+
+    // Insert both tenants' rows via the query builder, bypassing Eloquent,
+    // so the RefreshesPermissionCache model events don't auto-bust the cache and
+    // mask the very staleness this test is meant to catch.
+    $tenantAId = DB::table('permissions')->insertGetId([
+        'name' => 'tenant-permission',
+        'guard_name' => 'web',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    config(['permission.cache.store' => 'tenant_a']);
+    app(PermissionRegistrar::class)->initializeCache();
+
+    $loaded = app(PermissionRegistrar::class)->getPermissions()->firstWhere('name', 'tenant-permission');
+    expect($loaded->getKey())->toBe($tenantAId);
+
+    // Simulate switching to tenant B: its own row for the "same" permission has
+    // a different primary key, as it would in a separate tenant database.
+    DB::table('permissions')->where('id', $tenantAId)->delete();
+    $tenantBId = DB::table('permissions')->insertGetId([
+        'name' => 'tenant-permission',
+        'guard_name' => 'web',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+    expect($tenantBId)->not->toBe($tenantAId);
+
+    config(['permission.cache.store' => 'tenant_b']);
+    app(PermissionRegistrar::class)->initializeCache();
+
+    $loaded = app(PermissionRegistrar::class)->getPermissions()->firstWhere('name', 'tenant-permission');
+    expect($loaded->getKey())->toBe($tenantBId);
 });
 
 it('can check uids', function () {
