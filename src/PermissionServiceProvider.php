@@ -121,19 +121,15 @@ class PermissionServiceProvider extends PackageServiceProvider
         }
 
         $dispatcher = $this->app[Dispatcher::class];
-        // @phpstan-ignore-next-line
         $dispatcher->listen(function (OperationTerminated $event) {
-            // @phpstan-ignore-next-line
-            $event->sandbox->make(PermissionRegistrar::class)->setPermissionsTeamId(null);
+            $event->sandbox()->make(PermissionRegistrar::class)->setPermissionsTeamId(null);
         });
 
         if (! $this->app['config']->get('permission.register_octane_reset_listener')) {
             return;
         }
-        // @phpstan-ignore-next-line
         $dispatcher->listen(function (OperationTerminated $event) {
-            // @phpstan-ignore-next-line
-            $event->sandbox->make(PermissionRegistrar::class)->clearPermissionsCollection();
+            $event->sandbox()->make(PermissionRegistrar::class)->clearPermissionsCollection();
         });
     }
 
