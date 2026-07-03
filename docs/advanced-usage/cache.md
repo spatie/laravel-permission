@@ -80,6 +80,8 @@ Tip: Most parts of your multitenancy app will relate to a single tenant during a
 app()->make(\Spatie\Permission\PermissionRegistrar::class)->initializeCache();
 ```
 
+`initializeCache()` also discards the registrar's in-memory permissions/roles collection (equivalent to `clearPermissionsCollection()`), so the next permission check reloads from the newly-configured cache/tenant instead of reusing the previous tenant's already-loaded collection.
+
 
 ### Custom Cache Store
 
