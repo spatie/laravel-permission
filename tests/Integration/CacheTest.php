@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Cache\DatabaseStore;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Contracts\Permission;
@@ -256,7 +257,7 @@ it('shows an error when the cache exists but cannot be flushed', function () {
     $registrar->cacheKey = $this->registrar->cacheKey;
     $registrar->shouldReceive('forgetCachedPermissions')->once()->andReturn(false);
 
-    $cacheRepository = Mockery::mock(Illuminate\Contracts\Cache\Repository::class);
+    $cacheRepository = Mockery::mock(Repository::class);
     $cacheRepository->shouldReceive('has')->with($registrar->cacheKey)->andReturn(true);
     $registrar->shouldReceive('getCacheRepository')->once()->andReturn($cacheRepository);
 

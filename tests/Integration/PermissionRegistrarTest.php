@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 use Spatie\Permission\Contracts\Role as RoleContract;
@@ -174,7 +176,7 @@ it('falls back to the array cache store when an undefined cache store is configu
     app(PermissionRegistrar::class)->initializeCache();
 
     expect(app(PermissionRegistrar::class)->getCacheStore())
-        ->toBeInstanceOf(Illuminate\Cache\ArrayStore::class);
+        ->toBeInstanceOf(ArrayStore::class);
 });
 
 it('retries loading permissions when another load is already in progress', function () {
@@ -188,6 +190,6 @@ it('retries loading permissions when another load is already in progress', funct
 
     $permissions = $registrar->getPermissions();
 
-    expect($permissions)->toBeInstanceOf(Illuminate\Database\Eloquent\Collection::class);
+    expect($permissions)->toBeInstanceOf(Collection::class);
     expect($loadingProperty->getValue($registrar))->toBeFalse();
 });
