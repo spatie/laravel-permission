@@ -31,6 +31,7 @@
     },
     "require-dev": {
         "larastan/larastan": "^3.9",
+        "laravel/octane": "^2.0",
         "laravel/passport": "^13.0",
         "laravel/pint": "^1.0",
         "orchestra/testbench": "^10.0|^11.0",
