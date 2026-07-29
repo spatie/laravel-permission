@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Support\Config;
@@ -60,6 +61,17 @@ it('can sync models using a single model instance', function () {
     $this->testUserRole->syncModels($user1);
 
     expect($user1->fresh()->hasRole($this->testUserRole))->toBeTrue();
+});
+
+it('does not detach models when syncing an unsaved model', function () {
+    $user = User::create(['email' => 'user@test.com']);
+    $this->testUserRole->syncModels($user);
+
+    $unsavedUser = new User(['email' => 'unsaved-user@test.com']);
+
+    expect(fn () => $this->testUserRole->syncModels($unsavedUser))->toThrow(QueryException::class);
+
+    expect($user->fresh()->hasRole($this->testUserRole))->toBeTrue();
 });
 
 it('can sync models using IDs', function () {
