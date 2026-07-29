@@ -142,8 +142,14 @@ trait HasAssignedModels
 
     private function newPivotQueryForRole(): Builder
     {
-        return $this->getConnection()
+        $query = $this->getConnection()
             ->table(Config::modelHasRolesTable())
             ->where(app(PermissionRegistrar::class)->pivotRole, $this->getKey());
+
+        if (Config::teamsEnabled()) {
+            $query->where(Config::teamForeignKey(), getPermissionsTeamId());
+        }
+
+        return $query;
     }
 }
