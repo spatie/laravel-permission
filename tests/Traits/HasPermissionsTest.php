@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Cache\CacheManager;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
@@ -10,6 +12,7 @@ use Spatie\Permission\Events\PermissionAttachedEvent;
 use Spatie\Permission\Events\PermissionDetachedEvent;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
+use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Tests\TestSupport\TestModels\SoftDeletingUser;
 use Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum;
 use Spatie\Permission\Tests\TestSupport\TestModels\User;
@@ -774,4 +777,108 @@ it('can be given a permission on user when lazy loading is restricted', function
     $testUser->givePermissionTo('edit-articles');
 
     expect($testUser->hasPermissionTo('edit-articles'))->toBeTrue();
+});
+
+// ---- checkPermissionTo() memo ----
+
+it('memoises checkPermissionTo answers for repeated checks on the same instance', function () {
+    $counting = new class(app(CacheManager::class)) extends PermissionRegistrar
+    {
+        public int $lookups = 0;
+
+        public function getPermissions(array $params = [], bool $onlyOne = false): Collection
+        {
+            if ($params !== []) {
+                $this->lookups++;
+            }
+
+            return parent::getPermissions($params, $onlyOne);
+        }
+    };
+    app()->instance(PermissionRegistrar::class, $counting);
+
+    $this->testUser->givePermissionTo('edit-articles');
+    // Resolving the Gate for the first time clears the registrar's collection once
+    // (PermissionServiceProvider::packageBooted), so warm it before counting.
+    $this->testUser->can('edit-articles');
+    $this->testUser->checkPermissionTo('edit-articles');
+    $this->testUser->checkPermissionTo('edit-news');
+    $this->testUser->checkPermissionTo('does-not-exist');
+    $lookupsAfterFirstRound = $counting->lookups;
+
+    expect($lookupsAfterFirstRound)->toBeGreaterThan(0)
+        ->and($this->testUser->checkPermissionTo('edit-articles'))->toBeTrue()
+        ->and($this->testUser->checkPermissionTo('edit-news'))->toBeFalse()
+        ->and($this->testUser->checkPermissionTo('does-not-exist'))->toBeFalse()
+        ->and($this->testUser->can('edit-articles'))->toBeTrue()
+        ->and($counting->lookups)->toBe($lookupsAfterFirstRound);
+});
+
+it('forgets memoised checks when the model is given or stripped of a direct permission', function () {
+    expect($this->testUser->checkPermissionTo('edit-articles'))->toBeFalse();
+
+    $this->testUser->givePermissionTo('edit-articles');
+    expect($this->testUser->checkPermissionTo('edit-articles'))->toBeTrue();
+
+    $this->testUser->revokePermissionTo('edit-articles');
+    expect($this->testUser->checkPermissionTo('edit-articles'))->toBeFalse();
+
+    $this->testUser->syncPermissions(['edit-articles', 'edit-news']);
+    expect($this->testUser->checkPermissionTo('edit-articles'))->toBeTrue()
+        ->and($this->testUser->checkPermissionTo('edit-news'))->toBeTrue();
+});
+
+it('forgets memoised checks when the model gains or loses a role', function () {
+    $this->testUserRole->givePermissionTo('edit-articles');
+
+    expect($this->testUser->checkPermissionTo('edit-articles'))->toBeFalse();
+
+    $this->testUser->assignRole('testRole');
+    expect($this->testUser->checkPermissionTo('edit-articles'))->toBeTrue();
+
+    $this->testUser->removeRole('testRole');
+    expect($this->testUser->checkPermissionTo('edit-articles'))->toBeFalse();
+
+    $this->testUser->syncRoles(['testRole']);
+    expect($this->testUser->checkPermissionTo('edit-articles'))->toBeTrue();
+});
+
+it('forgets memoised checks when a role the model holds gains a permission', function () {
+    $this->testUser->assignRole('testRole');
+
+    expect($this->testUser->checkPermissionTo('edit-articles'))->toBeFalse();
+
+    $this->testUserRole->givePermissionTo('edit-articles');
+    expect($this->testUser->checkPermissionTo('edit-articles'))->toBeTrue();
+
+    $this->testUserRole->revokePermissionTo('edit-articles');
+    expect($this->testUser->checkPermissionTo('edit-articles'))->toBeFalse();
+});
+
+it('forgets memoised checks when a permission is created after a miss', function () {
+    expect($this->testUser->checkPermissionTo('created-later'))->toBeFalse();
+
+    $permission = app(Permission::class)->create(['name' => 'created-later']);
+    $this->testUser->givePermissionTo($permission);
+
+    expect($this->testUser->checkPermissionTo('created-later'))->toBeTrue();
+});
+
+it('forgets memoised checks when the roles relation is reloaded outside the trait', function () {
+    $this->testUserRole->givePermissionTo('edit-articles');
+
+    expect($this->testUser->checkPermissionTo('edit-articles'))->toBeFalse();
+
+    $this->testUser->roles()->attach($this->testUserRole->getKey());
+    $this->testUser->unsetRelation('roles');
+
+    expect($this->testUser->checkPermissionTo('edit-articles'))->toBeTrue();
+});
+
+it('memoises per guard', function () {
+    $this->testUser->givePermissionTo('edit-articles');
+
+    expect($this->testUser->checkPermissionTo('edit-articles', 'web'))->toBeTrue()
+        ->and($this->testUser->checkPermissionTo('edit-articles', 'admin'))->toBeFalse()
+        ->and($this->testUser->checkPermissionTo('edit-articles', 'web'))->toBeTrue();
 });

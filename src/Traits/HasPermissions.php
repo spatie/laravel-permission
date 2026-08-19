@@ -31,6 +31,20 @@ trait HasPermissions
 
     private array $wildcardPermissionsIndex;
 
+    /**
+     * Per-instance memo of checkPermissionTo() answers, keyed by guard and
+     * permission. Only valid for the context recorded alongside it.
+     *
+     * @var array<string, bool>
+     */
+    private array $checkedPermissions = [];
+
+    private ?string $checkedPermissionsContext = null;
+
+    private ?Collection $checkedPermissionsRoles = null;
+
+    private ?Collection $checkedPermissionsDirect = null;
+
     public static function bootHasPermissions(): void
     {
         static::deleting(function ($model) {
@@ -252,11 +266,68 @@ trait HasPermissions
      */
     public function checkPermissionTo($permission, ?string $guardName = null): bool
     {
+        $permission = enum_value($permission);
+
+        if (! is_string($permission) && ! is_int($permission)) {
+            return $this->resolveCheckPermissionTo($permission, $guardName);
+        }
+
+        $key = ($guardName ?? $this->getDefaultGuardName())."\0".$permission;
+
+        $this->refreshCheckedPermissionsContext();
+
+        if (array_key_exists($key, $this->checkedPermissions)) {
+            return $this->checkedPermissions[$key];
+        }
+
+        $result = $this->resolveCheckPermissionTo($permission, $guardName);
+
+        // Resolving may have lazy-loaded the roles/permissions relations, which
+        // changes the context the answer belongs to; record it after the fact.
+        $this->refreshCheckedPermissionsContext();
+
+        return $this->checkedPermissions[$key] = $result;
+    }
+
+    /**
+     * @param  string|int|Permission  $permission
+     */
+    private function resolveCheckPermissionTo($permission, ?string $guardName = null): bool
+    {
         try {
             return $this->hasPermissionTo($permission, $guardName);
         } catch (PermissionDoesNotExist $e) {
             return false;
         }
+    }
+
+    /**
+     * Drop the memo whenever anything it depends on changed: the registrar's
+     * permission collection (any role/permission cache flush), the team context,
+     * or this model's loaded roles/permissions relations being unset or replaced
+     * (every mutator on this trait unsets them; callers may reload them).
+     *
+     * A relation that was not loaded when an answer was memoised and is loaded
+     * later does not invalidate it — the answer was computed from the same rows.
+     */
+    private function refreshCheckedPermissionsContext(): void
+    {
+        $registrar = app(PermissionRegistrar::class);
+
+        $roles = $this->relationLoaded('roles') ? $this->getRelation('roles') : null;
+        $direct = $this->relationLoaded('permissions') ? $this->getRelation('permissions') : null;
+        $context = $registrar->getPermissionsVersion().'|'.$registrar->getPermissionsTeamId();
+
+        $relationsChanged = ($this->checkedPermissionsRoles !== null && $roles !== $this->checkedPermissionsRoles)
+            || ($this->checkedPermissionsDirect !== null && $direct !== $this->checkedPermissionsDirect);
+
+        if ($context !== $this->checkedPermissionsContext || $relationsChanged) {
+            $this->checkedPermissions = [];
+            $this->checkedPermissionsContext = $context;
+        }
+
+        $this->checkedPermissionsRoles = $roles;
+        $this->checkedPermissionsDirect = $direct;
     }
 
     /**
