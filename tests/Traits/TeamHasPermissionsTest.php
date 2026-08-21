@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Cache\CacheManager;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
@@ -10,6 +12,7 @@ use Spatie\Permission\Events\PermissionAttachedEvent;
 use Spatie\Permission\Events\PermissionDetachedEvent;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
+use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Tests\TestSupport\TestModels\SoftDeletingUser;
 use Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum;
 use Spatie\Permission\Tests\TestSupport\TestModels\User;
@@ -923,4 +926,73 @@ it('can scope users on different teams', function () {
 
     expect($scopedUsers1Team1->count())->toEqual(1);
     expect($scopedUsers2Team1->count())->toEqual(0);
+});
+
+// ---- checkPermissionTo() memo ----
+
+it('does not leak memoised direct permission checks across teams', function () {
+    setPermissionsTeamId(1);
+    $this->testUser->givePermissionTo('edit-articles');
+
+    expect($this->testUser->checkPermissionTo('edit-articles'))->toBeTrue();
+
+    setPermissionsTeamId(2);
+    $this->testUser->load('permissions');
+
+    expect($this->testUser->checkPermissionTo('edit-articles'))->toBeFalse();
+
+    setPermissionsTeamId(1);
+    $this->testUser->load('permissions');
+
+    expect($this->testUser->checkPermissionTo('edit-articles'))->toBeTrue();
+});
+
+it('does not leak memoised role permission checks across teams', function () {
+    $this->testUserRole->givePermissionTo('edit-articles');
+
+    setPermissionsTeamId(1);
+    $this->testUser->assignRole('testRole');
+
+    expect($this->testUser->checkPermissionTo('edit-articles'))->toBeTrue();
+
+    setPermissionsTeamId(2);
+    $this->testUser->load('roles');
+
+    expect($this->testUser->checkPermissionTo('edit-articles'))->toBeFalse();
+
+    setPermissionsTeamId(1);
+    $this->testUser->load('roles');
+
+    expect($this->testUser->checkPermissionTo('edit-articles'))->toBeTrue();
+});
+
+it('drops memoised checks when the team is switched', function () {
+    $counting = new class(app(CacheManager::class)) extends PermissionRegistrar
+    {
+        public int $lookups = 0;
+
+        public function getPermissions(array $params = [], bool $onlyOne = false): Collection
+        {
+            if ($params !== []) {
+                $this->lookups++;
+            }
+
+            return parent::getPermissions($params, $onlyOne);
+        }
+    };
+    app()->instance(PermissionRegistrar::class, $counting);
+    setPermissionsTeamId(1);
+
+    $this->testUser->givePermissionTo('edit-articles');
+    $this->testUser->can('edit-articles');
+    $lookupsAfterFirstRound = $counting->lookups;
+
+    expect($lookupsAfterFirstRound)->toBeGreaterThan(0)
+        ->and($this->testUser->checkPermissionTo('edit-articles'))->toBeTrue()
+        ->and($counting->lookups)->toBe($lookupsAfterFirstRound);
+
+    setPermissionsTeamId(2);
+
+    expect($this->testUser->checkPermissionTo('edit-articles'))->toBeTrue()
+        ->and($counting->lookups)->toBeGreaterThan($lookupsAfterFirstRound);
 });
