@@ -85,13 +85,20 @@ class PermissionRegistrar
 
     protected function getCacheStoreFromConfig(): Repository
     {
+        // Resolve the cache manager fresh from the container instead of the instance
+        // captured in the constructor. Long-lived registrars (Octane, or apps that
+        // rebind 'cache' on tenant switch, e.g. spatie/laravel-multitenancy) would
+        // otherwise keep asking a stale CacheManager for a store, and get back one
+        // memoised under a previous cache prefix.
+        $cacheManager = app('cache');
+
         // the 'default' fallback here is from the permission.php config file,
         // where 'default' means to use config(cache.default)
         $cacheDriver = config('permission.cache.store', 'default');
 
         // when 'default' is specified, no action is required since we already have the default instance
         if ($cacheDriver === 'default') {
-            return $this->cacheManager->store();
+            return $cacheManager->store();
         }
 
         // if an undefined cache store is specified, fallback to 'array' which is Laravel's closest equiv to 'none'
@@ -99,7 +106,7 @@ class PermissionRegistrar
             $cacheDriver = 'array';
         }
 
-        return $this->cacheManager->store($cacheDriver);
+        return $cacheManager->store($cacheDriver);
     }
 
     public function setPermissionsTeamId(int|string|Model|null $id): void
