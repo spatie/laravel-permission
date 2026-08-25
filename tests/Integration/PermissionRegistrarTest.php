@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Cache\ArrayStore;
-use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -101,7 +100,6 @@ it('picks up a rebound cache manager when initializeCache runs after the contain
         app('cache')->forgetDriver(config('cache.default'));
         app()->forgetInstance('cache');
         app()->forgetInstance('cache.store');
-        app()->forgetInstance(Repository::class);
         Cache::clearResolvedInstances();
     };
 
