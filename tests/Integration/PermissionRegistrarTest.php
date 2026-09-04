@@ -2,7 +2,9 @@
 
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 use Spatie\Permission\Contracts\Role as RoleContract;
 use Spatie\Permission\Models\Permission as SpatiePermission;
@@ -79,6 +81,35 @@ it('does not leak a previous tenant\'s permissions after switching cache context
 
     $loaded = app(PermissionRegistrar::class)->getPermissions()->firstWhere('name', 'tenant-permission');
     expect($loaded->getKey())->toBe($tenantBId);
+});
+
+it('picks up a rebound cache manager when initializeCache runs after the container cache binding is replaced', function () {
+    // Neither the array nor the file store apply cache.prefix (only
+    // apc/database/redis/memcached/dynamodb do), so this needs a store that
+    // actually honours the prefix to observe the staleness.
+    if (! Schema::hasTable('cache')) {
+        $this->createCacheTable();
+    }
+    config()->set('cache.default', 'database');
+
+    // This mirrors what spatie/laravel-multitenancy's PrefixCacheTask does on every
+    // tenant switch: change cache.prefix, then forget the container's cache
+    // singletons so they get rebuilt against the new prefix.
+    $switchPrefix = function (string $prefix) {
+        config()->set('cache.prefix', $prefix);
+        app('cache')->forgetDriver(config('cache.default'));
+        app()->forgetInstance('cache');
+        app()->forgetInstance('cache.store');
+        Cache::clearResolvedInstances();
+    };
+
+    $switchPrefix('tenant_a_');
+    app(PermissionRegistrar::class)->initializeCache();
+    expect(app(PermissionRegistrar::class)->getCacheStore()->getPrefix())->toBe('tenant_a_');
+
+    $switchPrefix('tenant_b_');
+    app(PermissionRegistrar::class)->initializeCache();
+    expect(app(PermissionRegistrar::class)->getCacheStore()->getPrefix())->toBe('tenant_b_');
 });
 
 it('can check uids', function () {
