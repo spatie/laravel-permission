@@ -230,6 +230,26 @@ it('applies the current team id when assigning models with teams enabled', funct
     expect((int) $pivot->team_test_id)->toBe(1);
 });
 
+it('only syncs models for the active team', function () {
+    $this->setUpTeams();
+
+    $user = User::create(['email' => 'team-user@test.com']);
+
+    setPermissionsTeamId(1);
+    $user->assignRole($this->testUserRole);
+
+    setPermissionsTeamId(2);
+    $user->assignRole($this->testUserRole);
+
+    setPermissionsTeamId(1);
+    $this->testUserRole->syncModels([]);
+
+    expect($user->fresh()->hasRole($this->testUserRole))->toBeFalse();
+
+    setPermissionsTeamId(2);
+    expect($user->fresh()->hasRole($this->testUserRole))->toBeTrue();
+});
+
 it('uses config default_model when resolving IDs', function () {
     config()->set('permission.models.default_model', User::class);
 
