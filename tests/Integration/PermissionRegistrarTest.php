@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 use Spatie\Permission\Contracts\Role as RoleContract;
+use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Models\Permission as SpatiePermission;
 use Spatie\Permission\Models\Role as SpatieRole;
 use Spatie\Permission\PermissionRegistrar;
@@ -223,4 +224,59 @@ it('retries loading permissions when another load is already in progress', funct
 
     expect($permissions)->toBeInstanceOf(Collection::class);
     expect($loadingProperty->getValue($registrar))->toBeFalse();
+});
+
+it('resolves single-record lookups by name and by key from the index', function () {
+    $registrar = app(PermissionRegistrar::class);
+
+    foreach ($registrar->getPermissions() as $permission) {
+        $byName = $registrar->getPermissions(['name' => $permission->name, 'guard_name' => $permission->guard_name], true);
+        $byKey = $registrar->getPermissions([$permission->getKeyName() => $permission->getKey(), 'guard_name' => $permission->guard_name], true);
+
+        expect($byName)->toHaveCount(1)
+            ->and($byName->first())->toBe($permission)
+            ->and($byKey)->toHaveCount(1)
+            ->and($byKey->first())->toBe($permission);
+    }
+});
+
+it('returns the same permission instance for indexed and filtered lookups', function () {
+    $registrar = app(PermissionRegistrar::class);
+    $params = ['name' => 'edit-articles', 'guard_name' => 'web'];
+
+    expect($registrar->getPermissions($params, true)->first())
+        ->toBe($registrar->getPermissions($params)->first());
+});
+
+it('does not resolve an indexed lookup across guards', function () {
+    $registrar = app(PermissionRegistrar::class);
+
+    expect($registrar->getPermissions(['name' => 'edit-articles', 'guard_name' => 'admin'], true))->toBeEmpty()
+        ->and($registrar->getPermissions(['name' => 'admin-permission', 'guard_name' => 'web'], true))->toBeEmpty()
+        ->and($registrar->getPermissions(['name' => 'admin-permission', 'guard_name' => 'admin'], true))->toHaveCount(1);
+});
+
+it('still filters lookups that are not indexable', function () {
+    $registrar = app(PermissionRegistrar::class);
+
+    expect($registrar->getPermissions(['guard_name' => 'web'])->count())
+        ->toBe($registrar->getPermissions()->where('guard_name', 'web')->count())
+        ->and($registrar->getPermissions(['guard_name' => 'web'], true))->toHaveCount(1)
+        ->and($registrar->getPermissions(['name' => 'edit-articles'], true))->toHaveCount(1)
+        ->and($registrar->getPermissions(['name' => 'edit-articles', 'guard_name' => 'web', 'id' => 0], true))->toBeEmpty();
+});
+
+it('rebuilds the lookup index when the permission cache is flushed', function () {
+    $registrar = app(PermissionRegistrar::class);
+
+    expect(fn () => SpatiePermission::findByName('late-permission'))->toThrow(PermissionDoesNotExist::class);
+
+    $created = SpatiePermission::create(['name' => 'late-permission']);
+
+    expect(SpatiePermission::findByName('late-permission')->getKey())->toBe($created->getKey())
+        ->and(SpatiePermission::findById($created->getKey())->name)->toBe('late-permission');
+
+    $registrar->clearPermissionsCollection();
+
+    expect(SpatiePermission::findByName('late-permission')->getKey())->toBe($created->getKey());
 });

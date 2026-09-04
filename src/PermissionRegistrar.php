@@ -50,6 +50,14 @@ class PermissionRegistrar
 
     private array $wildcardPermissionsIndex = [];
 
+    /**
+     * Single-record lookup index over the loaded permission collection,
+     * keyed by attribute name, then guard name, then attribute value.
+     *
+     * @var array<string, array<string, array<string, Model>>>
+     */
+    private array $permissionsLookupIndex = [];
+
     private bool $isLoadingPermissions = false;
 
     public function __construct(CacheManager $cacheManager)
@@ -143,6 +151,7 @@ class PermissionRegistrar
     public function forgetCachedPermissions(): bool
     {
         $this->permissions = null;
+        $this->permissionsLookupIndex = [];
         $this->forgetWildcardPermissionIndex();
 
         return $this->cache->forget($this->cacheKey);
@@ -176,6 +185,7 @@ class PermissionRegistrar
     public function clearPermissionsCollection(): void
     {
         $this->permissions = null;
+        $this->permissionsLookupIndex = [];
         $this->wildcardPermissionsIndex = [];
         $this->isLoadingPermissions = false;
     }
@@ -221,6 +231,8 @@ class PermissionRegistrar
 
             $this->permissions = $this->getHydratedPermissionCollection();
 
+            $this->indexPermissionsForLookup();
+
             $this->cachedRoles = $this->alias = $this->except = [];
         } finally {
             // Always release the loading flag, even if an exception occurs
@@ -235,6 +247,10 @@ class PermissionRegistrar
     {
         $this->loadPermissions();
 
+        if ($onlyOne && ($indexed = $this->getIndexedPermission($params)) !== false) {
+            return new Collection($indexed ? [$indexed] : []);
+        }
+
         $method = $onlyOne ? 'first' : 'filter';
 
         $permissions = $this->permissions->$method(static function ($permission) use ($params) {
@@ -247,6 +263,53 @@ class PermissionRegistrar
         }
 
         return $permissions;
+    }
+
+    /**
+     * Index the loaded permissions by name and by primary key, per guard, so that
+     * findByName() / findById() (and every Gate check that goes through them)
+     * resolve in O(1) instead of filtering the whole collection.
+     */
+    private function indexPermissionsForLookup(): void
+    {
+        $this->permissionsLookupIndex = [];
+
+        foreach ($this->permissions as $permission) {
+            $guardName = (string) $permission->getAttribute('guard_name');
+
+            $this->permissionsLookupIndex['name'][$guardName][(string) $permission->getAttribute('name')] = $permission;
+            $this->permissionsLookupIndex[$permission->getKeyName()][$guardName][(string) $permission->getKey()] = $permission;
+        }
+    }
+
+    /**
+     * Resolve a single-record lookup from the index.
+     *
+     * Returns false when the params are not an indexable shape (exactly one indexed
+     * attribute plus guard_name, both scalar), so the caller falls back to filtering.
+     */
+    private function getIndexedPermission(array $params): Model|null|false
+    {
+        if (count($params) !== 2 || ! array_key_exists('guard_name', $params)) {
+            return false;
+        }
+
+        $attribute = array_key_first(array_diff_key($params, ['guard_name' => true]));
+
+        if (! isset($this->permissionsLookupIndex[$attribute])) {
+            return false;
+        }
+
+        if (! $this->isIndexableValue($params[$attribute]) || ! $this->isIndexableValue($params['guard_name'])) {
+            return false;
+        }
+
+        return $this->permissionsLookupIndex[$attribute][(string) $params['guard_name']][(string) $params[$attribute]] ?? null;
+    }
+
+    private function isIndexableValue(mixed $value): bool
+    {
+        return is_string($value) || is_int($value);
     }
 
     public function getPermissionClass(): string
