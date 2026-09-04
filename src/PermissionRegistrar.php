@@ -75,6 +75,13 @@ class PermissionRegistrar
         $this->pivotRole = config('permission.column_names.role_pivot_key') ?: 'role_id';
         $this->pivotPermission = config('permission.column_names.permission_pivot_key') ?: 'permission_id';
 
+        // Re-resolve the cache manager from the container on every call, rather than
+        // trusting the instance captured in the constructor. Long-lived registrars
+        // (Octane, or apps that rebind the 'cache' singleton on tenant switch, e.g.
+        // spatie/laravel-multitenancy's PrefixCacheTask) would otherwise keep asking
+        // a stale CacheManager for a store and get one memoised under the previous
+        // cache prefix.
+        $this->cacheManager = app('cache');
         $this->cache = $this->getCacheStoreFromConfig();
 
         // Discard any in-memory permissions/roles loaded under the previous cache config,
@@ -85,20 +92,13 @@ class PermissionRegistrar
 
     protected function getCacheStoreFromConfig(): Repository
     {
-        // Resolve the cache manager fresh from the container instead of the instance
-        // captured in the constructor. Long-lived registrars (Octane, or apps that
-        // rebind 'cache' on tenant switch, e.g. spatie/laravel-multitenancy) would
-        // otherwise keep asking a stale CacheManager for a store, and get back one
-        // memoised under a previous cache prefix.
-        $cacheManager = app('cache');
-
         // the 'default' fallback here is from the permission.php config file,
         // where 'default' means to use config(cache.default)
         $cacheDriver = config('permission.cache.store', 'default');
 
         // when 'default' is specified, no action is required since we already have the default instance
         if ($cacheDriver === 'default') {
-            return $cacheManager->store();
+            return $this->cacheManager->store();
         }
 
         // if an undefined cache store is specified, fallback to 'array' which is Laravel's closest equiv to 'none'
@@ -106,7 +106,7 @@ class PermissionRegistrar
             $cacheDriver = 'array';
         }
 
-        return $cacheManager->store($cacheDriver);
+        return $this->cacheManager->store($cacheDriver);
     }
 
     public function setPermissionsTeamId(int|string|Model|null $id): void
