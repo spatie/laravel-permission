@@ -63,19 +63,21 @@ trait HasAssignedModels
      */
     public function syncModels(array|Collection|Model|int|string $models, ?string $modelClass = null): static
     {
-        if ($this->exists) {
-            $this->newPivotQueryForRole()->delete();
-        }
+        return $this->getConnection()->transaction(function () use ($models, $modelClass) {
+            if ($this->exists) {
+                $this->newPivotQueryForRole()->delete();
+            }
 
-        $teamPivot = $this->teamPivot();
+            $teamPivot = $this->teamPivot();
 
-        foreach ($this->groupModelsByMorphClass($models, $modelClass) as $morphClass => $ids) {
-            $this->relationForModel($morphClass)->attach($ids, $teamPivot);
-        }
+            foreach ($this->groupModelsByMorphClass($models, $modelClass) as $morphClass => $ids) {
+                $this->relationForModel($morphClass)->attach($ids, $teamPivot);
+            }
 
-        $this->unsetRelation('users');
+            $this->unsetRelation('users');
 
-        return $this;
+            return $this;
+        });
     }
 
     /**
