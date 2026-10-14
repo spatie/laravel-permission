@@ -32,7 +32,7 @@ jobs:
         uses: ramsey/composer-install@v4
         with:
           dependency-versions: ${{ matrix.dependency-version }}
-          composer-options: --with "laravel/framework:${{ matrix.laravel }}"
+          composer-options: --with "laravel/framework:${{ matrix.laravel }}" --ignore-platform-req=php+
 
       - name: Execute tests
         run: vendor/bin/pest
