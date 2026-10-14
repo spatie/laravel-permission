@@ -30,10 +30,11 @@ jobs:
           extensions: curl, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, iconv, memcache
           coverage: none
 
-      - name: Install dependencies
-        run: |
-          composer require "predis/predis" --no-interaction --no-update
-          composer update --prefer-stable --prefer-dist --no-interaction
+      - name: Install composer dependencies
+        uses: ramsey/composer-install@v4
+        with:
+          dependency-versions: highest
+          composer-options: --with "predis/predis:*"
 
       - name: Execute tests - memcached cache driver
         run: |

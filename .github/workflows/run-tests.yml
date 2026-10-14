@@ -13,12 +13,7 @@ jobs:
       matrix:
         php: [8.5, 8.4, 8.3]
         laravel: ["^13", "^12"]
-        dependency-version: [prefer-stable, prefer-lowest]
-        include:
-          - laravel: "^13"
-            testbench: 11.*
-          - laravel: "^12"
-            testbench: 10.*
+        dependency-version: [highest, lowest]
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }}
 
@@ -33,10 +28,11 @@ jobs:
           extensions: curl, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, iconv
           coverage: none
 
-      - name: Install dependencies
-        run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" "symfony/console:>=4.3.4" "mockery/mockery:^1.3.2" "nesbot/carbon:>=2.72.6" --no-interaction --no-update
-          composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
+      - name: Install composer dependencies
+        uses: ramsey/composer-install@v4
+        with:
+          dependency-versions: ${{ matrix.dependency-version }}
+          composer-options: --with "laravel/framework:${{ matrix.laravel }}"
 
       - name: Execute tests
         run: vendor/bin/pest

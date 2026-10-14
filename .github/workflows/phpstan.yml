@@ -25,11 +25,8 @@ jobs:
 
             - name: Install composer dependencies
               uses: ramsey/composer-install@v4
-
-            - name: Install larastan
-              run: |
-                  composer require "larastan/larastan" --no-interaction --no-update
-                  composer update --prefer-dist --no-interaction
+              with:
+                dependency-versions: highest
 
             - name: Run PHPStan
               run: ./vendor/bin/phpstan --error-format=github
