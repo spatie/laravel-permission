@@ -11,9 +11,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [8.6, 8.5, 8.4, 8.3]
+        php: ['8.5', '8.4', '8.3']
         laravel: ["^13", "^12"]
         dependency-version: [highest, lowest]
+        include:
+          # Older Laravel releases do not support PHP 8.6's session interfaces.
+          - php: '8.6'
+            laravel: "^13"
+            dependency-version: highest
+            composer-options: --ignore-platform-req=php+
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }}
 
@@ -32,7 +38,7 @@ jobs:
         uses: ramsey/composer-install@v4
         with:
           dependency-versions: ${{ matrix.dependency-version }}
-          composer-options: --with "laravel/framework:${{ matrix.laravel }}" --ignore-platform-req=php+
+          composer-options: --with "laravel/framework:${{ matrix.laravel }}" ${{ matrix.composer-options }}
 
       - name: Execute tests
         run: vendor/bin/pest
