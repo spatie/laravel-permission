@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export DEBIAN_FRONTEND=noninteractive
+
+packages=(php8.5-cli php8.5-curl php8.5-mbstring php8.5-sqlite3 php8.5-xml php8.5-zip)
+missing=()
+
+for package in "${packages[@]}"; do
+    if ! dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'install ok installed'; then
+        missing+=("$package")
+    fi
+done
+
+if ((${#missing[@]})); then
+    curl -fsSLo /tmp/debsuryorg-archive-keyring.deb https://packages.sury.org/debsuryorg-archive-keyring.deb
+    sudo dpkg -i /tmp/debsuryorg-archive-keyring.deb
+    echo 'deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ bookworm main' | sudo tee /etc/apt/sources.list.d/php.list
+    sudo apt-get update -qq
+    sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq "${missing[@]}"
+    rm /tmp/debsuryorg-archive-keyring.deb
+fi
+
+sudo update-alternatives --set php /usr/bin/php8.5
+
+if ! command -v composer >/dev/null; then
+    curl -fsSLo /tmp/composer-setup.php https://getcomposer.org/installer
+    expected=$(curl -fsSL https://composer.github.io/installer.sig)
+    echo "$expected  /tmp/composer-setup.php" | sha384sum --check
+    sudo php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer
+    rm /tmp/composer-setup.php
+fi
+
+composer install --no-interaction --prefer-dist

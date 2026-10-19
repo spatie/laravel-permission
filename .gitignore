@@ -7,3 +7,4 @@ tests/temp
 .phpunit.result.cache
 .php-cs-fixer.cache
 tests/TestSupport/CreatePermissionCustomTables.php
+.amp/portals/*
