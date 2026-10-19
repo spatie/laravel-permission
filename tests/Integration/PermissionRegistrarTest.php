@@ -1,12 +1,14 @@
 <?php
 
 use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\CacheManager;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 use Spatie\Permission\Contracts\Role as RoleContract;
+use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Spatie\Permission\Models\Permission as SpatiePermission;
 use Spatie\Permission\Models\Role as SpatieRole;
 use Spatie\Permission\PermissionRegistrar;
@@ -224,3 +226,250 @@ it('retries loading permissions when another load is already in progress', funct
     expect($permissions)->toBeInstanceOf(Collection::class);
     expect($loadingProperty->getValue($registrar))->toBeFalse();
 });
+
+it('resolves single-record lookups by name and by key from the index', function () {
+    $registrar = app(PermissionRegistrar::class);
+
+    foreach ($registrar->getPermissions() as $permission) {
+        $byName = $registrar->getPermissions(['name' => $permission->name, 'guard_name' => $permission->guard_name], true);
+        $byKey = $registrar->getPermissions([$permission->getKeyName() => $permission->getKey(), 'guard_name' => $permission->guard_name], true);
+
+        expect($byName)->toHaveCount(1)
+            ->and($byName->first())->toBe($permission)
+            ->and($byKey)->toHaveCount(1)
+            ->and($byKey->first())->toBe($permission);
+    }
+});
+
+it('returns the same permission instance for indexed and filtered lookups', function () {
+    $registrar = app(PermissionRegistrar::class);
+    $params = ['name' => 'edit-articles', 'guard_name' => 'web'];
+
+    expect($registrar->getPermissions($params, true)->first())
+        ->toBe($registrar->getPermissions($params)->first());
+});
+
+it('does not resolve an indexed lookup across guards', function () {
+    $registrar = app(PermissionRegistrar::class);
+
+    expect($registrar->getPermissions(['name' => 'edit-articles', 'guard_name' => 'admin'], true))->toBeEmpty()
+        ->and($registrar->getPermissions(['name' => 'admin-permission', 'guard_name' => 'web'], true))->toBeEmpty()
+        ->and($registrar->getPermissions(['name' => 'admin-permission', 'guard_name' => 'admin'], true))->toHaveCount(1);
+});
+
+it('still filters lookups that are not indexable', function () {
+    $registrar = app(PermissionRegistrar::class);
+
+    expect($registrar->getPermissions(['guard_name' => 'web'])->count())
+        ->toBe($registrar->getPermissions()->where('guard_name', 'web')->count())
+        ->and($registrar->getPermissions(['guard_name' => 'web'], true))->toHaveCount(1)
+        ->and($registrar->getPermissions(['name' => 'edit-articles'], true))->toHaveCount(1)
+        ->and($registrar->getPermissions(['name' => 'edit-articles', 'guard_name' => 'web', 'id' => 0], true))->toBeEmpty();
+});
+
+it('rebuilds the lookup index when the permission cache is flushed', function () {
+    $registrar = app(PermissionRegistrar::class);
+
+    expect(fn () => SpatiePermission::findByName('late-permission'))->toThrow(PermissionDoesNotExist::class);
+
+    $created = SpatiePermission::create(['name' => 'late-permission']);
+
+    expect(SpatiePermission::findByName('late-permission')->getKey())->toBe($created->getKey())
+        ->and(SpatiePermission::findById($created->getKey())->name)->toBe('late-permission');
+
+    $registrar->clearPermissionsCollection();
+
+    expect(SpatiePermission::findByName('late-permission')->getKey())->toBe($created->getKey());
+});
+
+it('preserves loose comparisons and the first matching permission', function (string $attribute, mixed $value) {
+    DB::table('permissions')->insert([
+        ['name' => '01', 'guard_name' => 'web'],
+        ['name' => '1', 'guard_name' => 'web'],
+        ['name' => 'numeric-guard', 'guard_name' => '01'],
+        ['name' => 'numeric-guard', 'guard_name' => '1'],
+    ]);
+
+    $registrar = app(PermissionRegistrar::class);
+    $registrar->forgetCachedPermissions();
+    $params = match ($attribute) {
+        'name' => ['name' => $value, 'guard_name' => 'web'],
+        'guard_name' => ['name' => 'numeric-guard', 'guard_name' => $value],
+        'id' => ['id' => $value, 'guard_name' => 'web'],
+    };
+    $expectedName = match ($attribute) {
+        'name' => '01',
+        'guard_name' => 'numeric-guard',
+        'id' => 'edit-articles',
+    };
+
+    $permission = $registrar->getPermissions($params, true)->first();
+
+    expect($permission?->name)->toBe($expectedName);
+
+    if ($attribute === 'guard_name') {
+        expect($permission->guard_name)->toBe('01');
+    }
+})->with([
+    ['name', '1'], ['name', '1e0'], ['name', 1],
+    ['guard_name', '1'], ['guard_name', 1],
+    ['id', '01'], ['id', '1e0'], ['id', '1.0'], ['id', '+1'], ['id', ' 1 '],
+    ['id', true], ['id', 1.0],
+]);
+
+it('observes mutations of returned permission models without requiring a save', function (string $attribute, mixed $value, bool $multiple) {
+    $registrar = app(PermissionRegistrar::class);
+    $permission = $multiple
+        ? $registrar->getPermissions(['name' => 'edit-articles'])->first()
+        : SpatiePermission::findByName('edit-articles');
+    $oldParams = ['name' => 'edit-articles', 'guard_name' => 'web'];
+    $params = [$attribute => $value, 'guard_name' => 'web'];
+
+    $permission->setAttribute($attribute, $value);
+    $permission->syncOriginal();
+
+    if ($attribute === 'guard_name') {
+        $params = ['name' => 'edit-articles', 'guard_name' => $value];
+    }
+
+    expect($registrar->getPermissions($params, true)->first())->toBe($permission);
+
+    if ($attribute !== 'id') {
+        expect($registrar->getPermissions($oldParams, true))->toBeEmpty();
+    }
+})->with([
+    ['name', 'renamed', false],
+    ['name', 'edit-news', false],
+    ['guard_name', 'admin', false],
+    ['id', 999, false],
+    ['name', 'renamed', true],
+]);
+
+it('observes runtime casts on returned permission models', function () {
+    $permission = SpatiePermission::findByName('edit-articles');
+    $permission->mergeCasts(['name' => 'boolean']);
+
+    expect(app(PermissionRegistrar::class)->getPermissions(['name' => 'anything', 'guard_name' => 'web'], true)->first())
+        ->toBe($permission);
+});
+
+it('uses current custom accessors without eagerly evaluating unrelated attributes', function () {
+    $registrar = app(PermissionRegistrar::class);
+    $registrar->setPermissionClass(LookupPermission::class)->forgetCachedPermissions();
+    config(['testing.permission_prefix' => 'first-']);
+
+    $permission = LookupPermission::findByName('first-edit-articles');
+
+    config(['testing.permission_prefix' => 'second-']);
+
+    expect(LookupPermission::findByName('second-edit-articles'))->toBe($permission)
+        ->and($registrar->getPermissions(['name' => 'first-edit-articles', 'guard_name' => 'web'], true))->toBeEmpty();
+
+    $registrar->clearPermissionsCollection();
+    config(['testing.permission_prefix' => null]);
+
+    expect($registrar->getPermissions(['guard_name' => 'web'], true))->toHaveCount(1);
+});
+
+it('supports custom permission keys across cache hydration', function () {
+    $this->setUpCustomModels();
+    $registrar = app(PermissionRegistrar::class);
+
+    $permission = TestPermission::findByName('edit-articles');
+
+    expect(TestPermission::findById($permission->getKey()))->toBe($permission)
+        ->and($registrar->getPermissions(['permission_test_id' => $permission->getKey(), 'guard_name' => 'admin'], true))->toBeEmpty();
+
+    $registrar->clearPermissionsCollection();
+
+    expect(TestPermission::findById($permission->getKey())->name)->toBe('edit-articles');
+});
+
+it('returns the first matching model from custom collections', function (bool $keyed) {
+    config(['testing.keyed_permissions' => $keyed]);
+    $registrar = new class(app(CacheManager::class)) extends PermissionRegistrar
+    {
+        protected function getPermissionsWithRoles(): Collection
+        {
+            $permissions = parent::getPermissionsWithRoles();
+            $permissions[1]->name = $permissions[0]->name;
+
+            return new LookupPermissionCollection(config('testing.keyed_permissions')
+                ? $permissions->keyBy('id')->all()
+                : $permissions->all());
+        }
+    };
+    $registrar->forgetCachedPermissions();
+
+    $permissions = $registrar->getPermissions(['name' => 'edit-articles', 'guard_name' => 'web'], true);
+
+    expect($permissions)->toBeInstanceOf(Collection::class)->toHaveCount(1)
+        ->and($permissions->first()->getKey())->toBe($this->testUserPermission->getKey())
+        ->and($registrar->getPermissions(['name' => 'edit-articles'])->count())->toBe(2);
+})->with([true, false]);
+
+it('preserves lookup comparisons when the primary key is excluded from the cache', function () {
+    config(['permission.cache.column_names_except' => ['id']]);
+    $registrar = app(PermissionRegistrar::class);
+    $registrar->forgetCachedPermissions();
+
+    SpatiePermission::preventAccessingMissingAttributes();
+
+    try {
+        expect($registrar->getPermissions(['guard_name' => 'web'], true)->first()?->name)
+            ->toBe('edit-articles');
+    } finally {
+        SpatiePermission::preventAccessingMissingAttributes(false);
+    }
+
+    expect($registrar->getPermissions(['id' => 0, 'guard_name' => 'web'], true)->first()?->name)
+        ->toBe('edit-articles');
+});
+
+it('invalidates lookups after saved name and guard changes and deletion', function () {
+    $permission = SpatiePermission::findByName('edit-articles');
+    $id = $permission->getKey();
+    $permission->update(['name' => 'renamed', 'guard_name' => 'admin']);
+
+    expect(fn () => SpatiePermission::findByName('edit-articles'))->toThrow(PermissionDoesNotExist::class)
+        ->and(fn () => SpatiePermission::findById($id, 'web'))->toThrow(PermissionDoesNotExist::class)
+        ->and(SpatiePermission::findByName('renamed', 'admin')->getKey())->toBe($id);
+
+    SpatiePermission::findById($id, 'admin')->delete();
+
+    expect(fn () => SpatiePermission::findByName('renamed', 'admin'))->toThrow(PermissionDoesNotExist::class)
+        ->and(fn () => SpatiePermission::findById($id, 'admin'))->toThrow(PermissionDoesNotExist::class);
+});
+
+it('releases indexed models when clearing the in memory cache', function (string $method) {
+    $permission = SpatiePermission::findByName('edit-articles');
+    $reference = WeakReference::create($permission);
+    unset($permission);
+
+    app(PermissionRegistrar::class)->$method();
+    gc_collect_cycles();
+
+    expect($reference->get())->toBeNull()
+        ->and(SpatiePermission::findByName('edit-articles')->name)->toBe('edit-articles');
+})->with(['clearPermissionsCollection', 'forgetCachedPermissions', 'initializeCache']);
+
+class LookupPermission extends SpatiePermission
+{
+    public function getNameAttribute(string $value): string
+    {
+        $prefix = config('testing.permission_prefix');
+
+        if ($prefix === null) {
+            throw new LogicException('The name accessor should not be evaluated.');
+        }
+
+        return $prefix.$value;
+    }
+
+    public function newCollection(array $models = []): LookupPermissionCollection
+    {
+        return new LookupPermissionCollection($models);
+    }
+}
+
+class LookupPermissionCollection extends Collection {}
