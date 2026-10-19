@@ -789,6 +789,14 @@ it('can determine that a user does not have a role from another guard', function
     expect($this->testUser->hasAnyRole('testAdminRole', $this->testAdminRole))->toBeFalse();
 });
 
+it('respects the guard when checking role models', function () {
+    $this->testUser->assignRole($this->testUserRole);
+
+    expect($this->testUser->hasRole($this->testUserRole, 'admin'))->toBeFalse();
+    expect($this->testUser->hasRole([$this->testUserRole], 'admin'))->toBeFalse();
+    expect($this->testUser->hasAllRoles($this->testUserRole, 'admin'))->toBeFalse();
+});
+
 it('can check against any multiple roles using multiple arguments', function () {
     $this->testUser->assignRole('testRole');
 
