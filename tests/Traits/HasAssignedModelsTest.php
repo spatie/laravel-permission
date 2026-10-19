@@ -1,9 +1,11 @@
 <?php
 
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Support\Config;
+use Spatie\Permission\Tests\TestSupport\TestModels\Admin;
 use Spatie\Permission\Tests\TestSupport\TestModels\User;
 
 it('can sync models to a role', function () {
@@ -230,24 +232,112 @@ it('applies the current team id when assigning models with teams enabled', funct
     expect((int) $pivot->team_test_id)->toBe(1);
 });
 
-it('only syncs models for the active team', function () {
+it('only syncs models for the active team', function (bool $replace) {
     $this->setUpTeams();
 
     $user = User::create(['email' => 'team-user@test.com']);
+    $replacement = User::create(['email' => 'replacement@test.com']);
+    $otherRole = Role::findByName('testRole2');
 
     setPermissionsTeamId(1);
-    $user->assignRole($this->testUserRole);
+    $user->assignRole($this->testUserRole, $otherRole);
 
     setPermissionsTeamId(2);
     $user->assignRole($this->testUserRole);
 
     setPermissionsTeamId(1);
-    $this->testUserRole->syncModels([]);
+    $this->testUserRole->syncModels($replace ? [$replacement] : []);
 
     expect($user->fresh()->hasRole($this->testUserRole))->toBeFalse();
+    expect($user->fresh()->hasRole($otherRole))->toBeTrue();
+    expect($replacement->fresh()->hasRole($this->testUserRole))->toBe($replace);
 
     setPermissionsTeamId(2);
     expect($user->fresh()->hasRole($this->testUserRole))->toBeTrue();
+    expect($replacement->fresh()->hasRole($this->testUserRole))->toBeFalse();
+})->with([false, true]);
+
+it('assigns the same global role independently in each team without duplicates', function (bool $customModels) {
+    $this->setUpTeams();
+
+    if ($customModels) {
+        setPermissionsTeamId(null);
+        $this->setUpCustomModels();
+        setPermissionsTeamId(1);
+    }
+
+    $this->testUserRole->assignToModels($this->testUser);
+
+    setPermissionsTeamId(2);
+    $this->testUserRole->assignToModels($this->testUser);
+    $this->testUserRole->assignToModels($this->testUser);
+
+    expect($this->testUser->fresh()->hasRole($this->testUserRole))->toBeTrue();
+
+    setPermissionsTeamId(1);
+    expect($this->testUser->fresh()->hasRole($this->testUserRole))->toBeTrue();
+
+    expect(DB::table(Config::modelHasRolesTable())->count())->toBe(2);
+})->with([false, true]);
+
+it('only detaches the requested models and role in the active team', function () {
+    $this->setUpTeams();
+
+    $otherRole = Role::findByName('testRole2');
+    $otherUser = User::create(['email' => 'other@test.com']);
+    $this->testUser->assignRole($this->testUserRole, $otherRole);
+    $otherUser->assignRole($this->testUserRole);
+    $this->testUserRole->assignToModels($this->testAdmin);
+
+    setPermissionsTeamId(2);
+    $this->testUser->assignRole($this->testUserRole);
+
+    setPermissionsTeamId(1);
+    $this->testUserRole->removeFromModels($this->testUser);
+
+    expect($this->testUser->fresh()->hasRole($this->testUserRole))->toBeFalse();
+    expect($this->testUser->fresh()->hasRole($otherRole))->toBeTrue();
+    expect($otherUser->fresh()->hasRole($this->testUserRole))->toBeTrue();
+    expect($this->testAdmin->fresh()->hasRole($this->testUserRole))->toBeTrue();
+
+    setPermissionsTeamId(2);
+    expect($this->testUser->fresh()->hasRole($this->testUserRole))->toBeTrue();
+});
+
+it('rolls back all sync changes when an insert fails inside an existing transaction', function (bool $teams) {
+    if ($teams) {
+        $this->setUpTeams();
+        setPermissionsTeamId(2);
+        $this->testUser->assignRole($this->testUserRole);
+        setPermissionsTeamId(1);
+    }
+
+    $this->testUser->assignRole($this->testUserRole);
+    $replacement = User::create(['email' => 'replacement@test.com']);
+
+    DB::transaction(function () use ($replacement) {
+        expect(fn () => $this->testUserRole->syncModels([$replacement, new Admin]))
+            ->toThrow(QueryException::class);
+
+        expect(DB::transactionLevel())->toBe(1);
+        expect($this->testUser->fresh()->hasRole($this->testUserRole))->toBeTrue();
+        expect($replacement->fresh()->hasRole($this->testUserRole))->toBeFalse();
+    });
+
+    expect($this->testUser->fresh()->hasRole($this->testUserRole))->toBeTrue();
+    expect($replacement->fresh()->hasRole($this->testUserRole))->toBeFalse();
+
+    if ($teams) {
+        setPermissionsTeamId(2);
+        expect($this->testUser->fresh()->hasRole($this->testUserRole))->toBeTrue();
+    }
+})->with([false, true]);
+
+it('does nothing when syncing an unsaved role', function () {
+    $role = new Role(['name' => 'unsaved-role']);
+
+    expect($role->syncModels($this->testUser))->toBe($role);
+    expect($this->testUser->fresh()->roles)->toBeEmpty();
 });
 
 it('uses config default_model when resolving IDs', function () {

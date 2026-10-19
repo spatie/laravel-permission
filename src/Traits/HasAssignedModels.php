@@ -63,15 +63,20 @@ trait HasAssignedModels
      */
     public function syncModels(array|Collection|Model|int|string $models, ?string $modelClass = null): static
     {
-        if ($this->exists) {
-            $this->newPivotQueryForRole()->delete();
+        if (! $this->exists) {
+            return $this;
         }
 
+        $groupedModels = $this->groupModelsByMorphClass($models, $modelClass);
         $teamPivot = $this->teamPivot();
 
-        foreach ($this->groupModelsByMorphClass($models, $modelClass) as $morphClass => $ids) {
-            $this->relationForModel($morphClass)->attach($ids, $teamPivot);
-        }
+        $this->getConnection()->transaction(function () use ($groupedModels, $teamPivot) {
+            $this->newPivotQueryForRole()->delete();
+
+            foreach ($groupedModels as $morphClass => $ids) {
+                $this->relationForModel($morphClass)->attach($ids, $teamPivot);
+            }
+        });
 
         $this->unsetRelation('users');
 
@@ -83,13 +88,19 @@ trait HasAssignedModels
      */
     protected function relationForModel(string $modelClass): MorphToMany
     {
-        return $this->morphedByMany(
+        $relation = $this->morphedByMany(
             $modelClass,
             'model',
             Config::modelHasRolesTable(),
             app(PermissionRegistrar::class)->pivotRole,
             Config::morphKey(),
         );
+
+        if (Config::teamsEnabled()) {
+            $relation->wherePivot(Config::teamForeignKey(), getPermissionsTeamId());
+        }
+
+        return $relation;
     }
 
     /**

@@ -50,3 +50,69 @@ jobs:
 
       - name: Execute tests
         run: vendor/bin/pest
+
+  database-tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: mysql:8.4
+            connection: mysql
+            port: 3306
+            health-command: mysqladmin ping -h 127.0.0.1
+          - image: mariadb:11.4
+            connection: mariadb
+            port: 3306
+            health-command: healthcheck.sh --connect --innodb_initialized
+          - image: postgres:17
+            connection: pgsql
+            port: 5432
+            health-command: pg_isready -U permission -d permission_test
+
+    name: Role assignments - ${{ matrix.image }}
+
+    services:
+      database:
+        image: ${{ matrix.image }}
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: permission_test
+          MYSQL_USER: permission
+          MYSQL_PASSWORD: password
+          POSTGRES_DB: permission_test
+          POSTGRES_USER: permission
+          POSTGRES_PASSWORD: password
+        ports:
+          - 3306:3306
+          - 5432:5432
+        options: >-
+          --health-cmd="${{ matrix.health-command }}"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_mysql, pdo_pgsql
+          coverage: none
+
+      - name: Install composer dependencies
+        uses: ramsey/composer-install@v4
+
+      - name: Test inverse role assignments on a disposable database
+        run: vendor/bin/pest tests/Traits/HasAssignedModelsTest.php
+        env:
+          PERMISSION_TEST_DB_CONNECTION: ${{ matrix.connection }}
+          DB_HOST: 127.0.0.1
+          DB_PORT: ${{ matrix.port }}
+          DB_DATABASE: permission_test
+          DB_USERNAME: permission
+          DB_PASSWORD: password

@@ -46,6 +46,10 @@ $role->removeFromModels($user1);
 $role->syncModels([$user2, $user3]);
 ```
 
+When teams are enabled, all three methods operate only on the active team set with `setPermissionsTeamId()`. Assignments in other teams are preserved, including assignments of a global role to the same model in multiple teams. `syncModels([])` clears only the active team's assignments.
+
+`syncModels()` runs its delete and inserts in a transaction on the role's database connection. If an insert fails, the previous assignments are restored. Assigning or syncing an unsaved role does nothing.
+
 Each method also accepts a single model, a single ID, an array of IDs, a Collection, or a mix of models and IDs:
 
 ```php
@@ -221,4 +225,3 @@ All these responses are collections of `Spatie\Permission\Models\Permission` obj
 
 If we follow the previous example, the first response will be a collection with the `delete article` permission and 
 the second will be a collection with the `edit article` permission and the third will contain both.
-
