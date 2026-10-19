@@ -5,10 +5,16 @@ on:
         paths:
             - '**.php'
             - 'phpstan.neon.dist'
+            - 'phpstan-baseline.neon'
+            - 'composer.json'
+            - '.github/workflows/phpstan.yml'
     pull_request:
         paths:
             - '**.php'
             - 'phpstan.neon.dist'
+            - 'phpstan-baseline.neon'
+            - 'composer.json'
+            - '.github/workflows/phpstan.yml'
 
 jobs:
     phpstan:
@@ -20,16 +26,13 @@ jobs:
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
               with:
-                  php-version: 8.4
+                  php-version: '8.5'
                   coverage: none
 
             - name: Install composer dependencies
               uses: ramsey/composer-install@v4
-
-            - name: Install larastan
-              run: |
-                  composer require "larastan/larastan" --no-interaction --no-update
-                  composer update --prefer-dist --no-interaction
+              with:
+                  dependency-versions: highest
 
             - name: Run PHPStan
-              run: ./vendor/bin/phpstan --error-format=github
+              run: composer analyse -- --error-format=github

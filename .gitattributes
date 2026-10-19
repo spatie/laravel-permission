@@ -12,6 +12,7 @@
 /.editorconfig      export-ignore
 /.php_cs.dist.php   export-ignore
 /phpstan*           export-ignore
+/pint.json          export-ignore
 /CHANGELOG.md       export-ignore
 /CONTRIBUTING.md    export-ignore
 

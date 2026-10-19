@@ -75,6 +75,13 @@ class PermissionRegistrar
         $this->pivotRole = config('permission.column_names.role_pivot_key') ?: 'role_id';
         $this->pivotPermission = config('permission.column_names.permission_pivot_key') ?: 'permission_id';
 
+        // Re-resolve the cache manager from the container on every call, rather than
+        // trusting the instance captured in the constructor. Long-lived registrars
+        // (Octane, or apps that rebind the 'cache' singleton on tenant switch, e.g.
+        // spatie/laravel-multitenancy's PrefixCacheTask) would otherwise keep asking
+        // a stale CacheManager for a store and get one memoised under the previous
+        // cache prefix.
+        $this->cacheManager = app('cache');
         $this->cache = $this->getCacheStoreFromConfig();
 
         // Discard any in-memory permissions/roles loaded under the previous cache config,
