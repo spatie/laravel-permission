@@ -15,10 +15,11 @@ jobs:
         laravel: ["^13", "^12"]
         dependency-version: [highest, lowest]
         include:
-          - php: '8.5'
+          - laravel: "^13"
             pest: '^5.0'
-          - php: '8.4'
-            pest: '^5.0'
+          # Testbench 10 requires Symfony Process 7; Pest 5 requires Symfony Process 8.
+          - laravel: "^12"
+            pest: '^4.4.1'
           - php: '8.3'
             pest: '^4.4.1'
 
