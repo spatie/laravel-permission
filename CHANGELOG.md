@@ -2,6 +2,23 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 8.3.1 - 2026-10-19
+
+### Fixes
+
+- Respect the explicit guard when `hasRole()` and `hasAllRoles()` receive a role model, including model-array checks. Fixes #2977 via #2978.
+- Refresh the cache manager when reinitializing permission caches, preventing stale stores after tenant or cache configuration switches (#2973).
+- Exclude `pint.json` from distribution archives (#2972).
+
+### Maintenance
+
+- Update test tooling to Pest 5.3.3, with Pest 4.7.8 for compatible PHP 8.3 and Laravel 12 stacks.
+- Test PHP 8.3–8.6 and Laravel 12/13 with appropriate lowest and highest dependencies (#2975, #2976, #2978).
+
+No breaking changes. PHP and Laravel support are unchanged.
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/8.3.0...8.3.1
+
 ## 8.3.0 - 2026-07-03
 
 ### What's Changed
@@ -41,6 +58,7 @@ hasAnyRole("'writer|admin'")     // same
 hasAnyRole('"writer|admin"')     // same
 hasAnyRole("'writer|admin")      // changed: mismatched apostrophe is removed
 hasAnyRole("'writer|admin\"")    // changed: mismatched quote is removed
+
 
 
 ```
@@ -1362,6 +1380,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -1409,6 +1428,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
