@@ -16,16 +16,16 @@ jobs:
         dependency-version: [highest, lowest]
         include:
           - laravel: "^13"
-            pest: '^5.0'
+            pest: '^5.3.3'
           # Testbench 10 requires Symfony Process 7; Pest 5 requires Symfony Process 8.
           - laravel: "^12"
-            pest: '^4.4.1'
+            pest: '^4.7.8'
           - php: '8.3'
-            pest: '^4.4.1'
+            pest: '^4.7.8'
           # Older Laravel releases do not support PHP 8.6's session interfaces.
           - php: '8.6'
             laravel: "^13"
-            pest: '^5.0'
+            pest: '^5.3.3'
             dependency-version: highest
             composer-options: --ignore-platform-req=php+
 
