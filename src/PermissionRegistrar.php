@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\PermissionsTeamResolver;
 use Spatie\Permission\Contracts\Role;
+use Spatie\Permission\Models\Permission as PermissionModel;
 
 class PermissionRegistrar
 {
@@ -50,13 +51,11 @@ class PermissionRegistrar
 
     private array $wildcardPermissionsIndex = [];
 
-    /**
-     * Single-record lookup index over the loaded permission collection,
-     * keyed by attribute name, then guard name, then attribute value.
-     *
-     * @var array<string, array<string, array<string, Model>>>
-     */
+    /** @var array<string, array<string, array<int|string, int>>> */
     private array $permissionsLookupIndex = [];
+
+    /** @var array<int, array{Model, array<string, mixed>}> */
+    private array $returnedPermissions = [];
 
     private bool $isLoadingPermissions = false;
 
@@ -152,6 +151,7 @@ class PermissionRegistrar
     {
         $this->permissions = null;
         $this->permissionsLookupIndex = [];
+        $this->returnedPermissions = [];
         $this->forgetWildcardPermissionIndex();
 
         return $this->cache->forget($this->cacheKey);
@@ -186,6 +186,7 @@ class PermissionRegistrar
     {
         $this->permissions = null;
         $this->permissionsLookupIndex = [];
+        $this->returnedPermissions = [];
         $this->wildcardPermissionsIndex = [];
         $this->isLoadingPermissions = false;
     }
@@ -248,6 +249,10 @@ class PermissionRegistrar
         $this->loadPermissions();
 
         if ($onlyOne && ($indexed = $this->getIndexedPermission($params)) !== false) {
+            if ($indexed) {
+                $this->rememberReturnedPermission($indexed);
+            }
+
             return new Collection($indexed ? [$indexed] : []);
         }
 
@@ -262,31 +267,52 @@ class PermissionRegistrar
             $permissions = new Collection($permissions ? [$permissions] : []);
         }
 
+        if ($this->permissionsLookupIndex) {
+            foreach ($permissions as $permission) {
+                $this->rememberReturnedPermission($permission);
+            }
+        }
+
         return $permissions;
     }
 
-    /**
-     * Index the loaded permissions by name and by primary key, per guard, so that
-     * findByName() / findById() (and every Gate check that goes through them)
-     * resolve in O(1) instead of filtering the whole collection.
-     */
     private function indexPermissionsForLookup(): void
     {
         $this->permissionsLookupIndex = [];
+        $this->returnedPermissions = [];
+        $index = ['name' => [], 'id' => []];
 
-        foreach ($this->permissions as $permission) {
-            $guardName = (string) $permission->getAttribute('guard_name');
-
-            $this->permissionsLookupIndex['name'][$guardName][(string) $permission->getAttribute('name')] = $permission;
-            $this->permissionsLookupIndex[$permission->getKeyName()][$guardName][(string) $permission->getKey()] = $permission;
+        if (! array_is_list($this->permissions->all())) {
+            return;
         }
+
+        foreach ($this->permissions as $position => $permission) {
+            // Custom accessors and casts may depend on state outside the model.
+            if ($permission::class !== PermissionModel::class || $permission->getCasts() !== ['id' => 'int']) {
+                return;
+            }
+
+            $attributes = $permission->getAttributes();
+
+            if (! is_string($attributes['name'] ?? null) || ! is_string($attributes['guard_name'] ?? null)) {
+                return;
+            }
+
+            if (! isset($attributes['id']) || ! is_int($permission->getKey())) {
+                return;
+            }
+
+            $guardName = $attributes['guard_name'];
+
+            $index['name'][$guardName][$attributes['name']] ??= $position;
+            $index['id'][$guardName][$permission->getKey()] ??= $position;
+        }
+
+        $this->permissionsLookupIndex = $index;
     }
 
     /**
-     * Resolve a single-record lookup from the index.
-     *
-     * Returns false when the params are not an indexable shape (exactly one indexed
-     * attribute plus guard_name, both scalar), so the caller falls back to filtering.
+     * Return false when the lookup needs the original loose-comparison filter.
      */
     private function getIndexedPermission(array $params): Model|null|false
     {
@@ -300,16 +326,47 @@ class PermissionRegistrar
             return false;
         }
 
-        if (! $this->isIndexableValue($params[$attribute]) || ! $this->isIndexableValue($params['guard_name'])) {
+        if (! is_string($params['guard_name']) || is_numeric($params['guard_name'])) {
             return false;
         }
 
-        return $this->permissionsLookupIndex[$attribute][(string) $params['guard_name']][(string) $params[$attribute]] ?? null;
+        $value = $params[$attribute];
+
+        if ($attribute === 'name' && (! is_string($value) || is_numeric($value))) {
+            return false;
+        }
+
+        if ($attribute === 'id' && ! is_int($value)) {
+            if (! is_string($value) || (string) (int) $value !== $value) {
+                return false;
+            }
+        }
+
+        $position = $this->permissionsLookupIndex[$attribute][$params['guard_name']][$value] ?? null;
+
+        // An early hit needs fewer model reads through the original filter.
+        if ($position !== null && $position < count($this->returnedPermissions)) {
+            return false;
+        }
+
+        // Returned models are shared and mutable, even after syncOriginal().
+        // Checking only the candidate would miss an earlier model renamed to match it.
+        foreach ($this->returnedPermissions as [$permission, $attributes]) {
+            if ($permission->getCasts() !== ['id' => 'int'] || $permission->getAttributes() !== $attributes) {
+                $this->permissionsLookupIndex = $this->returnedPermissions = [];
+
+                return false;
+            }
+        }
+
+        return $position === null ? null : $this->permissions[$position];
     }
 
-    private function isIndexableValue(mixed $value): bool
+    private function rememberReturnedPermission(Model $permission): void
     {
-        return is_string($value) || is_int($value);
+        $this->returnedPermissions[spl_object_id($permission)] ??= [
+            $permission, $permission->getAttributes(),
+        ];
     }
 
     public function getPermissionClass(): string
