@@ -13,6 +13,10 @@ jobs:
         ports:
           - 6379/tcp
         options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      memcached:
+        image: memcached:1.6
+        ports:
+          - 11211/tcp
 
     strategy:
       fail-fast: false
@@ -26,26 +30,31 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.4
-          extensions: curl, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, iconv, memcache
+          php-version: '8.5'
+          extensions: curl, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, iconv, memcached
           coverage: none
 
-      - name: Install dependencies
-        run: |
-          composer require "predis/predis" --no-interaction --no-update
-          composer update --prefer-stable --prefer-dist --no-interaction
+      - name: Require Redis client
+        run: composer require --dev "predis/predis:^3.0" --no-update --no-interaction
+
+      - name: Install composer dependencies
+        uses: ramsey/composer-install@v4
+        with:
+          dependency-versions: highest
 
       - name: Execute tests - memcached cache driver
         run: |
           vendor/bin/pest
         env:
           CACHE_DRIVER: memcached
+          MEMCACHED_PORT: ${{ job.services.memcached.ports['11211'] }}
 
       - name: Execute tests - redis cache driver
         run: |
           vendor/bin/pest
         env:
           CACHE_DRIVER: redis
+          REDIS_CLIENT: predis
           REDIS_PORT: ${{ job.services.redis.ports['6379'] }}
 
       - name: Execute tests - database cache driver
