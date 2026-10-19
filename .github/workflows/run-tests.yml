@@ -15,13 +15,21 @@ jobs:
         laravel: ["^13", "^12"]
         dependency-version: [highest, lowest]
         include:
+          - laravel: "^13"
+            pest: '^5.0'
+          # Testbench 10 requires Symfony Process 7; Pest 5 requires Symfony Process 8.
+          - laravel: "^12"
+            pest: '^4.4.1'
+          - php: '8.3'
+            pest: '^4.4.1'
           # Older Laravel releases do not support PHP 8.6's session interfaces.
           - php: '8.6'
             laravel: "^13"
+            pest: '^5.0'
             dependency-version: highest
             composer-options: --ignore-platform-req=php+
 
-    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }}
+    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} - Pest ${{ matrix.pest }} - ${{ matrix.dependency-version }}
 
     steps:
       - name: Checkout code
@@ -38,7 +46,7 @@ jobs:
         uses: ramsey/composer-install@v4
         with:
           dependency-versions: ${{ matrix.dependency-version }}
-          composer-options: --with "laravel/framework:${{ matrix.laravel }}" ${{ matrix.composer-options }}
+          composer-options: --with "laravel/framework:${{ matrix.laravel }}" --with "pestphp/pest:${{ matrix.pest }}" ${{ matrix.composer-options }}
 
       - name: Execute tests
         run: vendor/bin/pest
