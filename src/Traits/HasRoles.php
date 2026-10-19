@@ -430,8 +430,7 @@ trait HasRoles
         }
 
         if ($roles instanceof Role) {
-            return ($guard ? $this->roles->where('guard_name', $guard) : $this->roles)
-                ->contains($roles->getKeyName(), $roles->getKey());
+            return $this->hasRole($roles, $guard);
         }
 
         $roles = collect()->make($roles)->map(fn ($role) => $role instanceof Role ? $role->name : enum_value($role));
