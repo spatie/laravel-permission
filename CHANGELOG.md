@@ -2,6 +2,23 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 8.3.2 - 2026-10-19
+
+### Performance
+
+- Speed up repeated cached permission lookups by name and ID without changing lookup semantics (#2969).
+- Preserve loose comparisons, guard isolation, first-match ordering, shared model identity, and mutations of returned models. Custom models and keyed collections continue to use the original filter.
+- Keep lookup indexes tied to cache invalidation, including saved changes, deletion, explicit resets, and cache/tenant reinitialization.
+
+### Verification
+
+- Add regression coverage for numeric comparisons, custom accessors and keys, collection ordering, runtime casts, invalidation, strict missing-attribute handling, and release of cached model references.
+- Add an opt-in benchmark covering warm hits/misses, hydration, and retained memory. Indexing trades some hydration work and memory for faster repeated lookups; performance depends on the workload and is not unconditionally O(1).
+
+No breaking changes. Public APIs, persistent cache format, and PHP/Laravel support are unchanged.
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/8.3.1...8.3.2
+
 ## 8.3.1 - 2026-10-19
 
 ### Fixes
@@ -58,6 +75,7 @@ hasAnyRole("'writer|admin'")     // same
 hasAnyRole('"writer|admin"')     // same
 hasAnyRole("'writer|admin")      // changed: mismatched apostrophe is removed
 hasAnyRole("'writer|admin\"")    // changed: mismatched quote is removed
+
 
 
 
@@ -1381,6 +1399,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -1428,6 +1447,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
