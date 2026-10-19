@@ -79,6 +79,16 @@ If you need to assign the role to different model types in the same call, pass t
 $role->assignToModels([$user, $admin, $apiClient]);
 ```
 
+### Bulk assignment boundaries
+
+Save the role and target models before assigning them. These methods do not save models or check whether target IDs exist. The polymorphic pivot table cannot enforce foreign keys to every target model table. An unsaved model with a null key fails the default schema's non-null constraint; a manually assigned key is not proof that the model exists.
+
+`syncModels()` wraps deletion and attachment in a transaction on the role's connection. If an attachment fails, the exception propagates, previous assignments on that connection are restored, and inserts made earlier in the same call are rolled back. This requires transactional tables and all pivot writes to use that connection. Explicitly configured related-model connections are not covered by a distributed transaction. An enclosing transaction can still roll back a successful sync; this is not a guarantee of serialization between concurrent sync calls.
+
+With teams enabled, `syncModels()` replaces this role's assignments **across all teams**, then attaches the supplied models to the current team. It is not a current-team-only sync. Passing an empty array removes every assignment of the role.
+
+These role-side bulk methods do not dispatch `RoleAttachedEvent` or `RoleDetachedEvent`, even when `permission.events_enabled` is enabled. The transaction does not make external side effects in custom model or pivot listeners rollback-safe.
+
 ## Checking Roles
 
 You can determine if a user has a certain role:
