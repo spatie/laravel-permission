@@ -5,6 +5,7 @@ use Spatie\Permission\Exceptions\WildcardPermissionInvalidArgument;
 use Spatie\Permission\Exceptions\WildcardPermissionNotImplementsContract;
 use Spatie\Permission\Exceptions\WildcardPermissionNotProperlyFormatted;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum;
 use Spatie\Permission\Tests\TestSupport\TestModels\User;
 use Spatie\Permission\Tests\TestSupport\TestModels\WildcardPermission;
@@ -330,3 +331,23 @@ it('throws exception when permission id not exists', function () {
     expect(fn () => $user->hasPermissionTo(6))
         ->toThrow(PermissionDoesNotExist::class);
 });
+
+it('rechecks wildcard permissions after their index is explicitly cleared', function (bool $allModels) {
+    config()->set('permission.enable_wildcard_permission', true);
+
+    $permission = Permission::create(['name' => 'articles.*']);
+    $this->testUser->givePermissionTo($permission);
+
+    expect($this->testUser->checkPermissionTo('articles.edit'))->toBeTrue();
+
+    $this->testUser->permissions->pop();
+    app(PermissionRegistrar::class)->forgetWildcardPermissionIndex($allModels ? null : $this->testUser);
+
+    expect($this->testUser->hasPermissionTo('articles.edit'))->toBeFalse()
+        ->and($this->testUser->checkPermissionTo('articles.edit'))->toBeFalse();
+
+    $this->testUser->permissions->push($permission);
+    app(PermissionRegistrar::class)->forgetWildcardPermissionIndex($allModels ? null : $this->testUser);
+
+    expect($this->testUser->checkPermissionTo('articles.edit'))->toBeTrue();
+})->with([true, false]);

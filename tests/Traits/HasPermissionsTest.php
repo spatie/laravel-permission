@@ -876,9 +876,32 @@ it('forgets memoised checks when the roles relation is reloaded outside the trai
 });
 
 it('memoises per guard', function () {
+    $otherGuardPermission = app(Permission::class)::create([
+        'name' => 'edit-articles',
+        'guard_name' => 'api',
+    ]);
     $this->testUser->givePermissionTo('edit-articles');
 
     expect($this->testUser->checkPermissionTo('edit-articles', 'web'))->toBeTrue()
-        ->and($this->testUser->checkPermissionTo('edit-articles', 'admin'))->toBeFalse()
+        ->and($this->testUser->checkPermissionTo('edit-articles', 'api'))->toBeFalse()
         ->and($this->testUser->checkPermissionTo('edit-articles', 'web'))->toBeTrue();
+
+    $this->testUser->givePermissionTo($otherGuardPermission);
+
+    expect($this->testUser->checkPermissionTo('edit-articles', 'api'))->toBeTrue();
 });
+
+it('distinguishes permission ids from numeric names in repeated checks', function (bool $grantId, bool $checkIdFirst) {
+    $id = $this->testUserPermission->getKey();
+    $numericPermission = app(Permission::class)::create(['name' => (string) $id]);
+
+    $this->testUser->givePermissionTo($grantId ? $this->testUserPermission : $numericPermission);
+
+    $checks = $checkIdFirst ? [$id, (string) $id] : [(string) $id, $id];
+
+    foreach (array_merge($checks, $checks) as $permission) {
+        $expected = is_int($permission) ? $grantId : ! $grantId;
+
+        expect($this->testUser->checkPermissionTo($permission))->toBe($expected);
+    }
+})->with([true, false])->with([true, false]);

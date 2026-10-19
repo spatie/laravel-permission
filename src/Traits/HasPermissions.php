@@ -266,13 +266,17 @@ trait HasPermissions
      */
     public function checkPermissionTo($permission, ?string $guardName = null): bool
     {
+        if ($this->getWildcardClass()) {
+            return $this->resolveCheckPermissionTo($permission, $guardName);
+        }
+
         $permission = enum_value($permission);
 
         if (! is_string($permission) && ! is_int($permission)) {
             return $this->resolveCheckPermissionTo($permission, $guardName);
         }
 
-        $key = ($guardName ?? $this->getDefaultGuardName())."\0".$permission;
+        $key = serialize([$guardName ?? $this->getDefaultGuardName(), $permission]);
 
         $this->refreshCheckedPermissionsContext();
 
