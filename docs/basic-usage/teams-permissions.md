@@ -3,7 +3,7 @@ title: Teams permissions
 weight: 5
 ---
 
-When enabled, teams permissions offers you flexible control for a variety of scenarios. The idea behind teams permissions is inspired by the default permission implementation of [Laratrust](https://laratrust.santigarcor.me/).
+When enabled, teams permissions offer you flexible control for a variety of scenarios. The idea behind teams permissions is inspired by the default permission implementation of [Laratrust](https://laratrust.santigarcor.me/).
 
 ## Enabling Teams Permissions Feature
 
