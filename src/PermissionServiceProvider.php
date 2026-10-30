@@ -8,6 +8,8 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Routing\Route;
+use Illuminate\Routing\Router;
+use Illuminate\Routing\RouteRegistrar;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\View\Compilers\BladeCompiler;
@@ -112,6 +114,20 @@ class PermissionServiceProvider extends PackageServiceProvider
             /** @var Route $this */
             return $this->middleware('role_or_permission:'.implode('|', $rolesOrPermissions));
         });
+
+        foreach (['role' => 'role', 'permission' => 'permission', 'roleOrPermission' => 'role_or_permission'] as $macro => $middleware) {
+            $resolve = fn ($values) => $middleware.':'.implode('|', array_map(fn ($value) => enum_value($value), Arr::wrap($values)));
+
+            RouteRegistrar::macro($macro, function ($values = []) use ($resolve) {
+                /** @var RouteRegistrar $this */
+                return $this->middleware([...($this->attributes['middleware'] ?? []), $resolve($values)]);
+            });
+
+            Router::macro($macro, function ($values = []) use ($resolve) {
+                /** @var Router $this */
+                return $this->middleware($resolve($values));
+            });
+        }
     }
 
     protected function registerOctaneListener(): void

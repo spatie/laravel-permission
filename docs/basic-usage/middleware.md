@@ -89,6 +89,21 @@ Route::middleware('role_or_permission:manager|edit articles')
 Route::middleware('permission:publish articles|edit articles,api')
 ```
 
+The package also registers `role`, `permission` and `roleOrPermission` route macros, which accept a string, an array or a backed enum. They can be used on individual routes and on route groups:
+
+```php
+Route::get('/admin', ...)->role('manager');
+Route::get('/articles/create', ...)->permission(['publish articles', 'edit articles']);
+
+Route::permission('publish articles')->group(function () {
+    // ...
+});
+
+Route::prefix('admin')->middleware('auth')->role('manager')->group(function () {
+    // ...
+});
+```
+
 ### Controllers
 
 If your controller implements the `HasMiddleware` interface, you can register [controller middleware](https://laravel.com/docs/12.x/controllers#controller-middleware) using the `middleware()` method:

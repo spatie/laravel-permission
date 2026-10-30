@@ -112,3 +112,72 @@ it('test role or permission function with backed enum array', function () {
         ['role_or_permission:'.TestRolePermissionsEnum::UserManager->value.'|'.TestRolePermissionsEnum::EditArticles->value] // @phpstan-ignore-line
     );
 });
+
+it('test role function on route group', function () {
+    $router = $this->getRouter();
+
+    $router->prefix('admin')->role('superadmin')->group(function () use ($router) {
+        $router->get('role-group-test', $this->getRouteResponse())->name('role-group.test');
+    });
+
+    expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual(['role:superadmin']);
+});
+
+it('test permission function on route group', function () {
+    $router = $this->getRouter();
+
+    $router->prefix('articles')->permission(['edit articles', 'save articles'])->group(function () use ($router) {
+        $router->get('permission-group-test', $this->getRouteResponse())->name('permission-group.test');
+    });
+
+    expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual(['permission:edit articles|save articles']);
+});
+
+it('test role or permission function on route group', function () {
+    $router = $this->getRouter();
+
+    $router->prefix('articles')->roleOrPermission(['admin', 'edit articles'])->group(function () use ($router) {
+        $router->get('role-or-permission-group-test', $this->getRouteResponse())->name('role-or-permission-group.test');
+    });
+
+    expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual(['role_or_permission:admin|edit articles']);
+});
+
+it('test permission function on route group with backed enum', function () {
+    $router = $this->getRouter();
+
+    $router->prefix('articles')->permission([TestRolePermissionsEnum::Writer, TestRolePermissionsEnum::Editor])->group(function () use ($router) {
+        $router->get('permission-group-test.enum', $this->getRouteResponse())->name('permission-group.test.enum');
+    });
+
+    expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual([
+        'permission:'.TestRolePermissionsEnum::Writer->value.'|'.TestRolePermissionsEnum::Editor->value,
+    ]);
+});
+
+it('test role and permission functions on router', function () {
+    $router = $this->getRouter();
+
+    $router->role('superadmin')->permission('edit articles')->group(function () use ($router) {
+        $router->get('router-group-test', $this->getRouteResponse())->name('router-group.test');
+    });
+
+    expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual([
+        'role:superadmin',
+        'permission:edit articles',
+    ]);
+});
+
+it('test role and permission functions on route group keep existing middleware', function () {
+    $router = $this->getRouter();
+
+    $router->middleware('auth')->role('superadmin')->permission('edit articles')->group(function () use ($router) {
+        $router->get('route-group-middleware-test', $this->getRouteResponse())->name('route-group-middleware.test');
+    });
+
+    expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual([
+        'auth',
+        'role:superadmin',
+        'permission:edit articles',
+    ]);
+});
