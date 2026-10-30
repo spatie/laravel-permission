@@ -115,19 +115,53 @@ class PermissionServiceProvider extends PackageServiceProvider
             return $this->middleware('role_or_permission:'.implode('|', $rolesOrPermissions));
         });
 
-        foreach (['role' => 'role', 'permission' => 'permission', 'roleOrPermission' => 'role_or_permission'] as $macro => $middleware) {
-            $resolve = fn ($values) => $middleware.':'.implode('|', array_map(fn ($value) => enum_value($value), Arr::wrap($values)));
+        RouteRegistrar::macro('role', function ($roles = []) {
+            $roles = Arr::wrap($roles);
+            $roles = array_map(fn ($role) => enum_value($role), $roles);
 
-            RouteRegistrar::macro($macro, function ($values = []) use ($resolve) {
-                /** @var RouteRegistrar $this */
-                return $this->middleware([...($this->attributes['middleware'] ?? []), $resolve($values)]);
-            });
+            /** @var RouteRegistrar $this */
+            return $this->middleware([...($this->attributes['middleware'] ?? []), 'role:'.implode('|', $roles)]);
+        });
 
-            Router::macro($macro, function ($values = []) use ($resolve) {
-                /** @var Router $this */
-                return $this->middleware($resolve($values));
-            });
-        }
+        RouteRegistrar::macro('permission', function ($permissions = []) {
+            $permissions = Arr::wrap($permissions);
+            $permissions = array_map(fn ($permission) => enum_value($permission), $permissions);
+
+            /** @var RouteRegistrar $this */
+            return $this->middleware([...($this->attributes['middleware'] ?? []), 'permission:'.implode('|', $permissions)]);
+        });
+
+        RouteRegistrar::macro('roleOrPermission', function ($rolesOrPermissions = []) {
+            $rolesOrPermissions = Arr::wrap($rolesOrPermissions);
+            $rolesOrPermissions = array_map(fn ($item) => enum_value($item), $rolesOrPermissions);
+
+            /** @var RouteRegistrar $this */
+            return $this->middleware([...($this->attributes['middleware'] ?? []), 'role_or_permission:'.implode('|', $rolesOrPermissions)]);
+        });
+
+        Router::macro('role', function ($roles = []) {
+            $roles = Arr::wrap($roles);
+            $roles = array_map(fn ($role) => enum_value($role), $roles);
+
+            /** @var Router $this */
+            return $this->middleware('role:'.implode('|', $roles));
+        });
+
+        Router::macro('permission', function ($permissions = []) {
+            $permissions = Arr::wrap($permissions);
+            $permissions = array_map(fn ($permission) => enum_value($permission), $permissions);
+
+            /** @var Router $this */
+            return $this->middleware('permission:'.implode('|', $permissions));
+        });
+
+        Router::macro('roleOrPermission', function ($rolesOrPermissions = []) {
+            $rolesOrPermissions = Arr::wrap($rolesOrPermissions);
+            $rolesOrPermissions = array_map(fn ($item) => enum_value($item), $rolesOrPermissions);
+
+            /** @var Router $this */
+            return $this->middleware('role_or_permission:'.implode('|', $rolesOrPermissions));
+        });
     }
 
     protected function registerOctaneListener(): void
