@@ -240,4 +240,62 @@ it('uses Laravel middleware replacement on registrars but appends on individual 
     $this->actingAs($this->testUser);
     $this->get('/group')->assertOk()->assertSee('allowed');
     $this->get('/individual')->assertForbidden();
-})->with(['role', 'permission', 'roleOrPermission']);
+})->with(['role', 'permission', 'roleOrPermission', 'canAny', 'canAll']);
+
+it('registers canAny and canAll as permission middleware on routes, registrars and the router', function (string $macro, array $expected) {
+    $router = $this->getRouter();
+
+    $router->get('route', fn () => 'allowed')->{$macro}(['edit articles', 'save articles']);
+    expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual($expected);
+
+    $router->middleware('auth')->{$macro}(['edit articles', 'save articles'])->group(function () use ($router) {
+        $router->get('registrar', fn () => 'allowed');
+    });
+    expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual(['auth', ...$expected]);
+
+    $router->{$macro}(['edit articles', 'save articles'])->group(function () use ($router) {
+        $router->get('router', fn () => 'allowed');
+    });
+    expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual($expected);
+})->with([
+    ['canAny', ['permission:edit articles|save articles']],
+    ['canAll', ['permission:edit articles', 'permission:save articles']],
+]);
+
+it('accepts backed enums in canAny and canAll', function (string $macro, array $expected) {
+    $router = $this->getRouter();
+
+    $router->get('route', fn () => 'allowed')->{$macro}([TestRolePermissionsEnum::Writer, TestRolePermissionsEnum::Editor]);
+
+    expect($this->getLastRouteMiddlewareFromRouter($router))->toEqual($expected);
+})->with([
+    ['canAny', ['permission:'.TestRolePermissionsEnum::Writer->value.'|'.TestRolePermissionsEnum::Editor->value]],
+    ['canAll', ['permission:'.TestRolePermissionsEnum::Writer->value, 'permission:'.TestRolePermissionsEnum::Editor->value]],
+]);
+
+it('requires any listed permission for canAny and every listed permission for canAll', function (string $macro, bool $allowedWithOnePermission) {
+    $router = $this->getRouter();
+
+    $router->middleware('auth')->{$macro}(['edit-articles', 'edit-news'])->group(function () use ($router) {
+        $router->get('group', fn () => 'allowed');
+    });
+    $router->get('individual', fn () => 'allowed')->middleware('auth')->{$macro}(['edit-articles', 'edit-news']);
+
+    $this->getJson('/group')->assertUnauthorized();
+    $this->getJson('/individual')->assertUnauthorized();
+
+    $this->actingAs($this->testUser);
+    $this->get('/group')->assertForbidden();
+    $this->get('/individual')->assertForbidden();
+
+    $this->testUser->givePermissionTo('edit-articles');
+    $this->get('/group')->assertStatus($allowedWithOnePermission ? 200 : 403);
+    $this->get('/individual')->assertStatus($allowedWithOnePermission ? 200 : 403);
+
+    $this->testUser->givePermissionTo('edit-news');
+    $this->get('/group')->assertOk()->assertSee('allowed');
+    $this->get('/individual')->assertOk()->assertSee('allowed');
+})->with([
+    ['canAny', true],
+    ['canAll', false],
+]);
