@@ -927,3 +927,15 @@ it('fires detach event when syncing roles', function () {
             && $event->rolesOrIds === $attachedRoleIds;
     });
 });
+
+it('can query the disabled teams relation without migrating team columns', function () {
+    expect($this->testUser->teams()->get())->toBeEmpty();
+});
+
+it('can eagerly load disabled teams without migrating team columns', function () {
+    $user = User::with('teams')->findOrFail($this->testUser->getKey());
+
+    expect($user->relationLoaded('teams'))->toBeTrue();
+    expect($user->teams)->toBeEmpty();
+    expect(User::whereHas('teams')->count())->toBe(0);
+});
