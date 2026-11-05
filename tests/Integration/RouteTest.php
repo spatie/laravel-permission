@@ -1,6 +1,16 @@
 <?php
 
+use Spatie\Permission\Middleware\PermissionMiddleware;
+use Spatie\Permission\Middleware\RoleMiddleware;
+use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
 use Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum;
+
+beforeEach(function () {
+    $router = $this->getRouter();
+    $router->aliasMiddleware('role', RoleMiddleware::class);
+    $router->aliasMiddleware('permission', PermissionMiddleware::class);
+    $router->aliasMiddleware('role_or_permission', RoleOrPermissionMiddleware::class);
+});
 
 it('test role function', function () {
     $router = $this->getRouter();
@@ -181,3 +191,53 @@ it('test role and permission functions on route group keep existing middleware',
         'permission:edit articles',
     ]);
 });
+
+it('enforces group macros after auth and retains them in nested middleware groups', function (string $macro, string $requirement, string $grantMethod, string $grant) {
+    $router = $this->getRouter();
+
+    $router->middleware('auth')->{$macro}($requirement)->group(function () use ($router) {
+        $router->get('direct', fn () => 'allowed');
+
+        $router->middleware('permission:edit-news')->group(function () use ($router) {
+            $router->get('nested', fn () => 'allowed');
+        });
+    });
+    $router->get('outside', fn () => 'public');
+
+    $this->get('/outside')->assertOk();
+    $this->getJson('/direct')->assertUnauthorized();
+    $this->getJson('/nested')->assertUnauthorized();
+
+    $this->actingAs($this->testUser);
+    $this->get('/direct')->assertForbidden();
+    $this->get('/nested')->assertForbidden();
+
+    $this->testUser->{$grantMethod}($grant);
+    $this->get('/direct')->assertOk()->assertSee('allowed');
+    $this->get('/nested')->assertForbidden();
+
+    $this->testUser->givePermissionTo('edit-news');
+    $this->get('/nested')->assertOk()->assertSee('allowed');
+
+    $this->testUser->{$grantMethod === 'assignRole' ? 'removeRole' : 'revokePermissionTo'}($grant);
+    $this->get('/nested')->assertForbidden();
+})->with([
+    ['role', 'testRole|testRole2', 'assignRole', 'testRole2'],
+    ['permission', 'edit-blog|edit-articles', 'givePermissionTo', 'edit-articles'],
+    ['roleOrPermission', 'testRole|edit-articles', 'givePermissionTo', 'edit-articles'],
+]);
+
+it('uses Laravel middleware replacement on registrars but appends on individual routes', function (string $macro) {
+    $router = $this->getRouter();
+
+    $router->{$macro}('unassigned')->middleware('auth')->group(function () use ($router) {
+        $router->get('group', fn () => 'allowed');
+    });
+    $router->get('individual', fn () => 'allowed')->{$macro}('unassigned')->middleware('auth');
+
+    $this->getJson('/group')->assertUnauthorized();
+
+    $this->actingAs($this->testUser);
+    $this->get('/group')->assertOk()->assertSee('allowed');
+    $this->get('/individual')->assertForbidden();
+})->with(['role', 'permission', 'roleOrPermission']);

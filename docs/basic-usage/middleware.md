@@ -104,6 +104,26 @@ Route::prefix('admin')->middleware('auth')->role('manager')->group(function () {
 });
 ```
 
+**Middleware order on groups:** Call `middleware()` before `role()`, `permission()` or `roleOrPermission()`. Laravel replaces a route registrar's middleware when `middleware()` is called again, so calling it after a group macro removes the role or permission check:
+
+```php
+Route::middleware('auth')->role('manager')->permission('publish articles')->group(function () {
+    // Requires authentication, the manager role and the publish articles permission.
+});
+```
+
+To add more middleware without replacing the group's authorization checks, use a nested group:
+
+```php
+Route::middleware('auth')->role('manager')->group(function () {
+    Route::middleware('throttle:60,1')->group(function () {
+        // Requires authentication, the manager role and the rate limit.
+    });
+});
+```
+
+This is Laravel's normal route-group behavior. Individual routes, such as `Route::get(...)->role('manager')->middleware('auth')`, continue to append middleware rather than replace it.
+
 ### Controllers
 
 If your controller implements the `HasMiddleware` interface, you can register [controller middleware](https://laravel.com/docs/12.x/controllers#controller-middleware) using the `middleware()` method:
