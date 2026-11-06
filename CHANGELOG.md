@@ -2,6 +2,21 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 8.5.0 - 2026-11-06
+
+### Added
+
+- Add `canAny()` and `canAll()` route macros for individual routes and route groups, by @ziadoz in #2981. `canAny()` requires any listed permission; `canAll()` requires each listed array entry. Both accept strings, backed enums, and mixed arrays.
+- Expand real authorization coverage for guests, grants and revocation, authentication guards, nested/sibling route isolation, scalar and enum inputs, and compatibility with native Laravel `can()`.
+
+### Documentation
+
+- Document safe group middleware ordering, guard selection, pipe-separated OR alternatives within an entry, and the fact that an empty `canAll([])` adds no authorization checks. Apply authentication separately when needed.
+
+No breaking changes. PHP and Laravel requirements are unchanged. Native Laravel `can()` and group middleware replacement semantics remain unchanged. Includes the released 8.4.1 disabled-teams relation fix.
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/8.4.1...8.5.0
+
 ## 8.4.1 - 2026-11-06
 
 ### Fixed
@@ -102,6 +117,7 @@ hasAnyRole("'writer|admin'")     // same
 hasAnyRole('"writer|admin"')     // same
 hasAnyRole("'writer|admin")      // changed: mismatched apostrophe is removed
 hasAnyRole("'writer|admin\"")    // changed: mismatched quote is removed
+
 
 
 
@@ -1431,6 +1447,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -1478,6 +1495,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
