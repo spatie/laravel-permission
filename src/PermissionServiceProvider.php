@@ -162,6 +162,44 @@ class PermissionServiceProvider extends PackageServiceProvider
             /** @var Router $this */
             return $this->middleware('role_or_permission:'.implode('|', $rolesOrPermissions));
         });
+
+        Route::macro('canAny', function ($permissions = []) {
+            /** @var Route $this */
+            return $this->permission($permissions); // @phpstan-ignore method.notFound
+        });
+
+        Route::macro('canAll', function ($permissions = []) {
+            foreach (Arr::wrap($permissions) as $permission) {
+                /** @var Route $this */
+                $this->permission($permission); // @phpstan-ignore method.notFound
+            }
+
+            return $this;
+        });
+
+        RouteRegistrar::macro('canAny', function ($permissions = []) {
+            /** @var RouteRegistrar $this */
+            return $this->permission($permissions); // @phpstan-ignore method.notFound
+        });
+
+        RouteRegistrar::macro('canAll', function ($permissions = []) {
+            foreach (Arr::wrap($permissions) as $permission) {
+                /** @var RouteRegistrar $this */
+                $this->permission($permission); // @phpstan-ignore method.notFound
+            }
+
+            return $this;
+        });
+
+        Router::macro('canAny', function ($permissions = []) {
+            /** @var Router $this */
+            return $this->permission($permissions); // @phpstan-ignore method.notFound
+        });
+
+        Router::macro('canAll', function ($permissions = []) {
+            /** @var Router $this */
+            return (new RouteRegistrar($this))->canAll($permissions); // @phpstan-ignore method.notFound
+        });
     }
 
     protected function registerOctaneListener(): void

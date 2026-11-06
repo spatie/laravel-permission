@@ -104,7 +104,20 @@ Route::prefix('admin')->middleware('auth')->role('manager')->group(function () {
 });
 ```
 
-**Middleware order on groups:** Call `middleware()` before `role()`, `permission()` or `roleOrPermission()`. Laravel replaces a route registrar's middleware when `middleware()` is called again, so calling it after a group macro removes the role or permission check:
+The `canAny` and `canAll` macros check a list of permissions, requiring any one of them or all of them. They work on individual routes and groups, accepting strings, backed enums or arrays containing either:
+
+```php
+Route::get('/articles', ...)->canAny(['publish articles', 'edit articles']);
+Route::get('/articles', ...)->canAll(['publish articles', 'edit articles']);
+
+Route::middleware('auth:admin')->canAll(['publish articles', 'edit articles'])->group(function () {
+    // Requires both permissions for the authenticated admin.
+});
+```
+
+These macros use this package's permission middleware; Laravel's native `can()` method remains unchanged. `canAny()` is an alias for `permission()`. `canAll()` adds a permission middleware check for each array entry, so use separate entries to require separate permissions: a pipe-separated string still means OR within that entry. An empty `canAll([])` adds no checks; apply authentication middleware separately when needed.
+
+**Middleware order on groups:** Call `middleware()` before `role()`, `permission()`, `roleOrPermission()`, `canAny()` or `canAll()`. Laravel replaces a route registrar's middleware when `middleware()` is called again, so calling it after a group macro removes the role or permission check:
 
 ```php
 Route::middleware('auth')->role('manager')->permission('publish articles')->group(function () {
