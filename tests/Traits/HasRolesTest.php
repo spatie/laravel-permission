@@ -927,3 +927,41 @@ it('fires detach event when syncing roles', function () {
             && $event->rolesOrIds === $attachedRoleIds;
     });
 });
+
+it('can query the disabled teams relation without migrating team columns', function (bool $customModels) {
+    if ($customModels) {
+        $this->setUpCustomModels();
+    }
+
+    $this->testUser->givePermissionTo($this->testUserPermission);
+    $this->testUser->assignRole($this->testUserRole);
+
+    expect($this->testUser->teams())->toBeInstanceOf(BelongsToMany::class);
+    expect($this->testUser->teams()->get())->toBeEmpty();
+    expect($this->testUser->teams()->exists())->toBeFalse();
+    expect($this->testUser->permissions()->get()->modelKeys())->toBe([$this->testUserPermission->getKey()]);
+    expect($this->testUser->roles()->get()->modelKeys())->toBe([$this->testUserRole->getKey()]);
+})->with(['default models' => false, 'custom UUID models' => true]);
+
+it('can eagerly load disabled teams without migrating team columns', function (bool $customModels) {
+    if ($customModels) {
+        $this->setUpCustomModels();
+    }
+
+    $this->testUser->givePermissionTo($this->testUserPermission);
+    $otherUser = User::create(['email' => 'without-permissions@example.com']);
+
+    $users = User::with(['teams', 'permissions'])->withCount('teams')->get();
+
+    foreach ($users as $user) {
+        expect($user->relationLoaded('teams'))->toBeTrue();
+        expect($user->teams)->toBeEmpty();
+        expect($user->teams_count)->toBe(0);
+    }
+
+    expect($users->find($this->testUser->getKey())->permissions->modelKeys())->toBe([$this->testUserPermission->getKey()]);
+    expect($users->find($otherUser->getKey())->permissions)->toBeEmpty();
+    expect(User::whereHas('teams')->count())->toBe(0);
+    expect(User::whereDoesntHave('teams')->get()->modelKeys())
+        ->toEqualCanonicalizing([$this->testUser->getKey(), $otherUser->getKey()]);
+})->with(['default models' => false, 'custom UUID models' => true]);

@@ -126,13 +126,7 @@ trait HasRoles
     public function teams(): BelongsToMany
     {
         if (! Config::teamsEnabled()) {
-            return $this->morphToMany(
-                Config::permissionModel(),
-                'model',
-                Config::modelHasRolesTable(),
-                Config::morphKey(),
-                Config::teamForeignKey()
-            )->whereRaw('1 = 0');
+            return $this->permissions()->whereRaw('1 = 0');
         }
 
         return $this->morphToMany(
