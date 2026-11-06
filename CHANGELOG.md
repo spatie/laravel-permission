@@ -2,6 +2,33 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 8.4.1 - 2026-11-06
+
+### Fixed
+
+- Fix querying `teams()` when teams are disabled and the database was migrated without team columns. The empty relation now uses the configured permission relation instead of joining a nonexistent team foreign key, by @AleksandrSpicyn in #2982.
+- Add regression coverage for direct queries, existence checks, eager loading, counts, and relationship existence filters with populated permissions and custom UUID models. Disabled teams stay empty without affecting ordinary permissions or roles.
+
+No breaking changes. PHP and Laravel requirements, enabled-team behavior, and route-group authorization middleware behavior are unchanged.
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/8.4.0...8.4.1
+
+## 8.4.0 - 2026-11-05
+
+### Added
+
+- Use the existing `role`, `permission` and `roleOrPermission` route macros on route groups, including router-first and prefixed group declarations, by @ziadoz in #2980.
+- Group macros accept the same string, array and backed-enum inputs as individual routes.
+
+### Documentation and verification
+
+- Document Laravel's normal group middleware replacement behavior: call `middleware()` before authorization macros, or use nested groups to add middleware without replacing authorization checks. Individual routes continue to append middleware.
+- Add HTTP coverage for safe ordering, nested authorization constraints, sibling isolation and the intentional distinction between group and individual-route middleware behavior.
+
+No breaking changes. PHP and Laravel requirements are unchanged.
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/8.3.2...8.4.0
+
 ## 8.3.2 - 2026-10-19
 
 ### Performance
@@ -75,6 +102,8 @@ hasAnyRole("'writer|admin'")     // same
 hasAnyRole('"writer|admin"')     // same
 hasAnyRole("'writer|admin")      // changed: mismatched apostrophe is removed
 hasAnyRole("'writer|admin\"")    // changed: mismatched quote is removed
+
+
 
 
 
@@ -1400,6 +1429,8 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -1447,6 +1478,8 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
+
 
 
 
