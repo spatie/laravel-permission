@@ -422,7 +422,14 @@ class PermissionRegistrar
 
     protected function getPermissionsWithRoles(): Collection
     {
-        return $this->permissionClass::select()->with('roles')->get();
+        // This cache is a single, app-wide snapshot shared by every request/tenant/connection,
+        // so it must not be filtered by any global scope that happens to be active on the
+        // Permission or Role models at the moment it's rebuilt (e.g. a multi-tenancy scope
+        // registered by the application). See: https://github.com/spatie/laravel-permission/issues/2983
+        return $this->permissionClass::withoutGlobalScopes()
+            ->select()
+            ->with(['roles' => fn ($query) => $query->withoutGlobalScopes()])
+            ->get();
     }
 
     /**

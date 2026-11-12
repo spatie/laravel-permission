@@ -3,6 +3,7 @@
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -112,6 +113,42 @@ it('picks up a rebound cache manager when initializeCache runs after the contain
     $switchPrefix('tenant_b_');
     app(PermissionRegistrar::class)->initializeCache();
     expect(app(PermissionRegistrar::class)->getCacheStore()->getPrefix())->toBe('tenant_b_');
+});
+
+it('does not let a global scope active on Role at cache-rebuild time filter the shared permission cache', function () {
+    // The permission cache is one shared, app-wide snapshot (not per-tenant/per-request), so
+    // it must not be filtered by a global scope that merely happens to be active on Role at
+    // the moment it gets rebuilt — e.g. a multi-tenancy scope an application registers for the
+    // duration of a single request. See: https://github.com/spatie/laravel-permission/issues/2983
+    $permission = SpatiePermission::create(['name' => 'scope-test-permission']);
+
+    $roleA = SpatieRole::create(['name' => 'scope-test-role-a']);
+    $roleA->givePermissionTo($permission);
+
+    $roleB = SpatieRole::create(['name' => 'scope-test-role-b']);
+    $roleB->givePermissionTo($permission);
+
+    SpatieRole::addGlobalScope('scope-test', function ($query) {
+        $query->where('name', 'scope-test-role-a');
+    });
+
+    try {
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        app(PermissionRegistrar::class)->clearPermissionsCollection();
+
+        $cachedPermission = app(PermissionRegistrar::class)->getPermissions()
+            ->firstWhere('name', 'scope-test-permission');
+    } finally {
+        $globalScopes = (new ReflectionProperty(Model::class, 'globalScopes'));
+        $globalScopes->setAccessible(true);
+        $scopes = $globalScopes->getValue();
+        unset($scopes[SpatieRole::class]['scope-test']);
+        $globalScopes->setValue(null, $scopes);
+    }
+
+    expect($cachedPermission->roles->pluck($roleA->getKeyName())->all())
+        ->toContain($roleA->getKey())
+        ->toContain($roleB->getKey());
 });
 
 it('can check uids', function () {
