@@ -10,6 +10,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\PermissionsTeamResolver;
 use Spatie\Permission\Contracts\Role;
@@ -422,7 +423,30 @@ class PermissionRegistrar
 
     protected function getPermissionsWithRoles(): Collection
     {
-        return $this->permissionClass::select()->with('roles')->get();
+        $permissionScopes = (array) config('permission.cache.without_global_scopes', []);
+
+        return $this->permissionClass::select()
+            ->withoutGlobalScopes($permissionScopes)
+            ->with(['roles' => fn ($query) => $query->withoutGlobalScopes($this->getRoleScopesIgnoredByCache())])
+            ->get();
+    }
+
+    /**
+     * The cache is one snapshot shared by every request, so it has to hold every role
+     * that grants a permission. Role scopes are not lost: a role only grants access
+     * through the roles relation of the model being checked, and that relation is
+     * queried with the scopes of the current request.
+     *
+     * Soft deletes never depend on the request, so they keep filtering the snapshot.
+     *
+     * @return array<int, string>
+     */
+    protected function getRoleScopesIgnoredByCache(): array
+    {
+        return array_values(array_diff(
+            array_keys((new $this->roleClass)->getGlobalScopes()),
+            [SoftDeletingScope::class],
+        ));
     }
 
     /**

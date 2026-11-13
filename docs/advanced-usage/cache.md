@@ -7,22 +7,42 @@ Role and Permission data are cached to speed up performance.
 
 ## Global scopes and multitenancy
 
-The permission cache contains permissions and their associated roles. When rebuilding it, the package queries the configured Permission model and eager-loads its `roles` relationship. Eloquent global scopes on either model apply to these queries.
+The permission cache contains permissions and their associated roles. By default, this snapshot is shared between requests, so it must not depend on which request happens to rebuild it.
 
-By default, this snapshot is shared between requests. A request-specific scope can therefore affect permission checks in later requests. For example, if a tenant-A request rebuilds the cache while a global scope filters Role to tenant A, tenant B's roles will be missing from the cache. A later tenant-B request can deny permissions that its roles should grant. The same problem occurs with request-specific scopes on Permission.
+### Scopes on Role
+
+Global scopes on your Role model do not filter the snapshot: it holds every role that grants a permission, whichever scopes are active when it is built. The only exception is Laravel's `SoftDeletingScope`, which never depends on the request and keeps soft-deleted roles out of the cache.
+
+Your Role scopes still restrict authorization. A role only grants a permission through the `roles` relationship of the model being checked, and that relationship is queried with the scopes of the current request. A role hidden by a tenant scope, a visibility scope or a soft delete is not among the model's roles, so it grants nothing.
+
+This means a request-specific scope on Role, such as the one a tenant-scoped Filament resource registers, cannot make later requests of other tenants lose their permissions.
+
+Note that the `roles` relationship of a permission returned by the registrar (for example through `Permission::findByName()`) comes from the snapshot, so it is not filtered by the Role scopes of the current request. Query `$permission->roles()` when you need a scoped list.
+
+### Scopes on Permission
+
+Global scopes on your Permission model do apply when the snapshot is built. A request-specific scope on Permission can therefore affect permission checks in later requests: permissions hidden while the cache was rebuilt are missing for everyone until the next rebuild.
 
 Enabling the package's teams feature does not create a separate cache for each team. Calling `setPermissionsTeamId()` alone does not isolate snapshots built under different global scopes.
 
 Choose an approach that matches what the scope is intended to do:
 
-- If the scope only filters an administration UI, apply it to that UI's queries instead of registering it globally on Role or Permission. Check whether your integration, such as a tenant-scoped Filament resource, registers a global scope on these models.
+- If the scope only filters an administration UI, apply it to that UI's queries instead of registering it globally on Permission.
 - If the scope must restrict authorization to the current tenant, use a separate permission cache namespace for each tenant. Every code path that reads or rebuilds the cache must select the matching tenant and cache context, including queue jobs and Artisan commands. Keep unscoped queries in a separate cache context too. See [Cache Identifier / Prefix](#cache-identifier--prefix) below for reinitializing the registrar when switching contexts. When switching teams, also unset the user's loaded `roles` and `permissions` relationships before the next permission check.
+- If you need to keep a shared registry and cannot change an integration's UI-only scope, list that known scope in the `cache.without_global_scopes` option of `config/permission.php`, by class name or by the name it was registered with:
 
-For an application that needs to keep a shared registry and cannot change its integration's UI-only scope, a custom `PermissionRegistrar` can override `getPermissionsWithRoles()` and use Eloquent's `withoutGlobalScope()` to exclude only that known scope. Review the Permission query and the eager-loaded Role query separately. This is an application-specific opt-in: bypass a scope only if it must not constrain authorization, and leave all other scopes in place.
+```php
+'cache' => [
+    // ...
+    'without_global_scopes' => ['name-of-the-ui-only-scope'],
+],
+```
 
-Do not use `withoutGlobalScopes()` as a blanket workaround. It also removes intentional visibility restrictions and Laravel's `SoftDeletingScope` when your custom models use soft deletes. A soft-deleted permission can then still grant access through an assigned role. Preserving only `SoftDeletingScope` is not enough if your application has other authorization scopes.
+Only the listed scopes are left out when the cache is built; all other Permission scopes, including `SoftDeletingScope`, stay in place. This is an application-specific opt-in: list a scope only if it must not constrain authorization.
 
-After correcting the scope or cache setup, [reset the affected permission cache](#manual-cache-reset) in each affected cache context. Clearing the cache on every request does not solve this problem: the next rebuild still uses whichever scopes are active at that time.
+Do not override the registrar to call `withoutGlobalScopes()` on the Permission query as a blanket workaround. It also removes intentional visibility restrictions and Laravel's `SoftDeletingScope` when your custom models use soft deletes. A soft-deleted permission can then still grant access through an assigned role.
+
+After correcting the scope or cache setup, [reset the affected permission cache](#manual-cache-reset) in each affected cache context. Clearing the cache on every request does not solve this problem: the next rebuild still uses whichever Permission scopes are active at that time.
 
 ## Automatic Cache Refresh Using Built-In Functions
 
