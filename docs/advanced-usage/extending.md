@@ -26,7 +26,7 @@ public function up()
 }
 ```
 
-Semi-Related article: [Adding Extra Fields To Pivot Table](https://quickadminpanel.com/blog/laravel-belongstomany-add-extra-fields-to-pivot-table/) (video)
+Semi-Related article: [Adding Extra Fields To Pivot Table](https://web.archive.org/web/20210525140651/https://blog.quickadminpanel.com/laravel-belongstomany-add-extra-fields-to-pivot-table/) (video)
 
 ## Adding a description to roles and permissions
 A common question is "how do I add a description for my roles or permissions?".
