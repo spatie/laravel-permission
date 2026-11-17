@@ -32,6 +32,13 @@ For an application that needs to keep a shared registry and cannot change its in
 
 Both lists are empty by default, so nothing is bypassed unless you list it. This is an application-specific opt-in: bypass a scope only if it must not constrain authorization, and leave all other scopes in place. If you need more control, a custom `PermissionRegistrar` can still override `getPermissionsWithRoles()`.
 
+Keep these points in mind when listing scopes:
+
+- A name that does not match a registered scope is ignored silently, so a typo leaves the scope applied. If the option seems to have no effect, check the registered names while the scope is active, for example with `array_keys((new \App\Models\Role)->getGlobalScopes())`.
+- Anonymous closure scopes registered without a name, such as `addGlobalScope(fn ($query) => ...)`, cannot be listed: Laravel keys them by an internal object id instead of a name. Register the scope with a name, or as a `Scope` class, to make it listable.
+- Filament names the scope after the panel. If a tenant-scoped Role resource is registered in more than one panel, each panel adds its own scope, so list one entry per panel, for example `['admin_tenancy', 'app_tenancy']`.
+- When a Role scope is listed, the `roles` relationship of a permission returned by the registrar (for example through `Permission::findByName()`) comes from the shared cache, so it also contains roles that scope would hide in the current request. Query `$permission->roles()` when you need a list filtered by the current request's scopes.
+
 Do not use `withoutGlobalScopes()` as a blanket workaround. It also removes intentional visibility restrictions and Laravel's `SoftDeletingScope` when your custom models use soft deletes. A soft-deleted permission can then still grant access through an assigned role. Preserving only `SoftDeletingScope` is not enough if your application has other authorization scopes.
 
 After correcting the scope or cache setup, [reset the affected permission cache](#manual-cache-reset) in each affected cache context. Clearing the cache on every request does not solve this problem: the next rebuild still uses whichever scopes are active at that time.

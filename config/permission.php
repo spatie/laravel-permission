@@ -225,6 +225,9 @@ return [
          * List such scopes here, by class name or by the name they were registered
          * with, to leave them out when the cache is built. Scopes that are not listed
          * always stay applied. Only list a scope that must not restrict authorization.
+         *
+         * A name that matches no registered scope is ignored silently, and anonymous
+         * closure scopes (addGlobalScope(fn ...)) cannot be listed. See the cache docs.
          */
 
         'without_global_scopes' => [

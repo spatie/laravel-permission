@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Scope;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\PermissionRegistrar;
@@ -127,6 +129,43 @@ describe('with configured scopes', function () {
         expect(($this->userInNextRequest)()->hasPermissionTo('edit-articles'))->toBeTrue();
 
         setPermissionsTeamId(1);
+        expect(($this->userInNextRequest)()->hasPermissionTo('edit-articles'))->toBeFalse();
+    });
+
+    it('leaves a role scope listed by class name out of the cache', function () {
+        ($this->giveBothRolesThePermission)();
+        $this->testUser->assignRole('testRole2');
+
+        $scope = new class implements Scope
+        {
+            public function apply(Builder $builder, Model $model): void
+            {
+                $builder->where('name', 'testRole');
+            }
+        };
+
+        config(['permission.cache.without_global_scopes.role' => [$scope::class]]);
+
+        $roleClass = app(Role::class)::class;
+        $roleClass::addGlobalScope($scope);
+        $this->registeredScopes[] = [$roleClass, $scope::class];
+
+        ($this->rebuildCache)();
+        ($this->removeScopes)();
+
+        expect(($this->userInNextRequest)()->hasPermissionTo('edit-articles'))->toBeTrue();
+    });
+
+    it('keeps applying a scope when the listed name does not match it', function () {
+        config(['permission.cache.without_global_scopes.role' => ['tennant']]);
+
+        ($this->giveBothRolesThePermission)();
+        $this->testUser->assignRole('testRole2');
+
+        ($this->addScope)(Role::class, 'tenant', fn ($query) => $query->where('name', 'testRole'));
+        ($this->rebuildCache)();
+        ($this->removeScopes)();
+
         expect(($this->userInNextRequest)()->hasPermissionTo('edit-articles'))->toBeFalse();
     });
 
