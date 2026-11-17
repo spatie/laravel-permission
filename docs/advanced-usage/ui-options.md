@@ -23,7 +23,7 @@ If you decide you need a UI, even if it's not for creating/editing role/permissi
 
 - [How to create a UI for managing the permissions and roles](http://www.qcode.in/easy-roles-and-permissions-in-laravel-5-4/)
 
-- [Laravel User Management for managing users, roles, permissions, departments and authorization](https://github.com/Mekaeil/LaravelUserManagement) by [Mekaeil](https://github.com/Mekaeil)
+- [Laravel User Management for managing users, roles, permissions, departments and authorization](https://github.com/MichaelAndish/LaravelUserManagement) by [MichaelAndish](https://github.com/MichaelAndish)
 
 - [Generating UI boilerplate using InfyOm](https://youtu.be/hlGu2pa1bdU) video tutorial by [Shailesh](https://github.com/shailesh-ladumor)
 
