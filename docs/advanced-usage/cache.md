@@ -18,7 +18,19 @@ Choose an approach that matches what the scope is intended to do:
 - If the scope only filters an administration UI, apply it to that UI's queries instead of registering it globally on Role or Permission. Check whether your integration, such as a tenant-scoped Filament resource, registers a global scope on these models.
 - If the scope must restrict authorization to the current tenant, use a separate permission cache namespace for each tenant. Every code path that reads or rebuilds the cache must select the matching tenant and cache context, including queue jobs and Artisan commands. Keep unscoped queries in a separate cache context too. See [Cache Identifier / Prefix](#cache-identifier--prefix) below for reinitializing the registrar when switching contexts. When switching teams, also unset the user's loaded `roles` and `permissions` relationships before the next permission check.
 
-For an application that needs to keep a shared registry and cannot change its integration's UI-only scope, a custom `PermissionRegistrar` can override `getPermissionsWithRoles()` and use Eloquent's `withoutGlobalScope()` to exclude only that known scope. Review the Permission query and the eager-loaded Role query separately. This is an application-specific opt-in: bypass a scope only if it must not constrain authorization, and leave all other scopes in place.
+For an application that needs to keep a shared registry and cannot change its integration's UI-only scope, list only that known scope in the `cache.without_global_scopes` option of `config/permission.php`. The Permission query and the eager-loaded Role query are configured separately. A scope is identified by its class name or by the name it was registered with. For a tenant-scoped Filament resource, that name is `{panel id}_tenancy`:
+
+```php
+'cache' => [
+    // ...
+    'without_global_scopes' => [
+        'permission' => [],
+        'role' => ['admin_tenancy'],
+    ],
+],
+```
+
+Both lists are empty by default, so nothing is bypassed unless you list it. This is an application-specific opt-in: bypass a scope only if it must not constrain authorization, and leave all other scopes in place. If you need more control, a custom `PermissionRegistrar` can still override `getPermissionsWithRoles()`.
 
 Do not use `withoutGlobalScopes()` as a blanket workaround. It also removes intentional visibility restrictions and Laravel's `SoftDeletingScope` when your custom models use soft deletes. A soft-deleted permission can then still grant access through an assigned role. Preserving only `SoftDeletingScope` is not enough if your application has other authorization scopes.
 

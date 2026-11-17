@@ -422,7 +422,13 @@ class PermissionRegistrar
 
     protected function getPermissionsWithRoles(): Collection
     {
-        return $this->permissionClass::select()->with('roles')->get();
+        $permissionScopes = (array) config('permission.cache.without_global_scopes.permission', []);
+        $roleScopes = (array) config('permission.cache.without_global_scopes.role', []);
+
+        return $this->permissionClass::select()
+            ->withoutGlobalScopes($permissionScopes)
+            ->with(['roles' => fn ($query) => $query->withoutGlobalScopes($roleScopes)])
+            ->get();
     }
 
     /**

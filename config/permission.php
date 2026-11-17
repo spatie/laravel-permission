@@ -215,5 +215,21 @@ return [
          */
 
         'store' => 'default',
+
+        /*
+         * The permission cache is one snapshot shared by every request. Global scopes
+         * on your Permission and Role models apply when it is built, so a scope that
+         * only exists for the current request (for example a tenant scope registered
+         * by an admin panel) would filter the snapshot for everyone else.
+         *
+         * List such scopes here, by class name or by the name they were registered
+         * with, to leave them out when the cache is built. Scopes that are not listed
+         * always stay applied. Only list a scope that must not restrict authorization.
+         */
+
+        'without_global_scopes' => [
+            'permission' => [],
+            'role' => [],
+        ],
     ],
 ];
