@@ -77,7 +77,7 @@ We publish all received postcards [on our company website](https://spatie.be/en/
 
 - [Chris Brown](https://github.com/drbyte)
 - [Freek Van der Herten](https://github.com/freekmurze)
-- [All Contributors](../../contributors)
+- [All Contributors](../../graphs/contributors)
 
 This package is heavily based on [Jeffrey Way](https://twitter.com/jeffrey_way)'s awesome [Laracasts](https://laracasts.com) lessons
 on [permissions and roles](https://laracasts.com/series/whats-new-in-laravel-5-1/episodes/16). His original code
