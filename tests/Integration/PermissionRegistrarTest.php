@@ -3,6 +3,7 @@
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -452,6 +453,91 @@ it('releases indexed models when clearing the in memory cache', function (string
     expect($reference->get())->toBeNull()
         ->and(SpatiePermission::findByName('edit-articles')->name)->toBe('edit-articles');
 })->with(['clearPermissionsCollection', 'forgetCachedPermissions', 'initializeCache']);
+
+it('does not let temporary Role global scopes poison the shared permission cache', function () {
+    $permission = SpatiePermission::findByName('edit-articles');
+    $visibleRole = SpatieRole::create(['name' => 'cache-visible-role']);
+    $hiddenRole = SpatieRole::create(['name' => 'cache-hidden-role']);
+    $permission->assignRole([$visibleRole, $hiddenRole]);
+
+    SpatieRole::addGlobalScope('tenant-filter', function ($query) use ($visibleRole) {
+        $query->where($query->getModel()->getTable().'.id', $visibleRole->getKey());
+    });
+
+    try {
+        $registrar = app(PermissionRegistrar::class);
+        $registrar->forgetCachedPermissions();
+        $registrar->clearPermissionsCollection();
+
+        $cached = $registrar->getPermissions(['name' => 'edit-articles', 'guard_name' => 'web'], true)->first();
+
+        expect($cached)->not->toBeNull()
+            ->and($cached->roles->pluck('name')->sort()->values()->all())
+            ->toBe(['cache-hidden-role', 'cache-visible-role']);
+    } finally {
+        SpatieRole::clearBootedModels();
+        SpatiePermission::clearBootedModels();
+    }
+});
+
+it('still honors SoftDeletes on Role when building the shared permission cache', function () {
+    Schema::table('roles', function ($table) {
+        if (! Schema::hasColumn('roles', 'deleted_at')) {
+            $table->softDeletes();
+        }
+    });
+
+    $softRole = new class extends SpatieRole
+    {
+        use SoftDeletes;
+
+        protected $table = 'roles';
+    };
+
+    $registrar = app(PermissionRegistrar::class);
+    $originalRoleClass = $registrar->getRoleClass();
+    $registrar->setRoleClass($softRole::class);
+
+    try {
+        $permission = SpatiePermission::findByName('edit-articles');
+        $activeRole = $softRole::query()->create(['name' => 'soft-active-role', 'guard_name' => 'web']);
+        $deletedRole = $softRole::query()->create(['name' => 'soft-deleted-role', 'guard_name' => 'web']);
+        $permission->roles()->sync([$activeRole->getKey(), $deletedRole->getKey()]);
+        $deletedRole->delete();
+
+        $registrar->forgetCachedPermissions();
+        $registrar->clearPermissionsCollection();
+
+        $cached = $registrar->getPermissions(['name' => 'edit-articles', 'guard_name' => 'web'], true)->first();
+
+        expect($cached->roles->pluck('name')->all())->toBe(['soft-active-role']);
+    } finally {
+        $registrar->setRoleClass($originalRoleClass);
+        SpatieRole::clearBootedModels();
+        SpatiePermission::clearBootedModels();
+    }
+});
+
+it('still honors Permission global scopes when building the shared permission cache', function () {
+    $blocked = SpatiePermission::create(['name' => 'scoped-out-permission']);
+    $blocked->assignRole($this->testUserRole);
+
+    SpatiePermission::addGlobalScope('hide-scoped-out', function ($query) {
+        $query->where($query->getModel()->getTable().'.name', '!=', 'scoped-out-permission');
+    });
+
+    try {
+        $registrar = app(PermissionRegistrar::class);
+        $registrar->forgetCachedPermissions();
+        $registrar->clearPermissionsCollection();
+
+        expect($registrar->getPermissions(['name' => 'scoped-out-permission', 'guard_name' => 'web'], true))->toBeEmpty()
+            ->and($registrar->getPermissions(['name' => 'edit-articles', 'guard_name' => 'web'], true))->toHaveCount(1);
+    } finally {
+        SpatiePermission::clearBootedModels();
+        SpatieRole::clearBootedModels();
+    }
+});
 
 class LookupPermission extends SpatiePermission
 {

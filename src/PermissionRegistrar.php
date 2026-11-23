@@ -10,6 +10,8 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\PermissionsTeamResolver;
 use Spatie\Permission\Contracts\Role;
@@ -422,7 +424,38 @@ class PermissionRegistrar
 
     protected function getPermissionsWithRoles(): Collection
     {
-        return $this->permissionClass::select()->with('roles')->get();
+        // Permission query keeps global scopes (soft-deletes, app-level exclusions).
+        // Role eager-load strips request-level scopes (e.g. Filament tenancy) so the
+        // shared cache is not poisoned, while SoftDeletes on Role still applies.
+        return $this->permissionClass::select()
+            ->with(['roles' => fn (Relation $query) => $this->withoutRequestLevelRoleScopes($query)])
+            ->get();
+    }
+
+    /**
+     * Remove non-SoftDeleting global scopes from the roles relation query.
+     *
+     * The permission registry cache is process-wide. Tenant/panel scopes on Role
+     * must not filter which roles are stored for each permission. Soft-deleted
+     * roles should still be excluded when the Role model uses SoftDeletes.
+     */
+    protected function withoutRequestLevelRoleScopes(Relation $query): void
+    {
+        $softDeletingScope = null;
+
+        foreach ($query->getModel()->getGlobalScopes() as $identifier => $scope) {
+            if ($scope instanceof SoftDeletingScope || $identifier === SoftDeletingScope::class) {
+                $softDeletingScope = $scope instanceof SoftDeletingScope ? $scope : new SoftDeletingScope;
+
+                break;
+            }
+        }
+
+        $query->withoutGlobalScopes();
+
+        if ($softDeletingScope !== null) {
+            $query->withGlobalScope(SoftDeletingScope::class, $softDeletingScope);
+        }
     }
 
     /**
