@@ -8,11 +8,6 @@ use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Tests\TestSupport\TestModels\User;
 
-/*
- * The permission cache is one snapshot shared by every request. These tests build it
- * in one "request" and read it in another, with different global scopes active.
- */
-
 beforeEach(function () {
     $this->registeredScopes = [];
 
@@ -39,7 +34,6 @@ beforeEach(function () {
         app(PermissionRegistrar::class)->getPermissions();
     };
 
-    // A later request starts without the in-memory collection and without loaded relations.
     $this->userInNextRequest = function (): User {
         app(PermissionRegistrar::class)->clearPermissionsCollection();
 
@@ -66,7 +60,13 @@ describe('by default', function () {
         expect(($this->userInNextRequest)()->hasPermissionTo('edit-articles'))->toBeFalse();
     });
 
-    it('lets a role scope deny a user whose roles were already loaded', function () {
+    it('lets a role scope deny a user whose roles were already loaded', function (bool $hasScopeConfig) {
+        if (! $hasScopeConfig) {
+            $cacheConfig = config('permission.cache');
+            unset($cacheConfig['without_global_scopes']);
+            config(['permission.cache' => $cacheConfig]);
+        }
+
         app(Role::class)->findByName('testRole')->givePermissionTo('edit-articles');
         $this->testUser->assignRole('testRole');
 
@@ -74,10 +74,10 @@ describe('by default', function () {
 
         ($this->addScope)(Role::class, 'restricted', fn ($query) => $query->where('name', '!=', 'testRole'));
         ($this->rebuildCache)();
-        app(PermissionRegistrar::class)->clearPermissionsCollection();
 
-        expect($user->can('edit-articles'))->toBeFalse();
-    });
+        expect(($this->userInNextRequest)()->can('edit-articles'))->toBeFalse()
+            ->and($user->can('edit-articles'))->toBeFalse();
+    })->with(['empty scope lists' => true, 'previously published config' => false]);
 
     it('lets a permission scope filter the cache', function () {
         ($this->giveBothRolesThePermission)();
@@ -212,7 +212,7 @@ describe('with configured scopes', function () {
         expect(($this->userInNextRequest)()->checkPermissionTo('edit-articles'))->toBeFalse();
     });
 
-    it('keeps soft deletes applied', function () {
+    it('keeps soft deletes applied to fresh and preloaded users', function (string $contract, string $name) {
         $this->setUpCustomModels();
         config([
             'permission.cache.without_global_scopes.permission' => ['tenant'],
@@ -222,7 +222,9 @@ describe('with configured scopes', function () {
         ($this->giveBothRolesThePermission)();
         $this->testUser->assignRole('testRole2');
 
-        app(Permission::class)->findByName('edit-articles')->delete();
+        $loadedUser = User::query()->with('roles')->findOrFail($this->testUser->getKey());
+
+        app($contract)->findByName($name)->delete();
 
         ($this->addScope)(Role::class, 'tenant', fn ($query) => $query->where('name', 'testRole'));
         ($this->rebuildCache)();
@@ -231,6 +233,10 @@ describe('with configured scopes', function () {
         $user = ($this->userInNextRequest)();
 
         expect($user->checkPermissionTo('edit-articles'))->toBeFalse();
-        expect($user->can('edit-articles'))->toBeFalse();
-    });
+        expect($user->can('edit-articles'))->toBeFalse()
+            ->and($loadedUser->can('edit-articles'))->toBeFalse();
+    })->with([
+        'deleted permission' => [Permission::class, 'edit-articles'],
+        'deleted role' => [Role::class, 'testRole2'],
+    ]);
 });

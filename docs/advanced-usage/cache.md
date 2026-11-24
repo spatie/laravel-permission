@@ -32,6 +32,8 @@ For an application that needs to keep a shared registry and cannot change its in
 
 Both lists are empty by default, so nothing is bypassed unless you list it. This is an application-specific opt-in: bypass a scope only if it must not constrain authorization, and leave all other scopes in place. If you need more control, a custom `PermissionRegistrar` can still override `getPermissionsWithRoles()`.
 
+This option only changes the queries used to build the cache. It does not remove scopes from the user's `roles()` relationship or reload relationships that are already loaded. If a listed Role scope is still active during a permission check, a fresh user can be denied while a user whose roles were loaded before the scope became active is allowed. For consistent checks, keep UI-only scopes off the user's role queries too. Do not list a scope that enforces tenant access.
+
 Keep these points in mind when listing scopes:
 
 - A name that does not match a registered scope is ignored silently, so a typo leaves the scope applied. If the option seems to have no effect, check the registered names while the scope is active, for example with `array_keys((new \App\Models\Role)->getGlobalScopes())`.
