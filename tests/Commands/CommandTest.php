@@ -308,6 +308,17 @@ it('warns when creating a role with team id but teams disabled', function () {
     expect(Role::where('name', 'new-role')->get())->toHaveCount(0);
 });
 
+it('does not change the team id when creating a role with team id but teams disabled', function () {
+    setPermissionsTeamId(null);
+
+    Artisan::call('permission:create-role', [
+        'name' => 'new-role',
+        '--team-id' => 7,
+    ]);
+
+    expect(getPermissionsTeamId())->toBeNull();
+});
+
 it('warns when creating a role with team id and the role already exists on the global team', function () {
     config()->set('permission.teams', true);
     app(PermissionRegistrar::class)->initializeCache();
