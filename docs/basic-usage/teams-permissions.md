@@ -21,7 +21,10 @@ Teams permissions can be enabled in the permission config file:
 Also, if you want to use a custom foreign key for teams you set it in the permission config file:
 ```php
 // config/permission.php
-'team_foreign_key' => 'custom_team_id',
+'column_names' => [
+    // ...
+    'team_foreign_key' => 'custom_team_id',
+],
 ```
 
 ## Working with Teams Permissions

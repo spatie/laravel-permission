@@ -85,6 +85,26 @@ The default cache key is `spatie.permission.cache`.
 We recommend not changing the cache "key" name. Usually changing it is a bad idea. More likely setting the cache `prefix` is better, as mentioned below.
 
 
+### Columns Excluded From The Cache
+
+To keep the cache small, some columns of the `permissions` and `roles` tables are left out of it. By default these are `created_at`, `updated_at` and `deleted_at`.
+
+You can change the list by adding `column_names_except` to the `cache` array in `config/permission.php`. For example, to also leave out a large `description` column you added to your tables:
+
+```php
+'cache' => [
+    // ...
+    'column_names_except' => ['created_at', 'updated_at', 'deleted_at', 'description'],
+],
+```
+
+Permission models returned by `findByName()`, `findById()` and permission checks are loaded from the cache, so they will not have the excluded attributes. If you need those values, query the model from the database instead.
+
+Never exclude the primary key, `name`, `guard_name`, or (when using teams) the team foreign key: the package needs them to look up permissions and roles.
+
+After changing this setting, [reset the cache](#manual-cache-reset) so it is rebuilt with the new columns.
+
+
 ### Cache Identifier / Prefix
 
 Laravel Tip: If you are leveraging a caching service such as `redis` or `memcached` and there are other sites running on your server, you could run into cache clashes between apps. 
