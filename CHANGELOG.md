@@ -2,6 +2,23 @@
 
 All notable changes to `laravel-permission` will be documented in this file
 
+## 8.5.1 - 2026-11-26
+
+### Fixed
+
+- Preserve the active team context when `permission:create-role` is called with `--team-id` while teams are disabled. The command still warns and skips role creation, and normal role creation without teams is unchanged. Thanks to @shalinidevi-dev in #2993.
+- Cover both null and existing team contexts in the command regression tests.
+
+### Documentation
+
+- Correct the `HasAssignedModels` config comment and the custom team foreign key example.
+- Document `permission.cache.column_names_except`, its defaults, and the attributes that must remain cached.
+- Include the documentation-only global-scope/cache-isolation guidance and dead-link fixes already on `main` (#2985, #2987).
+
+No breaking changes or dependency requirement changes.
+
+**Full Changelog**: https://github.com/spatie/laravel-permission/compare/8.5.0...8.5.1
+
 ## 8.5.0 - 2026-11-06
 
 ### Added
@@ -117,6 +134,7 @@ hasAnyRole("'writer|admin'")     // same
 hasAnyRole('"writer|admin"')     // same
 hasAnyRole("'writer|admin")      // changed: mismatched apostrophe is removed
 hasAnyRole("'writer|admin\"")    // changed: mismatched quote is removed
+
 
 
 
@@ -1448,6 +1466,7 @@ The following changes are not "breaking", but worth making the updates to your a
 
 
 
+
 ```
 1. Also this is a good time to point out that now with v2.25.0 and v2.26.0 most permission-cache-reset scenarios may no longer be needed in your app, so it's worth reviewing those cases, as you may gain some app speed improvement by removing unnecessary cache resets.
 
@@ -1495,6 +1514,7 @@ The following changes are not "breaking", but worth making the updates to your a
 @elserole('roleB')
  // user hasRole 'roleB' but not 'roleA'
 @endrole
+
 
 
 
