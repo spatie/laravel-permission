@@ -6,12 +6,15 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Tests\TestSupport\TestModels\User;
 
-it('can create a role', function () {
+it('can create a role', function (?int $teamId) {
+    setPermissionsTeamId($teamId);
+
     Artisan::call('permission:create-role', ['name' => 'new-role']);
 
     expect(Role::where('name', 'new-role')->get())->toHaveCount(1);
     expect(Role::where('name', 'new-role')->first()->permissions)->toHaveCount(0);
-});
+    expect(getPermissionsTeamId())->toBe($teamId);
+})->with([null, 42]);
 
 it('can create a role with a specific guard', function () {
     Artisan::call('permission:create-role', [
@@ -307,6 +310,17 @@ it('warns when creating a role with team id but teams disabled', function () {
     expect($output)->toContain('Teams feature disabled, argument --team-id has no effect');
     expect(Role::where('name', 'new-role')->get())->toHaveCount(0);
 });
+
+it('does not change the team id when creating a role with team id but teams disabled', function (?int $teamId) {
+    setPermissionsTeamId($teamId);
+
+    Artisan::call('permission:create-role', [
+        'name' => 'new-role',
+        '--team-id' => 7,
+    ]);
+
+    expect(getPermissionsTeamId())->toBe($teamId);
+})->with([null, 42]);
 
 it('warns when creating a role with team id and the role already exists on the global team', function () {
     config()->set('permission.teams', true);

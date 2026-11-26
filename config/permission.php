@@ -38,9 +38,9 @@ return [
         'team' => null,
 
         /*
-         * When using the "HasModels" trait and passing raw IDs to syncModels,
-         * attachModels, or detachModels, this model class will be used to
-         * resolve those IDs. If null, defaults to the guard's model.
+         * When using the "HasAssignedModels" trait and passing raw IDs to
+         * assignToModels, removeFromModels, or syncModels, this model class
+         * will be used to resolve those IDs. If null, defaults to the guard's model.
          */
         'default_model' => null,
     ],
@@ -215,5 +215,14 @@ return [
          */
 
         'store' => 'default',
+
+        /*
+         * Columns of the permissions and roles tables that are left out of the
+         * cache, to keep it small. Models loaded from the cache will not have
+         * these attributes. Never exclude the primary key, `name`, `guard_name`
+         * or the team foreign key.
+         */
+
+        // 'column_names_except' => ['created_at', 'updated_at', 'deleted_at'],
     ],
 ];
