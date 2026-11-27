@@ -8,6 +8,7 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Tests\TestSupport\TestModels\TestRolePermissionsEnum;
 use Spatie\Permission\Tests\TestSupport\TestModels\User;
 use Spatie\Permission\Tests\TestSupport\TestModels\WildcardPermission;
+use Spatie\Permission\WildcardPermission as BaseWildcardPermission;
 
 it('can check wildcard permission', function () {
     app('config')->set('permission.enable_wildcard_permission', true);
@@ -329,4 +330,49 @@ it('throws exception when permission id not exists', function () {
 
     expect(fn () => $user->hasPermissionTo(6))
         ->toThrow(PermissionDoesNotExist::class);
+});
+
+it('builds the expected wildcard index', function () {
+    app('config')->set('permission.enable_wildcard_permission', true);
+
+    $user = User::create(['email' => 'user@test.com']);
+
+    $user->givePermissionTo([
+        Permission::create(['name' => 'posts.create,edit.own']),
+        Permission::create(['name' => 'news.*']),
+    ]);
+
+    expect((new BaseWildcardPermission($user))->getIndex())->toBe([
+        'web' => [
+            'posts' => [
+                'create' => ['own' => ['' => true]],
+                'edit' => ['own' => ['' => true]],
+            ],
+            'news' => ['*' => ['' => true]],
+        ],
+    ]);
+});
+
+it('builds the wildcard index in linear time for deep permissions', function () {
+    app('config')->set('permission.enable_wildcard_permission', true);
+
+    $user = User::create(['email' => 'user@test.com']);
+    $user->givePermissionTo(Permission::create(['name' => 'a.b.c.d.e.f.g.h.i.j']));
+
+    $wildcard = new class($user) extends BaseWildcardPermission
+    {
+        public int $calls = 0;
+
+        protected function buildIndex(array $index, array $parts, string $permission): array
+        {
+            $this->calls++;
+
+            return parent::buildIndex($index, $parts, $permission);
+        }
+    };
+
+    $wildcard->getIndex();
+
+    // One call per part, plus one for the end of the permission.
+    expect($wildcard->calls)->toBe(11);
 });
