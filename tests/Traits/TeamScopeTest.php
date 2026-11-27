@@ -5,6 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Exceptions\TeamModelNotConfigured;
 use Spatie\Permission\Exceptions\TeamsNotEnabled;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Tests\TestSupport\TestModels\Team;
 use Spatie\Permission\Tests\TestSupport\TestModels\User;
@@ -69,6 +70,93 @@ it('returns the teams a user belongs to via the teams relation', function () {
 
     expect($teams)->toHaveCount(2);
     expect($teams->pluck('id')->all())->toEqualCanonicalizing([1, 2]);
+});
+
+it('runs callbacks in another team context and restores the original context', function () {
+    Team::create(['id' => 1, 'name' => 'Team One']);
+    Team::create(['id' => 2, 'name' => 'Team Two']);
+
+    $user = User::create(['email' => 'user1@test.com']);
+
+    setPermissionsTeamId(1);
+    $user->assignRole('testRole');
+    $user->load('roles');
+
+    setPermissionsTeamId(2);
+    Role::create(['name' => 'team-two-role']);
+    $user->assignRole('team-two-role');
+
+    setPermissionsTeamId(1);
+
+    $roleNames = runOnAnotherTeam(2, $user, function () use ($user) {
+        $user->load('roles');
+
+        return $user->roles->pluck('name')->all();
+    });
+
+    expect($roleNames)->toBe(['team-two-role'])
+        ->and(getPermissionsTeamId())->toBe(1);
+
+    $user->load('roles');
+
+    expect($user->roles->pluck('name')->all())->toBe(['testRole']);
+});
+
+it('accepts a team model instance', function () {
+    Team::create(['id' => 1, 'name' => 'Team One']);
+    $team = Team::create(['id' => 2, 'name' => 'Team Two']);
+    setPermissionsTeamId(1);
+
+    $teamId = runOnAnotherTeam($team, $this->testUser, fn () => getPermissionsTeamId());
+    $resolvedTeam = resolveTeam($team);
+
+    expect($resolvedTeam)->toBe($team)
+        ->and($teamId)->toBe(2)
+        ->and(getPermissionsTeamId())->toBe(1);
+});
+
+it('rejects a model that is not the configured team model', function () {
+    Team::create(['id' => 2, 'name' => 'Team Two']);
+    $user = User::create(['id' => 2, 'email' => 'user2@test.com']);
+
+    expect(fn () => runOnAnotherTeam($user, $this->testUser, fn () => null))
+        ->toThrow(InvalidArgumentException::class, 'The team must be an instance of the configured team model.');
+});
+
+it('validates team models through resolveTeam', function () {
+    $user = User::create(['id' => 2, 'email' => 'user2@test.com']);
+
+    expect(fn () => resolveTeam($user))
+        ->toThrow(InvalidArgumentException::class, 'The team must be an instance of the configured team model.');
+});
+
+it('restores the original team context when the callback throws', function () {
+    Team::create(['id' => 1, 'name' => 'Team One']);
+    Team::create(['id' => 2, 'name' => 'Team Two']);
+    setPermissionsTeamId(1);
+
+    expect(fn () => runOnAnotherTeam(2, $this->testUser, fn () => throw new RuntimeException('Callback failed')))
+        ->toThrow(RuntimeException::class, 'Callback failed');
+
+    expect(getPermissionsTeamId())->toBe(1);
+});
+
+it('throws when the requested team does not exist', function () {
+    Team::create(['id' => 1, 'name' => 'Team One']);
+
+    expect(fn () => runOnAnotherTeam(2, $this->testUser, fn () => null))
+        ->toThrow(InvalidArgumentException::class, 'Team with ID 2 does not exist.');
+});
+
+it('validates team ids through resolveTeam', function () {
+    $team = Team::create(['id' => 1, 'name' => 'Team One']);
+
+    expect(fn () => resolveTeam(2))
+        ->toThrow(InvalidArgumentException::class, 'Team with ID 2 does not exist.');
+
+    expect(resolveTeam(1))->toBeInstanceOf(Team::class)
+        ->and(resolveTeam(1)->getKey())->toBe(1)
+        ->and(resolveTeam($team))->toBe($team);
 });
 
 it('can scope users by team using an id', function () {
