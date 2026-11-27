@@ -46,6 +46,44 @@ There is also a `show` command to show a table of roles and permissions per guar
 php artisan permission:show
 ```
 
+## Exporting role and permission names
+
+The `export` command writes the names of all roles and permissions to a JSON file. This is useful when a separate frontend (or any other consumer) needs to know which names exist, for example to generate types or to validate permission checks at build time.
+
+```bash
+php artisan permission:export
+```
+
+By default the file is written to `resources/js/permissions.json`. The names are sorted, duplicates (e.g. the same name on multiple guards or teams) are removed, and the output is pretty-printed with a trailing newline so the file produces clean diffs in version control:
+
+```json
+{
+    "permissions": [
+        "edit articles",
+        "publish articles"
+    ],
+    "roles": [
+        "admin",
+        "writer"
+    ]
+}
+```
+
+You can write the file to a different location with the `--path` option, limit the export to a single guard with `--guard`, and export only one of the two lists with `--only`:
+
+```bash
+php artisan permission:export --path=../frontend/src/permissions.json
+php artisan permission:export --guard=api
+php artisan permission:export --only=permissions
+```
+
+Because the output is deterministic, you can run the command in your CI pipeline after migrating and seeding, and fail the build when the committed file is out of date:
+
+```bash
+php artisan permission:export
+git diff --exit-code resources/js/permissions.json
+```
+
 ## Resetting the Cache
 
 When you use the built-in functions for manipulating roles and permissions, the cache is automatically reset for you, and relations are automatically reloaded for the current model record.
