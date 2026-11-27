@@ -55,6 +55,8 @@ class WildcardPermission implements Wildcard
                 $parts,
                 $permission,
             );
+
+            return $index;
         }
 
         $subParts = explode(static::SUBPART_DELIMITER, $part);
